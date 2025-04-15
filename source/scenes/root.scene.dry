@@ -226,7 +226,7 @@ Q.old_middle_qol = 100;
 Q.new_middle_qol = 100;
 
 Q.classes = ['workers', 'old_middle', 'new_middle', 'rural', 'unemployed', 'catholics'];
-Q.parties = ['spd', 'kpd', 'z', 'ddp', 'dvp', 'dnvp', 'nsdap', 'other'];
+Q.parties = ['psoe', '2015 ', 'z', 'ddp', 'dvp', 'dnvp', 'nsdap', 'other'];
 
 // TODO: add 'sapd' later on
 Q.sapd_formed = 0;
@@ -330,9 +330,9 @@ Q.economic_records = [];
 
 // State of the government
 Q.president = "Hindenburg";
-// starting chancellor: Wilhelm Marx
-Q.chancellor = "Marx";
-Q.chancellor_party = 'Z';
+// starting chancellor: Mariano Rajoy
+Q.chancellor = "Mariano Rajoy";
+Q.chancellor_party = 'PP';
 Q.spd_in_government = 0;
 Q.z_in_government = 1;
 Q.ddp_in_government = 0;
