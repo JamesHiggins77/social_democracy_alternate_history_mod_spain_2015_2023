@@ -816,6 +816,15 @@ Q.spain_podemos_relation = Math.max(0, Math.min(100, Q.spain_podemos_relation));
 Q.spain_cs_relation = Math.max(0, Math.min(100, Q.spain_cs_relation));
 Q.spain_pp_relation = Math.max(0, Math.min(100, Q.spain_pp_relation));
 Q.spain_regional_trust = Math.max(0, Math.min(100, Q.spain_regional_trust));
+if (Q.spain_podemos_talks && Q.spain_cs_talks) {
+    Q.spain_negotiation_label = "both Podemos and Ciudadanos";
+} else if (Q.spain_podemos_talks) {
+    Q.spain_negotiation_label = "Podemos";
+} else if (Q.spain_cs_talks) {
+    Q.spain_negotiation_label = "Ciudadanos";
+} else {
+    Q.spain_negotiation_label = "neither party";
+}
 !}
 
 = The balance of power
@@ -824,7 +833,7 @@ Q.spain_regional_trust = Math.max(0, Math.min(100, Q.spain_regional_trust));
 
 You entered the crisis with the following strategy: **[+ spain_posture +]**.
 
-Your first negotiating priority was: **[? if spain_podemos_talks and spain_cs_talks: keeping both channels open [? else if spain_podemos_talks: Podemos [? else if spain_cs_talks: Ciudadanos [? else: neither party ?] ?]**.
+Your first negotiating priority was: **[+ spain_negotiation_label +]**.
 
 Your programme priority was: **[+ spain_policy_offer +]**.
 
