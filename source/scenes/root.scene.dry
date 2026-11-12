@@ -10,6 +10,7 @@ go-to: start_menu_2
 
 @start_menu_2
 
+- @spain_chapter_1: Spain 2015 — The Impossible Parliament
 - @start: Start game
 - @election_simulation: Election simulation
 - @credits: Credits
@@ -630,3 +631,215 @@ It is a pivotal moment for Spain’s future. After years of economic uncertainty
 Now, the task of Social Democracy is to prepare for the next election; The Spanish Socialist Worker's Party (PSOE) faces significant internal challenges, it is losing potential voters to Podemos and Plural Left (iu) on its left, which have capitalized on discontent with traditional political structures. To the right, Ciudadanos (C's) is beginning to attracting more centrist voters, further fragmenting the political landscape. Additionally, the growing influence of separatist parties is weakening PSOE's grip on regional votes, as more Catalans, Basques and Galacians turn to parties advocating for independence or greater autonomy. These divisions will make it harder for PSOE to achieve a majority in the upcoming elections.
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SPAIN 2015 — CHAPTER I: THE IMPOSSIBLE PARLIAMENT
+// A self-contained playable prologue. It deliberately does not invoke the
+// inherited Weimar demographic/election simulation.
+////////////////////////////////////////////////////////////////////////////////
+
+@spain_chapter_1
+title: Spain — The Impossible Parliament
+new-page: true
+on-arrival: {!
+Q.spain_chapter = 1;
+Q.spain_month = 12;
+Q.spain_year = 2015;
+Q.spain_pp_seats = 123;
+Q.spain_psoe_seats = 90;
+Q.spain_podemos_seats = 69;
+Q.spain_cs_seats = 40;
+Q.spain_other_seats = 28;
+Q.spain_psoe_unity = 62;
+Q.spain_sanchez_authority = 58;
+Q.spain_member_morale = 55;
+Q.spain_pp_relation = 20;
+Q.spain_podemos_relation = 35;
+Q.spain_cs_relation = 45;
+Q.spain_regional_trust = 50;
+Q.spain_posture = "undecided";
+Q.spain_podemos_talks = 0;
+Q.spain_cs_talks = 0;
+Q.spain_policy_offer = "unwritten";
+Q.spain_investiture = "unresolved";
+Q.spain_turns = 0;
+!}
+set-bg: img/map_2.jpg
+
+= December 2015 — The morning after
+
+The general election has broken the old two-party pattern. Mariano Rajoy's People's Party has finished first, but it is far short of a majority. The PSOE is second. Podemos and Ciudadanos have both entered Congress as major forces.
+
+You are **Pedro Sánchez**, Secretary-General of the PSOE. You have the formal authority to lead the party, but not an unlimited mandate. Regional presidents, former leaders, senior MPs and party members all have their own ideas about what should happen next.
+
+The King is expected to consult party leaders. Rajoy wants to remain Prime Minister. If he cannot secure enough support, the initiative may pass to you — but the numbers are difficult.
+
+**Congress of Deputies — 350 seats**
+
+| Party or group | Seats |
+|---|---:|
+| PP | 123 |
+| PSOE | 90 |
+| Podemos and regional alliances | 69 |
+| Ciudadanos | 40 |
+| Other territorial and regional groups | 28 |
+| **Total** | **350** |
+
+An absolute majority is 176. In a second investiture ballot, a candidate needs more votes in favour than against; abstentions can therefore matter enormously.
+
+The first decision is how you want to position the PSOE.
+
+- @spain_posture_responsible: The responsible opposition
+- @spain_posture_alternative: Build an alternative government
+- @spain_posture_stability: Put institutional stability first
+
+@spain_posture_responsible
+on-arrival: {! Q.spain_posture = "responsible opposition"; Q.spain_psoe_unity += 4; Q.spain_sanchez_authority += 2; Q.spain_member_morale += 3; !}
+go-to: spain_january
+
+@spain_posture_alternative
+on-arrival: {! Q.spain_posture = "alternative government"; Q.spain_podemos_relation += 12; Q.spain_cs_relation -= 8; Q.spain_member_morale += 7; Q.spain_psoe_unity -= 5; Q.spain_sanchez_authority += 4; !}
+go-to: spain_january
+
+@spain_posture_stability
+on-arrival: {! Q.spain_posture = "institutional stability"; Q.spain_pp_relation += 12; Q.spain_cs_relation += 5; Q.spain_member_morale -= 8; Q.spain_psoe_unity += 3; Q.spain_sanchez_authority -= 3; !}
+go-to: spain_january
+
+@spain_january
+title: January 2016 — The numbers game
+new-page: true
+set-bg: img/map_2.jpg
+
+= January 2016 — The numbers game
+
+Rajoy has struggled to secure the support required for investiture. The King is weighing the next steps. Inside the PSOE, the question is no longer whether you should speak to other parties, but which conversations you are prepared to have.
+
+Your advisers disagree.
+
+**Antonio Hernando**, the parliamentary spokesperson, urges you to keep the arithmetic at the centre of every discussion. **Meritxell Batet** argues that a serious programme must address constitutional reform. **Jordi Sevilla** believes a credible economic offer could open doors with Ciudadanos. **Rodolfo Ares** warns that regional parties cannot be treated as interchangeable votes.
+
+Your first political action is to choose the negotiating channel to prioritise.
+
+- @spain_jan_podemos: Open a serious channel with Podemos
+- @spain_jan_cs: Explore an agreement with Ciudadanos
+- @spain_jan_both: Keep both channels open
+- @spain_jan_none: Refuse premature coalition talks
+
+@spain_jan_podemos
+on-arrival: {! Q.spain_podemos_talks = 1; Q.spain_podemos_relation += 12; Q.spain_cs_relation -= 10; Q.spain_member_morale += 4; Q.spain_psoe_unity -= 3; !}
+go-to: spain_february
+
+@spain_jan_cs
+on-arrival: {! Q.spain_cs_talks = 1; Q.spain_cs_relation += 12; Q.spain_podemos_relation -= 10; Q.spain_member_morale -= 3; Q.spain_psoe_unity += 2; !}
+go-to: spain_february
+
+@spain_jan_both
+on-arrival: {! Q.spain_podemos_talks = 1; Q.spain_cs_talks = 1; Q.spain_podemos_relation += 5; Q.spain_cs_relation += 5; Q.spain_psoe_unity -= 5; Q.spain_sanchez_authority += 2; !}
+go-to: spain_february
+
+@spain_jan_none
+on-arrival: {! Q.spain_psoe_unity += 5; Q.spain_sanchez_authority -= 3; Q.spain_member_morale -= 2; !}
+go-to: spain_february
+
+@spain_february
+title: February 2016 — A country waiting
+new-page: true
+set-bg: img/map_2.jpg
+
+= February 2016 — A country waiting
+
+The negotiations have begun to take shape, but every possible arrangement has a weakness. A PSOE–Ciudadanos agreement would still need additional votes or abstentions. A government dependent on Podemos would face resistance from Ciudadanos and parts of your own party. A broad agreement may be arithmetically attractive but politically unstable.
+
+The Federal Executive wants to know what programme you are prepared to defend. Your choice will shape the next round of negotiations.
+
+- @spain_offer_social: Put jobs, labour rights and public services first
+- @spain_offer_reform: Prioritise anti-corruption and constitutional reform
+- @spain_offer_economy: Lead with fiscal and economic credibility
+- @spain_offer_compromise: Offer a broad minimum programme
+
+@spain_offer_social
+on-arrival: {! Q.spain_policy_offer = "social programme"; Q.spain_podemos_relation += 8; Q.spain_member_morale += 5; Q.spain_cs_relation -= 4; !}
+go-to: spain_investiture
+
+@spain_offer_reform
+on-arrival: {! Q.spain_policy_offer = "institutional reform"; Q.spain_cs_relation += 7; Q.spain_podemos_relation += 3; Q.spain_sanchez_authority += 2; !}
+go-to: spain_investiture
+
+@spain_offer_economy
+on-arrival: {! Q.spain_policy_offer = "economic credibility"; Q.spain_cs_relation += 7; Q.spain_pp_relation += 3; Q.spain_member_morale -= 2; !}
+go-to: spain_investiture
+
+@spain_offer_compromise
+on-arrival: {! Q.spain_policy_offer = "minimum programme"; Q.spain_psoe_unity += 6; Q.spain_sanchez_authority += 3; Q.spain_podemos_relation -= 2; Q.spain_cs_relation -= 2; !}
+go-to: spain_investiture
+
+@spain_investiture
+title: The investiture question
+new-page: true
+set-bg: img/map_2.jpg
+
+= The investiture question
+
+You must now decide what the PSOE will do as the parliamentary process continues. The choice is not merely tactical: it will define your leadership and the party's position for the months ahead.
+
+- @spain_vote_against: Vote against Rajoy and prepare an alternative
+- @spain_abstain: Permit a PP government through abstention
+- @spain_seek_investiture: Put yourself forward as an alternative candidate
+- @spain_continue_deadlock: Refuse both routes and risk another election
+
+@spain_vote_against
+on-arrival: {! Q.spain_investiture = "vote against Rajoy"; Q.spain_member_morale += 5; Q.spain_pp_relation -= 8; Q.spain_sanchez_authority += 2; !}
+go-to: spain_chapter_end
+
+@spain_abstain
+on-arrival: {! Q.spain_investiture = "abstain to permit a PP government"; Q.spain_member_morale -= 15; Q.spain_psoe_unity -= 8; Q.spain_pp_relation += 8; Q.spain_sanchez_authority -= 8; !}
+go-to: spain_chapter_end
+
+@spain_seek_investiture
+on-arrival: {! Q.spain_investiture = "seek an alternative investiture"; Q.spain_sanchez_authority += 7; Q.spain_member_morale += 6; Q.spain_psoe_unity -= 4; !}
+go-to: spain_chapter_end
+
+@spain_continue_deadlock
+on-arrival: {! Q.spain_investiture = "continue the parliamentary deadlock"; Q.spain_member_morale -= 3; Q.spain_sanchez_authority -= 4; Q.spain_psoe_unity -= 2; !}
+go-to: spain_chapter_end
+
+@spain_chapter_end
+title: Chapter I — The balance of power
+new-page: true
+set-bg: img/map_2.jpg
+on-arrival: {!
+Q.spain_psoe_unity = Math.max(0, Math.min(100, Q.spain_psoe_unity));
+Q.spain_sanchez_authority = Math.max(0, Math.min(100, Q.spain_sanchez_authority));
+Q.spain_member_morale = Math.max(0, Math.min(100, Q.spain_member_morale));
+Q.spain_podemos_relation = Math.max(0, Math.min(100, Q.spain_podemos_relation));
+Q.spain_cs_relation = Math.max(0, Math.min(100, Q.spain_cs_relation));
+Q.spain_pp_relation = Math.max(0, Math.min(100, Q.spain_pp_relation));
+Q.spain_regional_trust = Math.max(0, Math.min(100, Q.spain_regional_trust));
+!}
+
+= The balance of power
+
+**End of Chapter I — February 2016**
+
+You entered the crisis with the following strategy: **[+ spain_posture +]**.
+
+Your first negotiating priority was: **[? if spain_podemos_talks and spain_cs_talks: keeping both channels open [? else if spain_podemos_talks: Podemos [? else if spain_cs_talks: Ciudadanos [? else: neither party ?] ?]**.
+
+Your programme priority was: **[+ spain_policy_offer +]**.
+
+Your final parliamentary decision was: **[+ spain_investiture +]**.
+
+**Political position**
+
+- PSOE unity: [+ spain_psoe_unity +]/100
+- Sánchez's authority: [+ spain_sanchez_authority +]/100
+- Member morale: [+ spain_member_morale +]/100
+- Relationship with Podemos: [+ spain_podemos_relation +]/100
+- Relationship with Ciudadanos: [+ spain_cs_relation +]/100
+- Relationship with the PP: [+ spain_pp_relation +]/100
+
+The historical March 2016 investiture crisis is not forced here. The next chapter should respond to the parliamentary position and internal relationships you have created.
+
+- @spain_chapter_1: Replay Chapter I
+- @start_menu: Return to main menu
