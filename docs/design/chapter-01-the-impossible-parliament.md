@@ -345,3 +345,140 @@ For the first prototype, implement only a few complete examples rather than a la
 - one monthly-resolution routine that consistently updates time and deadlines.
 
 This will test the original game's proven scene architecture while ensuring the Spanish mod's mechanics are built around Sánchez's actual political problem rather than a reskinned Weimar card deck.
+
+
+## 12. Spanish adviser roster organised by PSOE faction
+
+The Spanish version should follow the original game's faction-organised adviser structure. In the Weimar game, advisers are not presented as one undifferentiated cabinet of experts: each pinned character card carries a faction tag (for example `left`, `labor` or `centrist`), and the adviser roster makes the party's internal balance visible. The Spanish mod should do the same. The player should be able to see who represents each current of the PSOE, what their priorities are, and which political resources they can bring to bear.
+
+The factions below are **simulation groupings**, not claims that the PSOE had six formally constituted, disciplined blocs in 2015. They overlap, contain internal disagreements and can change their alignment. A politician's starting tag describes their strongest political network or tendency at the opening date, not an immutable identity. Some important figures should remain independent actors rather than being forced into a faction.
+
+### 12.1 Sanchistas — Sánchez's leadership network
+
+**Political centre:** defend Sánchez's mandate from the 2014 primary, consolidate the national leadership and preserve room for a new political strategy.
+
+**Core figures and advisers**
+- **César Luena** — Secretary of Organisation and one of Sánchez's closest organisational allies at the opening. Access to the party machine, federal organisation and internal appointments.
+- **Adriana Lastra** — trusted parliamentary and party operator; useful for membership relations, parliamentary discipline and internal mobilisation.
+- **José Luis Ábalos** — initially part of the broader Sánchez network, with strong organisational and territorial skills; his prominence and role can grow substantially in later chapters.
+- **Óscar Puente** — municipal and communications ally; useful for public messaging and building a political profile beyond the national apparatus.
+- **María José Limón / Susana Sumelzo** — Sumelzo is a useful national-level ally and intermediary, particularly for territorial relationships; availability and influence should reflect the date and later developments rather than being assumed to hold the same office throughout.
+
+**Distinctive adviser actions:** secure support in the Federal Executive; count votes in the Federal Committee; mobilise supportive provincial organisations; coordinate parliamentary messaging; defend Sánchez publicly; identify wavering members before a leadership challenge.
+
+**Internal tensions:** loyalty to Sánchez does not mean agreement on every tactical decision. Organisational control, parliamentary strategy and the balance between consultation and presidential leadership can divide this network.
+
+### 12.2 Institutional social democrats and parliamentary pragmatists
+
+**Political centre:** protect the PSOE's credibility as a governing party, maintain institutional influence and seek workable parliamentary agreements. This is a tendency, not a single unified faction; it includes people who may disagree sharply over whether to facilitate a PP government.
+
+**Core figures and advisers**
+- **Antonio Hernando** — parliamentary spokesperson and a central figure in negotiations. Particularly important for parliamentary arithmetic, group discipline and contacts with other parties.
+- **José Enrique Serrano** — institutional and constitutional strategist; suited to drafting agreements, assessing investiture procedure and negotiating the architecture of a government.
+- **Jordi Sevilla** — economic-policy voice and interlocutor for centrist, business-facing and Ciudadanos-compatible proposals.
+- **Alfredo Pérez Rubalcaba** — former secretary-general and senior institutional voice; better treated as an influential elder and independent broker than as a routine operational adviser.
+- **Elena Valenciano** — experienced national figure with European and international links; can provide political and communications advice where appropriate.
+
+**Distinctive adviser actions:** test the viability of a parliamentary agreement; negotiate procedural guarantees; prepare an investiture strategy; assess the electoral and institutional cost of abstention; broker compromises with centrist parties.
+
+**Internal tensions:** pragmatists may disagree about whether institutional responsibility requires abstention, whether a Podemos agreement is viable, and how much policy compromise is acceptable. Do not make this group automatically pro-PP or anti-Sánchez.
+
+### 12.3 Regional barons and federal pragmatists
+
+**Political centre:** defend the autonomy, electoral interests and governing credibility of the PSOE's regional federations. Their shared interest is influence over national strategy; they are not a unified ideological bloc.
+
+**Core figures and power-brokers**
+- **Susana Díaz (Andalusia)** — the most consequential potential rival to Sánchez in this period; commands a major federation and has her own national ambitions. A rival power centre, not simply an adviser who can be summoned at will.
+- **Javier Fernández (Asturias)** — institutional and organisational heavyweight; can become a key broker in a leadership or Federal Committee crisis.
+- **Emiliano García-Page (Castilla-La Mancha)** — regional president with a strong interest in protecting his government's room for manoeuvre and a cautious approach to Podemos.
+- **Guillermo Fernández Vara (Extremadura)** — regional leader with institutional priorities and influence in federal debates.
+- **Ximo Puig (Valencia)** — regional president operating in a plural coalition environment; brings a distinct perspective on territorial and coalition politics.
+- **Javier Lambán (Aragón)** — regional president whose position can diverge from Sánchez's national strategy.
+- **Other regional counterweights:** Francina Armengol (Balearic Islands), Idoia Mendia (Basque Country), Luis Tudanca (Castile and León), María Chivite (Navarre) and Miquel Iceta (PSC) should be modelled as consequential regional actors, with their own relationships and changing positions.
+
+**Distinctive adviser/interlocutor actions:** convene regional presidents; negotiate a common federal position; count regional delegates; secure or withhold public endorsements; coordinate territorial demands; mediate between national leadership and autonomous-community governments.
+
+**Implementation rule:** most regional barons should not be permanently pinned as friendly advisers. They should be represented as faction-linked power-broker cards or contacts that become available for consultation when the player has sufficient trust or a relevant issue is active. Their support can be conditional, transactional or openly hostile. Susana Díaz and Javier Fernández in particular should have independent agendas.
+
+### 12.4 The social-democratic left and labour movement
+
+**Political centre:** defend social-democratic economic and labour priorities, resist an overly centrist accommodation, and maintain the PSOE's relationship with organised labour and its activist base. This group is not identical to Podemos and should not automatically favour a coalition with it.
+
+**Core figures and advisers**
+- **María Luisa Carcedo** — social-policy expertise and a voice for public services and welfare priorities.
+- **Carmen Montón** — progressive policy and public-health experience; useful on social policy and the party's reform agenda.
+- **Manuel de la Rocha Rubí** — economic-policy adviser with a more socially interventionist profile; useful for employment, fiscal and social investment proposals.
+- **Óscar López** — experienced party organiser and political operator; his relationships and loyalties should be modelled rather than assumed.
+- **UGT leadership and union interlocutors** — represent labour's institutional interests as an external but closely connected power centre. Do not collapse the unions into the PSOE faction system.
+
+**Distinctive adviser actions:** develop employment and welfare proposals; consult UGT; mobilise activists and affiliated networks; assess the effect of a policy compromise on working-class voters; build support for a more ambitious social programme.
+
+**Internal tensions:** the labour movement, parliamentary left and younger activists do not necessarily share the same view of Podemos, coalition government or party discipline. Keep union leaders as independent actors who can support, oppose or bargain with the PSOE leadership.
+
+### 12.5 Constitutional federalists and territorial reformers
+
+**Political centre:** reform the territorial settlement, defend a plural conception of Spain and pursue constitutional change while maintaining a commitment to the constitutional framework. This tendency overlaps with regional pragmatists and institutional social democrats but deserves a distinct policy voice.
+
+**Core figures and advisers**
+- **Meritxell Batet** — federalist constitutional reformer and an important link to the PSC; central for drafting a territorial and constitutional offer.
+- **Miquel Iceta** — PSC leader and a major interlocutor on Catalonia; should also have his own regional and party interests, rather than being reduced to an adviser tag.
+- **Patxi López** — experienced former Lehendakari with federal and institutional credentials; potentially useful as a mediator across regional and national networks.
+- **Francesc Vallès and other PSC figures** may be used as supporting actors if the later scope of the game requires a deeper Catalan network.
+
+**Distinctive adviser actions:** draft a federal constitutional proposal; negotiate with PSC leadership; consult regional federations; prepare a response to Catalan demands; seek cross-party support for institutional reform.
+
+**Internal tensions:** federal reformers may disagree over the exact constitutional model, the scope of Catalan self-government and whether a referendum can be part of a negotiated settlement. They are not automatically aligned with the regional barons or with Podemos.
+
+### 12.6 The old guard and former national leadership
+
+**Political centre:** preserve the PSOE's institutional legacy, influence national strategy and protect the party's established networks. This is an informal circle of influential former leaders, not a formal faction with a unified programme.
+
+**Core figures**
+- **Felipe González** — former prime minister and highly influential elder; can intervene publicly or privately, but should not be treated as a routine adviser subordinate to Sánchez.
+- **José Luis Rodríguez Zapatero** — former prime minister with his own relationships and views on dialogue, territorial issues and party strategy.
+- **Alfredo Pérez Rubalcaba** — former secretary-general with strong institutional knowledge; can be an adviser, mediator or critic depending on the situation.
+- **Other former senior office-holders** can appear in events, private consultations and public interventions as the timeline advances.
+
+**Distinctive interventions:** private counsel; public endorsement or criticism; contact with business, media and international networks; mediation during a party crisis; warnings about electoral or institutional risks.
+
+**Implementation rule:** these figures should normally be independent senior actors, not ordinary pinned advisers with repeatable stat bonuses. Their influence comes from reputation, networks and the ability to shape the debate. They may help Sánchez, pressure him or undermine him.
+
+### 12.7 How faction organisation should work in the game
+
+Use faction tags on adviser scenes in the same way the original uses tags such as `left`, `labor` and `centrist`. Suggested Spanish tags:
+
+- `sanchista`
+- `institutionalist`
+- `regionalist`
+- `social_left`
+- `federalist`
+- `old_guard`
+
+Characters can carry more than one tag where genuinely appropriate, but give each a primary affiliation for display and faction accounting. Keep office, role and personal relationship as separate variables: a person can be an institutionalist and a Sanchista, or a federalist and a regional power-broker, without the game forcing a false choice.
+
+Each faction should have:
+- **Influence:** its practical ability to shape decisions, appointments and party votes.
+- **Dissent:** how dissatisfied its members are with Sánchez's leadership and current strategy.
+- **Cohesion:** how reliably its members act together. A regional federation or loose network should have lower cohesion than a tightly organised leadership team.
+- **Policy priorities:** a small set of positions on investiture, Podemos, Ciudadanos, territorial reform, economic policy and party organisation.
+- **Key relationships:** ties to Sánchez, other factions, regional federations, unions and external parties.
+
+Faction influence must not be the same as the number of advisers pinned to the screen. A faction may have few formal advisers but substantial delegate strength, regional office-holders or parliamentary influence. Conversely, a well-represented adviser group may lack support in the Federal Committee.
+
+### 12.8 Starting adviser-card layout for December 2015
+
+The first playable screen should show a balanced cross-section of the party rather than a full directory of every notable politician. A sensible initial pinned roster is:
+
+| Faction | Initial pinned adviser | Main use |
+|---|---|---|
+| Sanchistas | César Luena | Organisation, Federal Executive and leadership support |
+| Institutional social democrats | Antonio Hernando | Parliamentary group and negotiations |
+| Institutional social democrats | José Enrique Serrano | Investiture procedure and agreement drafting |
+| Regional/federal pragmatists | Patxi López | Mediation and regional relationships |
+| Social-democratic left | María Luisa Carcedo | Social programme and welfare policy |
+| Constitutional federalists | Meritxell Batet | Territorial and constitutional reform |
+| Institutional/economic pragmatists | Jordi Sevilla | Economic credibility and centrist negotiations |
+
+Other characters should enter through faction/contact cards, events and unlockable adviser scenes. Susana Díaz, Javier Fernández, García-Page and Felipe González should not simply appear as obedient members of Sánchez's permanent staff. Their independent power is part of the simulation.
+
+This roster is a starting point, not a permanent cast. As the story branches, appointments, resignations, defections, the 2016 leadership crisis and the 2017 primary should change who is available, which faction they represent and whether they are an adviser, rival, broker or opponent.
