@@ -677,14 +677,12 @@ The King is expected to consult party leaders. Rajoy wants to remain Prime Minis
 
 **Congress of Deputies — 350 seats**
 
-| Party or group | Seats |
-|---|---:|
-| PP | 123 |
-| PSOE | 90 |
-| Podemos and regional alliances | 69 |
-| Ciudadanos | 40 |
-| Other territorial and regional groups | 28 |
-| **Total** | **350** |
+PP: 123 //
+PSOE: 90 //
+Podemos and regional alliances: 69 //
+Ciudadanos: 40 //
+Other territorial and regional groups: 28 //
+**Total: 350**
 
 An absolute majority is 176. In a second investiture ballot, a candidate needs more votes in favour than against; abstentions can therefore matter enormously.
 
@@ -841,12 +839,17 @@ Your final parliamentary decision was: **[+ spain_investiture +]**.
 
 **Political position**
 
-- PSOE unity: [+ spain_psoe_unity +]/100
-- Sánchez's authority: [+ spain_sanchez_authority +]/100
-- Member morale: [+ spain_member_morale +]/100
-- Relationship with Podemos: [+ spain_podemos_relation +]/100
-- Relationship with Ciudadanos: [+ spain_cs_relation +]/100
-- Relationship with the PP: [+ spain_pp_relation +]/100
+PSOE unity: [+ spain_psoe_unity +]/100
+
+Sánchez's authority: [+ spain_sanchez_authority +]/100
+
+Member morale: [+ spain_member_morale +]/100
+
+Relationship with Podemos: [+ spain_podemos_relation +]/100
+
+Relationship with Ciudadanos: [+ spain_cs_relation +]/100
+
+Relationship with the PP: [+ spain_pp_relation +]/100
 
 The historical March 2016 investiture crisis is not forced here. The next chapter should respond to the parliamentary position and internal relationships you have created.
 
