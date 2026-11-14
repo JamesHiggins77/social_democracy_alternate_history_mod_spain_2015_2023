@@ -219,3 +219,129 @@ This is a design specification, not yet a scene-code implementation. Before conv
 - Contemporary reporting on the PSOE negotiating team and January–February 2016 investiture negotiations.
 
 Historical figures and procedural details should be checked against official election and constitutional records during implementation. Preserve the distinction between the historical baseline and player-created outcomes.
+
+
+## 11. Lessons from the original Social Democracy game: advisers and cards
+
+This section is based on inspection of the original game's Dendry scene files, especially `main.scene.dry`, representative files in `source/scenes/advisors/` and `source/scenes/party_affairs/`, `events/black_thursday.scene.dry`, and `post_event.scene.dry`. The original source is available in the [aucchen/social_democracy_alternate_history repository](https://github.com/aucchen/social_democracy_alternate_history).
+
+### 11.1 The main screen and the role of pinned advisers
+
+The original game's main scene is effectively a political desk. It presents separate decks for Party Affairs and Government Affairs, alongside pinned adviser cards. The main scene uses `is-hand: true`, a defined hand capacity, and deck scenes such as `@party` and `@govt`. The adviser area is not simply another random deck: advisers are persistent cards that remain visible and can be opened whenever the player wants to consult or use their abilities.
+
+Each adviser has an individual scene, normally in `source/scenes/advisors/`, with a structure such as:
+
+- `title`: the person's name;
+- `is-pinned-card: true`: keeps the character available on the main screen;
+- `tags: advisor` plus relevant political/faction tags;
+- `card-image`: the person's portrait;
+- `view-if`: determines whether the character is currently available;
+- `new-page: true`: opens a dedicated adviser page;
+- narrative biography and a list of selectable actions.
+
+The adviser page is a small menu of actions, not one generic button. Marie Juchacz, for example, has distinct actions for emergency fundraising, Workers' Welfare and organising women. Wladimir Woytinsky can build support for an economic plan, help carry out an adopted plan, or campaign during the depression. Each action has its own conditions, effects and explanatory text.
+
+**Design implication for Spain:** Sánchez's inner circle should be represented by persistent, individually authored adviser cards. Opening an adviser should reveal several distinct ways to use that person: negotiate with a particular party or leader, prepare a policy proposal, consult a regional network, manage the parliamentary group, brief the press, or calm an internal dispute. Not every adviser should be useful for every task. Their political outlook, relationships and access should determine which actions are available and what risks accompany them.
+
+The original system also demonstrates that advisers can be made available conditionally. A character or role can appear only when the relevant political circumstances exist. For the Spanish game, an adviser might become unavailable after resignation, dismissal, a falling-out, a change of office or a loss of access to Sánchez. A person who is not a formal adviser may still appear as an event actor or negotiator.
+
+### 11.2 Adviser actions: conditions, costs, cooldowns and effects
+
+An adviser action is authored as a sub-scene beneath the adviser's main scene. The original examples use:
+
+- `title` and `subtitle` to explain the action and its likely cost;
+- `choose-if` to determine whether the action can be selected;
+- `unavailable-subtitle` to explain why it cannot currently be used;
+- `view-if` to hide actions that are irrelevant or no longer possible;
+- `on-arrival` to apply its effects;
+- `go-to` to transfer the player into a more detailed event or policy sequence when needed.
+
+Many original adviser actions share a global `advisor_action_timer`. A successful action sets the timer (often to six months in the original game), and other actions display how long remains before another adviser action can be taken. This makes choosing which adviser to use a strategic decision rather than allowing the player to exhaust every character's abilities in one turn.
+
+The actions are not all simple numerical bonuses. They can be conditional on holding a ministry, being in government, having sufficient resources, reaching a threshold of faction support, or having an earlier event occur. Woytinsky's plan-adoption action, for instance, depends on the economic crisis, support for the plan and factional conditions. Juchacz's welfare action requires resources and changes both the organisation's capacity and support among relevant social groups.
+
+**Design implication for Spain:** use a shared adviser-action opportunity or a deliberately limited number of adviser consultations per month, but avoid copying the original six-month cooldown mechanically. A monthly political simulation needs a cadence appropriate to its scale. A useful approach would be to distinguish:
+- **Consultation:** hear advice or obtain information; relatively frequent, but limited by the number of meetings or available time.
+- **Personal intervention:** ask an adviser to spend political capital, make calls, negotiate or manage a faction; less frequent and potentially risky.
+- **Formal appointment or delegation:** assign someone a continuing responsibility, changing their availability and influence over time.
+
+Actions should have visible requirements and a clear explanation when unavailable. Their effects should be multi-dimensional: a successful negotiation may improve one relationship while angering a PSOE faction, raising expectations among a partner, or weakening Sánchez's control of the process. Avoid making every adviser action a flat increase to a single Sánchez or PSOE statistic.
+
+### 11.3 Ordinary cards: one card, a meaningful political problem
+
+The original Party Affairs cards are temporary opportunities drawn from a deck. A typical card such as Political Rally or Media has `is-card: true`, a `tags` category, a `card-image`, eligibility conditions such as `view-if`, and an `on-arrival` effect that can consume an action or start a timer. The player then chooses among several sub-scenes.
+
+The Political Rally card is a particularly useful example. It does not simply say “gain support”. It asks what the rally should be about: class struggle, welfare, democracy, pacifism, an economic plan, or local concerns. Each option has different effects on different voter groups and party factions. Some options become available only if the party has adopted the relevant policy. The choice also has a narrative explanation of who is likely to respond and why.
+
+The Media card offers a different set of choices: commercialise newspapers, focus on campaigning, allow ideological debate, or invest in radio. These choices involve trade-offs between resources, electoral reach and internal factional satisfaction. The Choosing Our Enemies card is even more explicitly strategic: choosing to attack the KPD, the far right, the NSDAP alone or the bourgeois parties affects faction strength, relations with other parties and the possibility of future cooperation.
+
+These examples establish a strong pattern:
+1. A card introduces a recognisable political situation or opportunity.
+2. Its choices are concrete strategies, not merely differently worded stat boosts.
+3. Each choice changes several connected parts of the simulation.
+4. The narrative explains the political logic and likely consequences.
+5. Conditions make some choices dependent on previous decisions or the current situation.
+
+**Design implication for Spain:** cards should represent real political work and dilemmas: a negotiating offer arrives, a regional president demands a meeting, an interview request creates a communications choice, a leaked conversation threatens the leadership, or the parliamentary group disputes the line on investiture. Choices should make the player decide what Sánchez does, not simply select a generic “left”, “centre” or “right” bonus.
+
+### 11.4 Card availability, decks and the difference between cards and events
+
+The original separates card categories into decks. In `main.scene.dry`, Party Affairs and Government Affairs are represented as decks, with Government Affairs only appearing when the relevant time or government conditions are met. Individual cards can be gated by `view-if`, timers and other conditions. Cards can also have visit limits, and their sub-scenes can offer a discard, return or cancellation route.
+
+The original also has event scenes, which are not identical to ordinary action cards. The Black Thursday event, for example, has a date-based trigger, an event tag, a one-visit limit and a `face-image`. Its arrival applies the immediate economic shock and presents a narrative event with responses. By contrast, an ordinary card such as Political Rally uses `card-image` and consumes a player action to pursue a chosen activity.
+
+For the Spanish mod, preserve this distinction:
+- **Action cards:** things Sánchez and the PSOE can choose to do, such as negotiate, campaign, consult, organise or prepare a policy.
+- **Event cards:** developments that happen to the player, such as a public statement by another leader, a court ruling, a leak, an election result, a resignation or a parliamentary defeat. The player responds, but does not choose whether the event occurs.
+- **Pinned character cards:** people who remain accessible and offer a set of possible interventions or advice.
+- **Major crisis sequences:** multi-stage scenes that temporarily take priority over the ordinary card loop, such as an investiture vote, a Federal Committee confrontation or a leadership challenge.
+
+Do not make every historical occurrence an action card. A rival's public intervention should generally be an event or an action by an independent actor, not a card the player “plays” on their behalf.
+
+### 11.5 The monthly action economy and post-event resolution
+
+The original's action system is connected to a central post-event scene. Cards and actions increment a monthly action counter; the post-event resolution then updates the date and decrements timers when the relevant action threshold has been reached. It also recalculates derived statistics and normalises values. This is important: individual cards apply immediate changes, but the post-event scene is responsible for the shared consequences of taking an action and moving the simulation forward.
+
+This creates a predictable rhythm. The player can see a card, make a choice, receive its immediate narrative and mechanical result, and then return to the main screen. The central resolution handles the consequences that should apply consistently after actions, rather than requiring every card to implement its own version of time advancement.
+
+**Design implication for Spain:** implement one central monthly-resolution routine. It should handle the calendar, polling updates, faction and relationship drift, negotiation deadlines, media cycles, adviser availability and scheduled events. Individual cards should change the relevant variables and set flags or deadlines; they should not each independently advance the month or duplicate the same monthly calculations.
+
+The Spanish game may need a more flexible action budget than the original. For example, the player might receive a small number of major political actions each month, while meetings, statements and urgent events use separate limits. Investiture votes and leadership crises should interrupt or expand the ordinary action sequence rather than being squeezed into a normal card.
+
+### 11.6 What to borrow — and what not to copy
+
+**Borrow from the original:**
+- Persistent adviser cards with individual biographies, portraits and multiple distinct actions.
+- Clear availability requirements and explanatory unavailable text.
+- A limited action economy that forces prioritisation.
+- Cards built around concrete political dilemmas and meaningful alternatives.
+- Conditional card availability, timers, visit limits and flags that allow earlier decisions to shape later events.
+- Separate action cards, event scenes and character/adviser cards.
+- A central post-action/monthly resolution routine.
+- Immediate narrative feedback explaining why a choice helped one group and harmed another.
+
+**Adapt rather than copy:**
+- The original's six-month shared adviser cooldown may be too slow for the intense December 2015–October 2016 period. Use a smaller monthly action budget and differentiated cooldowns where appropriate.
+- The original's large deck of recurring policy and campaigning actions suits a long-running party-management game. Spain's opening chapter should initially prioritise negotiations, parliamentary arithmetic, party consultation and leadership management.
+- The original's faction and voter-group statistics are designed for the SPD and Weimar electoral system. Do not transplant those variables directly. Spain needs distinct measures for PSOE factional balance, regional organisation, parliamentary discipline, leader authority, partner trust and public approval.
+- The original often expresses political outcomes through numerical changes. Retain the readable narrative explanations, but make important Spanish political actors capable of refusing, counter-offering, delaying, leaking or pursuing their own strategies.
+
+### 11.7 Proposed Spanish implementation pattern
+
+For Chapter I, organise the main screen around three persistent areas:
+
+1. **People:** pinned adviser and key-actor cards. Sánchez's core team is accessible here; other figures can appear as contacts, rivals or temporary interlocutors when relevant.
+2. **Political work:** a small set of action decks, initially focused on parliamentary negotiations, party organisation and public communication. Government policy actions should become more prominent only if the player forms a government.
+3. **Events and crises:** date-triggered or condition-triggered developments, with major sequences taking control when an investiture or party confrontation requires several linked decisions.
+
+Each adviser should have a concise character page and a small number of authored actions. Each action should specify its eligibility, cost, time commitment, immediate effects, delayed consequences and any actors whose reactions it may trigger. Each ordinary card should present a specific situation, a limited set of plausible choices and consequences that flow into later scenes.
+
+For the first prototype, implement only a few complete examples rather than a large number of shallow cards:
+- one adviser card with several distinct interventions;
+- one negotiation action card with multiple partner-specific approaches;
+- one PSOE consultation or regional-leaders card;
+- one event card that can trigger independently of the player's action;
+- one multi-stage investiture sequence;
+- one monthly-resolution routine that consistently updates time and deadlines.
+
+This will test the original game's proven scene architecture while ensuring the Spanish mod's mechanics are built around Sánchez's actual political problem rather than a reskinned Weimar card deck.
