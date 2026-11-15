@@ -443,3 +443,35 @@ unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.regional_leaders_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 3); window.SpainGame.recalculate(Q); } !}
 
 Small towns where every seat is decided by a few hundred votes. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
+
+@pes_contacts
+title: International contacts
+new-page: true
+is-card: true
+tags: sp_national
+view-if: psoe_in_government = 0 and sanchez_leader = 1 and pes_timer <= 0
+on-arrival: month_actions += 1; pes_timer = 3
+
+= International contacts
+
+As leader of the opposition you have no ministry, but you do have the Party of European Socialists and the Socialist International. Being seen abroad as a Prime Minister in waiting has its uses.
+
+- @pes_congress: Speak at the PES congress
+- @pes_lisbon: Visit António Costa in Lisbon
+- @pes_washington: Meet Democrats in Washington
+- @root: Not this month
+
+@pes_congress
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); } Q.sanchez_authority += 1; Q.funds -= 0.2; !}
+
+Social democrats from twenty-seven countries applaud the man who might govern Spain.
+
+@pes_lisbon
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 4); } Q.rel_up += 1; Q.funds -= 0.2; !}
+
+Costa explains, over lunch, how to govern with the radical left without being swallowed by it.
+
+@pes_washington
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 4); window.SpainGame.intl(Q, 'nato', 2); } Q.funds -= 0.3; !}
+
+The photos with senators look prime-ministerial. The bill is not cheap.

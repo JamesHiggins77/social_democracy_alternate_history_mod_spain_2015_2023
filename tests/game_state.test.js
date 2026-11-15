@@ -297,3 +297,30 @@ test('moving the PSOE to the right sends left voters to Podemos', () => {
   G.endOfMonth(Q);
   assert.ok(Q.vm.classSupport.students.up > up + 1, `${up} -> ${Q.vm.classSupport.students.up}`);
 });
+
+test('international relations are clamped, worded, and set Brussels deficit tolerance', () => {
+  const Q = newQ();
+  G.recalculate(Q);
+  assert.strictEqual(Q.deficit_tolerance, 3.5);
+  G.intl(Q, 'eu', 30);
+  G.recalculate(Q);
+  assert.strictEqual(Q.intl_eu, 90);
+  assert.strictEqual(Q.deficit_tolerance, 4.2);
+  G.intl(Q, 'eu', -200);
+  G.recalculate(Q);
+  assert.strictEqual(Q.intl_eu, 0);
+  assert.strictEqual(Q.deficit_tolerance, 3.0);
+  assert.ok(typeof Q.intl_maghreb_word === 'string' && Q.intl_maghreb_word.length > 0);
+});
+
+test('world-event flags: Madrid governed by the PP, Cs collapse after a peak', () => {
+  const Q = newQ();
+  G.recalculate(Q);
+  assert.strictEqual(Q.madrid_pp, 1);
+  Q.congress = Object.assign({}, Q.congress, { cs: 57 });
+  G.recalculate(Q);
+  assert.strictEqual(Q.cs_collapsed, 0);
+  Q.congress.cs = 10;
+  G.recalculate(Q);
+  assert.strictEqual(Q.cs_collapsed, 1);
+});

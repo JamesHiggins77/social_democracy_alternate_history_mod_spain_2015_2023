@@ -233,3 +233,47 @@ Young urban voters approve. Truck drivers and farmers do not.
 on-arrival: {! Q.fiscal_adj += 0.3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, homemakers: 1, pensioners: 0.5}); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
 
 Popular at home. In Brussels, someone opens a spreadsheet.
+
+@foreign_tour
+title: Foreign policy
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and foreign_timer <= 0
+on-arrival: month_actions += 1; foreign_timer = 3
+
+= Foreign policy
+
+The foreign minister brings a list of capitals that want a visit, and a reminder that every trip abroad is a week not spent at home.
+
+- @tour_brussels: Brussels and Berlin: be a reliable European
+- @tour_south: Lisbon, Rome and Athens: build a southern alliance
+- @tour_rabat: Rabat and Algiers: secure the southern border and the gas
+- @tour_washington: Washington and NATO: be a dependable ally
+- @tour_un: New York: lead on climate and development at the UN
+- @root: Stay at home this month
+
+@tour_brussels
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 6); window.SpainGame.intl(Q, 'south', -1); } Q.sanchez_authority += 1; !}
+
+The Commission sees a government it can work with. Brussels will be more patient with the deficit.
+
+@tour_south
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 7); window.SpainGame.intl(Q, 'eu', 1); } !}
+
+Costa, the Italian prime minister and the Greek prime minister sign a joint letter on fiscal rules. Together, the south carries weight in the Council.
+
+@tour_rabat
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 7); } Q.progressives_dissent += 1; !}
+
+Cooperation on migration improves. Human rights groups ask what was promised in return.
+
+@tour_washington
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 6); window.SpainGame.intl(Q, 'nato', 4); } Q.rel_up -= 2; !}
+
+The bases at Rota and Morón are mentioned warmly. Podemos is less warm.
+
+@tour_un
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 7); window.SpainGame.target(Q, 'psoe', 'young', 0.5); } !}
+
+A speech on the 2030 Agenda earns applause in New York and a few headlines at home.

@@ -1,0 +1,687 @@
+title: The Security Council vote
+new-page: true
+tags: sp_event
+view-if: unsc_seen = 0 and ((year = 2014 and month >= 10) or year >= 2015)
+max-visits: 1
+on-arrival: unsc_seen = 1
+
+= The Security Council vote
+
+Spain is competing with Turkey and New Zealand for two non-permanent seats on the UN Security Council for 2015–2016. The government's diplomats have lobbied for years; the vote in the General Assembly is days away. Rajoy asks the opposition to show a united front.
+
+- @unsc_back: Back the bid publicly: this is Spain's seat, not the PP's
+- @unsc_criticise: Back the bid, but criticise the government's aid cuts
+- @unsc_silent: Say nothing
+
+@unsc_back
+on-arrival: {! Q.rel_pp += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 8); } !}
+go-to: unsc_result
+
+@unsc_criticise
+on-arrival: {! Q.progressives_dissent -= 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 2); window.SpainGame.target(Q, 'psoe', 'young', 1); } !}
+go-to: unsc_result
+
+@unsc_silent
+go-to: unsc_result
+
+@unsc_result
+on-arrival: {! Q.unsc_won = (Q.intl && Q.intl.un >= 50) ? 1 : 0; if (Q.unsc_won && window.SpainGame) { window.SpainGame.intl(Q, 'un', 5); window.SpainGame.intl(Q, 'eu', 2); } !}
+
+[? if unsc_won = 1 : After three rounds of voting, Spain defeats Turkey and wins a seat on the Security Council for 2015 and 2016, the fifth in its history. For two years Spanish diplomats will sit at the table on Syria, Libya and North Korea. ?][? if unsc_won = 0 : Spain falls short in the third round. The seat goes to Turkey, and the opposition and government blame each other. ?]
+
+@geringonca
+title: Portugal's "contraption"
+new-page: true
+tags: sp_event
+view-if: geringonca_seen = 0 and ((year = 2015 and month >= 11) or year >= 2016)
+max-visits: 1
+on-arrival: geringonca_seen = 1
+
+= Portugal's "contraption"
+
+In Lisbon, the socialist António Costa topples the centre-right minority government and governs with the support of the Communists, the Greens and the Left Bloc. The right calls it the *geringonça*, the contraption. It is exactly the kind of arrangement Spain's left is arguing about.
+
+- @costa_model: Hail it as a model: the left can govern together
+- @costa_cautious: Praise Costa, but say every country is different
+- @costa_warning: Warn that Spain is not Portugal
+
+@costa_model
+on-arrival: {! Q.rel_up += 6; Q.progressives_dissent -= 4; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 6); window.SpainGame.position(Q, 0.5, 0); } !}
+
+Costa calls to thank you. Susana Díaz's people note that you are already measuring the curtains for a government with Podemos.
+
+@costa_cautious
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 3); } !}
+
+A diplomatic answer, and a door left ajar.
+
+@costa_warning
+on-arrival: {! Q.rel_up -= 5; Q.regional_leaders_dissent -= 4; Q.progressives_dissent += 4; !}
+
+The barons are reassured. Podemos quotes Lisbon at you for months.
+
+@brexit
+title: Brexit
+new-page: true
+tags: sp_event
+view-if: brexit_seen = 0 and ((year = 2016 and month >= 7) or year >= 2017)
+max-visits: 1
+on-arrival: brexit_seen = 1
+
+= Brexit
+
+The United Kingdom votes to leave the European Union. Three hundred thousand Spaniards live there, and as many Britons live in Spain. Gibraltar voted 96% to remain; the foreign ministry is already talking about co-sovereignty.
+
+- @brexit_eu: Stand with the EU: no special deals, the Union negotiates as one
+- @brexit_gibraltar: Put Gibraltar on the table
+- @brexit_people: Make it about people: protect citizens on both sides
+
+@brexit_eu
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 6); window.SpainGame.target(Q, 'psoe', 'middle', 1); } !}
+
+Brussels appreciates a reliable partner.
+
+@brexit_gibraltar
+on-arrival: {! Q.rel_pp += 3; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.5); } !}
+
+A patriotic note that plays well in Andalusia and badly in Brussels.
+
+@brexit_people
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.target(Q, 'psoe', 'young', 1); } !}
+
+Thousands of young Spaniards working in Britain take note.
+
+@barcelona_attack
+title: Las Ramblas
+new-page: true
+tags: sp_event
+view-if: barcelona_attack_seen = 0 and ((year = 2017 and month >= 8) or year >= 2018)
+max-visits: 1
+on-arrival: {! Q.barcelona_attack_seen = 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.intl(Q, 'maghreb', -3); } !}
+
+= Las Ramblas
+
+A van drives into the crowds on Barcelona's Ramblas; another attack follows in Cambrils. Sixteen people are killed. The attackers were young men from Ripoll, radicalised by an imam. For a few days, Spain and Catalonia mourn together, a month before the referendum.
+
+- @attack_unity: Stand with every government, Spanish and Catalan
+- @attack_police: Question the coordination between the Mossos and the national police
+- @attack_islamophobia: Warn against blaming Muslims and migrants
+
+@attack_unity
+on-arrival: {! Q.sanchez_authority += 3; Q.rel_pp += 2; Q.rel_erc += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1); } !}
+
+Your presence at the march in Barcelona is noted with respect.
+
+@attack_police
+on-arrival: {! Q.rel_erc -= 8; Q.rel_junts -= 8; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 0.98); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.partyRel(Q, 'cs', 'junts', -5); } !}
+
+The question is fair; the timing is not. In Catalonia it reads as an attack on its police.
+
+@attack_islamophobia
+on-arrival: {! Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 5); window.SpainGame.position(Q, 0, 0.8); window.SpainGame.campaign(Q, 'vox', {self_employed: 0.5, pensioners: 0.5}); } !}
+
+Morocco's ambassador thanks you. A small party called Vox calls you naive.
+
+@la_manada
+title: La Manada
+new-page: true
+tags: sp_event
+view-if: la_manada_seen = 0 and ((year = 2018 and month >= 5) or year >= 2019)
+max-visits: 1
+on-arrival: la_manada_seen = 1
+
+= La Manada
+
+A court in Navarre convicts five men of "sexual abuse" rather than rape for the group assault of an 18-year-old during the San Fermín festival, because she did not resist. Hundreds of thousands of women take to the streets: "It's not abuse, it's rape."
+
+- @only_yes: Promise a law where only yes means yes
+- @review_code: Call for a review of the penal code by experts
+- @respect_courts: Respect the courts' decision
+
+@only_yes
+on-arrival: {! Q.progressives_dissent -= 5; Q.only_yes_law = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 3); window.SpainGame.position(Q, 0, 1.5); } !}
+
+The feminist movement has its demand, and the PSOE has made it its own. Drafting such a law well will be harder than promising it.
+
+@review_code
+on-arrival: {! Q.institutionalists_dissent -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 1.5); } !}
+
+Serious and slow. The marchers wanted more.
+
+@respect_courts
+on-arrival: {! Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); window.SpainGame.position(Q, 0, -0.5); } !}
+
+Institutionally correct, politically deaf. Young women notice.
+
+@cifuentes
+title: The master's degree
+new-page: true
+tags: sp_event
+view-if: cifuentes_seen = 0 and ((year = 2018 and month >= 4) or year >= 2019) and madrid_pp = 1
+max-visits: 1
+on-arrival: {! Q.cifuentes_seen = 1; Q.pp_scandal = (Q.pp_scandal || 0) + 1; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'pp', 0.95); } !}
+
+= The master's degree
+
+Madrid's president, Cristina Cifuentes, turns out to have been awarded a master's degree she never studied for, with forged marks. Then a video emerges of her being stopped for shoplifting face cream years before. She resigns.
+
+- @madrid_censure: Table a motion of no confidence in the Madrid assembly
+- @demand_elections: Demand early elections in Madrid
+- @universities: Make it about cleaning up the universities
+
+@madrid_censure
+on-arrival: {! Q.rel_cs -= 3; Q.rel_up += 3; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'psoe', 1.03); } !}
+
+Ciudadanos refuses to back it, and the PP keeps Madrid. But voters saw who tried.
+
+@demand_elections
+on-arrival: {! if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'psoe', 1.02); window.SpainGame.regionalMod(Q, 'Madrid', 'cs', 1.03); } !}
+
+Ciudadanos agrees in principle and abstains in practice.
+
+@universities
+on-arrival: {! if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'students', 1.5); } !}
+
+The scandal spreads to other politicians' degrees.
+
+@aquarius
+title: The Aquarius
+new-page: true
+tags: sp_event
+view-if: aquarius_seen = 0 and ((year = 2018 and month >= 6) or year >= 2019)
+max-visits: 1
+on-arrival: aquarius_seen = 1
+
+= The Aquarius
+
+Italy's new interior minister, Matteo Salvini, closes Italian ports to the rescue ship *Aquarius*, carrying 629 people picked up off Libya. Malta refuses too. The ship is drifting in the Mediterranean. [? if psoe_in_government = 1 : The decision is yours. ?][? if psoe_in_government = 0 : The government hesitates, and asks the opposition what it would do. ?]
+
+- @aquarius_valencia: Offer the port of Valencia
+- @aquarius_eu: Insist on a European solution: every country must take its share
+- @aquarius_no: Refuse: Spain cannot become Europe's only open door
+
+@aquarius_valencia
+on-arrival: {! Q.progressives_dissent -= 6; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 6); window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', -4); window.SpainGame.position(Q, 0, 1.2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.8, self_employed: 0.8, workers: 0.5}); } !}
+
+The *Aquarius* docks in Valencia to a welcome from volunteers and the world's cameras. Salvini mocks you; Vox finds a cause.
+
+@aquarius_eu
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.intl(Q, 'south', 2); } !}
+
+Brussels convenes a summit. The ship waits another week.
+
+@aquarius_no
+on-arrival: {! Q.progressives_dissent += 10; Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', -6); window.SpainGame.intl(Q, 'south', 3); window.SpainGame.position(Q, 0, -1); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); } !}
+
+Salvini praises Spain. Your own members do not.
+
+@nato_two_percent
+title: Two per cent
+new-page: true
+tags: sp_event
+view-if: nato_two_seen = 0 and ((year = 2018 and month >= 7) or year >= 2019)
+max-visits: 1
+on-arrival: nato_two_seen = 1
+
+= Two per cent
+
+At the NATO summit in Brussels, President Trump demands that every ally spend 2% of GDP on defence, and singles out the laggards. Spain spends 0.9%, among the lowest in the alliance.
+
+- @nato_commit: Commit to a path towards 2%
+- @nato_gradual: Promise gradual increases, with no date
+- @nato_refuse: Refuse: Spain's priority is its welfare state
+
+@nato_commit
+on-arrival: {! Q.progressives_dissent += 8; Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', 10); window.SpainGame.intl(Q, 'us', 8); window.SpainGame.position(Q, -0.5, 0); } if (Q.psoe_in_government) { Q.fiscal_adj += 0.2; } !}
+
+Washington is pleased. Podemos calls it a militarist budget.
+
+@nato_gradual
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', 3); window.SpainGame.intl(Q, 'us', 1); } !}
+
+A promise everyone knows how to read.
+
+@nato_refuse
+on-arrival: {! Q.progressives_dissent -= 5; Q.rel_up += 4; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', -8); window.SpainGame.intl(Q, 'us', -10); window.SpainGame.position(Q, 0.5, 0); } !}
+
+Trump names Spain in a tweet. The left applauds.
+
+@tariffs
+title: Trump's tariffs
+new-page: true
+tags: sp_event
+view-if: tariffs_seen = 0 and ((year = 2019 and month >= 10) or year >= 2020)
+max-visits: 1
+on-arrival: {! Q.tariffs_seen = 1; Q.tariff_hit = (Q.intl && Q.intl.us < 45) ? 2 : 1; if (window.SpainGame) { window.SpainGame.target(Q, Q.psoe_in_government ? 'psoe' : 'pp', 'rural', -2 * Q.tariff_hit); } !}
+
+= Trump's tariffs
+
+In the Airbus dispute, Washington slaps 25% tariffs on Spanish olive oil, olives, wine and cheese. [? if tariff_hit = 2 : With relations already cold, Spain is hit harder than its neighbours. ?] Farmers in Andalusia and Castilla-La Mancha face ruin, and blame the government.
+
+- @tariffs_eu: Answer through the EU: retaliation on American goods
+- @tariffs_bilateral: Negotiate directly with Washington
+- @tariffs_farmers: Compensate the farmers
+
+@tariffs_eu
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'us', -6); } !}
+
+Brussels prepares its list. The farmers wait.
+
+@tariffs_bilateral
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 6); window.SpainGame.intl(Q, 'eu', -3); } !}
+
+A few exemptions, a lot of photographs.
+
+@tariffs_farmers
+on-arrival: {! Q.regional_leaders_dissent -= 4; if (Q.psoe_in_government) { Q.fiscal_adj += 0.1; } else { Q.funds -= 1; } if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 2); } !}
+
+[? if psoe_in_government = 1 : Aid reaches the cooperatives within months. ?][? if psoe_in_government = 0 : The PSOE funds a campaign tour of the olive groves and promises aid. ?]
+
+@mas_pais
+title: Errejón goes his own way
+new-page: true
+tags: sp_event
+view-if: mas_pais_seen = 0 and ((year = 2019 and month >= 9) or year >= 2020) and up_running = 1
+max-visits: 1
+on-arrival: {! Q.mas_pais_seen = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'mp', {students: 3, professionals: 2.5, workers: 1, unemployed: 1}); window.SpainGame.partyRel(Q, 'up', 'erc', -2); } !}
+
+= Errejón goes his own way
+
+Íñigo Errejón, Podemos's co-founder and its most moderate strategist, breaks with Pablo Iglesias and launches Más País, allied with Compromís in Valencia. The space to the PSOE's left is now split in two.
+
+- @errejon_welcome: Welcome a partner who wants to govern
+- @errejon_ignore: Ignore it: it is Podemos's problem
+- @errejon_vote: Tell left voters that only the PSOE vote is useful
+
+@errejon_welcome
+on-arrival: {! Q.rel_mp = (Q.rel_mp || 50) + 10; Q.rel_up -= 4; !}
+
+Errejón returns the compliment, carefully.
+
+@errejon_ignore
+on-arrival: institutionalists_dissent -= 1
+
+The split costs the left seats in small provinces under D'Hondt.
+
+@errejon_vote
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transfer(Q, 'mp', 'psoe', {students: 1, professionals: 1}); window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 0.5}); } !}
+
+The "useful vote" argument works on some of them.
+
+@cat_sentence
+title: The sentence
+new-page: true
+tags: sp_event
+view-if: cat_sentence_seen = 0 and cat_crisis_seen = 1 and ((year = 2019 and month >= 10) or year >= 2020)
+max-visits: 1
+on-arrival: {! Q.cat_sentence_seen = 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {self_employed: 2, pensioners: 1.5, workers: 1.5, homemakers: 1, professionals: 1}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.partyRel(Q, 'cs', 'erc', -5); } !}
+
+= The sentence
+
+The Supreme Court sentences the independence leaders to between nine and thirteen years for sedition. Barcelona burns for a week: barricades, burning containers, the airport blockaded. The images play on every channel in Spain, and Vox's rallies fill up.
+
+- @sentence_order: Order first: full support for the police
+- @sentence_dialogue: Order, and the promise of dialogue once calm returns
+- @sentence_pardons: Hint that pardons could be part of the solution
+
+@sentence_order
+on-arrival: {! Q.cat_hard_line += 1; Q.rel_erc -= 8; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.campaign(Q, 'vox', {self_employed: -0.5, pensioners: -0.5}); window.SpainGame.position(Q, 0, -1); } !}
+
+Firmness takes a little of Vox's oxygen.
+
+@sentence_dialogue
+on-arrival: {! Q.cat_dialogue += 1; Q.rel_erc += 3; !}
+
+Both camps think you are talking to the other one.
+
+@sentence_pardons
+on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 10; Q.regional_leaders_dissent += 15; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.4, vox: 0.4, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.position(Q, 0, 2); } !}
+
+The word "pardon" dominates the next election campaign. Not in your favour.
+
+@rivera_resigns
+title: Rivera resigns
+new-page: true
+tags: sp_event
+view-if: rivera_resigns_seen = 0 and elections_held >= 2 and cs_collapsed = 1
+max-visits: 1
+on-arrival: {! Q.rivera_resigns_seen = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'cs', {pp: 0.6, vox: 0.25, psoe: 0.15}, {professionals: 3, self_employed: 3, pensioners: 2, students: 2}); } !}
+
+= Rivera resigns
+
+Ciudadanos has collapsed at the polls, and Albert Rivera resigns as leader and leaves politics. The party that wanted to replace the PP is fighting for survival; most of its voters are heading back to the PP, and some to Vox.
+
+- @cs_voters: Make a play for Ciudadanos's centrist voters
+- @cs_shrug: Let them go
+
+@cs_voters
+on-arrival: {! if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 2.5); window.SpainGame.position(Q, -0.5, 0); } !}
+
+Some of the urban professionals who voted Cs in 2019 give the PSOE a look.
+
+@cs_shrug
+on-arrival: progressives_dissent -= 2
+
+The centre empties, and the PP fills it.
+
+@covid
+title: The pandemic
+new-page: true
+tags: sp_event
+view-if: covid_seen = 0 and ((year = 2020 and month >= 3) or year >= 2021)
+max-visits: 1
+on-arrival: {! Q.covid_seen = 1; Q.funds += 1; !}
+
+= The pandemic
+
+A new coronavirus is filling the hospitals of Madrid and Barcelona. On 14 March the government declares a state of alarm. Spain enters one of the strictest lockdowns in the world; tens of thousands will die; the economy will shrink by more than 10% this year. Party campaigns stop; the party saves money it cannot spend. [? if psoe_in_government = 1 : As Prime Minister, every decision is yours, and so is every death in the headlines. ?][? if psoe_in_government = 0 : The government asks for the opposition's votes to extend the state of alarm every two weeks. ?]
+
+- @covid_strict: [? if psoe_in_government = 1 : A strict national lockdown, decided in Madrid ?][? if psoe_in_government = 0 : Support every extension of the state of alarm ?]
+- @covid_regions: [? if psoe_in_government = 1 : Co-governance: the regions manage the measures ?][? if psoe_in_government = 0 : Support it, but demand the regions have a say ?]
+- @covid_economy: [? if psoe_in_government = 1 : Protect the economy: lighter, shorter measures ?][? if psoe_in_government = 0 : Oppose the extensions: the government is improvising ?]
+
+@covid_strict
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.5; Q.sanchez_authority += 6; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1}); window.SpainGame.campaign(Q, 'vox', {self_employed: 2, professionals: 0.5}); window.SpainGame.intl(Q, 'eu', 3); } } else { Q.rel_pp += 5; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } } !}
+
+[? if psoe_in_government = 1 : The curve flattens. The furlough scheme (ERTE) protects millions of jobs. Shopkeepers and the self-employed are furious, and Vox drives through Madrid in caravans of honking cars. ?][? if psoe_in_government = 0 : Responsible opposition. The government thanks you; your critics say you have become the PP's crutch. ?]
+
+@covid_regions
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; Q.regional_leaders_dissent -= 10; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 0.5}); window.SpainGame.regionalMod(Q, 'Madrid', 'pp', 1.04); } } else { Q.regional_leaders_dissent -= 6; Q.rel_pp += 2; } !}
+
+[? if psoe_in_government = 1 : The regions take charge, and seventeen different sets of rules confuse everyone. Madrid's president keeps her bars open and becomes a national figure. ?][? if psoe_in_government = 0 : The barons who govern regions are grateful. ?]
+
+@covid_economy
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, up: 0.3, cs: 0.2}, {pensioners: 3, homemakers: 2, professionals: 1.5}); window.SpainGame.intl(Q, 'eu', -3); } } else { Q.rel_pp -= 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, pp: 0.5}, {pensioners: 1.5, homemakers: 1}); } } !}
+
+[? if psoe_in_government = 1 : The second wave is worse. The death toll rises, and the anger with it. ?][? if psoe_in_government = 0 : In the middle of a pandemic, opposing the measures looks irresponsible to most voters. ?]
+
+@recovery_fund
+title: The recovery fund
+new-page: true
+tags: sp_event
+view-if: recovery_seen = 0 and covid_seen = 1 and ((year = 2020 and month >= 7) or year >= 2021)
+max-visits: 1
+on-arrival: {! Q.recovery_seen = 1; Q.recovery_size = (Q.intl && Q.intl.eu >= 65 && Q.intl.south >= 60) ? 2 : ((Q.intl && Q.intl.eu >= 45) ? 1 : 0); !}
+
+= The recovery fund
+
+For the first time, the EU will borrow together: €750 billion for recovery, much of it in grants. The "frugal" northern countries want loans with conditions; Spain, Italy, Portugal and Greece want grants. [? if recovery_size = 2 : With strong allies in Brussels and the south, Spain secures around €140 billion, nearly half of it in grants. ?][? if recovery_size = 1 : Spain secures a fair share, after hard bargaining. ?][? if recovery_size = 0 : With few friends in Brussels, Spain gets less than it hoped, and on stricter terms. ?]
+
+- @fund_green: Spend it on the green and digital transition
+- @fund_regions: Share it generously with the regions
+- @fund_social: Put it into health, care and jobs
+
+@fund_green
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj -= 0.3 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.target(Q, 'psoe', 'young', 1 + Q.recovery_size); } !}
+
+Brussels approves the plan quickly. Solar farms and charging points start to appear.
+
+@fund_regions
+on-arrival: {! Q.regional_leaders_dissent -= 10; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 1 + Q.recovery_size); } !}
+
+The regional presidents, of every party, are happy for once.
+
+@fund_social
+on-arrival: {! Q.trade_unionists_dissent -= 5; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'working', 1 + Q.recovery_size); } !}
+
+Popular at home; Brussels insists on more reforms in return.
+
+@emeritus
+title: The King Emeritus leaves
+new-page: true
+tags: sp_event
+view-if: emeritus_seen = 0 and ((year = 2020 and month >= 8) or year >= 2021)
+max-visits: 1
+on-arrival: emeritus_seen = 1
+
+= The King Emeritus leaves
+
+Under investigation in Switzerland and Spain over millions from Saudi Arabia, the former King Juan Carlos I leaves Spain for Abu Dhabi. Podemos demands a referendum on the monarchy.
+
+- @monarchy_defend: Defend the institution: the King is not his father
+- @monarchy_transparency: Demand transparency and an end to the King's legal immunity
+- @monarchy_silence: Say as little as possible
+
+@monarchy_defend
+on-arrival: {! Q.institutionalists_dissent -= 5; Q.rel_up -= 8; Q.rel_pp += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.5); } !}
+
+The PSOE as a party of State. Podemos calls you courtiers.
+
+@monarchy_transparency
+on-arrival: {! Q.progressives_dissent -= 5; Q.institutionalists_dissent += 5; Q.rel_up += 5; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.position(Q, 0, 0.8); } !}
+
+The Royal Household is not pleased. Young voters are.
+
+@monarchy_silence
+on-arrival: institutionalists_dissent -= 1
+
+The story runs for weeks without you.
+
+@ayuso
+title: Ayuso calls an election
+new-page: true
+tags: sp_event
+view-if: ayuso_seen = 0 and madrid_pp = 1 and ((year = 2021 and month >= 3) or year >= 2022)
+max-visits: 1
+on-arrival: {!
+Q.ayuso_seen = 1;
+if (Q.regions && Q.regions['Madrid']) { var y = Q.year, m = Q.month + 2; if (m > 12) { m -= 12; y += 1; } Q.regions['Madrid'].nextElection = y + '-' + (m < 10 ? '0' : '') + m + '-04'; Q.regions['Madrid'].lastWasSnap = true; }
+if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'pp', 1.15); window.SpainGame.regionalMod(Q, 'Madrid', 'cs', 0.6); }
+!}
+
+= Ayuso calls an election
+
+In Murcia, Ciudadanos tries to topple the PP with the PSOE's help, and fails. In Madrid, Isabel Díaz Ayuso, fearing the same, dissolves her assembly first and calls an election under one word: *Libertad*. Pablo Iglesias leaves the national government to run against her.
+
+- @madrid_all_in: Throw everything into Madrid
+- @madrid_local: Let the Madrid socialists run their own campaign
+
+@madrid_all_in
+choose-if: funds >= 2
+unavailable-subtitle: Not enough party funds (needs 2).
+on-arrival: {! Q.funds -= 2; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'psoe', 1.04); } !}
+
+You campaign in Madrid every weekend. If it goes badly, it will be your defeat as much as theirs.
+
+@madrid_local
+on-arrival: {! Q.sanchez_authority -= 1; !}
+
+A local campaign by a local candidate. The national stakes are obvious anyway.
+
+@ceuta
+title: Ceuta
+new-page: true
+tags: sp_event
+view-if: ceuta_seen = 0 and ((year = 2021 and month >= 5) or year >= 2022)
+max-visits: 1
+on-arrival: {! Q.ceuta_seen = 1; Q.ceuta_severe = (Q.intl && Q.intl.maghreb < 45) ? 1 : 0; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {pensioners: 1 + Q.ceuta_severe, self_employed: 1 + Q.ceuta_severe, workers: 0.5 + Q.ceuta_severe}); } !}
+
+= Ceuta
+
+Angry that Spain admitted the Polisario leader Brahim Ghali to a Spanish hospital, Morocco's border guards step aside. [? if ceuta_severe = 1 : Ten thousand people, many of them children, swim and walk into Ceuta in two days. ?][? if ceuta_severe = 0 : Several thousand people cross into Ceuta before Rabat closes the border again. ?] Vox calls it an invasion.
+
+- @ceuta_army: Send the army to the border and ask Brussels for support
+- @ceuta_rabat: Calm things down with Rabat, quietly
+- @ceuta_children: Protect the unaccompanied children first
+
+@ceuta_army
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', -8); window.SpainGame.intl(Q, 'eu', 5); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.8); } !}
+
+Firm, and seen to be firm. Brussels declares Ceuta's border Europe's border.
+
+@ceuta_rabat
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 6); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.5, self_employed: 0.5}); } !}
+
+The crisis ends, the questions about what Spain conceded do not.
+
+@ceuta_children
+on-arrival: {! Q.progressives_dissent -= 4; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 4); window.SpainGame.position(Q, 0, 1); } !}
+
+UNICEF praises Spain. Vox puts the children on its campaign posters.
+
+@pardons
+title: The pardons
+new-page: true
+tags: sp_event
+view-if: pardons_seen = 0 and psoe_in_government = 1 and cat_crisis_seen = 1 and cat_sentence_seen = 1 and ((year = 2021 and month >= 6) or year >= 2022)
+max-visits: 1
+on-arrival: pardons_seen = 1
+
+= The pardons
+
+The independence leaders have served more than three years. ERC, on whose votes your government depends, asks for pardons. The Supreme Court advises against; the PP collects signatures in the street.
+
+- @pardon_yes: Grant the pardons: "concord over revenge"
+- @pardon_no: Refuse: the sentences stand
+
+@pardon_yes
+on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 20; Q.rel_junts += 10; Q.regional_leaders_dissent += 15; Q.rel_pp -= 10; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, vox: 0.3, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 0.97); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); window.SpainGame.position(Q, 0, 1.5); } !}
+
+The streets of Catalonia go quiet. The rest of Spain argues about it for a year.
+
+@pardon_no
+on-arrival: {! Q.rel_erc -= 20; Q.regional_leaders_dissent -= 8; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } if (Q.depends_on_catalans) { Q.depends_on_catalans = 0; Q.lost_majority = 1; } !}
+
+[? if lost_majority = 1 : ERC withdraws its support. Your government no longer has a majority. ?][? if lost_majority = 0 : The PP has nothing to campaign on. ERC has everything. ?]
+
+@la_palma
+title: The volcano
+new-page: true
+tags: sp_event
+view-if: la_palma_seen = 0 and ((year = 2021 and month >= 9) or year >= 2022)
+max-visits: 1
+on-arrival: la_palma_seen = 1
+
+= The volcano
+
+A volcano erupts on La Palma. For three months lava buries homes, farms and banana plantations; seven thousand people are evacuated.
+
+- @palma_aid: [? if psoe_in_government = 1 : Declare a disaster zone and fund the reconstruction ?][? if psoe_in_government = 0 : Demand that the government spends whatever it takes ?]
+- @palma_visit: Visit, listen, and promise not to forget
+
+@palma_aid
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.05; } Q.rel_cc += 5; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Canarias', 'psoe', 1.03); } !}
+
+The islanders remember who came, and who paid.
+
+@palma_visit
+on-arrival: rel_cc += 2
+
+The visit is appreciated; the help will be measured later.
+
+@ukraine
+title: War in Ukraine
+new-page: true
+tags: sp_event
+view-if: ukraine_seen = 0 and ((year = 2022 and month >= 2) or year >= 2023)
+max-visits: 1
+on-arrival: {! Q.ukraine_seen = 1; if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; } !}
+
+= War in Ukraine
+
+Russia invades Ukraine. Millions flee west; gas and electricity prices explode. [? if psoe_in_government = 1 : Your coalition partners in Podemos oppose sending weapons. ?]
+
+- @ukraine_arms: Send weapons with the EU and NATO
+- @ukraine_humanitarian: Humanitarian aid and refugees, no weapons
+- @ukraine_refugees: Open Spain to Ukrainian refugees, whatever else
+
+@ukraine_arms
+on-arrival: {! Q.rel_up -= 10; Q.progressives_dissent += 5; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', 12); window.SpainGame.intl(Q, 'eu', 6); window.SpainGame.intl(Q, 'us', 8); window.SpainGame.target(Q, 'psoe', 'middle', 1); window.SpainGame.partyRel(Q, 'pp', 'up', -5); } !}
+
+Spain stands with its allies. Podemos votes against in Congress, and the coalition creaks.
+
+@ukraine_humanitarian
+on-arrival: {! Q.rel_up += 4; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', -8); window.SpainGame.intl(Q, 'eu', -4); window.SpainGame.intl(Q, 'us', -6); } !}
+
+Brussels and Washington notice who is missing from the list.
+
+@ukraine_refugees
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'un', 4); window.SpainGame.target(Q, 'psoe', 'women', 1); } !}
+
+Families in Málaga and Valencia take in Ukrainians. For once, almost nobody objects.
+
+@sahara
+title: The letter to Rabat
+new-page: true
+tags: sp_event
+view-if: sahara_seen = 0 and psoe_in_government = 1 and ceuta_seen = 1 and ((year = 2022 and month >= 3) or year >= 2023)
+max-visits: 1
+on-arrival: sahara_seen = 1
+
+= The letter to Rabat
+
+Morocco offers to end the crisis if Spain backs its plan for autonomy for Western Sahara under Moroccan sovereignty, abandoning Spain's long neutrality. Algeria, which supplies much of Spain's gas and backs the Polisario, warns of consequences.
+
+- @sahara_morocco: Back Morocco's autonomy plan
+- @sahara_neutral: Keep Spain's neutrality
+
+@sahara_morocco
+on-arrival: {! Q.rel_up -= 10; Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 10); window.SpainGame.intl(Q, 'un', -5); } Q.fiscal_adj += 0.1; !}
+
+Rabat reopens the borders and cooperates on migration. Algeria freezes its friendship treaty and raises gas prices. Every party in Congress, including your partners, votes to condemn the decision.
+
+@sahara_neutral
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', -6); window.SpainGame.intl(Q, 'un', 3); } !}
+
+Rabat keeps the pressure on, and the migration routes stay open.
+
+@pegasus
+title: Pegasus
+new-page: true
+tags: sp_event
+view-if: pegasus_seen = 0 and psoe_in_government = 1 and cat_crisis_seen = 1 and ((year = 2022 and month >= 4) or year >= 2023)
+max-visits: 1
+on-arrival: {! Q.pegasus_seen = 1; Q.rel_erc -= 15; Q.rel_junts -= 10; !}
+
+= Pegasus
+
+Researchers reveal that the phones of dozens of Catalan independence leaders were infected with Pegasus spyware, and later that the Prime Minister's own phone was hacked too, probably from Morocco. ERC suspends its support until there are answers.
+
+- @pegasus_dismiss: Dismiss the head of the intelligence service
+- @pegasus_defend: Defend the services: everything was authorised by a judge
+
+@pegasus_dismiss
+on-arrival: {! Q.rel_erc += 12; Q.institutionalists_dissent += 6; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', -2); } !}
+
+ERC returns to the table. The intelligence community is furious.
+
+@pegasus_defend
+on-arrival: {! Q.rel_erc -= 8; Q.institutionalists_dissent -= 3; if (Q.depends_on_catalans && Q.rel_erc < 30) { Q.depends_on_catalans = 0; Q.lost_majority = 1; } !}
+
+The services are reassured. ERC is not.
+
+@energy_exception
+title: The Iberian exception
+new-page: true
+tags: sp_event
+view-if: energy_seen = 0 and ukraine_seen = 1 and psoe_in_government = 1 and ((year = 2022 and month >= 4) or year >= 2023)
+max-visits: 1
+on-arrival: {! Q.energy_seen = 1; Q.iberian_ok = (Q.intl && Q.intl.south >= 55 && Q.intl.eu >= 50) ? 1 : 0; if (Q.iberian_ok) { Q.fiscal_adj -= 0.1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.intl(Q, 'south', 4); } } else { if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.6, vox: 0.4}, {workers: 1, pensioners: 1, self_employed: 1}); } } !}
+
+= The Iberian exception
+
+Electricity bills have tripled. Spain and Portugal ask Brussels to let them cap the price of gas used for electricity, arguing that the Iberian peninsula is an "energy island". [? if iberian_ok = 1 : With António Costa at your side and goodwill in Brussels, the Commission agrees. Bills fall within weeks. ?][? if iberian_ok = 0 : Without allies, the request stalls. Bills keep rising, and so does the anger. ?]
+
+@nato_madrid
+title: The Madrid summit
+new-page: true
+tags: sp_event
+view-if: nato_madrid_seen = 0 and psoe_in_government = 1 and ((year = 2022 and month >= 6) or year >= 2023)
+max-visits: 1
+on-arrival: {! Q.nato_madrid_seen = 1; Q.nato_hosts = (Q.intl && Q.intl.nato >= 55) ? 1 : 0; if (Q.nato_hosts) { Q.sanchez_authority += 4; Q.rel_up -= 4; if (window.SpainGame) { window.SpainGame.intl(Q, 'nato', 5); window.SpainGame.intl(Q, 'us', 5); } } !}
+
+= The Madrid summit
+
+[? if nato_hosts = 1 : NATO's leaders meet in Madrid, forty years after Spain joined, to adopt a new strategy after the invasion of Ukraine, including, at Spain's insistence, the threats from the alliance's southern flank. Biden, at a dinner in the Prado, calls Spain a model ally. ?][? if nato_hosts = 0 : The alliance chooses another capital for its summit; Spain's allies have doubts about its commitment. ?]
+
+@eu_presidency
+title: The EU presidency
+new-page: true
+tags: sp_event
+view-if: eu_presidency_seen = 0 and ((year = 2023 and month >= 7) or year >= 2024)
+max-visits: 1
+on-arrival: {! Q.eu_presidency_seen = 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); } if (Q.psoe_in_government) { Q.sanchez_authority += 3; } !}
+
+= The EU presidency
+
+For six months Spain holds the presidency of the Council of the European Union, chairing the negotiations on migration, artificial intelligence and fiscal rules. [? if psoe_in_government = 1 : You chair the summits, and the photographs help at home. ?][? if psoe_in_government = 0 : The government chairs the summits; the PSOE watches. ?]

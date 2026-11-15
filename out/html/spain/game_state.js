@@ -84,7 +84,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'foreign', 'pes', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -155,6 +155,11 @@
     Q.catalan_crisis = 0;
     Q.pp_scandal = 0;
 
+    // International relations (0-100): Spain's standing with each partner.
+    // While the PSOE is in opposition they reflect the government's
+    // diplomacy and the party's own contacts (European socialists etc.).
+    Q.intl = { eu: 60, south: 60, maghreb: 50, us: 55, nato: 55, un: 55 };
+
     // Party finances: an abstract fund, earned monthly and spent on campaigns.
     Q.funds = 6;
     // Government finances: policy adjustment to the deficit (points of GDP)
@@ -220,6 +225,14 @@
     Q.deficit = Math.round((yearValue(DEFICIT_BY_YEAR, Q.year) + (Q.fiscal_adj || 0)) * 10) / 10;
     Q.debt = Math.round(yearValue(DEBT_BY_YEAR, Q.year) + (Q.debt_adj || 0));
     Q.deficit_text = Q.deficit.toFixed(1);
+    Q.intl = Q.intl || { eu: 60, south: 60, maghreb: 50, us: 55, nato: 55, un: 55 };
+    Object.keys(Q.intl).forEach(function (k) {
+      Q.intl[k] = clamp(Math.round(Q.intl[k]), 0, 100);
+      Q['intl_' + k] = Q.intl[k];
+      Q['intl_' + k + '_word'] = UI.word('relation', Q.intl[k]);
+    });
+    // Brussels tolerates a little more deficit from a trusted government
+    Q.deficit_tolerance = Q.intl.eu >= 70 ? 4.2 : (Q.intl.eu >= 50 ? 3.5 : 3.0);
     Q.authority_word = UI.word('authority', Q.sanchez_authority);
     Q.morale_word = UI.word('morale', Q.member_morale);
     Q.unity_word = UI.word('unity', Q.psoe_unity);
@@ -230,6 +243,14 @@
     Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
+    // flags for conditional world events
+    var mad = Q.regions && Q.regions['Madrid'];
+    Q.madrid_pp = mad && mad.government && mad.government.party === 'pp' ? 1 : 0;
+    var csSeats = (Q.congress && Q.congress.cs) || 0;
+    Q.cs_peak_seats = Math.max(Q.cs_peak_seats || 0, csSeats);
+    Q.cs_collapsed = Q.cs_peak_seats >= 30 && csSeats < 15 ? 1 : 0;
+    Q.up_running = Q.true_poll && Q.true_poll.up >= 4 ? 1 : 0;
+    Q.lost_majority = Q.lost_majority || 0;
   }
 
   function congressText(seats) {
@@ -385,6 +406,12 @@
     }
     Q.econ_left = (Q.econ_left || 0) * 0.97;
     Q.social_prog = (Q.social_prog || 0) * 0.97;
+  }
+
+  // Change Spain's relation with an international partner.
+  function intl(Q, key, delta) {
+    Q.intl = Q.intl || {};
+    Q.intl[key] = clamp((Q.intl[key] === undefined ? 50 : Q.intl[key]) + delta, 0, 100);
   }
 
   // Change a relation between two other parties (clamped 0-100).
@@ -643,7 +670,7 @@
     Q.ruinous_debt = Q.funds <= -10 ? 1 : 0;
     // government finances: policy adjustments accumulate into debt
     Q.debt_adj = (Q.debt_adj || 0) + (Q.fiscal_adj || 0) / 12;
-    Q.brussels_due = (Q.psoe_in_government && Q.deficit > 3.5 &&
+    Q.brussels_due = (Q.psoe_in_government && Q.deficit > (Q.deficit_tolerance || 3.5) &&
       (Q.brussels_year || 0) < Q.year) ? 1 : 0;
 
     // a running investiture clock outside formation mode (should not
@@ -1392,6 +1419,7 @@
     campaign: campaign,
     transfer: transfer,
     partyRel: partyRel,
+    intl: intl,
     formationBlame: formationBlame,
     position: position,
     trueVote: trueVote,

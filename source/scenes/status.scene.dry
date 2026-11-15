@@ -74,6 +74,20 @@ Podemos–ERC: **[+ up_indep_word +]**
 
 PNV–PP: **[+ pnv_pp_word +]**
 
+= International
+
+EU: **[+ intl_eu_word +]**
+
+Portugal, Italy, Greece: **[+ intl_south_word +]**
+
+Morocco and Algeria: **[+ intl_maghreb_word +]**
+
+United States: **[+ intl_us_word +]**
+
+NATO: **[+ intl_nato_word +]**
+
+United Nations: **[+ intl_un_word +]**[? if unsc_won = 1 : (Security Council seat) ?]
+
 @paramilitaries
 title: Regions
 on-display: {!
