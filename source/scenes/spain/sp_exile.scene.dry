@@ -1,0 +1,169 @@
+title: Tour the agrupaciones
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and exile_tour_timer <= 0
+on-arrival: month_actions += 1; exile_tour_timer = 2
+
+= Tour the agrupaciones
+
+No car from the party, no staff. You drive yourself from one local branch to the next, as you did in 2014.
+
+- @tour_members: Listen to the members
+- @tour_critic: Criticise the leadership's line
+
+@tour_members
+on-arrival: sanchismo += 5; member_morale += 2
+
+The halls are small and full. The members tell you what they would not tell Ferraz.
+
+@tour_critic
+on-arrival: {! Q.sanchismo += 7; Q.populism += 1; Q.member_morale -= 2; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', {up: 0.5, cs: 0.5}, {students: 0.5, workers: 0.5}); } !}
+
+"The PSOE has forgotten who it is for." The leadership calls it disloyalty; the members call it the truth.
+
+@book
+title: Write a book
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exile_book_timer <= 0
+on-arrival: month_actions += 1; exile_book_timer = 12
+
+= Write a book
+
+A publisher offers you an advance for your account of the last years. The working title is *Manual de resistencia*.
+
+- @book_yes: Write it
+- @root: Not now
+
+@book_yes
+on-arrival: sanchismo += 6; funds += 1; populism += 1
+
+It sells well. Everyone in politics reads the chapter about themselves first.
+
+@organise
+title: Build the organisation
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and player_is_ps = 1 and exile_org_timer <= 0
+on-arrival: month_actions += 1; exile_org_timer = 2
+
+= Build the organisation
+
+A new party needs branches in fifty-two provinces, candidates, lawyers and money.
+
+- @org_branches: Open branches across Spain
+- @org_defectors: Recruit PSOE mayors and councillors
+- @org_movement: Run it as a movement: open primaries and online votes
+
+@org_branches
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaignRaw(Q, 'ps', {workers: 0.8, pensioners: 0.6, professionals: 0.6, unemployed: 0.6, students: 0.5, homemakers: 0.4, self_employed: 0.3}); } !}
+
+[+ new_party_name +] now exists outside Madrid.
+
+@org_defectors
+on-arrival: {! Q.rel_psoe = (Q.rel_psoe || 15) - 6; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', 'ps', {pensioners: 1, workers: 1, homemakers: 0.6}); } !}
+
+A dozen mayors in Andalusia and Extremadura switch sides. The PSOE's new leadership is furious.
+
+@org_movement
+on-arrival: {! Q.populism += 1; if (window.SpainGame) { window.SpainGame.campaignRaw(Q, 'ps', {students: 1.2, unemployed: 0.8, professionals: 0.5}); } !}
+
+Young volunteers join by the thousand. The press calls it Podemos with a tie.
+
+@bid
+title: Bid for the leadership
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and player_leads = 0 and player_is_ps = 0 and exile_bid_timer <= 0 and elections_held >= 2
+on-arrival: month_actions += 1; exile_bid_timer = 6
+
+= Bid for the leadership
+
+[+ my_party +] is not doing as well as it hoped. Some of its members think the newcomer with a national profile should lead it.
+
+- @bid_go: Stand for the leadership
+- @root: Not yet
+
+@bid_go
+on-arrival: {! Q.bid_won = (Q.sanchismo + Q.populism * 3 + (Math.random() * 20 - 10) >= 45) ? 1 : 0; if (Q.bid_won) { Q.player_leads = 1; } else { Q.sanchismo -= 5; } !}
+
+[? if bid_won = 1 : The members choose you. Pedro Sánchez leads [+ my_party +], and would be its candidate for Prime Minister. ?][? if bid_won = 0 : The founders close ranks. The newcomer will have to wait. ?]
+
+@bridge
+title: Bridges to the PSOE
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and exile_bridge_timer <= 0
+on-arrival: month_actions += 1; exile_bridge_timer = 3
+
+= Bridges to the PSOE
+
+Old colleagues still take your calls, some of them.
+
+- @bridge_lunch: Lunch with old friends in the PSOE group
+- @bridge_attack: Attack the PSOE leadership instead
+
+@bridge_lunch
+on-arrival: {! Q.rel_psoe = (Q.rel_psoe || 20) + 8; !}
+
+The conversation is awkward and useful.
+
+@bridge_attack
+on-arrival: {! Q.rel_psoe = (Q.rel_psoe || 20) - 6; Q.populism += 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', Q.player_party, {workers: 0.6, students: 0.4}); } !}
+
+Some PSOE voters agree with you. None of its leaders will.
+
+@exile_funds
+title: Raise money
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and exile_funds_timer <= 0
+on-arrival: month_actions += 1; exile_funds_timer = 3
+
+= Raise money
+
+- @funds_small: Small donations from supporters
+- @funds_big: A dinner with business donors
+
+@funds_small
+on-arrival: {! Q.funds += 0.6 + Q.sanchismo / 60; !}
+
+Thousands of small transfers. Not much, but nobody owns you.
+
+@funds_big
+on-arrival: {! Q.funds += 2; Q.populism -= 1; !}
+
+A generous evening. The photos are less generous.
+
+@low_profile
+title: Keep a low profile
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0
+on-arrival: month_actions += 1
+
+= Keep a low profile
+
+A quiet month: a few interviews declined, a few calls returned, a lot of reading.
+
+- @low_watch: Watch and wait
+- @low_calls: Keep in touch with your people
+
+@low_watch
+on-arrival: sanchismo -= 1
+
+Out of sight is, a little, out of mind.
+
+@low_calls
+on-arrival: sanchismo += 2
+
+Your network holds together.

@@ -324,3 +324,79 @@ test('world-event flags: Madrid governed by the PP, Cs collapse after a peak', (
   G.recalculate(Q);
   assert.strictEqual(Q.cs_collapsed, 1);
 });
+
+test('PP leader falls after losing power and a successor is chosen', () => {
+  const Q = newQ();
+  Q.year = 2018; Q.month = 6;
+  G.formGovernment(Q, 'sanchez');
+  assert.strictEqual(Q.pp_leader_falls_due, 1);
+  G.choosePPLeader(Q);
+  G.recalculate(Q);
+  assert.notStrictEqual(Q.pp_leader, 'Mariano Rajoy');
+  assert.strictEqual(Q.pp_leader_falls_due, 0);
+  assert.strictEqual(Q.right_leader, Q.pp_leader);
+});
+
+test('a governing PP leader is not forced out by a setback', () => {
+  const Q = newQ();
+  G.ppSetback(Q, 2);
+  assert.ok(!Q.pp_leader_falls_due);
+});
+
+test('leadership crisis stages follow authority', () => {
+  const Q = newQ();
+  Q.sanchez_authority = 28; G.endOfMonth(Q);
+  assert.strictEqual(Q.lead_rumours_due, 1);
+  assert.strictEqual(Q.lead_challenge_due, 0);
+  Q.lead_stage = 1; Q.sanchez_authority = 12; G.endOfMonth(Q);
+  assert.strictEqual(Q.lead_rumours_due, 0);
+  assert.strictEqual(Q.lead_challenge_due, 1);
+  Q.sanchez_authority = 0; G.endOfMonth(Q);
+  assert.strictEqual(Q.lead_forced_due, 1);
+});
+
+test('losing a primary ousts Sánchez and opens the exile choice', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.month = 3;
+  Q.member_morale = 0; Q.sanchismo = 0; Q.sanchez_authority = 0;
+  G.leadershipElection(Q, -100);
+  assert.strictEqual(Q.sanchez_leader, 0);
+  assert.strictEqual(Q.exile_pending, 1);
+  assert.ok(Q.psoe_leader && Q.psoe_leader !== 'Pedro Sánchez');
+  assert.strictEqual(G.lossReason(Q), '');
+});
+
+test('a new party takes votes in proportion to following and populism', () => {
+  const weak = newQ(); weak.year = 2019; weak.sanchismo = 20; weak.populism = 1;
+  const strong = newQ(); strong.year = 2019; strong.sanchismo = 70; strong.populism = 8;
+  [weak, strong].forEach(q => { G.oust(q, true); G.joinParty(q, 'ps', 'Avanza'); });
+  assert.ok(strong.true_poll.ps > weak.true_poll.ps + 3, `${strong.true_poll.ps} vs ${weak.true_poll.ps}`);
+  assert.strictEqual(strong.exiled, 1);
+  assert.strictEqual(strong.player_party, 'ps');
+  // card effects aimed at 'psoe' now go to the new party
+  const before = strong.true_poll.ps;
+  G.campaign(strong, 'psoe', { workers: 3, pensioners: 3 });
+  assert.ok(strong.true_poll.ps > before);
+});
+
+test('joining Ciudadanos needs a moderate line and good relations', () => {
+  const Q = newQ();
+  Q.econ_left = 3; Q.rel_cs = 70; Q.true_poll.cs = 12; G.recalculate(Q);
+  assert.strictEqual(Q.can_join_cs, 0);
+  Q.econ_left = 0; Q.true_poll.cs = 12; G.recalculate(Q);
+  assert.strictEqual(Q.can_join_cs, 1);
+});
+
+test('without Sánchez, formation runs automatically with his party\'s line', () => {
+  const Q = newQ();
+  Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  Q.elections_held = 2; Q.government_status = 'acting'; Q.formation_weeks = 3; Q.repeat_elections = 1;
+  G.oust(Q, true);
+  G.joinParty(Q, 'cs');
+  Q.player_line_right = 'coalition'; Q.player_line_left = 'no'; Q.player_line_set = 1;
+  G.recalculate(Q);
+  const r = G.autoFormation(Q);
+  assert.strictEqual(r, 'pp');
+  assert.deepStrictEqual(Q.govt_parties, ['pp', 'cs']);
+  assert.strictEqual(Q.player_in_government, 1);
+});

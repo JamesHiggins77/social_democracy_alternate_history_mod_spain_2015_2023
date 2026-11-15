@@ -54,7 +54,7 @@ Two days of speeches. What do you build your speech around?
 
 - @speech_change: A government of change
 - @speech_reform: A reformist government for all Spaniards
-- @speech_attack: The case against Rajoy
+- @speech_attack: The case against [+ pp_leader_short +]
 
 @speech_change
 on-arrival: rel_up += 3; rel_cs -= 2; member_morale += 3

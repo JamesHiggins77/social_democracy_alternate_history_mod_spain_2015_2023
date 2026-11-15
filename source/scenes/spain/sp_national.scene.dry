@@ -2,7 +2,7 @@ title: The interview
 new-page: true
 is-card: true
 tags: sp_national
-view-if: media_timer <= 0 and sanchez_leader = 1
+view-if: media_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; media_timer = 2
 
 = The interview
@@ -34,7 +34,7 @@ title: A rally
 new-page: true
 is-card: true
 tags: sp_national
-view-if: rally_timer <= 0 and sanchez_leader = 1
+view-if: rally_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; rally_timer = 2
 
 = A rally
@@ -88,7 +88,7 @@ title: The televised debate
 new-page: true
 is-card: true
 tags: sp_national
-view-if: election_year > 0 and debate_timer <= 0 and sanchez_leader = 1
+view-if: election_year > 0 and debate_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; debate_timer = 3
 
 = The televised debate
@@ -128,7 +128,7 @@ on-arrival: month_actions += 1; scandal_timer = 3
 Another sumario arrives from the National Court: Gürtel, Púnica, Lezo, the PP's off-the-books accounts. How hard do you push?
 
 - @commission: Demand a parliamentary commission of inquiry
-- @resign: Demand Rajoy's resignation
+- @resign: Demand [+ pp_leader_short +]'s resignation
 - @restraint: Leave it to the judges
 - @easy_discard
 
@@ -140,7 +140,7 @@ Podemos and Ciudadanos back the commission. The hearings will run for months.
 @resign
 on-arrival: {! Q.pp_scandal = (Q.pp_scandal || 0) + 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 1, workers: 1}); } Q.rel_pp -= 12; Q.member_morale += 4; !}
 
-A good headline. Rajoy, as ever, waits for it to pass.
+A good headline. [+ pp_leader_short +] waits for it to pass.
 
 @restraint
 on-arrival: rel_pp += 4; institutionalists_dissent -= 3; member_morale -= 3
@@ -152,7 +152,7 @@ title: The pensions march
 new-page: true
 is-card: true
 tags: sp_national
-view-if: pensions_campaign_timer <= 0 and sanchez_leader = 1 and year >= 2016
+view-if: pensions_campaign_timer <= 0 and sanchez_active = 1 and year >= 2016
 on-arrival: month_actions += 1; pensions_campaign_timer = 4
 
 = The pensions march
@@ -180,7 +180,7 @@ title: 8 March
 new-page: true
 is-card: true
 tags: sp_national
-view-if: feminism_timer <= 0 and sanchez_leader = 1 and year >= 2017
+view-if: feminism_timer <= 0 and sanchez_active = 1 and year >= 2017
 on-arrival: month_actions += 1; feminism_timer = 6
 
 = 8 March
@@ -255,7 +255,7 @@ title: Campaign ads
 new-page: true
 is-card: true
 tags: sp_national
-view-if: ads_timer <= 0 and sanchez_leader = 1
+view-if: ads_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; ads_timer = 2
 
 = Campaign ads
@@ -341,7 +341,7 @@ title: Media appearance
 new-page: true
 is-card: true
 tags: sp_national
-view-if: appearance_timer <= 0 and sanchez_leader = 1
+view-if: appearance_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; appearance_timer = 1
 
 = Media appearance
@@ -395,7 +395,7 @@ title: Campaign tour
 new-page: true
 is-card: true
 tags: sp_national
-view-if: election_year > 0 and tour_timer <= 0 and sanchez_leader = 1
+view-if: election_year > 0 and tour_timer <= 0 and sanchez_active = 1
 on-arrival: month_actions += 1; tour_timer = 1
 
 = Campaign tour

@@ -26,7 +26,7 @@ on-arrival: red_lines = 1; regional_leaders_dissent += 3; sanchez_authority += 2
 The final text bars any referendum, but leaves you to decide which parties you talk to. It is a draw, and both sides claim it.
 
 @defy
-on-arrival: red_lines = 0; regional_leaders_dissent += 20; institutionalists_dissent += 10; federal_committee_balance -= 8; sanchez_authority += 4; member_morale += 4
+on-arrival: populism += 1; red_lines = 0; regional_leaders_dissent += 20; institutionalists_dissent += 10; federal_committee_balance -= 8; sanchez_authority += 4; member_morale += 4
 
 The vote is close. You keep your freedom to negotiate, but Susana Díaz has counted her votes, and so have you.
 
@@ -34,7 +34,7 @@ The vote is close. You keep your freedom to negotiate, but Susana Díaz has coun
 title: Iglesias's offer
 new-page: true
 tags: sp_event
-view-if: year = 2016 and month >= 1 and month <= 3 and acting = 1 and psoe_in_government = 0 and rel_up >= 25 and formation_weeks >= 3
+view-if: year = 2016 and month >= 1 and month <= 3 and acting = 1 and psoe_in_government = 0 and rel_up >= 25 and formation_weeks >= 3 and sanchez_leader = 1
 max-visits: 1
 
 = Pablo Iglesias makes an offer
@@ -65,7 +65,7 @@ title: The King's consultations
 new-page: true
 face-image: img/spain/event_rajoy_sanchez.jpg
 tags: sp_event
-view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2 and psoe_largest = 0
+view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2 and psoe_largest = 0 and sanchez_leader = 1
 on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}
 
 = [+ right_leader +] asks for support
@@ -142,7 +142,7 @@ You tell the King you need more time. [+ right_leader +]'s strategy depends on e
 title: The King turns to you
 new-page: true
 tags: sp_event
-view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and formation_weeks >= 5
+view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and formation_weeks >= 5 and sanchez_leader = 1
 on-arrival: {! Q.king_asked = Q.formation_round || 1; !}
 
 = The King turns to you
@@ -274,7 +274,7 @@ title: You survive
 After a day of shouting in the corridors of Ferraz, the vote goes your way. Your critics will wait for another chance.
 
 @members
-on-arrival: sanchez_leader = 0; leadership_exception_open = 1 if in_leadership_window = 1
+on-arrival: populism += 1; sanchez_leader = 0; leadership_exception_open = 1 if in_leadership_window = 1
 go-to: ousted
 
 @ousted
@@ -307,7 +307,7 @@ if (Q.primary_won) {
 title: The King forces a vote
 new-page: true
 tags: sp_event
-view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and formation_weeks >= 16
+view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and formation_weeks >= 16 and sanchez_leader = 1
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.holdInvestiture(Q, Q.right_candidate || 'pp');
@@ -333,14 +333,14 @@ The results are in. Your senior team gathers at Ferraz. The party faces two oppo
 
 How do you position the PSOE this morning?
 
-- @responsible: The responsible opposition: no to Rajoy, no promises yet
+- @responsible: The responsible opposition: no to [+ pp_leader_short +], no promises yet
 - @alternative: An alternative government: announce talks for a change of government
 - @stability: Institutional stability: explore whether any agreement with the PP is possible
 
 @responsible
 on-arrival: posture = 1; sanchez_authority += 2; member_morale += 3; regional_leaders_dissent -= 3
 
-Refusing to back Rajoy while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
+Refusing to back [+ pp_leader_short +] while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
 
 @alternative
 on-arrival: {! Q.posture = 2; Q.rel_up += 10; Q.rel_cs -= 6; Q.member_morale += 7; Q.progressives_dissent -= 5; Q.regional_leaders_dissent += 8; Q.institutionalists_dissent += 4; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); window.SpainGame.transfer(Q, 'psoe', 'cs', {pensioners: 0.5, self_employed: 0.5}); } if (window.SpainGame) { window.SpainGame.position(Q, 0.8, 0); } !}

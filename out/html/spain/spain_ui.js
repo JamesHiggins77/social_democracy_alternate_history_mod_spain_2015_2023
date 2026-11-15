@@ -18,7 +18,7 @@
     ['mxme', 'Més per Menorca', '#9FBF1F', 'MxMe'], ['cha', 'Chunta Aragonesista', '#3A8A3A', 'CHA'],
     ['aa', 'Adelante Andalucía', '#2E8B57', 'AA'],
     ['bng', 'BNG', '#7FB3E0', 'BNG'], ['geroa', 'Geroa Bai', '#F75E42', 'Geroa'],
-    ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
+    ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['ps', 'Sánchez\'s party', '#F0648C', 'New party'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
     ['te', 'Teruel Existe', '#037252', 'TE'], ['foro', 'Foro Asturias', '#2E73B8', 'Foro'],
     ['prc', 'PRC', '#C2CE0C', 'PRC'], ['nc', 'Nueva Canarias', '#9ACD32', 'NC'],
     ['cc', 'Coalición Canaria', '#FFD700', 'CC'], ['asg', 'Agrupación Socialista Gomera', '#E3242B', 'ASG'],
@@ -51,6 +51,8 @@
     committee: [[29, 'Lost'], [44, 'Against him'], [54, 'Divided'], [69, 'Behind him'],
                 [100, 'Firmly behind him']],
     sanchismo: [[19, 'Isolated'], [39, 'Small'], [59, 'Solid'], [79, 'Strong'], [100, 'Dominant']],
+    style: [[1, 'Establishment'], [3, 'Pragmatic'], [5, 'Insurgent'], [7, 'Anti-establishment'],
+            [10, 'Populist']],
     strength: [[9, 'Marginal'], [19, 'Minor'], [29, 'Significant'], [39, 'Major'], [100, 'Dominant']]
   };
 
@@ -76,6 +78,14 @@
 
   function shortName(id) {
     return META[id] ? META[id].short : id.replace(/^x:/, '');
+  }
+
+  // Rename a party at runtime (the name Sánchez gives his own party).
+  function setPartyName(id, name, short) {
+    if (META[id]) {
+      META[id].name = name;
+      META[id].short = short || name;
+    }
   }
 
   function partyColor(id) {
@@ -453,6 +463,7 @@
 
   var api = {
     PARTIES: PARTIES,
+    setPartyName: setPartyName,
     PP_ALONE_LOSS_SEATS: PP_ALONE_LOSS_SEATS,
     LARGE_MAJORITY_SEATS: LARGE_MAJORITY_SEATS,
     partyName: partyName,

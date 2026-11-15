@@ -57,3 +57,175 @@ card-image: img/spain/portrait_sanchez_2015.jpg
 tags: sp_advisor
 view-if: sanchez_nominated = 1 and psoe_in_government = 0 and sanchez_leader = 1
 go-to: sp_investiture
+
+@organisation
+title: Secretary of Organisation
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1
+new-page: true
+
+= [? if year < 2017 : César Luena ?][? if year >= 2017 : José Luis Ábalos ?]
+
+The Secretary of Organisation runs the party machine: the federations, the lists, the money. Faction: loyal to the leadership.
+
+- @org_tour
+- @org_money
+- @org_discipline
+- @root: Back
+
+@org_tour
+title: Tour the federations
+subtitle: Calms the regional leaders and firms up the Federal Committee.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: regional_leaders_dissent -= 6; federal_committee_balance += 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+A month of dinners in regional capitals. The barons feel consulted.
+
+@org_money
+title: Squeeze the finances
+subtitle: Raises party funds; members grumble.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: funds += 1.5; member_morale -= 2; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Dues are chased, contracts renegotiated, the headquarters' heating turned down.
+
+@org_discipline
+title: Discipline the critics
+subtitle: More control of the Federal Committee; the old guard resents it.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: federal_committee_balance += 6; sanchez_authority += 2; institutionalists_dissent += 5; regional_leaders_dissent += 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+A few federations get new caretaker committees. The message is understood.
+
+@lastra
+title: Adriana Lastra
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1
+new-page: true
+
+= Adriana Lastra
+
+Asturian, combative, and one of the few who stayed with you in the worst moments. She speaks to the members, and to Podemos. Faction: Progressives.
+
+- @lastra_up
+- @lastra_members
+- @lastra_women
+- @root: Back
+
+@lastra_up
+title: Open a channel to Podemos
+subtitle: Better relations and talks with Podemos; Ciudadanos notices.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: rel_up += 8; up_talks += 1; rel_cs -= 2; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Coffee with Irene Montero's team. Nothing is promised; something is understood.
+
+@lastra_members
+title: Mobilise the members
+subtitle: Raises morale and your personal following.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: member_morale += 5; sanchismo += 3; populism += 0.5; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Assemblies in every federation. The members feel the party belongs to them again.
+
+@lastra_women
+title: Lead on equality
+subtitle: A campaign aimed at women.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 1.5); } !}
+
+Equal pay, the wage gap, gender violence: the PSOE's feminist agenda gets a month of attention.
+
+@redondo
+title: Iván Redondo
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and year >= 2017
+new-page: true
+
+= Iván Redondo
+
+A political consultant who once worked for the PP and now works for you. He believes in data, narrative and nothing else. Faction: none but yours.
+
+- @redondo_poll
+- @redondo_narrative
+- @redondo_centre
+- @root: Back
+
+@redondo_poll
+title: Commission private polling
+subtitle: See the PSOE's real support, without the published polls' error.
+choose-if: advisor_action_timer = 0 and funds >= 0.5
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?][? if advisor_action_timer = 0 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.funds -= 0.5; Q.internal_psoe = Math.round(((Q.true_poll && Q.true_poll.psoe) || 0) * 10) / 10; Q.published_psoe = Math.round(((Q.poll && Q.poll.psoe) || 0) * 10) / 10; !}
+
+Redondo's private poll puts the PSOE at [+ internal_psoe +]%. The published average says [+ published_psoe +]%.
+
+@redondo_narrative
+title: Build the narrative
+subtitle: Strengthens your personal following; the party elders dislike it.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: sanchismo += 6; populism += 1; sanchez_authority += 2; institutionalists_dissent += 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+The resistant, the survivor, the man the apparatus could not kill. The story writes itself, with some help.
+
+@redondo_centre
+title: Occupy the centre
+subtitle: Move towards the centre and court Ciudadanos's voters.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.rel_cs += 4; Q.progressives_dissent += 3; if (window.SpainGame) { window.SpainGame.position(Q, -1, 0); window.SpainGame.target(Q, 'psoe', 'middle', 1.2); } !}
+
+"The PSOE is the party of the great majority." Ciudadanos's voters hear it; so does Podemos.
+
+@montero
+title: María Jesús Montero
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and psoe_in_government = 1
+new-page: true
+
+= María Jesús Montero
+
+Minister of Finance. Sevillian, fast-talking, and the person who knows where every euro goes. Faction: Regional leaders.
+
+- @montero_tighten
+- @montero_regions
+- @montero_partners
+- @root: Back
+
+@montero_tighten
+title: Tighten spending
+subtitle: Lowers the deficit and pleases Brussels; the unions object.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.fiscal_adj -= 0.3; Q.trade_unionists_dissent += 5; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); } !}
+
+A spending freeze in every ministry but pensions.
+
+@montero_regions
+title: Renegotiate regional financing
+subtitle: Calms the barons; costs money.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: regional_leaders_dissent -= 8; fiscal_adj += 0.1; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Every region gets a little more. None of them thinks it is enough, but all of them take it.
+
+@montero_partners
+title: Sound out the budget partners
+subtitle: Better relations with the PNV and ERC.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: rel_pnv += 5; rel_erc += 5; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Investments for the Basque Country, a commission for Catalonia. The budget arithmetic improves.

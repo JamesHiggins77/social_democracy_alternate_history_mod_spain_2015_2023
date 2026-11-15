@@ -84,7 +84,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'foreign', 'pes', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'foreign', 'pes', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -152,6 +152,19 @@
     Q.up_talks = 0; Q.cs_talks = 0;
     Q.pact_cs = 0; Q.pact_up = 0; Q.red_lines = 0; Q.referendum_offer = 0;
     Q.pp_vox_relation = 50;
+    // PP leadership: Rajoy until defeat forces him out
+    Q.pp_leader = 'Mariano Rajoy';
+    Q.pp_leader_id = 'rajoy';
+    Q.pp_pressure = 0;
+    Q.pp_leaders_used = ['rajoy'];
+    // who Sánchez is: PSOE leader, or (after an ouster) a backbencher, a
+    // member of Ciudadanos or Podemos, or the leader of his own party
+    Q.player_party = 'psoe';
+    Q.exiled = 0;
+    Q.backbench = 0;
+    Q.populism = 1;
+    Q.lead_stage = 0;
+    Q.psoe_leader = 'Pedro Sánchez';
     Q.catalan_crisis = 0;
     Q.pp_scandal = 0;
 
@@ -199,7 +212,28 @@
     Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
     Q.right_candidate = (Q.congress.cs || 0) > (Q.congress.pp || 0) ? 'cs' : 'pp';
     Q.right_is_cs = Q.right_candidate === 'cs' ? 1 : 0;
-    Q.right_leader = Q.right_candidate === 'cs' ? LEADERS.cs : (Q.pp_leader || 'Mariano Rajoy');
+    Q.right_leader = Q.right_candidate === 'cs' ? leaderOf(Q, 'cs') : (Q.pp_leader || 'Mariano Rajoy');
+    Q.pp_leader_short = surname(Q.pp_leader || 'Mariano Rajoy');
+    Q.player_party = Q.player_party || 'psoe';
+    Q.my_party = Q.player_party === 'psoe' ? 'the PSOE' : UI.partyName(Q.player_party);
+    Q.player_is_cs = Q.player_party === 'cs' ? 1 : 0;
+    Q.player_is_up = Q.player_party === 'up' ? 1 : 0;
+    Q.player_is_ps = Q.player_party === 'ps' ? 1 : 0;
+    Q.sanchez_active = (Q.sanchez_leader || Q.exiled) ? 1 : 0;
+    Q.sanchez_pm = Q.pm === 'Pedro Sánchez' && !Q.acting ? 1 : 0;
+    Q.player_in_government = (!Q.acting && (Q.govt_parties || []).indexOf(Q.player_party) !== -1) ? 1 : 0;
+    Q.populism = clamp(Q.populism || 0, 0, 10);
+    Q.style_word = UI.word('style', Q.populism);
+    Q.player_seats = Q.congress[Q.player_party] || 0;
+    Q.player_is_right_cand = (Q.exiled && Q.player_leads && Q.right_candidate === Q.player_party) ? 1 : 0;
+    Q.player_poll = Math.round(((Q.true_poll && Q.true_poll[Q.player_party]) || 0) * 10) / 10;
+    Q.is_moderate = (Q.econ_left || 0) <= 1 ? 1 : 0;
+    Q.is_progressive = ((Q.econ_left || 0) >= 3 || (Q.social_prog || 0) >= 3) ? 1 : 0;
+    Q.can_join_cs = (Q.is_moderate && Q.rel_cs >= 55 && Q.true_poll && Q.true_poll.cs >= 3) ? 1 : 0;
+    Q.can_join_up = (Q.is_progressive && Q.rel_up >= 55 && Q.true_poll && Q.true_poll.up >= 3) ? 1 : 0;
+    var nps = newPartyStrength(Q);
+    // rough vote share a new party would poll (fitted to the vote model)
+    Q.new_party_prospect = Math.round(2.5 * nps + 0.25 * nps * nps);
     Q.right_party_name = Q.right_candidate === 'cs' ? 'Ciudadanos' : 'the PP';
     Q.up_rivals_psoe = (Q.congress.up || 0) >= 0.9 * (Q.congress.psoe || 1) ? 1 : 0;
     Q.congress_up_seats = Q.congress.up || 0;
@@ -219,7 +253,7 @@
     Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;
     var and = Q.regions && Q.regions['Andalucía'] && Q.regions['Andalucía'].government;
     Q.regions_andalucia_psoe = (and && and.party === 'psoe') ? 1 : 0;
-    Q.funds_income = Math.round((0.5 + (Q.congress.psoe || 0) / 200) * 10) / 10;
+    Q.funds_income = Math.round((0.5 + (Q.congress[Q.player_party || 'psoe'] || 0) / 200) * 10) / 10;
     Q.funds_display = Math.floor(Q.funds);
     Q.in_debt = Q.funds < 0 ? 1 : 0;
     Q.deficit = Math.round((yearValue(DEFICIT_BY_YEAR, Q.year) + (Q.fiscal_adj || 0)) * 10) / 10;
@@ -243,6 +277,7 @@
     Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
+    checkLeadership(Q);
     // flags for conditional world events
     var mad = Q.regions && Q.regions['Madrid'];
     Q.madrid_pp = mad && mad.government && mad.government.party === 'pp' ? 1 : 0;
@@ -265,7 +300,7 @@
   // historical bias and spread (tools/build_poll_errors.py), plus a small
   // monthly variation between pollsters. Elections use the true vote.
   // ------------------------------------------------------------------
-  var POLLED_PARTIES = ['psoe', 'pp', 'cs', 'up', 'vox', 'mp', 'iu'];
+  var POLLED_PARTIES = ['psoe', 'pp', 'cs', 'up', 'vox', 'mp', 'iu', 'ps'];
 
   function gaussian() {
     var u = 1 - Math.random();
@@ -495,10 +530,10 @@
       campaign(Q, party, changes);
       // cross-pressure: appealing to one group costs support in another
       var back = BACKLASH[key];
-      if (back && party === 'psoe') {
+      if (back && party === (Q.player_party || 'psoe')) {
         var lost = {};
         Object.keys(back.classes).forEach(function (c) { lost[c] = strength * factor * back.classes[c]; });
-        transfer(Q, 'psoe', back.to, lost);
+        transfer(Q, party, back.to, lost);
       }
     }
     Q.last_target = t.name;
@@ -593,6 +628,7 @@
   function endOfWeek(Q) {
     Q.month_actions = 0;
     Q.formation_weeks = (Q.formation_weeks || 0) + 1;
+    autoFormation(Q);
     (Q.timers || []).forEach(function (t) {
       if (Q[t + '_timer'] > 0) {
         var step = WEEKLY_TIMERS.indexOf(t) !== -1 ? 1 : 0.25;
@@ -642,6 +678,10 @@
         var rate = cur > initial[c][p] ? 0.03 : 0.01;
         Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * rate;
       });
+      // a new party without roots loses support unless it keeps campaigning
+      if (Q.vm.classSupport[c].ps) {
+        Q.vm.classSupport[c].ps *= 0.985;
+      }
     });
     Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
     positionDrift(Q);
@@ -652,7 +692,7 @@
     });
 
     // party finances: dues and the public subsidy, scaled by seats
-    Q.funds += 0.5 + (Q.congress.psoe || 0) / 200;
+    Q.funds += 0.5 + (Q.congress[Q.player_party || 'psoe'] || 0) / 200;
     if (Q.loan_months > 0) {
       Q.funds -= 0.4;
       Q.loan_months -= 1;
@@ -723,7 +763,7 @@
     checkLeadership(Q);
   }
 
-  var CHART_PARTIES = ['pp', 'psoe', 'up', 'cs', 'iu', 'vox', 'mp', 'upyd'];
+  var CHART_PARTIES = ['pp', 'psoe', 'up', 'cs', 'iu', 'vox', 'mp', 'upyd', 'ps'];
 
   function recordPoll(Q) {
     var row = { date: Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month };
@@ -796,25 +836,67 @@
 
   var LEADERS = { cs: 'Albert Rivera', up: 'Pablo Iglesias' };
 
+  // Who leads a party now: Sánchez himself if he has taken over Cs or
+  // Podemos, the historical successors after their leaders' falls.
+  function leaderOf(Q, p) {
+    if (Q.player_party === p && Q.player_leads) {
+      return 'Pedro Sánchez';
+    }
+    if (p === 'cs') {
+      return Q.cs_collapsed || Q.rivera_resigns_seen ? 'Inés Arrimadas' : LEADERS.cs;
+    }
+    if (p === 'up') {
+      return Q.year >= 2021 && Q.month >= 5 || Q.year >= 2022 ? 'Yolanda Díaz' : LEADERS.up;
+    }
+    if (p === 'psoe') {
+      return Q.sanchez_leader ? 'Pedro Sánchez' : (Q.psoe_leader || 'Susana Díaz');
+    }
+    if (p === 'pp') {
+      return Q.pp_leader || 'Mariano Rajoy';
+    }
+    return 'Pedro Sánchez';
+  }
+
+  function surname(name) {
+    var special = { 'Soraya Sáenz de Santamaría': 'Sáenz de Santamaría', 'María Dolores de Cospedal': 'Cospedal',
+                    'Alberto Núñez Feijóo': 'Feijóo', 'Isabel Díaz Ayuso': 'Ayuso' };
+    if (special[name]) {
+      return special[name];
+    }
+    var parts = String(name).split(' ');
+    return parts[parts.length - 1];
+  }
+
   function formGovernment(Q, candidate) {
+    var ppHadPower = Q.pm_party === 'pp';
     Q.government_status = 'formed';
     Q.repeat_elections = 0;
     Q.investiture_clock = -1;
     Q.dissolution_due = 0;
     Q.depends_on_catalans = 0;
-    if (candidate === 'sanchez') {
+    if (candidate === 'ps') {
       Q.pm = 'Pedro Sánchez';
+      Q.pm_party = 'ps';
+      Q.psoe_in_government = Q.player_line_left === 'coalition' ? 1 : 0;
+      Q.govt_parties = Q.psoe_in_government ? ['ps', 'psoe'] : ['ps'];
+      Q.government_type = Q.psoe_in_government ? UI.partyName('ps') + '–PSOE coalition government'
+        : UI.partyName('ps') + ' minority government';
+    } else if (candidate === 'sanchez') {
+      Q.pm = leaderOf(Q, 'psoe');
       Q.pm_party = 'psoe';
       Q.psoe_in_government = 1;
       Q.govt_parties = Q.pact_up ? ['psoe', 'up'] : ['psoe'];
-      Q.government_type = Q.pact_up ? 'PSOE–Podemos coalition government'
+      if (Q.exiled && Q.player_line_left === 'coalition' && Q.player_party !== 'psoe') {
+        Q.govt_parties = ['psoe', Q.player_party];
+      }
+      Q.government_type = Q.govt_parties.length > 1 ? 'PSOE–' + UI.shortName(Q.govt_parties[1]) + ' coalition government'
         : (Q.pact_cs ? 'PSOE minority government with a Ciudadanos agreement' : 'PSOE minority government');
       if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForSanchez(Q))) {
         Q.depends_on_catalans = 1;
         Q.government_type += ', relying on the Catalan and Basque nationalists';
       }
     } else if (candidate === 'up') {
-      Q.pm = LEADERS.up;
+      Q.pm = leaderOf(Q, 'up');
       Q.pm_party = 'up';
       Q.psoe_in_government = Q.psoe_backs_iglesias === 'coalition' ? 1 : 0;
       Q.govt_parties = Q.psoe_in_government ? ['up', 'psoe'] : ['up'];
@@ -824,7 +906,7 @@
         Q.depends_on_catalans = 1;
       }
     } else if (candidate === 'cs') {
-      Q.pm = LEADERS.cs;
+      Q.pm = leaderOf(Q, 'cs');
       Q.pm_party = 'cs';
       Q.psoe_in_government = 0;
       Q.govt_parties = ['cs', 'pp'];
@@ -835,7 +917,7 @@
       Q.psoe_in_government = 0;
       var cs = Q.congress.cs || 0;
       var vox = Q.congress.vox || 0;
-      if (Q.pact_pp_cs && cs >= 20) {
+      if ((Q.pact_pp_cs || (Q.player_party === 'cs' && Q.player_line_right === 'coalition')) && cs >= 20) {
         Q.govt_parties = ['pp', 'cs'];
         Q.government_type = 'PP–Ciudadanos coalition government';
       } else if (vox >= 15 && (Q.pp_vox_relation || 50) >= 60 && (Q.congress.pp || 0) + cs < 176) {
@@ -847,6 +929,9 @@
       }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
+    if (ppHadPower && Q.pm_party !== 'pp') {
+      ppSetback(Q, 3);
+    }
   }
 
   // Who is to blame when no government forms? If the PSOE had a workable
@@ -887,6 +972,9 @@
       var to = right === 'pp' ? (hasVox ? { psoe: 0.45, cs: 0.35, vox: 0.2 } : { psoe: 0.55, cs: 0.45 })
         : (hasVox ? { psoe: 0.45, pp: 0.35, vox: 0.2 } : { psoe: 0.55, pp: 0.45 });
       transfer(Q, right, to, all(1.5));
+      if (right === 'pp') {
+        ppSetback(Q, 1);
+      }
     }
     recalculate(Q);
   }
@@ -1003,6 +1091,24 @@
     var swing = (r.totals.psoe || 0) - (old.psoe || 0);
     Q.sanchez_authority += swing / 2;
     Q.member_morale += swing / 2;
+    var ppLoss = (old.pp || 0) - (r.totals.pp || 0);
+    var ppLargest = (r.totals.pp || 0) >= Math.max(r.totals.psoe || 0, r.totals.cs || 0, r.totals.up || 0, r.totals.ps || 0);
+    if (!ppLargest) {
+      ppSetback(Q, 2);
+    } else if (ppLoss >= 10) {
+      ppSetback(Q, 1);
+    } else if (ppLoss <= -10) {
+      Q.pp_pressure = 0;
+    }
+    if (Q.exiled && Q.player_party === 'ps' && (r.totals.ps || 0) === 0) {
+      Q.loss_reason = UI.partyName('ps') + ' wins no seats. Pedro Sánchez\'s new party is finished, and so is his career.';
+    }
+    if (!Q.sanchez_leader && !Q.exiled) {
+      Q.psoe_ai_swing = swing;
+    }
+    Q.player_line_left = '';
+    Q.player_line_right = '';
+    Q.player_line_set = 0;
     recalculate(Q);
     return r;
   }
@@ -1182,14 +1288,317 @@
     // the 2016-17 window in which an ouster can be reversed by a primary
     var k = dateKey(Q.year, Q.month);
     Q.in_leadership_window = (k >= 201606 && k <= 201703) ? 1 : 0;
+    // the leadership crisis: rumours, then talk of a leadership election,
+    // then a forced one
+    if (Q.sanchez_leader) {
+      if (Q.sanchez_authority > 40) {
+        Q.lead_stage = 0;
+      }
+      Q.lead_rumours_due = (Q.sanchez_authority <= 30 && Q.lead_stage < 1) ? 1 : 0;
+      Q.lead_challenge_due = (Q.sanchez_authority <= 15 && Q.lead_stage < 2) ? 1 : 0;
+      Q.lead_forced_due = Q.sanchez_authority <= 0 ? 1 : 0;
+      Q.challenger = challengerName(Q);
+    } else {
+      Q.lead_rumours_due = 0; Q.lead_challenge_due = 0; Q.lead_forced_due = 0;
+    }
+    if (!Q.sanchez_leader && !Q.psoe_rel) {
+      Q.psoe_rel = {};
+      RELATIONS.concat(['bng', 'prc', 'te', 'geroa', 'nc', 'mp']).forEach(function (p) {
+        Q.psoe_rel[p] = Q['rel_' + p];
+      });
+      Q.psoe_leader = Q.psoe_leader && Q.psoe_leader !== 'Pedro Sánchez' ? Q.psoe_leader : challengerName(Q);
+    }
+    if (Q.backbench && Q.backbench_since === undefined) {
+      Q.backbench_since = Q.time;
+    }
+    Q.comeback_ready = (Q.backbench && Q.time - (Q.backbench_since || Q.time) >= 12 &&
+      Q.time >= (Q.comeback_next || 0) &&
+      ((Q.psoe_ai_swing || 0) < 0 || ((Q.true_poll && Q.true_poll.psoe) || 0) < 22)) ? 1 : 0;
+    // out of the leadership with no primary pending: decide what next
+    Q.exile_pending = (!Q.sanchez_leader && !Q.leadership_exception_open && !Q.exiled &&
+      !Q.backbench && !Q.retired) ? 1 : 0;
+  }
+
+  function challengerName(Q) {
+    if (Q.year <= 2017 && (Q.diaz_relation || 0) < 55) {
+      return 'Susana Díaz';
+    }
+    if (Q.year <= 2016) {
+      return 'Eduardo Madina';
+    }
+    return 'Emiliano García-Page';
+  }
+
+  // A PSOE leadership election (primary). bonus: + for calling it oneself.
+  // Returns 1 if Sánchez wins.
+  function leadershipElection(Q, bonus) {
+    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) +
+      (bonus || 0) + 6 * gaussian();
+    Q.primary_score = Math.round(score);
+    var won = score >= 38 ? 1 : 0;
+    Q.primary_won = won;
+    if (won) {
+      Q.sanchez_leader = 1;
+      Q.sanchez_authority = Math.max(Q.sanchez_authority, 60);
+      Q.sanchismo += 10;
+      Q.member_morale += 6;
+      Q.federal_committee_balance = Math.max(Q.federal_committee_balance, 58);
+      Q.regional_leaders_dissent -= 12;
+      Q.institutionalists_dissent -= 8;
+      Q.lead_stage = 0;
+      Q.backbench = 0;
+      Q.psoe_leader = 'Pedro Sánchez';
+    } else {
+      oust(Q, false);
+    }
+    recalculate(Q);
+    checkLeadership(Q);
+    return won;
+  }
+
+  // Sánchez loses the leadership. expelled: thrown out of the party too.
+  function oust(Q, expelled) {
+    Q.sanchez_leader = 0;
+    Q.lead_stage = 0;
+    Q.psoe_leader = Q.challenger || challengerName(Q);
+    if (expelled) {
+      Q.expelled = 1;
+    }
+    if (Q.in_leadership_window && !expelled) {
+      Q.leadership_exception_open = 1;
+    }
+    // the PSOE without Sánchez: more centrist, closer to the barons; it
+    // keeps his relations with other parties as its own
+    Q.psoe_rel = {};
+    RELATIONS.concat(['bng', 'prc', 'te', 'geroa', 'nc', 'mp']).forEach(function (p) {
+      Q.psoe_rel[p] = Q['rel_' + p];
+    });
+    Q.psoe_rel.up = Math.max(0, (Q.psoe_rel.up || 35) - 10);
+    Q.psoe_rel.cs = Math.min(100, (Q.psoe_rel.cs || 45) + 10);
+    transfer(Q, 'psoe', { up: 0.6, cs: 0.4 }, { students: 1, workers: 1, professionals: 1 });
+  }
+
+  // Strength (support points per class) a party founded by Sánchez could
+  // draw: his personal following and an insurgent, anti-establishment
+  // profile matter most.
+  function newPartyStrength(Q) {
+    return Math.max(0, (Q.sanchismo || 0) / 30 + 0.45 * (Q.populism || 0) - 0.2);
+  }
+
+  // Sánchez leaves for another party (or founds one).
+  function joinParty(Q, party, name) {
+    var old = Q.player_party;
+    Q.exiled = 1;
+    Q.backbench = 0;
+    Q.player_party = party;
+    Q.player_leads = party === 'ps' ? 1 : 0;
+    Q.leadership_exception_open = 0;
+    Q.psoe_leader = Q.psoe_leader || challengerName(Q);
+    if (!Q.psoe_rel) {
+      oust(Q, true);
+    }
+    // relations now are the new party's relations with the others
+    if (party === 'cs' || party === 'up') {
+      RELATIONS.forEach(function (p) {
+        if (p !== party) {
+          Q['rel_' + p] = Parliament.between(Q, party, p);
+        }
+      });
+      Q.rel_psoe = 30;
+      Q.funds = 5;
+      // a famous recruit brings some voters with him
+      var gain = 1 + (Q.sanchismo || 0) / 25;
+      transfer(Q, 'psoe', party, { workers: gain, pensioners: gain * 0.8, professionals: gain,
+                                    students: gain * 0.8, unemployed: gain * 0.6, homemakers: gain * 0.5 });
+    } else {
+      UI.setPartyName('ps', name || 'Avanza', name || 'Avanza');
+      Q.new_party_name = name || 'Avanza';
+      Q.rel_psoe = 15;
+      Q.funds = Math.max(1, (Q.sanchismo || 0) / 12);
+      var s = newPartyStrength(Q);
+      var pop = (Q.populism || 0) / 10;
+      var classes = { workers: s, pensioners: s * 0.8, professionals: s * 0.9, students: s * (0.8 + pop),
+                      unemployed: s * (0.8 + pop), homemakers: s * 0.6, self_employed: s * 0.5 };
+      transfer(Q, 'psoe', 'ps', classes);
+      var fromOthers = {};
+      Object.keys(classes).forEach(function (c) { fromOthers[c] = classes[c] * pop * 0.6; });
+      transfer(Q, 'up', 'ps', fromOthers);
+      transfer(Q, 'cs', 'ps', fromOthers);
+    }
+    Q.joined_from = old;
+    recalculate(Q);
+  }
+
+  // PP setbacks build pressure on its leader: losing power or a bad
+  // election forces him out; a single failure may or may not.
+  function ppSetback(Q, weight) {
+    if (Q.pp_leader_falls_due) {
+      return;
+    }
+    Q.pp_pressure = (Q.pp_pressure || 0) + weight;
+    // a PP leader in office (not acting) is safe
+    if (Q.pm_party === 'pp' && Q.government_status === 'formed') {
+      return;
+    }
+    var chance = Q.pp_pressure >= 3 ? 1 : (Q.pp_pressure === 2 ? 0.6 : 0.25);
+    if (Math.random() < chance) {
+      Q.pp_leader_falls_due = 1;
+    }
+  }
+
+  // The PP chooses a new leader. Candidates by period; the right's mood
+  // (a strong Vox pulls it right, a strong Cs to the centre) weights them.
+  var PP_CANDIDATES = {
+    santamaria: { name: 'Soraya Sáenz de Santamaría', style: 'moderate', from: 2015, to: 2019 },
+    casado: { name: 'Pablo Casado', style: 'hard', from: 2015, to: 2023 },
+    cospedal: { name: 'María Dolores de Cospedal', style: 'establishment', from: 2015, to: 2018 },
+    feijoo: { name: 'Alberto Núñez Feijóo', style: 'moderate', from: 2019, to: 2023 },
+    ayuso: { name: 'Isabel Díaz Ayuso', style: 'hard', from: 2021, to: 2023 }
+  };
+
+  function choosePPLeader(Q) {
+    var vox = (Q.true_poll && Q.true_poll.vox) || 0;
+    var cs = (Q.true_poll && Q.true_poll.cs) || 0;
+    var used = Q.pp_leaders_used || [];
+    var pool = Object.keys(PP_CANDIDATES).filter(function (id) {
+      var c = PP_CANDIDATES[id];
+      return used.indexOf(id) === -1 && Q.year >= c.from && Q.year <= c.to;
+    });
+    if (!pool.length) {
+      pool = Object.keys(PP_CANDIDATES).filter(function (id) {
+        return used.indexOf(id) === -1 && Q.year <= PP_CANDIDATES[id].to;
+      });
+      if (Q.year < 2019) {
+        pool = pool.filter(function (id) { return PP_CANDIDATES[id].from <= 2016; });
+      }
+    }
+    if (!pool.length) {
+      pool = ['feijoo'];
+    }
+    var weights = pool.map(function (id) {
+      var st = PP_CANDIDATES[id].style;
+      return st === 'hard' ? 1 + vox / 6 : (st === 'moderate' ? 1 + cs / 10 : 0.6);
+    });
+    var total = weights.reduce(function (a, b) { return a + b; }, 0);
+    var r = Math.random() * total;
+    var pick = pool[0];
+    for (var i = 0; i < pool.length; i++) {
+      r -= weights[i];
+      if (r <= 0) { pick = pool[i]; break; }
+    }
+    var c = PP_CANDIDATES[pick];
+    Q.pp_old_leader = Q.pp_leader;
+    Q.pp_leader = c.name;
+    Q.pp_leader_id = pick;
+    Q.pp_style = c.style;
+    Q.pp_style_hard = c.style === 'hard' ? 1 : 0;
+    Q.pp_style_moderate = c.style === 'moderate' ? 1 : 0;
+    used.push(pick);
+    Q.pp_leaders_used = used;
+    Q.pp_pressure = 0;
+    Q.pp_leader_falls_due = 0;
+    var all = function (x) {
+      return { workers: x, professionals: x, pensioners: x, self_employed: x,
+               unemployed: x, students: x, homemakers: x };
+    };
+    if (c.style === 'hard') {
+      partyRel(Q, 'pp', 'vox', 20); partyRel(Q, 'pnv', 'pp', -15); partyRel(Q, 'cs', 'pp', -5);
+      transfer(Q, 'vox', 'pp', all(1));
+      transfer(Q, 'pp', { cs: 0.5, psoe: 0.5 }, { professionals: 1.2, pensioners: 0.6 });
+      Q.rel_pp -= 8;
+    } else if (c.style === 'moderate') {
+      partyRel(Q, 'pp', 'vox', -10); partyRel(Q, 'pnv', 'pp', 10); partyRel(Q, 'cs', 'pp', 8);
+      transfer(Q, 'cs', 'pp', { professionals: 1.5, self_employed: 1.5, pensioners: 1 });
+      transfer(Q, 'psoe', 'pp', { pensioners: 0.6, professionals: 0.4 });
+      transfer(Q, 'pp', 'vox', { self_employed: 0.6, workers: 0.4 });
+      Q.rel_pp += 5;
+    } else {
+      campaign(Q, 'pp', all(0.5));
+    }
+    recalculate(Q);
+  }
+
+  // When Sánchez is not leading the PSOE, governments form without him:
+  // each week of formation the largest bloc's candidate tries, with the
+  // PSOE voting by its new leadership's line and Sánchez's party voting by
+  // the line he set (player_line_right / player_line_left).
+  function aiStances(Q, candidate) {
+    var H = JSON.parse(JSON.stringify(Q));
+    if (Q.psoe_rel) {
+      Object.keys(Q.psoe_rel).forEach(function (p) { H['rel_' + p] = Q.psoe_rel[p]; });
+    }
+    var pl = Q.player_party;
+    if (Q.exiled && pl === 'up' && Q.player_line_left === 'coalition') { H.pact_up = 1; }
+    if (Q.exiled && pl === 'cs' && Q.player_line_right === 'coalition') { H.pact_pp_cs = 1; }
+    // without Sánchez the PSOE abstains for the right after a repeat election
+    H.psoe_stance_pp = (Q.repeat_elections || 0) >= 1 || (Q.formation_weeks || 0) >= 10 ? 'abstain' : 'no';
+    H.red_lines = 1;
+    var st = candidate === 'sanchez' ? Parliament.stancesForSanchez(H)
+      : (candidate === 'up' ? Parliament.stancesForUP(H)
+        : (candidate === 'cs' ? Parliament.stancesForCs(H)
+          : (candidate === 'ps' ? Parliament.stancesForUP(H) : Parliament.stancesForPP(H))));
+    if (candidate === 'ps') {
+      st.ps = 'yes';
+      st.up = Q.rel_up >= 50 ? 'yes' : 'abstain';
+      st.psoe = (Q.rel_psoe || 0) >= 45 ? 'yes' : 'abstain';
+    }
+    if (candidate === 'up' && Q.exiled && pl === 'psoe') { st.psoe = 'no'; }
+    if (Q.exiled && pl !== 'psoe') {
+      var right = candidate === 'pp' || candidate === 'cs';
+      var line = right ? Q.player_line_right : Q.player_line_left;
+      if (candidate !== pl && line) {
+        st[pl] = line === 'coalition' || line === 'support' ? 'yes' : line;
+      } else if (candidate !== pl && !line) {
+        st[pl] = 'no';
+      } else {
+        st[pl] = 'yes';
+      }
+    }
+    return st;
+  }
+
+  function autoFormation(Q) {
+    if (Q.sanchez_leader || !Q.acting || Q.election_year || (Q.formation_weeks || 0) < 3 || Q.elections_held < 1) {
+      return null;
+    }
+    if (Q.exiled && Q.player_party !== 'psoe' && !Q.player_line_set) {
+      return null;  // wait for Sánchez to set his party's line
+    }
+    var seats = Q.congress;
+    var right = Q.right_candidate || 'pp';
+    var leftCand = 'sanchez';
+    if (Q.exiled && Q.player_party === 'ps' && (seats.ps || 0) > (seats.psoe || 0)) {
+      leftCand = 'ps';
+    } else if ((seats.up || 0) > (seats.psoe || 0)) {
+      leftCand = 'up';
+    }
+    var tried = [right, leftCand];
+    for (var i = 0; i < tried.length; i++) {
+      var st = aiStances(Q, tried[i]);
+      var v = Parliament.count(seats, st);
+      if (v.passes) {
+        Q.investiture_votes += 1;
+        Q.auto_invested = tried[i];
+        if (tried[i] === 'up') { Q.psoe_backs_iglesias = 'external'; }
+        formGovernment(Q, tried[i]);
+        Q.auto_formed = 1;
+        recalculate(Q);
+        return tried[i];
+      }
+    }
+    if (Q.investiture_clock < 0) {
+      Q.investiture_clock = 8;
+      Q.investiture_votes += 1;
+    }
+    return null;
   }
 
   function lossReason(Q) {
     if (Q.loss_reason) {
       return Q.loss_reason;
     }
-    if (!Q.sanchez_leader && !Q.leadership_exception_open) {
-      return 'Pedro Sánchez is no longer Secretary-General of the PSOE.';
+    if (Q.retired) {
+      return 'Pedro Sánchez retires from politics.';
     }
     return '';
   }
@@ -1197,6 +1606,27 @@
   // ------------------------------------------------------------------
   // Rendering helpers for scenes (browser only)
   // ------------------------------------------------------------------
+  // Cards and events speak of 'psoe' meaning the player's party; once
+  // Sánchez has left it, their effects go to his new party.
+  function me(Q, party) {
+    return (party === 'psoe' && Q.exiled && Q.player_party && Q.player_party !== 'psoe') ? Q.player_party : party;
+  }
+
+  function meTo(Q, to) {
+    if (typeof to === 'string') {
+      return to === Q.player_party && Q.exiled ? 'psoe' : to;
+    }
+    if (!Q.exiled || !Q.player_party || Q.player_party === 'psoe' || to[Q.player_party] === undefined) {
+      return to;
+    }
+    var out = {};
+    Object.keys(to).forEach(function (k) {
+      var key = k === Q.player_party ? 'psoe' : k;
+      out[key] = (out[key] || 0) + to[k];
+    });
+    return out;
+  }
+
   function el(id) {
     return root.document && root.document.getElementById(id);
   }
@@ -1410,14 +1840,25 @@
     provinceWinners: provinceWinners,
     runDueRegionalElections: runDueRegionalElections,
     lossReason: lossReason,
+    leadershipElection: leadershipElection,
+    oust: oust,
+    joinParty: joinParty,
+    newPartyStrength: newPartyStrength,
+    choosePPLeader: choosePPLeader,
+    ppSetback: ppSetback,
+    autoFormation: autoFormation,
+    transferRaw: transfer,
+    campaignRaw: campaign,
+    aiStances: aiStances,
+    leaderOf: leaderOf,
     renderVote: renderVote,
     renderCongress: renderCongress,
     renderPolls: renderPolls,
     renderRegions: renderRegions,
     renderRegionalResults: renderRegionalResults,
     renderFactions: renderFactions,
-    campaign: campaign,
-    transfer: transfer,
+    campaign: function (Q, party, changes) { return campaign(Q, me(Q, party), changes); },
+    transfer: function (Q, from, to, changes) { return transfer(Q, me(Q, from), meTo(Q, to), changes); },
     partyRel: partyRel,
     intl: intl,
     formationBlame: formationBlame,
@@ -1425,7 +1866,7 @@
     trueVote: trueVote,
     drawPollError: drawPollError,
     typicalShare: typicalShare,
-    target: target,
+    target: function (Q, party, key, strength) { return target(Q, me(Q, party), key, strength); },
     TARGETS: TARGETS,
     regionalMod: regionalMod,
     territorial: territorial,

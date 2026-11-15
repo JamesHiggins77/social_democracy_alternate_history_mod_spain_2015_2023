@@ -21,6 +21,7 @@ max-cards: 3
 - @deck_negotiations
 - @deck_government
 - @deck_catalonia
+- @deck_exile
 - #sp_advisor
 
 @deck_national
@@ -32,6 +33,7 @@ is-deck: true
 
 @deck_party
 title: Party politics
+view-if: sanchez_leader = 1
 card-image: img/spain/deck_ferraz.jpg
 is-deck: true
 
@@ -47,7 +49,7 @@ is-deck: true
 
 @deck_government
 title: Government
-view-if: psoe_in_government = 1
+view-if: (psoe_in_government = 1 and sanchez_leader = 1) or sanchez_pm = 1
 card-image: img/spain/bg_congreso_hemiciclo.jpg
 is-deck: true
 
@@ -59,3 +61,11 @@ view-if: catalan_crisis = 1
 is-deck: true
 
 - #sp_catalonia
+
+@deck_exile
+title: Sánchez's road back
+view-if: sanchez_leader = 0 and (exiled = 1 or backbench = 1 or leadership_exception_open = 1)
+card-image: img/spain/portrait_sanchez_2015.jpg
+is-deck: true
+
+- #sp_exile

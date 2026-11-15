@@ -19,7 +19,7 @@
     ? require('./electoral_engine.js') : root.SpainElectoral;
 
   // Statewide parties driven by the class layer.
-  var STATEWIDE = ['psoe', 'pp', 'cs', 'up', 'iu', 'vox', 'mp', 'pacma', 'upyd'];
+  var STATEWIDE = ['psoe', 'pp', 'cs', 'up', 'iu', 'vox', 'mp', 'pacma', 'upyd', 'ps'];
   // Statewide parties large enough in 2015 for their regional pattern to be
   // meaningful. Smaller and new parties grow by class mix x regional affinity
   // instead of amplifying their 2015 micro-vote.
@@ -94,7 +94,11 @@
       'Aragón': 1.05, 'La Rioja': 1.05, 'Asturias': 0.9, 'Galicia': 0.55, 'Canarias': 0.8,
       'Cataluña': 0.5, 'Navarra': 0.6, 'País Vasco': 0.2
     },
-    mp: { 'Madrid': 1.6, 'Comunidad Valenciana': 1.4, 'Cataluña': 0.3, 'País Vasco': 0.4 }
+    mp: { 'Madrid': 1.6, 'Comunidad Valenciana': 1.4, 'Cataluña': 0.3, 'País Vasco': 0.4 },
+    // Pedro Sánchez's own party, if he founds one: strongest where the PSOE
+    // vote it draws on is strongest, weak where nationalists dominate
+    ps: { 'Andalucía': 1.2, 'Madrid': 1.15, 'Extremadura': 1.2, 'Castilla-La Mancha': 1.1,
+          'Asturias': 1.1, 'Cataluña': 0.6, 'País Vasco': 0.4, 'Navarra': 0.7, 'Galicia': 0.8 }
   };
 
   // Provincial swing: increases are spread partly uniformly and partly in
@@ -267,6 +271,9 @@
         var v;
         if (ESTABLISHED[p]) {
           v = base.M[r][p] * W[r][p];
+        } else if (p === 'ps') {
+          // Sánchez's own party inherits the PSOE's regional pattern
+          v = base.M[r].psoe * W[r][p] * ((NEW_PARTY_AFFINITY.ps && NEW_PARTY_AFFINITY.ps[r]) || 1);
         } else {
           var aff = (NEW_PARTY_AFFINITY[p] && NEW_PARTY_AFFINITY[p][r]) || 1;
           v = (A[p] || 0) + base.growthScale * aff * (W[r][p] - base.W0[r][p]);

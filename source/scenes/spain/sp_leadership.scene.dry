@@ -1,0 +1,305 @@
+title: Whispers in Ferraz
+new-page: true
+tags: sp_event
+view-if: lead_rumours_due = 1 and lead_challenge_due = 0 and lead_forced_due = 0 and sanchez_leader = 1 and election_year = 0
+on-arrival: lead_stage = 1
+
+= Whispers in Ferraz
+
+The stories start in the Madrid press: unnamed "historic leaders" and "senior figures in the federations" who doubt that Pedro Sánchez can win. Nobody puts a name to them yet. Everybody knows who they are.
+
+- @r_ignore: Ignore it: rumours die if you do not feed them
+- @r_address: Address it: meet the federations and the deputies one by one
+- @r_bluff: Call their bluff: challenge the critics to say it to your face
+- @r_primary: Call their bluff: call a leadership election yourself
+
+@r_ignore
+on-arrival: regional_leaders_dissent += 4; member_morale -= 2
+
+The rumours do not die. They wait.
+
+@r_address
+on-arrival: {! Q.sanchez_authority += 5 + Q.member_morale / 12; Q.regional_leaders_dissent -= 3; Q.institutionalists_dissent -= 3; Q.month_actions += 1; !}
+
+A fortnight of meetings and phone calls. It buys time, and some of the barons are flattered to be asked.
+
+@r_bluff
+on-arrival: {!
+Q.populism += 1; Q.lead_confronted = 1;
+Q.bluff_won = (Q.federal_committee_balance + Q.member_morale / 4 + (Math.random() * 12 - 6) >= 55) ? 1 : 0;
+if (Q.bluff_won) { Q.sanchez_authority += 15; Q.regional_leaders_dissent -= 8; Q.institutionalists_dissent -= 6; Q.sanchismo += 4; }
+else { Q.sanchez_authority -= 12; Q.regional_leaders_dissent += 8; }
+!}
+
+[? if bluff_won = 1 : "If anyone wants my job, let them stand in a primary." Nobody does. For now, the critics retreat. ?][? if bluff_won = 0 : You dare them, and they take note. The critics are now openly counting votes in the Federal Committee. ?]
+
+@r_primary
+on-arrival: {! Q.populism += 1; Q.sanchismo += 3; window.SpainGame.leadershipElection(Q, 6); !}
+go-to: primary_result
+
+@primary_result
+title: The leadership election
+
+= The leadership election
+
+[? if primary_won = 1 : The members vote, and they vote for you. With a fresh mandate from the rank and file, the critics have nothing left to say for a while. ?][? if primary_won = 0 : The members vote, and they choose [+ psoe_leader +]. Pedro Sánchez is no longer Secretary-General of the PSOE. ?]
+
+@lead_challenge
+title: A challenger emerges
+new-page: true
+tags: sp_event
+view-if: lead_challenge_due = 1 and lead_forced_due = 0 and sanchez_leader = 1 and election_year = 0
+on-arrival: lead_stage = 2
+
+= A challenger emerges
+
+The anonymous critics now have a name: [+ challenger +]. Seven regional federations are collecting signatures for an extraordinary leadership election, and the papers are already printing the arithmetic of the Federal Committee.
+
+- @c_ignore: Ignore it and get on with the job
+- @c_address: Address it: a speech to the parliamentary group, a tour of the federations
+- @c_bluff: Call their bluff: dare them to table the motion in the Federal Committee
+- @c_primary: Call their bluff: call the leadership election yourself, now
+
+@c_ignore
+on-arrival: sanchez_authority -= 5; regional_leaders_dissent += 6; federal_committee_balance -= 4
+
+Silence looks like weakness. More signatures arrive.
+
+@c_address
+on-arrival: {! Q.sanchez_authority += 4 + Q.member_morale / 15; Q.regional_leaders_dissent -= 2; Q.federal_committee_balance += 2; Q.month_actions += 1; !}
+
+You make your case. It steadies the group, but [+ challenger +] has not gone away.
+
+@c_bluff
+on-arrival: {!
+Q.populism += 1; Q.lead_confronted = 1;
+Q.bluff_won = (Q.federal_committee_balance + Q.member_morale / 4 + (Math.random() * 12 - 6) >= 60) ? 1 : 0;
+if (Q.bluff_won) { Q.sanchez_authority += 18; Q.regional_leaders_dissent -= 12; Q.sanchismo += 6; Q.lead_stage = 0; }
+else { Q.sanchez_authority = Math.max(0, Q.sanchez_authority - 15); Q.federal_committee_balance -= 6; if (Math.random() < 0.4) { window.SpainGame.oust(Q, true); Q.bluff_expelled = 1; } }
+!}
+
+[? if bluff_won = 1 : The motion is never tabled. [+ challenger +] says there was never any challenge. ?][? if bluff_won = 0 : [? if bluff_expelled = 1 : The Federal Committee answers your dare by removing you, and the ethics committee opens proceedings for "disloyalty to the party's organs". You are expelled from the PSOE. ?][? if bluff_expelled = 0 : The critics table the motion. You survive the night, barely, and everyone knows the next vote is a matter of time. ?] ?]
+
+@c_primary
+on-arrival: {! Q.populism += 1; Q.sanchismo += 3; window.SpainGame.leadershipElection(Q, 5); !}
+go-to: primary_result
+
+@lead_forced
+title: The forced primary
+new-page: true
+tags: sp_event
+view-if: lead_forced_due = 1 and sanchez_leader = 1
+
+= The forced primary
+
+Your authority has collapsed. The Federal Committee convenes an extraordinary leadership election, and you cannot stop it. [+ challenger +] is the candidate of the federations. All that remains is to fight it.
+
+- @f_fight: Fight for the members' votes
+- @f_withdraw: Withdraw and leave with dignity
+
+@f_fight
+on-arrival: {! window.SpainGame.leadershipElection(Q, -3); if (!Q.primary_won && (Q.lead_confronted || Q.populism >= 6)) { Q.expelled = 1; } !}
+
+[? if primary_won = 1 : Against every prediction, the members keep you. The apparatus is humiliated, and your authority is rebuilt from the ground up. ?][? if primary_won = 0 : [+ psoe_leader +] wins. [? if expelled = 1 : Within weeks your open war with the leadership ends in an expulsion file. You are no longer a member of the PSOE. ?] ?]
+
+@f_withdraw
+on-arrival: {! window.SpainGame.oust(Q, false); !}
+
+You do not stand. [+ psoe_leader +] becomes Secretary-General unopposed.
+
+@exile
+title: After Ferraz
+new-page: true
+tags: sp_event
+view-if: exile_pending = 1
+
+= After Ferraz
+
+[? if expelled = 1 : You have been expelled from the PSOE. ?][? if expelled = 0 : You are no longer Secretary-General. ?] Your phone keeps ringing anyway. Some calls are offers.
+
+[? if can_join_cs = 1 : Albert Rivera's people suggest that a moderate social democrat would be welcome in Ciudadanos. ?][? if can_join_up = 1 : Podemos sounds you out about joining a broad progressive front. ?] Your own followers want you to start again under a new name. Your pollsters think a party of your own could start at around [+ new_party_prospect +]%; your personal following and an anti-establishment profile are what it would run on.
+
+- @join_cs: Join Ciudadanos
+- @join_up: Join Podemos
+- @new_party: Found your own party
+- @backbench: Stay in the PSOE as a backbench deputy and wait
+- @retire: Retire from politics
+
+@join_cs
+choose-if: can_join_cs = 1
+unavailable-subtitle: Ciudadanos only wants a proven moderate (a centrist economic line) with good relations with them.
+on-arrival: {! window.SpainGame.joinParty(Q, 'cs'); Q.month_actions += 1; !}
+
+You sign up with Ciudadanos at a packed press conference. The PSOE calls it treason; Rivera calls it the birth of a great centre. You will have to earn your place in a party that is not yours.
+
+@join_up
+choose-if: can_join_up = 1
+unavailable-subtitle: Podemos only wants a proven progressive (a left or progressive line) with good relations with them.
+on-arrival: {! window.SpainGame.joinParty(Q, 'up'); Q.month_actions += 1; !}
+
+You join Podemos's lists as an independent. The left calls it the end of the PSOE's monopoly; the PSOE calls it the end of Pedro Sánchez.
+
+@new_party
+title: Found your own party
+
+= A new party
+
+What do you call it?
+
+- @name_avanza: Avanza
+- @name_rumbo: Nuevo Rumbo
+- @name_alternativa: La Alternativa
+
+@name_avanza
+on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Avanza'); Q.month_actions += 1; !}
+go-to: founded
+
+@name_rumbo
+on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Nuevo Rumbo'); Q.month_actions += 1; !}
+go-to: founded
+
+@name_alternativa
+on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'La Alternativa'); Q.month_actions += 1; !}
+go-to: founded
+
+@founded
+title: The founding
+
+= The founding
+
+[+ new_party_name +] is launched in a sports hall in Madrid. [? if populism >= 5 : Your anti-establishment message, "neither the apparatus nor the IBEX", fills it. ?][? if populism < 5 : The hall is respectable rather than full; you are known as a man of the apparatus you are now running against. ?] The first polls give it [+ player_poll +]%.
+
+@backbench
+choose-if: expelled = 0
+unavailable-subtitle: You have been expelled from the party.
+on-arrival: backbench = 1; backbench_since = time
+
+You take a seat at the back of the PSOE group. The new leadership watches you as closely as the PP does. If they stumble, the members may remember you.
+
+@retire
+on-arrival: retired = 1
+
+You leave politics, and write a book about it.
+
+@comeback
+title: The members remember
+new-page: true
+tags: sp_event
+view-if: comeback_ready = 1 and backbench = 1 and election_year = 0
+
+= The members remember
+
+The PSOE under [+ psoe_leader +] is sinking in the polls. Members are signing a petition for a new primary, and many of them want you on the ballot.
+
+- @comeback_run: Run in the primary
+- @comeback_wait: Not yet
+- @comeback_leave: Leave the PSOE for good
+
+@comeback_run
+on-arrival: {! var b = Q.backbench_since; window.SpainGame.leadershipElection(Q, 4); if (!Q.primary_won) { Q.backbench = 1; Q.backbench_since = b; Q.comeback_next = Q.time + 24; } !}
+
+[? if primary_won = 1 : Pedro Sánchez is Secretary-General of the PSOE again. The barons who threw you out will have to work with you. ?][? if primary_won = 0 : [+ psoe_leader +] holds on. The members were tempted, not convinced. ?]
+
+@comeback_wait
+on-arrival: comeback_next = time + 6
+
+You let them sign. The longer they wait, the louder they will ask.
+
+@comeback_leave
+on-arrival: backbench = 0; backbench_since = 0
+
+You hand in your membership card. The question is where to go next.
+
+@player_line
+title: How will your party vote?
+new-page: true
+tags: sp_event
+view-if: exiled = 1 and acting = 1 and election_year = 0 and player_line_set = 0 and formation_weeks >= 1
+
+= How will [+ my_party +] vote?
+
+Congress is hung. [? if player_is_right_cand = 1 : As the largest party of the right, you are the right's candidate; ?][? if player_is_right_cand = 0 : [+ right_leader +] is the right's candidate; ?] [+ psoe_leader +] leads the PSOE. With [+ player_seats +] deputies, [+ my_party +] has to choose. [? if player_is_ps = 1 : [? if player_seats > congress_psoe_seats : Your party is bigger than the PSOE: the left's candidate would be you. ?] ?]
+
+- @line_right_coalition: [? if player_is_right_cand = 1 : Stand as the right's candidate, in coalition with the PP ?][? if player_is_right_cand = 0 : Enter a coalition government with [+ right_leader +] ?]
+- @line_right_support: [? if player_is_right_cand = 1 : Stand as the right's candidate, alone ?][? if player_is_right_cand = 0 : Support [+ right_leader +] from outside ?]
+- @line_left_coalition: Enter a coalition government with the PSOE
+- @line_left_support: Support the PSOE's candidate from outside, abstain on the right's
+- @line_abstain: Abstain on every candidate
+- @line_against: Vote against every candidate and force new elections
+
+@line_right_coalition
+choose-if: player_is_cs = 1
+unavailable-subtitle: Only Ciudadanos would join the right in government.
+on-arrival: {! Q.player_line_right = 'coalition'; Q.player_line_left = 'no'; Q.player_line_set = 1; Q.rel_pp += 5; if (window.SpainGame) { window.SpainGame.position(Q, -0.5, -0.5); } !}
+
+Ministries in exchange for your votes. Your old comrades will never forgive the photograph.
+
+@line_right_support
+on-arrival: {! Q.player_line_right = 'support'; Q.player_line_left = 'no'; Q.player_line_set = 1; if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
+
+Your deputies will vote for [+ right_leader +], in exchange for a programme.
+
+@line_left_coalition
+choose-if: player_is_cs = 0
+unavailable-subtitle: Ciudadanos will not sit in a cabinet with the PSOE.
+on-arrival: {! Q.player_line_left = 'coalition'; Q.player_line_right = 'no'; Q.player_line_set = 1; Q.rel_psoe = (Q.rel_psoe || 20) + 5; !}
+
+You offer the PSOE a coalition. The irony is not lost on anyone.
+
+@line_left_support
+on-arrival: {! Q.player_line_left = 'support'; Q.player_line_right = 'abstain'; Q.player_line_set = 1; !}
+
+Support for the PSOE's candidate, without joining the government.
+
+@line_abstain
+on-arrival: {! Q.player_line_left = 'abstain'; Q.player_line_right = 'abstain'; Q.player_line_set = 1; !}
+
+Your deputies will abstain and let the others decide.
+
+@line_against
+on-arrival: {! Q.player_line_left = 'no'; Q.player_line_right = 'no'; Q.player_line_set = 1; Q.populism += 1; !}
+
+No to everyone. If nobody else can count to 176, Spain will vote again.
+
+@auto_government
+title: A government is formed
+new-page: true
+tags: sp_event
+view-if: auto_formed = 1
+on-arrival: auto_formed = 0
+
+= A government is formed
+
+Congress invests [+ pm +]. Spain has a [+ government_type +]. [? if player_in_government = 1 : [+ my_party +] is in government. ?][? if sanchez_pm = 1 : Pedro Sánchez is Prime Minister. ?]
+
+@pp_leader_falls
+title: The PP changes leader
+new-page: true
+tags: sp_event
+view-if: pp_leader_falls_due = 1 and election_year = 0
+on-arrival: {! window.SpainGame.choosePPLeader(Q); !}
+
+= The PP changes leader
+
+[+ pp_old_leader +] has lost [? if pm_is_pp = 0 : the government ?][? if pm_is_pp = 1 : the party's confidence ?], and the PP will not forgive it. After weeks of pressure from the regional barons, [+ pp_old_leader +] resigns. The party congress chooses [+ pp_leader +].
+
+[? if pp_style_hard = 1 : The new leader promises to recover the voters who left for Vox: a harder line on Catalonia, on taxes and on immigration. Vox's leaders smile; the PNV stops returning calls. ?][? if pp_style_moderate = 1 : The new leader promises a calmer, more centrist PP, open to State pacts. Ciudadanos's voters start coming home; Vox calls it the "cowardly right". ?]
+
+- @pp_pact: Offer the new leader a State pact on pensions and Catalonia
+- @pp_same: "Same PP, new face": tie them to the corruption of the past
+- @pp_wait: Watch and wait
+
+@pp_pact
+on-arrival: {! Q.rel_pp += 8; Q.progressives_dissent += 5; if (window.SpainGame) { window.SpainGame.position(Q, -0.3, 0); } !}
+
+The offer is received politely and declined politely. Moderate voters noticed it was made.
+
+@pp_same
+on-arrival: {! Q.rel_pp -= 6; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1); } !}
+
+The corruption files are reopened on every talk show.
+
+@pp_wait
+on-arrival: institutionalists_dissent -= 1
+
+You let the new leader make the first mistakes.
