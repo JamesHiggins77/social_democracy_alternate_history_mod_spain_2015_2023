@@ -140,8 +140,40 @@ test('party funds grow monthly and campaigns cost money', () => {
   G.endOfMonth(Q);
   assert.ok(Q.funds > start);
   const before = Q.funds;
+  G.startFinalCampaign(Q);
+  G.finalSpend(Q, 'region', 'Andalucía');
+  G.finalSpend(Q, 'class', 'pensioners');
   G.runGeneralElection(Q);
-  assert.strictEqual(Math.round((before - Q.funds) * 10) / 10, 4);
+  // only what was spent in the final campaign
+  assert.strictEqual(Math.round((before - Q.funds) * 10) / 10, 2);
+});
+
+test('final-campaign spending boosts the election-day vote far more than the polls after', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.month = 4; Q.vm.partyFactor = {}; G.recalculate(Q);
+  G.updatePolls ? G.updatePolls(Q) : null;
+  const base = G.trueVote(Q).voteShares.psoe;
+  G.startFinalCampaign(Q);
+  const f1 = G.finalSpend(Q, 'class', 'working');
+  const f2 = G.finalSpend(Q, 'class', 'working');
+  assert.strictEqual(f1, 1); assert.strictEqual(f2, 0.5);
+  G.finalSpend(Q, 'region', 'Andalucía');
+  assert.ok(Q.eday_poll > base + 1, `${Q.eday_poll} vs ${base}`);
+  const r = G.runGeneralElection(Q);
+  assert.ok(r.voteShares.psoe > base + 1);
+  const after = G.trueVote(Q).voteShares.psoe;
+  assert.ok(after - base < 0.3 * (r.voteShares.psoe - base), `after ${after}, base ${base}, eday ${r.voteShares.psoe}`);
+  assert.strictEqual(Q.eday, null);
+});
+
+test('attack ads cut the target party on election day', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.month = 4; Q.vm.partyFactor = {}; G.recalculate(Q);
+  const pp = G.trueVote(Q).voteShares.pp;
+  G.startFinalCampaign(Q);
+  G.finalSpend(Q, 'attack', 'pp');
+  const vm = G.withEday(Q);
+  assert.ok(vm.classSupport.pensioners.pp < Q.vm.classSupport.pensioners.pp);
 });
 
 test('government deficit follows the year and policy adjustments', () => {

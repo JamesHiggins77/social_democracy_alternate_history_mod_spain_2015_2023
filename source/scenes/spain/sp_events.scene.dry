@@ -186,7 +186,7 @@ Eight weeks, two months, have passed since the first investiture vote without a 
 title: General election
 new-page: true
 tags: sp_event
-view-if: general_election_due = 1
+view-if: general_election_due = 1 and (final_campaign_round > elections_held or sanchez_active = 0)
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.runGeneralElection(Q);
@@ -212,7 +212,7 @@ Vote share, seats and seat share, with the change since the previous election.
 
 {!<div id="sp-election-map"></div>!}
 
-The campaign cost the party 4 in funds.
+Final-campaign spending: [+ last_eday_spent +] in party funds.
 
 @regional_elections
 title: Regional elections
@@ -1052,3 +1052,243 @@ You are the candidate. (Use the "Seek investiture" card when your partners are r
 on-arrival: sanchez_authority -= 2
 
 The clock keeps running towards a new election.
+
+@final_campaign
+title: The final campaign
+new-page: true
+tags: sp_event
+view-if: general_election_due = 1 and final_campaign_round <= elections_held and sanchez_active = 1
+on-arrival: {! if (window.SpainGame && !Q.eday) { window.SpainGame.startFinalCampaign(Q); } !}
+
+= The final campaign
+
+Polling day is close. Whatever money is left can buy one last push: rallies and adverts in a region, a message aimed at one group, or attack ads against a rival. It moves votes on election day; little of it lasts beyond. Each repeat of the same spend does less than the last.
+
+Party funds: **[+ funds_display +]**. Spent so far: [+ eday_spent +].
+
+[+ my_party_cap +] on election day, on current spending: **[+ eday_poll +]%** (without the final push: [+ eday_base_poll +]%), about [+ eday_seats +] seats.
+
+[? if eday_spent > 0 : [+ eday_last +] ?]
+
+- @fc_class: Target a group
+- @fc_region: Concentrate on a region
+- @fc_attack: Run attack ads
+- @fc_go: Go to the polls
+
+@fc_go
+on-arrival: {! Q.final_campaign_round = (Q.elections_held || 0) + 1; !}
+
+The campaign closes at midnight on Friday. Saturday is the day of reflection.
+
+@fc_class
+title: Target a group
+
+= Target a group
+
+Each spend costs 1 in party funds.
+
+- @fcc_young: Young people
+- @fcc_students: Students
+- @fcc_pensioners: Pensioners
+- @fcc_working: The working class
+- @fcc_middle: The middle class
+- @fcc_women: Women
+- @fcc_unemployed: The unemployed
+- @fcc_rural: Rural Spain
+- @final_campaign: Back
+
+@fcc_young
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'young'); } !}
+go-to: final_campaign
+
+@fcc_students
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'students'); } !}
+go-to: final_campaign
+
+@fcc_pensioners
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'pensioners'); } !}
+go-to: final_campaign
+
+@fcc_working
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'working'); } !}
+go-to: final_campaign
+
+@fcc_middle
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'middle'); } !}
+go-to: final_campaign
+
+@fcc_women
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'women'); } !}
+go-to: final_campaign
+
+@fcc_unemployed
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'unemployed'); } !}
+go-to: final_campaign
+
+@fcc_rural
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'rural'); } !}
+go-to: final_campaign
+
+@fc_region
+title: Concentrate on a region
+
+= Concentrate on a region
+
+Each spend costs 1 in party funds. Big communities elect more deputies; close provinces are where seats change hands.
+
+- @fcr_andalucia: Andalucía
+- @fcr_cataluna: Cataluña
+- @fcr_madrid: Madrid
+- @fcr_comunidad_valenciana: Comunidad Valenciana
+- @fcr_galicia: Galicia
+- @fcr_castilla_y_leon: Castilla y León
+- @fcr_pais_vasco: País Vasco
+- @fcr_castilla-la_mancha: Castilla-La Mancha
+- @fcr_canarias: Canarias
+- @fcr_region_de_murcia: Región de Murcia
+- @fcr_aragon: Aragón
+- @fcr_extremadura: Extremadura
+- @fcr_asturias: Asturias
+- @final_campaign: Back
+
+@fcr_andalucia
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Andalucía'); } !}
+go-to: final_campaign
+
+@fcr_cataluna
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Cataluña'); } !}
+go-to: final_campaign
+
+@fcr_madrid
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Madrid'); } !}
+go-to: final_campaign
+
+@fcr_comunidad_valenciana
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Comunidad Valenciana'); } !}
+go-to: final_campaign
+
+@fcr_galicia
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Galicia'); } !}
+go-to: final_campaign
+
+@fcr_castilla_y_leon
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Castilla y León'); } !}
+go-to: final_campaign
+
+@fcr_pais_vasco
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'País Vasco'); } !}
+go-to: final_campaign
+
+@fcr_castilla-la_mancha
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Castilla-La Mancha'); } !}
+go-to: final_campaign
+
+@fcr_canarias
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Canarias'); } !}
+go-to: final_campaign
+
+@fcr_region_de_murcia
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Región de Murcia'); } !}
+go-to: final_campaign
+
+@fcr_aragon
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Aragón'); } !}
+go-to: final_campaign
+
+@fcr_extremadura
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Extremadura'); } !}
+go-to: final_campaign
+
+@fcr_asturias
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Asturias'); } !}
+go-to: final_campaign
+
+@fc_attack
+title: Run attack ads
+
+= Run attack ads
+
+Each spend costs 1 in party funds. Attack ads drive a rival's voters to stay at home or look elsewhere; only some come to you. About one in five campaigns backfires.
+
+- @fca_pp: Against the PP
+- @fca_cs: Against Ciudadanos
+- @fca_up: Against Podemos
+- @fca_vox: Against Vox
+- @fca_psoe: Against the PSOE
+- @final_campaign: Back
+
+@fca_pp
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'pp'); } !}
+go-to: final_campaign
+
+@fca_cs
+view-if: player_is_cs = 0
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'cs'); } !}
+go-to: final_campaign
+
+@fca_up
+view-if: player_is_up = 0
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'up'); } !}
+go-to: final_campaign
+
+@fca_vox
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'vox'); } !}
+go-to: final_campaign
+
+@fca_psoe
+view-if: exiled = 1
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'psoe'); } !}
+go-to: final_campaign
+

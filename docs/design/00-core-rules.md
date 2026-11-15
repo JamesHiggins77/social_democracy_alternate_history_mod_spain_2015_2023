@@ -237,7 +237,7 @@ Values are shown as words, never numbers: authority (Non-existent, Very low ≤9
 
 ### 7.3 Finances
 
-- **Party funds** (abstract units): start at 6, earn income and pay rising running costs each month (see §7.9). A general election campaign costs 4 (rising each year), a round of regional campaigns 1, and big-hall rallies, the branch tour, digital campaigns and member consultations cost 1 each. The *Party finances* card raises funds (donors, micro-donations, or a bank loan repaid from income). Debt lowers morale and authority each month.
+- **Party funds** (abstract units): start at 6, earn income and pay rising running costs each month (see §7.9). A general election has no fixed cost; the party spends what it chooses in the final campaign (§7.10), a round of regional campaigns 1, and big-hall rallies, the branch tour, digital campaigns and member consultations cost 1 each. The *Party finances* card raises funds (donors, micro-donations, or a bank loan repaid from income). Debt lowers morale and authority each month.
 - **Government finances** (shown while the PSOE governs): deficit and debt follow the real path for each year (2015–2023, including the 2020 pandemic) plus the player's policy adjustments (`fiscal_adj`), which also accumulate into debt. Above 3.5% of GDP, Brussels writes.
 
 ### 7.4 Decisions move votes
@@ -298,7 +298,7 @@ From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos
 
 **Investiture**: ERC abstains on a Sánchez investiture backed by a Podemos coalition if the red lines are gone and there is a dialogue table (or relations of 50+), as in January 2020; Bildu abstains from relations of 30. Winning a primary lifts the 2016 red lines. After the right's candidate loses a vote, the King offers Sánchez the nomination.
 
-**Party money**: income is 0.2 + seats/350 a month plus 0.15 per dues level; running costs are 0.03 + 0.03 per year since 2014; a general election costs 4 + 0.25 per year since 2015. The Party dues card raises dues (money, but members and some voters leave) or cuts them (members and goodwill, less money). The Socialist International and Progressive Alliance card spends money on hosting a conference (1.5: relations abroad) or studying a sister party (0.5). What the PSOE learns depends on who leads that party at the time, lessons can cut both ways, and studying the same leadership again has diminishing returns (full, then 1/2, 1/3...):
+**Party money**: income is 0.2 + seats/350 a month plus 0.15 per dues level; running costs are 0.03 + 0.03 per year since 2014; general elections have no fixed cost (see the final campaign, §7.10). The Party dues card raises dues (money, but members and some voters leave) or cuts them (members and goodwill, less money). The Socialist International and Progressive Alliance card spends money on hosting a conference (1.5: relations abroad) or studying a sister party (0.5). What the PSOE learns depends on who leads that party at the time, lessons can cut both ways, and studying the same leadership again has diminishing returns (full, then 1/2, 1/3...):
 British Labour — Miliband (to 2015): a sharper cost-of-living message on wages; Corbyn (2015–20): energises the young, members and progressives but loses pensioners, professionals and the self-employed to the PP and Cs and angers the barons; Starmer (2020–): wins the middle class and calms modernisers, but loses young voters to Podemos and angers progressives.
 Portugal — Seguro (2014): little; Costa in opposition (2014–15): a programme the radical left could sign; Costa's "contraption" (2015–22): written agreements with each partner, much easier talks with Podemos; Costa's majority (2022–): squeezes Podemos voters (the useful vote) and sours relations.
 Denmark — Thorning-Schmidt (to 2015): governing with liberals, warmer Cs; Frederiksen (2015–): Vox gains less from migration (20% less per full lesson, up to 30%), progressives object, socially more conservative.
@@ -308,6 +308,16 @@ US Democrats — Obama (to 2017): data-driven campaigning; the Sanders movement 
 Campaign skill (from Labour and Obama) adds up to +30% to campaign gains.
 
 **Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 2% a month back towards 55 without attention.
+
+### 7.10 The final campaign
+
+Just before every general election (when Sánchez leads a party), a final-campaign screen lets the party spend what is left, 1 in funds per spend, and shows the projected election-day vote and seats as money goes in:
+
+- **A group** (young people, students, pensioners, working class, middle class, women, the unemployed, rural Spain): +3 support points across the classes it reaches (rural Spain: +6% in six rural communities).
+- **A region** (the thirteen largest communities): +10% to the party's vote there.
+- **Attack ads** against the PP, Cs, Podemos, Vox (or the PSOE, after Sánchez has left it): the rival loses up to 1.6 points in every class; a quarter of that comes to the player's party (a fifth for a new party) and the rest scatters to the rival's neighbours. One attack in five backfires and costs the player's party instead.
+
+Repeating the same spend within one campaign has diminishing returns (full, 1/2, 1/3...). The effects apply to the election-day vote only; 15% of them persists afterwards, so the polls barely move. The last-minute swing shows up in the pollsters' miss on the results page.
 
 ### 7.5 Election results
 

@@ -188,6 +188,7 @@
     // Party finances: an abstract fund, earned monthly and spent on campaigns.
     Q.funds = 6;
     Q.dues_level = 0;           // -2..+2: party dues below or above the norm
+    Q.final_campaign_round = 0; // last-minute spending done for election n
     Q.campaign_skill = 0;       // learned from sister parties (Labour etc.)
     // Economy and society: historical path plus adjustments by any government
     Q.growth_adj = 0;
@@ -238,6 +239,7 @@
     Q.pp_leader_short = surname(Q.pp_leader || 'Mariano Rajoy');
     Q.player_party = Q.player_party || 'psoe';
     Q.my_party = Q.player_party === 'psoe' ? 'the PSOE' : UI.partyName(Q.player_party);
+    Q.my_party_cap = Q.my_party.charAt(0).toUpperCase() + Q.my_party.slice(1);
     Q.player_is_cs = Q.player_party === 'cs' ? 1 : 0;
     Q.player_is_up = Q.player_party === 'up' ? 1 : 0;
     Q.player_is_ps = Q.player_party === 'ps' ? 1 : 0;
@@ -371,6 +373,128 @@
   // The vote model's true national result (not shown to the player).
   function trueVote(Q) {
     return VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
+  }
+
+  // ------------------------------------------------------------------
+  // The final campaign: last-minute spending just before a general
+  // election. Its effects are temporary (election day only); a sixth of
+  // them persists afterwards. Repeating the same spend gives diminishing
+  // returns within a campaign.
+  // ------------------------------------------------------------------
+  var EDAY_PERSIST = 0.15;
+  var ATTACK_SPLIT = { pp: { cs: 0.3, vox: 0.3, psoe: 0.2 }, cs: { pp: 0.4, psoe: 0.3 }, up: { psoe: 0.4, iu: 0.2 },
+                       vox: { pp: 0.5, cs: 0.1 }, psoe: { up: 0.3, pp: 0.2 } };
+
+  function withEday(Q) {
+    var vm = JSON.parse(JSON.stringify(Q.vm));
+    var e = Q.eday;
+    if (!e) {
+      return vm;
+    }
+    Object.keys(e.cls).forEach(function (p) {
+      Object.keys(e.cls[p]).forEach(function (c) {
+        vm.classSupport[c][p] = Math.max(0, (vm.classSupport[c][p] || 0) + e.cls[p][c]);
+      });
+    });
+    Object.keys(e.reg).forEach(function (r) {
+      vm.regionalMod[r] = vm.regionalMod[r] || {};
+      Object.keys(e.reg[r]).forEach(function (p) {
+        vm.regionalMod[r][p] = (vm.regionalMod[r][p] === undefined ? 1 : vm.regionalMod[r][p]) * e.reg[r][p];
+      });
+    });
+    return vm;
+  }
+
+  function finalCampaignPoll(Q) {
+    var me = Q.player_party || 'psoe';
+    var r = VoteModel.runGeneralElection(withEday(Q), base(), DATA, Q.year, Q.month);
+    Q.eday_poll = Math.round((r.voteShares[me] || 0) * 10) / 10;
+    Q.eday_seats = r.totals[me] || 0;
+    Q.eday_base_poll = Math.round(((Q.true_poll && Q.true_poll[me]) || 0) * 10) / 10;
+    Q.funds_display = Math.floor(Q.funds);
+  }
+
+  function startFinalCampaign(Q) {
+    Q.eday = { cls: {}, reg: {}, uses: {} };
+    Q.eday_spent = 0;
+    Q.eday_last = '';
+    finalCampaignPoll(Q);
+  }
+
+  // kind: 'class' (key: a target group), 'region' (key: a community) or
+  // 'attack' (key: a rival party). Costs 1 in funds.
+  function finalSpend(Q, kind, key) {
+    if (!Q.eday) {
+      startFinalCampaign(Q);
+    }
+    var e = Q.eday;
+    var me = Q.player_party || 'psoe';
+    var uk = kind + ':' + key;
+    var n = e.uses[uk] || 0;
+    e.uses[uk] = n + 1;
+    var f = 1 / (1 + n);
+    var addCls = function (p, c, v) {
+      e.cls[p] = e.cls[p] || {};
+      e.cls[p][c] = (e.cls[p][c] || 0) + v;
+    };
+    var mulReg = function (r, p, x) {
+      e.reg[r] = e.reg[r] || {};
+      e.reg[r][p] = (e.reg[r][p] || 1) * x;
+    };
+    Q.funds -= 1;
+    Q.eday_spent = (Q.eday_spent || 0) + 1;
+    if (kind === 'class') {
+      var t = TARGETS[key];
+      if (t.regions) {
+        t.regions.forEach(function (r) { mulReg(r, me, 1 + 0.06 * f); });
+      } else {
+        Object.keys(t.classes).forEach(function (c) { addCls(me, c, 3 * f * t.classes[c]); });
+      }
+      Q.eday_last = 'A final push aimed at ' + t.name + '.';
+    } else if (kind === 'region') {
+      mulReg(key, me, 1 + 0.1 * f);
+      Q.eday_last = 'Your last week of rallies and adverts is concentrated in ' + key + '.';
+    } else if (kind === 'attack') {
+      var split = ATTACK_SPLIT[key] || {};
+      var mine = me === 'psoe' ? 0.25 : 0.2;
+      var backfire = Math.random() < 0.2;
+      Object.keys(Q.vm.classSupport).forEach(function (c) {
+        var hit = Math.min(1.6 * f, (Q.vm.classSupport[c][key] || 0) + ((e.cls[key] || {})[c] || 0));
+        addCls(key, c, -hit);
+        addCls(me, c, backfire ? -0.5 * f : hit * mine);
+        Object.keys(split).forEach(function (p) {
+          if (p !== me) {
+            addCls(p, c, hit * split[p]);
+          }
+        });
+      });
+      Q.eday_backfire = backfire ? 1 : 0;
+      Q.eday_last = backfire ? 'The attack ads against ' + UI.partyName(key) + ' backfire: the press calls them dirty, and some of your own voters agree.'
+        : 'The attack ads against ' + UI.partyName(key) + ' land. Some of its voters stay at home or look elsewhere.';
+    }
+    finalCampaignPoll(Q);
+    return f;
+  }
+
+  // After the vote: a fraction of the final push persists; the rest fades.
+  function settleFinalCampaign(Q) {
+    var e = Q.eday;
+    if (!e) {
+      return;
+    }
+    Object.keys(e.cls).forEach(function (p) {
+      Object.keys(e.cls[p]).forEach(function (c) {
+        Q.vm.classSupport[c][p] = Math.max(0, (Q.vm.classSupport[c][p] || 0) + EDAY_PERSIST * e.cls[p][c]);
+      });
+    });
+    Object.keys(e.reg).forEach(function (r) {
+      Q.vm.regionalMod[r] = Q.vm.regionalMod[r] || {};
+      Object.keys(e.reg[r]).forEach(function (p) {
+        var cur = Q.vm.regionalMod[r][p] === undefined ? 1 : Q.vm.regionalMod[r][p];
+        Q.vm.regionalMod[r][p] = cur * Math.pow(e.reg[r][p], EDAY_PERSIST);
+      });
+    });
+    Q.eday = null;
   }
 
   // Polls: what the pollsters report, error included.
@@ -1365,14 +1489,18 @@
 
   function runGeneralElection(Q) {
     Q.prev_poll = Q.poll ? JSON.parse(JSON.stringify(Q.poll)) : null;
-    var r = VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
+    var r = VoteModel.runGeneralElection(Q.eday ? withEday(Q) : Q.vm, base(), DATA, Q.year, Q.month);
+    Q.last_eday_spent = Q.eday ? (Q.eday_spent || 0) : 0;
+    settleFinalCampaign(Q);
+    Q.final_campaign_round = (Q.elections_held || 0) + 1;
     var old = Q.congress;
     Q.prev_congress = old;
     Q.prev_vote_shares = Q.vote_shares;
     Q.congress = r.totals;
     Q.vote_shares = r.voteShares;
     Q.elections_held = (Q.elections_held || 0) + 1;
-    Q.funds -= 4 + 0.25 * Math.max(0, Q.year - 2015);
+    // no fixed campaign cost: the party spends what it chooses in the
+    // final campaign
     Q.map_winners = provinceWinners(r.ballots);
     Q.map_shares = districtShares(r.ballots, 5);
     Q.map_kind = 'general';
@@ -2221,6 +2349,9 @@
     formationBlame: formationBlame,
     position: position,
     trueVote: trueVote,
+    startFinalCampaign: startFinalCampaign,
+    finalSpend: finalSpend,
+    withEday: withEday,
     drawPollError: drawPollError,
     typicalShare: typicalShare,
     target: function (Q, party, key, strength) { return target(Q, me(Q, party), key, strength); },
