@@ -589,3 +589,7 @@ a.sp-ent { text-decoration: none; }
 .sp-ent-more { margin-top: 4px; color: #3d3a73; font-size: 12px; }
 .sp-ent-desc { margin-top: 2px; }
 .sp-ent-lead { margin-top: 4px; }
+.sp-arrangements td { vertical-align: top; }
+.sp-arr-ok { color: #1f7a3a; font-weight: 600; }
+.sp-arr-mid { color: #9a6a00; }
+.sp-arr-no { color: #a3202a; }

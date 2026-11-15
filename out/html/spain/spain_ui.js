@@ -169,6 +169,72 @@
     return { lost: false, reason: 'No PP majority and no PP–Vox majority (' + ppVox + ' seats together).' };
   }
 
+  // Possible arrangements after an election: who votes yes, who abstains,
+  // and whether it reaches 176 (first ballot) or more yes than no (second).
+  // Parties without seats are left out; an arrangement needs all its core
+  // parties to have seats.
+  var ARRANGEMENTS = [
+    { core: ['psoe', 'up'], yes: ['iu', 'mp', 'compromis'], abst: [] },
+    { core: ['psoe', 'up'], yes: ['iu', 'mp', 'compromis', 'pnv', 'cc', 'bng', 'prc', 'te', 'geroa', 'nc'], abst: ['erc', 'bildu'] },
+    { core: ['psoe', 'cs'], yes: ['cc'], abst: [] },
+    { core: ['psoe', 'cs'], yes: ['cc'], abst: ['up', 'iu'] },
+    { core: ['psoe', 'up', 'cs'], yes: ['iu', 'mp', 'compromis', 'cc'], abst: [] },
+    { core: ['ps', 'psoe', 'up'], yes: ['iu', 'mp', 'compromis', 'pnv'], abst: ['erc', 'bildu'] },
+    { core: ['pp', 'psoe'], yes: [], abst: [], label: 'Grand coalition' },
+    { core: ['pp', 'cs'], yes: ['upn', 'cc', 'foro'], abst: [] },
+    { core: ['pp', 'cs'], yes: ['upn', 'cc', 'foro'], abst: ['psoe'] },
+    { core: ['pp', 'vox'], yes: ['upn', 'foro'], abst: [] },
+    { core: ['pp', 'cs', 'vox'], yes: ['upn', 'foro', 'cc'], abst: [] },
+    { core: ['pp'], yes: ['upn', 'foro'], abst: [] }
+  ];
+
+  function arrangements(totals) {
+    var seats = function (id) { return totals[id] || 0; };
+    var out = [];
+    var seen = {};
+    ARRANGEMENTS.forEach(function (a) {
+      if (!a.core.every(function (id) { return seats(id) > 0; })) {
+        return;
+      }
+      var yesIds = a.core.concat(a.yes.filter(function (id) { return seats(id) > 0; }));
+      var abstIds = a.abst.filter(function (id) { return seats(id) > 0; });
+      var key = yesIds.join('+') + '|' + abstIds.join('+');
+      if (seen[key]) {
+        return;
+      }
+      seen[key] = true;
+      var yes = yesIds.reduce(function (n, id) { return n + seats(id); }, 0);
+      var abst = abstIds.reduce(function (n, id) { return n + seats(id); }, 0);
+      var no = 350 - yes - abst;
+      out.push({
+        label: a.label || '', yesIds: yesIds, abstIds: abstIds, yes: yes, abstain: abst, no: no,
+        first: yes >= MAJORITY, second: yes > no
+      });
+    });
+    return out.sort(function (a, b) {
+      var sa = a.first ? 2 : (a.second ? 1 : 0), sb = b.first ? 2 : (b.second ? 1 : 0);
+      return sb - sa || b.yes - a.yes;
+    });
+  }
+
+  function arrangementsHtml(totals) {
+    var rows = arrangements(totals).map(function (a) {
+      var names = a.yesIds.map(function (id) { return shortName(id); }).join(' + ');
+      var abst = a.abstIds.length ? ', ' + a.abstIds.map(function (id) { return shortName(id); }).join(' and ') + ' abstaining' : '';
+      var verdict = a.first ? '<span class="sp-arr-ok">absolute majority</span>'
+        : (a.second ? '<span class="sp-arr-mid">second ballot only (' + a.yes + ' yes vs ' + a.no + ' no)</span>'
+          : '<span class="sp-arr-no">short by ' + (MAJORITY - a.yes) + '</span>');
+      var swatches = a.yesIds.map(function (id) {
+        return '<span class="sp-swatch" style="background:' + partyColor(id) + '"></span>';
+      }).join('');
+      return '<tr><td>' + swatches + ' ' + (a.label ? a.label + ': ' : '') + escapeHtml(names) + escapeHtml(abst) +
+        '</td><td class="sp-num"><b>' + a.yes + '</b> / ' + MAJORITY + '</td><td>' + verdict + '</td></tr>';
+    }).join('');
+    return '<h4>Paths to a majority</h4><p>An investiture needs <b>' + MAJORITY + '</b> yes votes on the first ballot, ' +
+      'or more yes than no votes on the second.</p><table class="sp-results sp-arrangements"><thead><tr><th>Arrangement</th>' +
+      '<th class="sp-num">Yes</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
   // Change marker: green up triangle, red down triangle, (-) if unchanged.
   function signed(v, digits) {
     var r = Math.abs(v).toFixed(digits);
@@ -684,6 +750,8 @@
     SCALES: SCALES,
     partyColor: partyColor,
     noPathToGovernment: noPathToGovernment,
+    arrangements: arrangements,
+    arrangementsHtml: arrangementsHtml,
     resultsTable: resultsTable,
     drawHemicycle: drawHemicycle,
     drawMap: drawMap,

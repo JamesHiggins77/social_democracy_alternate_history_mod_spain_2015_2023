@@ -218,6 +218,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.renderCongress(Q, 'sp-election-result', false);
+    window.SpainGame.renderArrangements(Q, 'sp-election-arrangements');
     window.SpainGame.renderMap(Q, 'sp-election-map');
     window.SpainGame.renderPollMiss(Q, 'sp-election-pollmiss');
 }
@@ -230,6 +231,8 @@ Vote share, seats and seat share, with the change since the previous election.
 {!<div id="sp-election-result"></div>!}
 
 [+ election_verdict +]
+
+{!<div id="sp-election-arrangements"></div>!}
 
 {!<div id="sp-election-pollmiss"></div>!}
 

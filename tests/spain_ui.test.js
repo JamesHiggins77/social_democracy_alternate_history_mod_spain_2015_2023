@@ -82,3 +82,16 @@ test('foreign sister parties are told apart from Spanish ones', () => {
   assert.deepStrictEqual(found('The US Democrats: Barack Obama'), ['usdem', 'usdem']);
   assert.deepStrictEqual(found('British Labour under Jeremy Corbyn'), ['labour', 'labour']);
 });
+
+test('majority arrangements: 2019 left bloc passes on the second ballot; parties without seats are left out', () => {
+  const U = require('../out/html/spain/spain_ui.js');
+  const nov2019 = { psoe: 120, pp: 89, vox: 52, up: 35, erc: 13, cs: 10, junts: 8, pnv: 6, bildu: 5, mp: 3, cup: 2, cc: 2, upn: 2, bng: 1, prc: 1, te: 1 };
+  const left = U.arrangements(nov2019).find(a => a.yesIds[0] === 'psoe' && a.abstIds.includes('erc'));
+  assert.strictEqual(left.first, false);
+  assert.strictEqual(left.second, true);
+  const dec2015 = { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, iu: 2, bildu: 2, cc: 1 };
+  const all = U.arrangements(dec2015);
+  assert.ok(!all.some(a => a.yesIds.includes('vox')), 'no Vox arrangements without Vox seats');
+  assert.ok(!all.some(a => a.yesIds.includes('mp') || a.yesIds.includes('upn')));
+  assert.ok(/Paths to a majority/.test(U.arrangementsHtml(dec2015)));
+});

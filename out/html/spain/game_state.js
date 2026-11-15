@@ -2680,6 +2680,13 @@
     }
   }
 
+  function renderArrangements(Q, id) {
+    var out = el(id);
+    if (out && Q.congress) {
+      out.innerHTML = UI.arrangementsHtml(Q.congress);
+    }
+  }
+
   function renderMap(Q, id) {
     var out = el(id);
     if (out && Q.map_winners) {
@@ -2791,6 +2798,7 @@
     dhondtSeats: dhondtSeats,
     europeanElection: europeanElection,
     renderEuropean: renderEuropean,
+    renderArrangements: renderArrangements,
     renderVote: renderVote,
     renderCongress: renderCongress,
     renderPolls: renderPolls,
