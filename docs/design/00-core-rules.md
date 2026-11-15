@@ -223,6 +223,12 @@ Major decisions transfer support between parties class by class (`SpainGame.tran
 
 Campaign and media cards can aim at an audience (`SpainGame.target`): students, young people, pensioners, the working class (workers and the unemployed), the middle class (professionals and the self-employed), women, the unemployed, or rural Spain (a regional boost in Castilla y León, Castilla-La Mancha, Extremadura, Aragón, Galicia and La Rioja). Women are reached through every class in proportion to its share of women (approximate INE shares, to be replaced by CIS microdata). Each repeat use of the same target is weaker (1/(1 + 0.25 × uses)), recovering slowly. Cards: **Campaign ads** (2 funds, strongest), **Media appearance** (the outlet decides the audience), **Campaign tour** (election only, 1 fund per regional stop).
 
+### 7.6 Polls: history and error
+
+- **Poll of polls** (Polls tab and Library): the last 48 months. Before December 2015, monthly averages of the 409 published polls listed on Wikipedia (`tools/build_poll_history.py`); afterwards, the game's monthly polls. Election results replace the poll in their month; dashed lines mark general elections.
+- **Polling error** (`tools/build_poll_errors.py`): the final three weeks of polls compared with every result 2015–2023. Mean error (poll − result) and spread: PSOE −1.3 (sd 1.1, underestimated every time), Ciudadanos +1.8 (sd 1.9), PP −0.1 (sd 2.3), Podemos/UP/Sumar −0.0 (sd 2.1), Vox −0.1 (sd 1.4). Largest misses: Cs +4.6 (2015), PP −3.6 and UP +3.4 (2016), PP +3.4 (April 2019), Vox −2.1 (November 2019), PSOE −3.4 (2023).
+- In the game, the first campaign's polls carry the real December 2015 errors; after each election a new error is drawn per party from its bias and spread, with ±0.5 monthly variation between pollsters. Polled seats come from the polled vote. Elections use the true vote, and the election page reports how far the polls were off.
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.

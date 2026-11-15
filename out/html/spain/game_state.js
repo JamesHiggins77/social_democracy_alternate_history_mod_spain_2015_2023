@@ -15,6 +15,8 @@
   var Parliament = lib('SpainParliament', 'parliament.js');
   var UI = lib('SpainUI', 'spain_ui.js');
   var DATA = lib('SPAIN_ELECTION_DATA', 'election_data.js');
+  var POLL_HISTORY = lib('SPAIN_POLL_HISTORY', 'poll_history_data.js');
+  var POLL_ERRORS = lib('SPAIN_POLL_ERRORS', 'poll_error_data.js');
   var REGIONAL = lib('SPAIN_REGIONAL_DATA', 'regional_data.js');
 
   var FACTIONS = ['institutionalists', 'regional_leaders', 'progressives', 'modernisers', 'trade_unionists'];
@@ -87,7 +89,12 @@
     Q.prev_vote_shares = null;
     Q.elections_held = 0;
     Q.election_records = [{ date: '2011-11', seats: Q.congress }];
+    // monthly poll of polls recorded during the game (history before
+    // December 2015 comes from real polling, poll_history_data.js)
+    Q.poll_history = [];
     Q.vm = VoteModel.initialState();
+    drawPollError(Q, '2015');
+    Q.poll_noise = {};
     Q.regions = RegionalModel.startingParliaments(REGIONAL);
 
     // Government: Rajoy's majority, with the election called for December
@@ -191,9 +198,70 @@
       .map(function (id) { return UI.partyName(id) + ' ' + seats[id]; }).join(', ');
   }
 
-  // Polls: national vote shares from the vote model.
+  // ------------------------------------------------------------------
+  // Polling error. Polls show the model's true vote plus an error for each
+  // party: for the first campaign, the real final-poll errors of December
+  // 2015; afterwards, a fresh draw per election cycle from each party's
+  // historical bias and spread (tools/build_poll_errors.py), plus a small
+  // monthly variation between pollsters. Elections use the true vote.
+  // ------------------------------------------------------------------
+  var POLLED_PARTIES = ['psoe', 'pp', 'cs', 'up', 'vox', 'mp', 'iu'];
+
+  function gaussian() {
+    var u = 1 - Math.random();
+    var v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  function drawPollError(Q, historicalKey) {
+    var err = {};
+    var hist = historicalKey && POLL_ERRORS && POLL_ERRORS.elections[historicalKey];
+    POLLED_PARTIES.forEach(function (p) {
+      if (hist) {
+        err[p] = hist.errors[p] || 0;
+      } else {
+        var stats = (POLL_ERRORS && POLL_ERRORS.parties[p]) || { bias: 0, sd: 1 };
+        err[p] = Math.round((stats.bias + stats.sd * gaussian()) * 10) / 10;
+      }
+    });
+    Q.poll_error = err;
+  }
+
+  function drawPollNoise(Q) {
+    var noise = {};
+    POLLED_PARTIES.forEach(function (p) { noise[p] = Math.round(0.5 * gaussian() * 10) / 10; });
+    Q.poll_noise = noise;
+  }
+
+  // The vote model's true national result (not shown to the player).
+  function trueVote(Q) {
+    return VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
+  }
+
+  // Polls: what the pollsters report, error included.
   function updatePolls(Q) {
-    var r = VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
+    var truth = trueVote(Q);
+    Q.true_poll = truth.voteShares;
+    var err = Q.poll_error || {};
+    var noise = Q.poll_noise || {};
+    // scale each polled party nationally so its share moves by its error
+    var polled = JSON.parse(JSON.stringify(Q.vm));
+    var factors = {};
+    POLLED_PARTIES.forEach(function (p) {
+      var share = truth.voteShares[p] || 0;
+      var e = (err[p] || 0) + (noise[p] || 0);
+      if (share > 0.5 && e) {
+        factors[p] = Math.max(0.2, (share + e) / share);
+      }
+    });
+    Object.keys(base().regionShares).forEach(function (r) {
+      polled.regionalMod[r] = polled.regionalMod[r] || {};
+      Object.keys(factors).forEach(function (p) {
+        var cur = polled.regionalMod[r][p] === undefined ? 1 : polled.regionalMod[r][p];
+        polled.regionalMod[r][p] = cur * factors[p];
+      });
+    });
+    var r = VoteModel.runGeneralElection(polled, base(), DATA, Q.year, Q.month);
     Q.poll = r.voteShares;
     Q.poll_seats = r.totals;
     Q.poll_psoe = Math.round(r.voteShares.psoe || 0);
@@ -420,9 +488,52 @@
     Q.general_election_due = (Q.election_year &&
       dateKey(Q.election_year, Q.election_month) <= dateKey(Q.year, Q.month)) ? 1 : 0;
 
+    drawPollNoise(Q);
     updatePolls(Q);
+    recordPoll(Q);
     recalculate(Q);
     checkLeadership(Q);
+  }
+
+  var CHART_PARTIES = ['pp', 'psoe', 'up', 'cs', 'iu', 'vox', 'mp', 'upyd'];
+
+  function recordPoll(Q) {
+    var row = { date: Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month };
+    CHART_PARTIES.forEach(function (p) {
+      if (Q.poll[p] !== undefined && !(Q.vm.notStanding && Q.vm.notStanding[p])) {
+        row[p] = Math.round(Q.poll[p] * 10) / 10;
+      }
+    });
+    Q.poll_history = Q.poll_history || [];
+    if (Q.poll_history.length && Q.poll_history[Q.poll_history.length - 1].date === row.date) {
+      Q.poll_history[Q.poll_history.length - 1] = row;
+    } else {
+      Q.poll_history.push(row);
+    }
+  }
+
+  // Real history up to November 2015, then the game's own record.
+  function pollSeries(Q) {
+    return (POLL_HISTORY || []).concat(Q.poll_history || []);
+  }
+
+  function electionDates(Q) {
+    var dates = ['2011-11'];
+    (Q.election_records || []).forEach(function (r) {
+      var p = String(r.date).split('-');
+      dates.push(p[0] + '-' + (Number(p[1]) < 10 ? '0' : '') + Number(p[1]));
+    });
+    return dates;
+  }
+
+  function renderPollChart(Q, id, compact) {
+    var out = el(id);
+    if (!out) {
+      return;
+    }
+    var w = compact ? Math.max(200, (out.parentElement || out).offsetWidth - 4) : 560;
+    UI.drawPollChart(out, pollSeries(Q), electionDates(Q),
+      { width: w, height: compact ? 170 : 300, months: 48 });
   }
 
   // ------------------------------------------------------------------
@@ -512,6 +623,7 @@
   }
 
   function runGeneralElection(Q) {
+    Q.prev_poll = Q.poll ? JSON.parse(JSON.stringify(Q.poll)) : null;
     var r = VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
     var old = Q.congress;
     Q.prev_congress = old;
@@ -523,6 +635,17 @@
     Q.map_winners = provinceWinners(r.ballots);
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
+    // the result itself replaces that month's poll; then a new polling
+    // error for the next cycle
+    Q.poll = r.voteShares;
+    recordPoll(Q);
+    Q.last_poll_miss = {};
+    POLLED_PARTIES.forEach(function (p) {
+      if (Q.prev_poll && Q.prev_poll[p] !== undefined && r.voteShares[p] !== undefined) {
+        Q.last_poll_miss[p] = Math.round((Q.prev_poll[p] - r.voteShares[p]) * 10) / 10;
+      }
+    });
+    drawPollError(Q, null);
     Q.election_year = 0;
     Q.election_month = 0;
     Q.general_election_due = 0;
@@ -868,6 +991,23 @@
     }
   }
 
+  // How far the final polls were from the result.
+  function renderPollMiss(Q, id) {
+    var out = el(id);
+    if (!out || !Q.last_poll_miss) {
+      return;
+    }
+    var parts = Object.keys(Q.last_poll_miss)
+      .filter(function (p) { return Math.abs(Q.last_poll_miss[p]) >= 0.5; })
+      .sort(function (a, b) { return Math.abs(Q.last_poll_miss[b]) - Math.abs(Q.last_poll_miss[a]); })
+      .map(function (p) {
+        var m = Q.last_poll_miss[p];
+        return UI.shortName(p) + (m > 0 ? ' overestimated by ' : ' underestimated by ') + Math.abs(m).toFixed(1);
+      });
+    out.innerHTML = parts.length ? '<p><strong>The polls:</strong> ' + parts.join('; ') + ' points.</p>'
+      : '<p><strong>The polls</strong> were close this time.</p>';
+  }
+
   function renderRegionalResults(Q, id) {
     var out = el(id);
     if (!out) {
@@ -938,6 +1078,8 @@
     renderFactions: renderFactions,
     campaign: campaign,
     transfer: transfer,
+    trueVote: trueVote,
+    drawPollError: drawPollError,
     target: target,
     TARGETS: TARGETS,
     regionalMod: regionalMod,
@@ -946,7 +1088,10 @@
     holdBudget: holdBudget,
     callElection: callElection,
     renderRelations: renderRelations,
-    renderMap: renderMap
+    renderMap: renderMap,
+    renderPollChart: renderPollChart,
+    renderPollMiss: renderPollMiss,
+    pollSeries: pollSeries
   };
   if (isNode) {
     module.exports = api;

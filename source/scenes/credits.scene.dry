@@ -19,6 +19,8 @@ General elections 2015–2023: official results of the Spanish Ministry of the I
 
 Regional elections 2011–2023: official results compiled in the histEleccionesAutonomicas project by rricote: https://github.com/rricote/histEleccionesAutonomicas
 
+Polls 2011–2015: monthly averages of the opinion polls listed in English Wikipedia's "Opinion polling for the 2015 Spanish general election" (CC BY-SA), built by tools/build_poll_history.py. Polling error 2015–2023: the poll lists on Wikipedia for each general election, analysed by tools/build_poll_errors.py.
+
 Province map: Natural Earth 1:10m administrative boundaries (public domain), naturalearthdata.com.
 
 Government deficit and debt: Eurostat and Bank of Spain annual figures.

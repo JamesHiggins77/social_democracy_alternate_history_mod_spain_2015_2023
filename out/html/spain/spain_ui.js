@@ -217,6 +217,83 @@
       '</svg><p class="sp-map-legend">' + legend + '</p>';
   }
 
+  // Poll of polls: one line per party over the last `months` months.
+  //   series: [{date: 'YYYY-MM', party: %...}], oldest first
+  //   elections: ['YYYY-MM', ...] drawn as dashed markers
+  function drawPollChart(container, series, elections, opts) {
+    if (!container || !series || !series.length) {
+      return;
+    }
+    opts = opts || {};
+    var months = opts.months || 48;
+    var data = series.slice(-months);
+    var W = opts.width || 560;
+    var H = opts.height || 300;
+    var compact = W < 350;
+    var m = { l: compact ? 22 : 30, r: compact ? 44 : 62, t: 8, b: compact ? 18 : 22 };
+    var toIndex = function (d) {
+      var p = d.split('-');
+      return Number(p[0]) * 12 + Number(p[1]) - 1;
+    };
+    var x0 = toIndex(data[0].date);
+    var x1 = toIndex(data[data.length - 1].date);
+    var span = Math.max(1, x1 - x0);
+    var parties = {};
+    data.forEach(function (row) {
+      Object.keys(row).forEach(function (k) {
+        if (k !== 'date' && row[k] >= 2) { parties[k] = true; }
+      });
+    });
+    var ids = Object.keys(parties);
+    var top = 10;
+    data.forEach(function (row) { ids.forEach(function (k) { top = Math.max(top, row[k] || 0); }); });
+    top = Math.ceil((top + 2) / 10) * 10;
+    var X = function (d) { return m.l + (toIndex(d) - x0) / span * (W - m.l - m.r); };
+    var Y = function (v) { return H - m.b - v / top * (H - m.t - m.b); };
+    var parts = [];
+    var fs = compact ? 8 : 10;
+    for (var g = 0; g <= top; g += 10) {
+      parts.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(g) + '" y2="' + Y(g) +
+        '" stroke="#ccc" stroke-width="0.5"/><text x="' + (m.l - 3) + '" y="' + (Y(g) + 3) +
+        '" font-size="' + fs + '" text-anchor="end" fill="#777">' + g + '</text>');
+    }
+    for (var yr = Math.ceil(x0 / 12); yr * 12 <= x1; yr++) {
+      var xx = m.l + (yr * 12 - x0) / span * (W - m.l - m.r);
+      parts.push('<text x="' + xx + '" y="' + (H - 4) + '" font-size="' + fs +
+        '" text-anchor="middle" fill="#777">' + (compact ? "'" + String(yr).slice(2) : yr) + '</text>');
+    }
+    (elections || []).forEach(function (d) {
+      var k = toIndex(d);
+      if (k >= x0 && k <= x1) {
+        parts.push('<line x1="' + X(d) + '" x2="' + X(d) + '" y1="' + m.t + '" y2="' + (H - m.b) +
+          '" stroke="#999" stroke-width="0.8" stroke-dasharray="3,3"><title>Election ' + d + '</title></line>');
+      }
+    });
+    var labels = [];
+    ids.forEach(function (k) {
+      var pts = data.filter(function (row) { return row[k] !== undefined && row[k] !== null; });
+      if (!pts.length) { return; }
+      var d = pts.map(function (row, i) {
+        return (i ? 'L' : 'M') + X(row.date).toFixed(1) + ',' + Y(row[k]).toFixed(1);
+      }).join('');
+      parts.push('<path d="' + d + '" fill="none" stroke="' + partyColor(k) + '" stroke-width="' +
+        (compact ? 1.6 : 2.2) + '" stroke-linejoin="round"><title>' + escapeHtml(partyName(k)) + '</title></path>');
+      var last = pts[pts.length - 1];
+      labels.push({ k: k, y: Y(last[k]), v: last[k], x: X(last.date) });
+    });
+    // end labels, nudged apart so they do not overlap
+    labels.sort(function (a, b) { return a.y - b.y; });
+    for (var i = 1; i < labels.length; i++) {
+      if (labels[i].y - labels[i - 1].y < fs + 1) { labels[i].y = labels[i - 1].y + fs + 1; }
+    }
+    labels.forEach(function (l) {
+      parts.push('<text x="' + (W - m.r + 3) + '" y="' + (l.y + 3) + '" font-size="' + fs + '" fill="' +
+        partyColor(l.k) + '" font-weight="bold">' + escapeHtml(shortName(l.k)) + ' ' + l.v.toFixed(0) + '</text>');
+    });
+    container.innerHTML = '<svg class="sp-poll-chart" viewBox="0 0 ' + W + ' ' + H + '">' +
+      parts.join('') + '</svg>';
+  }
+
   function drawHemicycle(selector, totals) {
     if (!root.d3 || !root.d3.parliament) {
       return;
@@ -352,6 +429,7 @@
     resultsTable: resultsTable,
     drawHemicycle: drawHemicycle,
     drawMap: drawMap,
+    drawPollChart: drawPollChart,
     signed: signed,
     SCENARIOS: SCENARIOS,
     runScenario: runScenario,

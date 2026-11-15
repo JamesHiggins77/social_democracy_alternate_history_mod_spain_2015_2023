@@ -7,9 +7,27 @@ go-to: menu
 
 @menu
 
+- @polls: Polling trends
 - @system: Spain's system of government
 - @elections: How elections work
 - @backSpecialScene: Exit the library
+
+@polls
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame && Q.started) {
+    window.SpainGame.renderPollChart(Q, 'sp-lib-pollchart', false);
+}
+!}
+
+= Polling trends
+
+A poll of polls over the last four years: before December 2015, the average of published polls (compiled from the list on Wikipedia); since then, the monthly polls of this game. Dashed lines mark general elections.
+
+{!<div id="sp-lib-pollchart"></div>!}
+
+Polls are not results. Comparing the final polls with the results of every general election from 2015 to 2023 shows misses of two to four points for a single party: Ciudadanos was overestimated in 2015, the predicted Podemos *sorpasso* of 2016 never came, the PP was overestimated in April 2019, Vox underestimated in November 2019, and the PSOE underestimated in 2023. The polls in this game make errors of the same kind and size.
+
+- @menu: Back
 
 @system
 go-to: menu

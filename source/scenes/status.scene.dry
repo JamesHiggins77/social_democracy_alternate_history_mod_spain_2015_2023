@@ -70,12 +70,17 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.regions) {
 title: Polls
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.poll) {
+    window.SpainGame.renderPollChart(Q, 'sp-side-pollchart', true);
     window.SpainGame.renderPolls(Q, 'sp-side-polls');
 }
 !}
 
 = Polls
 
-Change vs. last election.
+Poll of polls, last 4 years. Dashed lines: general elections.
+
+{!<div id="sp-side-pollchart"></div>!}
+
+Polls can be off by several points. Now, and change vs. last election:
 
 {!<div id="sp-side-polls"></div>!}

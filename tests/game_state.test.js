@@ -17,8 +17,12 @@ test('new game starts in November 2015 with the 2011 Congress and an election du
   assert.strictEqual(Q.pm, 'Mariano Rajoy');
   assert.strictEqual(Q.acting, 0);
   assert.strictEqual(Object.keys(Q.regions).length, 17);
-  // polls forecast the real December 2015 result when nothing changes
-  assert.strictEqual(Q.poll_seats.psoe, 90);
+  // the true vote is the real December 2015 result when nothing changes...
+  assert.ok(Math.abs(Q.true_poll.cs - 14.0) < 0.2);
+  // ...but the polls carry the real 2015 polling error: Ciudadanos
+  // overestimated, Podemos underestimated, as in November 2015
+  assert.ok(Q.poll.cs > 17.5, `polled Cs ${Q.poll.cs}`);
+  assert.ok(Q.poll.up < 18.5, `polled Podemos ${Q.poll.up}`);
 });
 
 test('the December 2015 election reproduces the real Congress and records changes', () => {
@@ -135,10 +139,10 @@ test('abstaining for Rajoy moves left-wing voters to Podemos', () => {
   const Q = newQ();
   G.endOfMonth(Q);
   G.runGeneralElection(Q);
-  const before = { psoe: Q.poll.psoe, up: Q.poll.up };
+  const before = { psoe: Q.true_poll.psoe, up: Q.true_poll.up };
   G.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 5, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
-  assert.ok(Q.poll.psoe < before.psoe - 2, `${before.psoe} -> ${Q.poll.psoe}`);
-  assert.ok(Q.poll.up > before.up + 1.5, `${before.up} -> ${Q.poll.up}`);
+  assert.ok(Q.true_poll.psoe < before.psoe - 2, `${before.psoe} -> ${Q.true_poll.psoe}`);
+  assert.ok(Q.true_poll.up > before.up + 1.5, `${before.up} -> ${Q.true_poll.up}`);
 });
 
 test('demographic targeting moves the right voters, with diminishing returns', () => {
@@ -159,4 +163,15 @@ test('demographic targeting moves the right voters, with diminishing returns', (
   G.target(Q, 'psoe', 'rural', 4);
   assert.ok(Q.vm.regionalMod['Extremadura'].psoe > 1);
   assert.strictEqual((Q.vm.regionalMod['Madrid'] || {}).psoe, undefined);
+});
+
+test('after an election the polls get a new error drawn from history', () => {
+  const Q = newQ();
+  G.endOfMonth(Q);
+  G.runGeneralElection(Q);
+  assert.ok(Q.last_poll_miss.cs > 3, `Cs miss ${Q.last_poll_miss.cs}`);
+  // repeated draws centre on the historical bias: PSOE underestimated
+  let sum = 0;
+  for (let i = 0; i < 400; i++) { G.drawPollError(Q, null); sum += Q.poll_error.psoe; }
+  assert.ok(sum / 400 < -0.8 && sum / 400 > -1.9, `mean PSOE error ${sum / 400}`);
 });
