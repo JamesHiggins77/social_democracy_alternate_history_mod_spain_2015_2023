@@ -22,16 +22,16 @@ The general election is due by the end of 2015. At the Extraordinary Congress in
 - @unity: A party of government: unity with the federations and the old guard
 
 @renewal
-on-arrival: {! Q.opening = 1; Q.modernisers_dissent -= 5; Q.modernisers_strength += 3; Q.institutionalists_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2); window.SpainGame.target(Q, 'psoe', 'middle', 1.5); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.opening = 1; Q.modernisers_dissent -= 5; Q.modernisers_strength += 3; Q.institutionalists_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2); window.SpainGame.target(Q, 'psoe', 'middle', 1.5); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0.5); } !}
 
 You fill the new executive with people under 45 and promise primaries, transparency and an end to the old ways. Commentators call it "the new PSOE". The old guard calls it inexperience.
 
 @left_turn
-on-arrival: {! Q.opening = 2; Q.progressives_dissent -= 8; Q.trade_unionists_dissent -= 6; Q.regional_leaders_dissent += 5; Q.institutionalists_dissent += 4; Q.rel_up += 5; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 2.5); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.opening = 2; Q.progressives_dissent -= 8; Q.trade_unionists_dissent -= 6; Q.regional_leaders_dissent += 5; Q.institutionalists_dissent += 4; Q.rel_up += 5; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 2.5); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 2.5, 0.5); } !}
 
 You promise to repeal the labour reform and to reform the Constitution's article 135, the austerity amendment your own party voted for in 2011. The left of the party is surprised and pleased. Díaz's people are surprised.
 
 @unity
-on-arrival: {! Q.opening = 3; Q.regional_leaders_dissent -= 5; Q.institutionalists_dissent -= 6; Q.diaz_relation += 8; Q.sanchismo -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.opening = 3; Q.regional_leaders_dissent -= 5; Q.institutionalists_dissent -= 6; Q.diaz_relation += 8; Q.sanchismo -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, -1, 0); } !}
 
 The barons get the posts they asked for. The party is calm; the voters notice little difference.

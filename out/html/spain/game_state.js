@@ -210,6 +210,10 @@
     Q.unity_word = UI.word('unity', Q.psoe_unity);
     Q.committee_word = UI.word('committee', Q.federal_committee_balance);
     Q.sanchismo_word = UI.word('sanchismo', Q.sanchismo);
+    var e = Q.econ_left || 0, so = Q.social_prog || 0;
+    Q.econ_word = e <= -1 ? 'Centrist' : (e <= 2 ? 'Centre-left' : (e <= 5 ? 'Left' : (e <= 8 ? 'Hard left' : 'Socialist')));
+    Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
+    Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
   }
 
@@ -301,11 +305,80 @@
 
   // Apply a support change to the PSOE among classes, damped by party
   // dissent as in the original. changes: {class: points}.
+  // Balance constants for the PSOE's own campaigning.
+  var GAIN_SCALE = 0.6;            // all PSOE gains are scaled down
+  var FATIGUE_PER_POINT = 0.08;    // each point gained adds campaign fatigue
+  var GOVERNING_GAIN = 0.7;        // in government, gains count for less...
+  var GOVERNING_LOSS = 1.5;        // ...and losses for more
+
+  // Campaign fatigue: the more the PSOE has campaigned recently, the less
+  // each new effort moves. Fades by a quarter each month.
+  function fatigueFactor(Q) {
+    return 1 / (1 + (Q.campaign_fatigue || 0));
+  }
+
   function shiftSupport(Q, party, changes) {
+    var isPsoe = party === 'psoe';
+    var gained = 0;
     Object.keys(changes).forEach(function (c) {
-      var v = changes[c] > 0 ? changes[c] * (1 - Q.dissent) : changes[c];
+      var v = changes[c];
+      if (v > 0) {
+        v *= (1 - Q.dissent);
+        if (isPsoe) {
+          v *= GAIN_SCALE * fatigueFactor(Q) * (Q.psoe_in_government ? GOVERNING_GAIN : 1);
+          gained += v;
+        }
+      } else if (isPsoe && Q.psoe_in_government) {
+        v *= GOVERNING_LOSS;
+      }
       Q.vm.classSupport[c][party] = Math.max(0, Q.vm.classSupport[c][party] + v);
     });
+    if (isPsoe) {
+      Q.campaign_fatigue = (Q.campaign_fatigue || 0) + gained * FATIGUE_PER_POINT;
+    }
+  }
+
+  // The PSOE's ideological position, built up by its promises and policies.
+  //   econ: economic left (public ownership, taxes on wealth, repealing the
+  //         labour reform) - scares liberals and the moderate middle class
+  //   social: social progressivism (feminism, memory, abortion rights,
+  //         territorial concessions) - scares older and traditional voters
+  // Moderating choices pass negative values. Both fade slowly.
+  function position(Q, econ, social) {
+    Q.econ_left = Math.max(-5, Math.min(12, (Q.econ_left || 0) + (econ || 0)));
+    Q.social_prog = Math.max(-5, Math.min(12, (Q.social_prog || 0) + (social || 0)));
+  }
+
+  // Monthly cost of the PSOE's position: beyond a threshold, moderates leave.
+  var POSITION_THRESHOLD = 3;
+  function positionDrift(Q) {
+    var e = Math.max(0, (Q.econ_left || 0) - POSITION_THRESHOLD);
+    var so = Math.max(0, (Q.social_prog || 0) - POSITION_THRESHOLD);
+    if (e > 0) {
+      transfer(Q, 'psoe', { cs: 0.6, pp: 0.4 },
+        { self_employed: 0.35 * e, professionals: 0.3 * e, pensioners: 0.1 * e });
+    }
+    if (so > 0) {
+      transfer(Q, 'psoe', { pp: 0.7, vox: 0.3 },
+        { pensioners: 0.25 * so, homemakers: 0.25 * so, self_employed: 0.1 * so });
+    }
+    Q.econ_left = (Q.econ_left || 0) * 0.97;
+    Q.social_prog = (Q.social_prog || 0) * 0.97;
+  }
+
+  // Governing wears a party down: a little support leaves every month for
+  // the opposition (from 2016; the PP's 2014-15 erosion is in the path).
+  function incumbencyWear(Q) {
+    if (Q.year < 2016) {
+      return;
+    }
+    var all = { workers: 0.25, professionals: 0.25, pensioners: 0.2, self_employed: 0.25,
+                unemployed: 0.3, students: 0.25, homemakers: 0.2 };
+    if (Q.psoe_in_government && !Q.acting) {
+      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all);
+    } else if (Q.pm_party === 'pp' && !Q.acting) {
+      transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all);
+    }
   }
 
   // Card helpers ------------------------------------------------------
@@ -333,6 +406,17 @@
                                              'Aragón', 'Galicia', 'La Rioja'] }
   };
 
+  // Who is put off when the PSOE courts a group, and where they go.
+  var BACKLASH = {
+    students: { classes: { pensioners: 0.3 }, to: { pp: 1 } },
+    young: { classes: { pensioners: 0.3, homemakers: 0.1 }, to: { pp: 1 } },
+    pensioners: { classes: { students: 0.25 }, to: { up: 1 } },
+    working: { classes: { professionals: 0.2, self_employed: 0.25 }, to: { cs: 0.6, pp: 0.4 } },
+    middle: { classes: { workers: 0.2, unemployed: 0.15 }, to: { up: 1 } },
+    unemployed: { classes: { self_employed: 0.15 }, to: { pp: 1 } },
+    women: { classes: { self_employed: 0.1 }, to: { vox: 0.5, pp: 0.5 } }
+  };
+
   // Campaign aimed at a demographic. `strength` is in support points for a
   // fully reached class; repeated use of the same target gives diminishing
   // returns (each earlier use cuts the effect by a quarter, recovering
@@ -341,7 +425,7 @@
     var t = TARGETS[key];
     Q.target_uses = Q.target_uses || {};
     var uses = Q.target_uses[key] || 0;
-    var factor = 1 / (1 + 0.25 * uses);
+    var factor = 1 / (1 + 1.0 * uses);
     Q.target_uses[key] = uses + 1;
     if (t.regions) {
       t.regions.forEach(function (r) {
@@ -354,6 +438,13 @@
       var changes = {};
       Object.keys(t.classes).forEach(function (c) { changes[c] = strength * factor * t.classes[c]; });
       campaign(Q, party, changes);
+      // cross-pressure: appealing to one group costs support in another
+      var back = BACKLASH[key];
+      if (back && party === 'psoe') {
+        var lost = {};
+        Object.keys(back.classes).forEach(function (c) { lost[c] = strength * factor * back.classes[c]; });
+        transfer(Q, 'psoe', back.to, lost);
+      }
     }
     Q.last_target = t.name;
     Q.last_target_factor = Math.round(factor * 100);
@@ -486,18 +577,23 @@
       });
     }
 
-    // campaign effects fade: support for the established parties drifts
-    // back towards its underlying level by 1.5% of the gap each month
+    // campaign effects fade towards the underlying level: gains fade at 3%
+    // of the gap a month, losses recover at only 1% - voters remember
+    // grievances longer than favours
     var initial = VoteModel.initialState().classSupport;
     Object.keys(Q.vm.classSupport).forEach(function (c) {
       ['psoe', 'pp', 'cs'].forEach(function (p) {
         var cur = Q.vm.classSupport[c][p];
-        Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * 0.015;
+        var rate = cur > initial[c][p] ? 0.03 : 0.01;
+        Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * rate;
       });
     });
+    Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
+    positionDrift(Q);
+    incumbencyWear(Q);
 
     Object.keys(Q.target_uses || {}).forEach(function (k) {
-      Q.target_uses[k] = Math.max(0, Q.target_uses[k] - 0.1);
+      Q.target_uses[k] = Math.max(0, Q.target_uses[k] - 0.15);
     });
 
     // party finances: dues and the public subsidy, scaled by seats
@@ -506,10 +602,17 @@
       Q.funds -= 0.4;
       Q.loan_months -= 1;
     }
+    // party debt: mismanagement costs Sánchez inside the party
     if (Q.funds < 0) {
+      var depth = Math.min(10, -Q.funds);
       Q.member_morale -= 1;
-      Q.sanchez_authority -= 0.5;
+      Q.sanchez_authority -= 1.5 + 0.25 * depth;
+      Q.federal_committee_balance -= 1 + 0.25 * depth;
+      Q.institutionalists_dissent += 1 + 0.3 * depth;
+      Q.regional_leaders_dissent += 0.5 + 0.2 * depth;
     }
+    Q.deep_debt = Q.funds <= -5 ? 1 : 0;
+    Q.ruinous_debt = Q.funds <= -10 ? 1 : 0;
     // government finances: policy adjustments accumulate into debt
     Q.debt_adj = (Q.debt_adj || 0) + (Q.fiscal_adj || 0) / 12;
     Q.brussels_due = (Q.psoe_in_government && Q.deficit > 3.5 &&
@@ -669,6 +772,24 @@
   // ------------------------------------------------------------------
   // General election
   // ------------------------------------------------------------------
+  // Top vote shares (%) in each ballot district, for the map tooltips.
+  function districtShares(ballots, top) {
+    var out = {};
+    Object.keys(ballots).forEach(function (d) {
+      var total = 0;
+      var lists = ballots[d].lists.map(function (l) {
+        var id = Array.isArray(l) ? l[0] : l.id;
+        var v = Array.isArray(l) ? l[2] : l.votes;
+        total += v;
+        return [id, v];
+      });
+      lists.sort(function (a, b) { return b[1] - a[1]; });
+      out[d] = lists.slice(0, top || 5).filter(function (l) { return l[1] > 0; })
+        .map(function (l) { return [l[0], Math.round(1000 * l[1] / total) / 10]; });
+    });
+    return out;
+  }
+
   // Party with most votes in each ballot district.
   function provinceWinners(ballots) {
     var out = {};
@@ -705,6 +826,8 @@
     Q.elections_held = (Q.elections_held || 0) + 1;
     Q.funds -= 4;
     Q.map_winners = provinceWinners(r.ballots);
+    Q.map_shares = districtShares(r.ballots, 5);
+    Q.map_kind = 'general';
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
     // the result itself replaces that month's poll; then a new polling
@@ -897,7 +1020,10 @@
       var dw = {};
       var byDistrict = provinceWinners(ballots);
       Object.keys(byDistrict).forEach(function (d) { dw[districtToProvince(d)] = byDistrict[d]; });
-      results.push({ region: region, districtWinners: dw, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
+      var ds = {};
+      var sharesByDistrict = districtShares(ballots, 5);
+      Object.keys(sharesByDistrict).forEach(function (d) { ds[districtToProvince(d)] = sharesByDistrict[d]; });
+      results.push({ region: region, districtWinners: dw, districtShares: ds, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
                      prevShares: reg.prevShares, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
     });
     Q.regional_elections_due = [];
@@ -912,6 +1038,14 @@
         provs[res.region].forEach(function (p) { winners[p] = res.districtWinners[p] || overall; });
       });
       Q.map_winners = winners;
+      var mapShares = {};
+      results.forEach(function (res) {
+        var regionTop = Object.keys(res.shares).sort(function (a, b) { return res.shares[b] - res.shares[a]; })
+          .slice(0, 5).map(function (id) { return [id, Math.round(res.shares[id] * 10) / 10]; });
+        provs[res.region].forEach(function (p) { mapShares[p] = res.districtShares[p] || regionTop; });
+      });
+      Q.map_shares = mapShares;
+      Q.map_kind = 'regional';
       Q.map_title = 'Regional elections, ' + Q.month + '/' + Q.year;
     }
     recalculate(Q);
@@ -923,8 +1057,9 @@
   // ------------------------------------------------------------------
   function checkLeadership(Q) {
     // A revolt becomes possible when the party is divided and Sánchez weak.
-    Q.revolt_possible = (Q.dissent_percent >= 40 && Q.sanchez_authority <= 35 &&
-      Q.federal_committee_balance < 50) ? 1 : 0;
+    Q.revolt_possible = ((Q.dissent_percent >= 40 && Q.sanchez_authority <= 35 &&
+      Q.federal_committee_balance < 50) ||
+      (Q.funds <= -5 && Q.sanchez_authority <= 45 && Q.federal_committee_balance < 50)) ? 1 : 0;
     // the 2016-17 window in which an ouster can be reversed by a primary
     var k = dateKey(Q.year, Q.month);
     Q.in_leadership_window = (k >= 201606 && k <= 201703) ? 1 : 0;
@@ -1070,7 +1205,8 @@
   function renderMap(Q, id) {
     var out = el(id);
     if (out && Q.map_winners) {
-      UI.drawMap(out, Q.map_winners, 'Most-voted party by province');
+      UI.drawMap(out, Q.map_winners, 'Most-voted party by province (hover for vote shares)',
+        { shares: Q.map_shares, outlines: Q.map_kind === 'regional' ? 'bold' : 'light' });
     }
   }
 
@@ -1162,6 +1298,7 @@
     renderFactions: renderFactions,
     campaign: campaign,
     transfer: transfer,
+    position: position,
     trueVote: trueVote,
     drawPollError: drawPollError,
     typicalShare: typicalShare,

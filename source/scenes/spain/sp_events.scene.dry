@@ -342,12 +342,12 @@ on-arrival: posture = 1; sanchez_authority += 2; member_morale += 3; regional_le
 Refusing to back Rajoy while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
 
 @alternative
-on-arrival: {! Q.posture = 2; Q.rel_up += 10; Q.rel_cs -= 6; Q.member_morale += 7; Q.progressives_dissent -= 5; Q.regional_leaders_dissent += 8; Q.institutionalists_dissent += 4; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); window.SpainGame.transfer(Q, 'psoe', 'cs', {pensioners: 0.5, self_employed: 0.5}); } !}
+on-arrival: {! Q.posture = 2; Q.rel_up += 10; Q.rel_cs -= 6; Q.member_morale += 7; Q.progressives_dissent -= 5; Q.regional_leaders_dissent += 8; Q.institutionalists_dissent += 4; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); window.SpainGame.transfer(Q, 'psoe', 'cs', {pensioners: 0.5, self_employed: 0.5}); } if (window.SpainGame) { window.SpainGame.position(Q, 0.8, 0); } !}
 
 The members are energised. In Seville, Toledo and Mérida, regional presidents read the announcement with alarm.
 
 @stability
-on-arrival: {! Q.posture = 3; Q.rel_pp += 10; Q.rel_cs += 5; Q.member_morale -= 8; Q.progressives_dissent += 8; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 3; Q.sanchez_authority -= 3; if (Q.campaign_line == 1) { Q.sanchez_authority -= 4; Q.member_morale -= 6; } if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {workers: Q.campaign_line == 1 ? 2.5 : 1.5, students: 1.5, unemployed: 1}); } !}
+on-arrival: {! Q.posture = 3; Q.rel_pp += 10; Q.rel_cs += 5; Q.member_morale -= 8; Q.progressives_dissent += 8; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 3; Q.sanchez_authority -= 3; if (Q.campaign_line == 1) { Q.sanchez_authority -= 4; Q.member_morale -= 6; } if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {workers: Q.campaign_line == 1 ? 2.5 : 1.5, students: 1.5, unemployed: 1}); } if (window.SpainGame) { window.SpainGame.position(Q, -0.8, 0); } !}
 
 Institutional voices welcome your responsibility. Among the members, the word "abstention" is already circulating. [? if campaign_line = 1 : You promised in the campaign that the PSOE would never make Rajoy Prime Minister, and the members have not forgotten. ?]
 
@@ -405,7 +405,7 @@ on-arrival: cat_dialogue += 1; regional_leaders_dissent += 2; sanchez_authority 
 Defend the Constitution, offer a way out. Neither side is convinced, but both keep talking to you.
 
 @talk
-on-arrival: cat_dialogue += 2; rel_erc += 8; rel_junts += 5; rel_cs -= 10; regional_leaders_dissent += 12; institutionalists_dissent += 6
+on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 8; Q.rel_junts += 5; Q.rel_cs -= 10; Q.regional_leaders_dissent += 12; Q.institutionalists_dissent += 6; if (window.SpainGame) { window.SpainGame.position(Q, 0, 1); } !}
 
 The PSC and Podemos welcome it. Susana Díaz and García-Page say it publicly: the PSOE cannot sound like it is negotiating with lawbreakers.
 
@@ -445,7 +445,7 @@ on-arrival: rel_up += 3; rel_erc += 3; regional_leaders_dissent += 3; sanchez_au
 You keep a foot in both camps, and are attacked from both.
 
 @mediate
-on-arrival: cat_dialogue += 1; rel_erc += 6; rel_junts += 4; rel_pp -= 6; regional_leaders_dissent += 8
+on-arrival: {! Q.cat_dialogue += 1; Q.rel_erc += 6; Q.rel_junts += 4; Q.rel_pp -= 6; Q.regional_leaders_dissent += 8; if (window.SpainGame) { window.SpainGame.position(Q, 0, 0.8); } !}
 
 Mediation goes nowhere, but you are the only national leader still talking to everyone.
 
@@ -478,7 +478,7 @@ on-arrival: {! Q.rel_pp += 6; Q.rel_cs += 6; Q.rel_erc -= 15; Q.rel_junts -= 20;
 The PSOE stands with the State. The PSC's vote holds in Barcelona's suburbs and falls in Girona.
 
 @abstain_155
-on-arrival: {! Q.rel_pp -= 10; Q.rel_cs -= 10; Q.rel_erc += 6; Q.rel_up += 6; Q.regional_leaders_dissent += 25; Q.institutionalists_dissent += 15; Q.federal_committee_balance -= 8; Q.sanchez_authority -= 4; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {cs: 0.5, pp: 0.4, vox: 0.1}, {pensioners: 2.5, homemakers: 2, self_employed: 1.5, workers: 1}); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); } !}
+on-arrival: {! Q.rel_pp -= 10; Q.rel_cs -= 10; Q.rel_erc += 6; Q.rel_up += 6; Q.regional_leaders_dissent += 25; Q.institutionalists_dissent += 15; Q.federal_committee_balance -= 8; Q.sanchez_authority -= 4; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {cs: 0.5, pp: 0.4, vox: 0.1}, {pensioners: 2.5, homemakers: 2, self_employed: 1.5, workers: 1}); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); } if (window.SpainGame) { window.SpainGame.position(Q, 0, 1.5); } !}
 
 The barons call it a betrayal of the Constitution. Podemos and the PSC applaud; nobody else does.
 
@@ -544,12 +544,12 @@ The European Commission writes that Spain's deficit, [+ deficit_text +]% of GDP,
 - @defy_brussels: Defend your spending: growth will close the gap
 
 @cuts
-on-arrival: {! Q.fiscal_adj -= 0.5; Q.progressives_dissent += 6; Q.trade_unionists_dissent += 6; Q.rel_up -= 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: -1.5, pensioners: -1, unemployed: -1}); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.fiscal_adj -= 0.5; Q.progressives_dissent += 6; Q.trade_unionists_dissent += 6; Q.rel_up -= 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: -1.5, pensioners: -1, unemployed: -1}); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, -1.5, 0); } !}
 
 The Commission is satisfied. Your voters remember 2010.
 
 @taxes
-on-arrival: {! Q.fiscal_adj -= 0.4; Q.rel_cs -= 6; Q.rel_pp -= 4; Q.rel_up += 4; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {self_employed: -1, professionals: -0.5}); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.fiscal_adj -= 0.4; Q.rel_cs -= 6; Q.rel_pp -= 4; Q.rel_up += 4; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {self_employed: -1, professionals: -0.5}); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 1, 0); } !}
 
 The banks protest; the Commission accepts the plan.
 
@@ -575,12 +575,12 @@ Facing protests across the country and divisions in his own party, Rajoy withdra
 - @move_on: Move on: this was the PP's own mess
 
 @women_victory
-on-arrival: {! Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2.5); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2.5); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 0, 0.5); } !}
 
 The feminist organisations that led the protests welcome the PSOE's support.
 
 @repeal
-on-arrival: {! Q.progressives_dissent -= 5; Q.institutionalists_dissent += 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.target(Q, 'psoe', 'pensioners', -1); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.progressives_dissent -= 5; Q.institutionalists_dissent += 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.target(Q, 'psoe', 'pensioners', -1); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 0, 1.2); } !}
 
 A clear commitment. The bishops' conference condemns it.
 
@@ -641,12 +641,12 @@ How does the PSOE answer?
 - @own_ground: Ignore Podemos and talk about governing
 
 @compete_left
-on-arrival: {! Q.progressives_dissent -= 4; Q.rel_up -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2.5); window.SpainGame.target(Q, 'psoe', 'unemployed', 2); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.progressives_dissent -= 4; Q.rel_up -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2.5); window.SpainGame.target(Q, 'psoe', 'unemployed', 2); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 0.8, 0); } !}
 
 You will not leave the indignant generation to Iglesias. Some of them listen.
 
 @populists
-on-arrival: {! Q.rel_up -= 12; Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, unemployed: 1}); } !}
+on-arrival: {! Q.rel_up -= 12; Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, unemployed: 1}); } if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
 
 Older voters nod. Younger ones hear the establishment defending itself.
 
@@ -672,7 +672,7 @@ Despite the Constitutional Court, Artur Mas's government holds a "participatory 
 - @psc_space: Let the PSC find its own space
 
 @federal_answer
-on-arrival: federal_proposal = 1; rel_pnv += 3; regional_leaders_dissent += 3; cat_dialogue += 1
+on-arrival: {! Q.federal_proposal = 1; Q.rel_pnv += 3; Q.regional_leaders_dissent += 3; Q.cat_dialogue += 1; if (window.SpainGame) { window.SpainGame.position(Q, 0, 0.5); } !}
 
 The Granada Declaration becomes your answer: a federal Spain. Few in Catalonia are listening any more.
 
@@ -734,12 +734,12 @@ Albert Rivera, until now known for opposing Catalan independence, takes Ciudadan
 - @ignore_cs: Ignore them: the real fight is with Podemos and the PP
 
 @spare_part
-on-arrival: {! Q.rel_cs -= 10; Q.progressives_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 1); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.rel_cs -= 10; Q.progressives_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 1); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 0.3, 0); } !}
 
 The label sticks, among your own voters at least.
 
 @court_centre
-on-arrival: {! Q.rel_cs += 3; Q.modernisers_dissent -= 3; Q.progressives_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 2.5); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.rel_cs += 3; Q.modernisers_dissent -= 3; Q.progressives_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 2.5); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, -0.8, 0); } !}
 
 You hold on to more of the professional middle class than the polls expected.
 
@@ -765,7 +765,7 @@ The municipal elections redraw the map of Spanish cities. Citizen platforms back
 - @let_pp: Abstain and let the most-voted lists govern
 
 @back_mayors
-on-arrival: {! Q.rel_up += 10; Q.rel_cs -= 4; Q.progressives_dissent -= 6; Q.regional_leaders_dissent += 4; Q.mayors_of_change = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1); window.SpainGame.recalculate(Q); } !}
+on-arrival: {! Q.rel_up += 10; Q.rel_cs -= 4; Q.progressives_dissent -= 6; Q.regional_leaders_dissent += 4; Q.mayors_of_change = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1); window.SpainGame.recalculate(Q); } if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0.3); } !}
 
 Carmena and Colau take office with socialist votes, and the PSOE wins dozens of city halls and regional governments with Podemos's support in return.
 
@@ -796,12 +796,12 @@ A week after the Greeks voted "no" to the bailout terms in a referendum, Alexis 
 - @say_nothing: Say nothing
 
 @realism
-on-arrival: {! Q.rel_up -= 4; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, professionals: 1, pensioners: 0.5}); } !}
+on-arrival: {! Q.rel_up -= 4; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, professionals: 1, pensioners: 0.5}); } if (window.SpainGame) { window.SpainGame.position(Q, -0.8, 0); } !}
 
 "Change is possible, but it has to be real." Some of the voters who left for Podemos start to come back.
 
 @solidarity
-on-arrival: {! Q.rel_up += 4; Q.progressives_dissent -= 3; Q.modernisers_dissent += 2; !}
+on-arrival: {! Q.rel_up += 4; Q.progressives_dissent -= 3; Q.modernisers_dissent += 2; if (window.SpainGame) { window.SpainGame.position(Q, 0.8, 0); } !}
 
 The left of the party approves. It does little for the PSOE's credibility as a government in waiting.
 
@@ -870,6 +870,7 @@ Four parties can now win more than 10%. What line does the PSOE take into the ca
 on-arrival: {!
 Q.campaign_line = 1; Q.rel_pp -= 8; Q.rel_up += 6; Q.member_morale += 5; Q.progressives_dissent -= 5;
 if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.recalculate(Q); }
+if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0); }
 !}
 
 You promise that the PSOE will never make Rajoy Prime Minister. It energises the members and closes a door you may later want open.
@@ -878,6 +879,7 @@ You promise that the PSOE will never make Rajoy Prime Minister. It energises the
 on-arrival: {!
 Q.campaign_line = 2; Q.rel_cs += 6; Q.rel_pnv += 3; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 4;
 if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, professionals: 1, self_employed: 0.5}); window.SpainGame.recalculate(Q); }
+if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); }
 !}
 
 The barons approve. Older and middle-class voters hear a party of government; younger ones hear the past.
@@ -886,6 +888,54 @@ The barons approve. Older and middle-class voters hear a party of government; yo
 on-arrival: {!
 Q.campaign_line = 3; Q.rel_up -= 12; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 5;
 if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1.5, students: -1}); window.SpainGame.recalculate(Q); }
+if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); }
 !}
 
 Your attacks on Iglesias hold the PSOE's older voters. Podemos will remember them when the talking starts.
+
+@finance_crisis
+title: The treasurer's report
+new-page: true
+tags: sp_event
+view-if: deep_debt = 1 and sanchez_leader = 1 and finance_crisis_year < year
+on-arrival: {! Q.finance_crisis_year = Q.year; !}
+
+= The treasurer's report
+
+The party treasurer brings the Federal Executive a report it cannot ignore: the PSOE owes [+ funds_display +] in party funds' worth to banks and suppliers, staff are being paid late, and the federations are asking where their money has gone. Your critics are already saying that a man who cannot run the party's accounts cannot run the country's.
+
+- @cut_staff: Cut Ferraz's staff and campaign budget
+- @appeal_members: Appeal to the members for an emergency contribution
+- @blame_predecessors: Blame the debts inherited from the previous leadership
+
+@cut_staff
+on-arrival: funds += 3; sanchismo -= 6; member_morale -= 4; modernisers_dissent += 6
+
+Dozens of party staff are let go, many of them your own people. The books improve; the loyalty of your team does not.
+
+@appeal_members
+on-arrival: funds += 2; member_morale -= 6; sanchez_authority -= 3
+
+The members pay, and some of them ask why they have to.
+
+@blame_predecessors
+on-arrival: sanchez_authority -= 4; institutionalists_dissent += 10; regional_leaders_dissent += 6; federal_committee_balance -= 6
+
+The old guard takes it personally. The debts are still there.
+
+@finance_ouster
+title: Removed over the finances
+new-page: true
+tags: sp_event
+view-if: ruinous_debt = 1 and sanchez_leader = 1 and federal_committee_balance < 55
+on-arrival: {!
+Q.sanchez_leader = 0;
+if (Q.in_leadership_window) { Q.leadership_exception_open = 1; }
+if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, cs: 0.5}, {students: 1, workers: 1, professionals: 1}); }
+!}
+
+= Removed over the finances
+
+With the party unable to pay its own campaign debts, the Federal Committee meets in emergency session. The regional leaders, the old guard and even some of your own executive vote to remove you for "the ruinous management of the party". A caretaker committee takes over Ferraz.
+
+[? if leadership_exception_open = 1 : The members have not spoken yet. The next primary is due in May 2017. ?]

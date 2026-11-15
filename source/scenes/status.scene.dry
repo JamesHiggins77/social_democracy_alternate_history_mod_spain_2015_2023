@@ -46,6 +46,10 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
 
 {!<div id="sp-side-factions"></div>!}
 
+Economic line: **[+ econ_word +]**
+
+Social line: **[+ social_word +]**
+
 Sanchismo: **[+ sanchismo_word +]**
 
 Fed. Committee: **[+ committee_word +]**

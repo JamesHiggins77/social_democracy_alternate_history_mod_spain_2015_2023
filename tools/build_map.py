@@ -17,7 +17,7 @@ from pathlib import Path
 
 import shapefile
 from shapely.geometry import shape
-from shapely.ops import transform
+from shapely.ops import transform, unary_union
 
 RENAME = {
     "La Coruña": "A Coruña", "Álava": "Araba", "Gerona": "Girona", "Lérida": "Lleida",
@@ -71,8 +71,17 @@ def main(shp):
                 out.append("M" + "L".join(f"{x:.1f},{y:.1f}" for x, y in pts) + "Z")
         return "".join(out)
 
+    # autonomous communities: provinces merged, for bold outlines
+    elections_js = (Path(__file__).resolve().parent.parent / "out" / "html" / "spain" / "election_data.js").read_text(encoding="utf-8")
+    regions = json.loads(elections_js[elections_js.index("var DATA = ") + 11:elections_js.rindex(";\n  if")])["regions"]
+    region_paths = {}
+    for region, provs in regions.items():
+        merged = unary_union([projected[p].buffer(0.01) for p in provs]).buffer(-0.01)
+        region_paths[region] = path(merged.simplify(0.02, preserve_topology=True))
+
     data = {
         "source": "Natural Earth 1:10m admin-1 (public domain)",
+        "regions": region_paths,
         "width": round(WIDTH), "height": round(height),
         "canariesBox": None,
         "provinces": {n: path(g) for n, g in sorted(projected.items())},

@@ -184,19 +184,27 @@
       '</thead><tbody>' + rows.join('') + '</tbody></table>';
   }
 
-  // Province map coloured by the party with most votes. winners:
-  // {province: party}; provinces not in winners are drawn grey.
-  function drawMap(container, winners, title) {
+  // Province map coloured by the party with most votes.
+  //   winners: {province: party}; provinces not in winners are drawn grey
+  //   opts.shares: {province: [[party, %], ...]} shown on hover
+  //   opts.outlines: 'bold' or 'light' outlines around autonomous communities
+  function drawMap(container, winners, title, opts) {
     var map = root.SPAIN_MAP;
     if (!map || !container) {
       return;
     }
+    opts = opts || {};
+    var shares = opts.shares || {};
     var paths = Object.keys(map.provinces).map(function (p) {
       var w = winners && winners[p];
-      return '<path d="' + map.provinces[p] + '" fill="' + (w ? partyColor(w) : '#ddd') +
-        '" stroke="#fff" stroke-width="0.6"><title>' + escapeHtml(p + (w ? ': ' + partyName(w) : '')) +
-        '</title></path>';
+      return '<path class="sp-prov" data-prov="' + escapeHtml(p) + '" d="' + map.provinces[p] + '" fill="' +
+        (w ? partyColor(w) : '#ddd') + '" stroke="#fff" stroke-width="0.6"></path>';
     });
+    var outlineWidth = opts.outlines === 'bold' ? 2.2 : (opts.outlines === 'light' ? 1 : 0);
+    var outlines = outlineWidth && map.regions ? Object.keys(map.regions).map(function (r) {
+      return '<path d="' + map.regions[r] + '" fill="none" stroke="#222" stroke-width="' + outlineWidth +
+        '" stroke-linejoin="round" pointer-events="none"></path>';
+    }).join('') : '';
     var box = map.canariesBox.slice();
     box[0] = Math.max(1, box[0]);
     box[1] = Math.max(1, box[1]);
@@ -213,8 +221,35 @@
         '"></span>' + escapeHtml(shortName(id)) + '</span>';
     }).join(' ');
     container.innerHTML = (title ? '<h4>' + escapeHtml(title) + '</h4>' : '') +
-      '<svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' + paths.join('') + inset +
-      '</svg><p class="sp-map-legend">' + legend + '</p>';
+      '<div class="sp-map-wrap"><svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' +
+      paths.join('') + outlines + inset + '</svg><div class="sp-map-tip"></div></div>' +
+      '<p class="sp-map-legend">' + legend + '</p>';
+    var tip = container.querySelector('.sp-map-tip');
+    var wrap = container.querySelector('.sp-map-wrap');
+    Array.prototype.forEach.call(container.querySelectorAll('.sp-prov'), function (el) {
+      el.addEventListener('mousemove', function (ev) {
+        var p = el.getAttribute('data-prov');
+        var rows = (shares[p] || []).map(function (s) {
+          return '<div><span class="sp-swatch" style="background:' + partyColor(s[0]) + '"></span>' +
+            escapeHtml(shortName(s[0])) + ' <b>' + s[1].toFixed(1) + '%</b></div>';
+        }).join('');
+        tip.innerHTML = '<strong>' + escapeHtml(p) + '</strong>' + (rows || '<div>No data</div>');
+        var r = wrap.getBoundingClientRect();
+        var x = ev.clientX - r.left + 12;
+        var y = ev.clientY - r.top + 12;
+        if (x > r.width - 130) { x -= 150; }
+        tip.style.left = x + 'px';
+        tip.style.top = y + 'px';
+        tip.style.display = 'block';
+        el.setAttribute('stroke', '#000');
+        el.setAttribute('stroke-width', '1.4');
+      });
+      el.addEventListener('mouseleave', function () {
+        tip.style.display = 'none';
+        el.setAttribute('stroke', '#fff');
+        el.setAttribute('stroke-width', '0.6');
+      });
+    });
   }
 
   // Poll of polls: one line per party over the last `months` months.

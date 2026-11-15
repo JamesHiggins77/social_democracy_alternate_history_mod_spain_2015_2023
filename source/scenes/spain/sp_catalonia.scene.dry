@@ -47,17 +47,17 @@ The PSC proposes a table where the two governments can talk, without preconditio
 - @easy_discard
 
 @propose
-on-arrival: cat_dialogue += 1; rel_erc += 8; rel_junts += 5; rel_cs -= 8; regional_leaders_dissent += 8
+on-arrival: {! Q.cat_dialogue += 1; Q.rel_erc += 8; Q.rel_junts += 5; Q.rel_cs -= 8; Q.regional_leaders_dissent += 8; if (window.SpainGame) { window.SpainGame.position(Q, 0, 1); } !}
 
 ERC is interested. Ciudadanos calls it treason; García-Page calls it naive.
 
 @mediator
-on-arrival: cat_dialogue += 2; rel_erc += 10; rel_junts += 10; rel_cs -= 15; rel_pp -= 10; regional_leaders_dissent += 18; institutionalists_dissent += 10; sanchez_authority -= 4
+on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 10; Q.rel_junts += 10; Q.rel_cs -= 15; Q.rel_pp -= 10; Q.regional_leaders_dissent += 18; Q.institutionalists_dissent += 10; Q.sanchez_authority -= 4; if (window.SpainGame) { window.SpainGame.position(Q, 0, 2); } !}
 
 Puigdemont's people are delighted. Within the PSOE, it is a scandal.
 
 @no_talks
-on-arrival: cat_hard_line += 1; rel_erc -= 8; regional_leaders_dissent -= 5; rel_cs += 4
+on-arrival: {! Q.cat_hard_line += 1; Q.rel_erc -= 8; Q.regional_leaders_dissent -= 5; Q.rel_cs += 4; if (window.SpainGame) { window.SpainGame.position(Q, 0, -0.5); } !}
 
 Clear and firm. And the conflict goes on.
 
@@ -79,7 +79,7 @@ Miquel Iceta needs to win back voters who fled to Ciudadanos without losing thos
 - @easy_discard
 
 @iceta_bridge
-on-arrival: {! Q.cat_dialogue += 1; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); } !}
+on-arrival: {! Q.cat_dialogue += 1; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); } if (window.SpainGame) { window.SpainGame.position(Q, 0, 1); } !}
 
 Iceta dances on stage and talks about a "nation of nations". Some voters come back.
 
@@ -110,11 +110,11 @@ The Granada Declaration of 2013 proposed a federal Spain. Is now the moment to p
 - @easy_discard
 
 @propose_reform
-on-arrival: federal_proposal = 1; constitutional_commission = 1; cat_dialogue += 1; rel_pnv += 6; rel_erc += 4; rel_pp -= 4; regional_leaders_dissent += 4; institutionalists_dissent -= 2
+on-arrival: {! Q.federal_proposal = 1; Q.constitutional_commission = 1; Q.cat_dialogue += 1; Q.rel_pnv += 6; Q.rel_erc += 4; Q.rel_pp -= 4; Q.regional_leaders_dissent += 4; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.position(Q, 0, 0.8); } !}
 
 The PP agrees to a commission and to nothing else. It is a start.
 
 @not_now
-on-arrival: regional_leaders_dissent -= 4; rel_pnv -= 3; cat_hard_line += 1
+on-arrival: {! Q.regional_leaders_dissent -= 4; Q.rel_pnv -= 3; Q.cat_hard_line += 1; if (window.SpainGame) { window.SpainGame.position(Q, 0, -0.3); } !}
 
 The reform can wait. The question is whether the conflict will.

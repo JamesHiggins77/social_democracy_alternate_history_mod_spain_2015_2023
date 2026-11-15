@@ -60,7 +60,7 @@ Podemos has its own incentives: it wants to overtake the PSOE, not prop it up. W
 - @easy_discard
 
 @coalition
-on-arrival: up_talks += 1.5; rel_up += 10; rel_cs -= 8; progressives_dissent -= 8; regional_leaders_dissent += 12; institutionalists_dissent += 8
+on-arrival: {! Q.up_talks += 1.5; Q.rel_up += 10; Q.rel_cs -= 8; Q.progressives_dissent -= 8; Q.regional_leaders_dissent += 12; Q.institutionalists_dissent += 8; if (window.SpainGame) { window.SpainGame.position(Q, 1, 0); } !}
 
 Iglesias wants the vice-presidency and the ministries that control the economy and security. The barons want you to walk away.
 
@@ -75,7 +75,7 @@ on-arrival: up_talks += 0.5; rel_up -= 2; sanchez_authority += 2
 Podemos refuses to be "the PSOE's crutch". The offer stays on the table.
 
 @no_podemos
-on-arrival: rel_up -= 15; regional_leaders_dissent -= 10; progressives_dissent += 10; member_morale -= 4
+on-arrival: {! Q.rel_up -= 15; Q.regional_leaders_dissent -= 10; Q.progressives_dissent += 10; Q.member_morale -= 4; if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
 
 The barons applaud. The arithmetic of any alternative to Rajoy has just become much harder.
 
@@ -98,7 +98,7 @@ Albert Rivera signals that Ciudadanos will negotiate reforms, but never in a gov
 - @easy_discard
 
 @bilateral
-on-arrival: cs_talks += 1.5; rel_cs += 10; rel_up -= 8; modernisers_dissent -= 5; progressives_dissent += 6; trade_unionists_dissent += 3
+on-arrival: {! Q.cs_talks += 1.5; Q.rel_cs += 10; Q.rel_up -= 8; Q.modernisers_dissent -= 5; Q.progressives_dissent += 6; Q.trade_unionists_dissent += 3; if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
 
 The two teams work fast. A document starts to take shape: 200 measures, from labour contracts to the provincial councils.
 
@@ -169,7 +169,7 @@ The talks have moved from procedure to policy. Every partner wants something dif
 - @easy_discard
 
 @offer_jobs
-on-arrival: rel_up += 6; rel_cs -= 4; trade_unionists_dissent -= 5; up_talks += 0.5
+on-arrival: {! Q.rel_up += 6; Q.rel_cs -= 4; Q.trade_unionists_dissent -= 5; Q.up_talks += 0.5; if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0); } !}
 
 Podemos and the unions are interested. Ciudadanos wants flexibility, not rights.
 
@@ -184,11 +184,11 @@ on-arrival: rel_cs += 6; rel_up += 3; cs_talks += 0.5; institutionalists_dissent
 Common ground with both new parties: the one subject they agree on.
 
 @offer_territory
-on-arrival: rel_pnv += 6; rel_erc += 6; rel_junts += 4; rel_cs -= 6; regional_leaders_dissent += 8; cat_dialogue += 1
+on-arrival: {! Q.rel_pnv += 6; Q.rel_erc += 6; Q.rel_junts += 4; Q.rel_cs -= 6; Q.regional_leaders_dissent += 8; Q.cat_dialogue += 1; if (window.SpainGame) { window.SpainGame.position(Q, 0, 1); } !}
 
 The nationalists listen. So do the barons, with alarm.
 
 @offer_fiscal
-on-arrival: rel_cs += 6; rel_pnv += 3; rel_up -= 6; cs_talks += 0.5; progressives_dissent += 4
+on-arrival: {! Q.rel_cs += 6; Q.rel_pnv += 3; Q.rel_up -= 6; Q.cs_talks += 0.5; Q.progressives_dissent += 4; if (window.SpainGame) { window.SpainGame.position(Q, -1, 0); } !}
 
 Brussels would approve. Podemos calls it austerity with a red rose.

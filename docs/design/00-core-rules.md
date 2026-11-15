@@ -233,6 +233,14 @@ Major decisions transfer support between parties class by class (`SpainGame.tran
 
 Campaign and media cards can aim at an audience (`SpainGame.target`): students, young people, pensioners, the working class (workers and the unemployed), the middle class (professionals and the self-employed), women, the unemployed, or rural Spain (a regional boost in Castilla y León, Castilla-La Mancha, Extremadura, Aragón, Galicia and La Rioja). Women are reached through every class in proportion to its share of women (approximate INE shares, to be replaced by CIS microdata). Each repeat use of the same target is weaker (1/(1 + 0.25 × uses)), recovering slowly. Cards: **Campaign ads** (2 funds, strongest), **Media appearance** (the outlet decides the audience), **Campaign tour** (election only, 1 fund per regional stop).
 
+### 7.5b Balance: gains, backlash, position, incumbency, money
+
+- **Harder gains:** PSOE campaign gains are scaled by 0.6, then by campaign fatigue, 1/(1 + fatigue), where every point gained adds 0.08 fatigue and fatigue falls by a quarter each month. Repeat targeting of the same audience: 1/(1 + uses), recovering 0.15 a month.
+- **Cross-pressure:** courting students or the young loses pensioners to the PP; courting pensioners loses students to Podemos; working-class appeals lose professionals and the self-employed to Cs and the PP; middle-class appeals lose workers to Podemos; women-focused appeals lose a few self-employed men.
+- **Position:** `econ_left` and `social_prog` rise with left-wing economic promises (labour-reform repeal, wealth tax, public ownership) and progressive social ones (feminism, memory, abortion, territorial concessions), and fall with moderating choices; both fade 3% a month. Above 3, moderates leave every month: professionals and the self-employed to Cs and the PP (economic), pensioners and homemakers to the PP and Vox (social). Shown as words in the Politics tab.
+- **Grievances outlast favours:** gains fade at 3% of the gap a month, losses recover at 1%. In government, PSOE gains count ×0.7 and losses ×1.5, and every month a party in government (from 2016) loses a little support to the opposition.
+- **Money:** every campaign action costs funds and cannot be taken without them. In debt, Sánchez loses authority and Federal Committee support monthly and the Institutionalists and Regional Leaders grow restless; at −5 the treasurer's crisis, and a revolt becomes possible; at −10, with a hostile Federal Committee, removal for mismanagement.
+
 ### 7.6 Polls: history and error
 
 - **Poll of polls** (Polls tab and Library): the last 48 months. Before December 2015, monthly averages of the 409 published polls listed on Wikipedia (`tools/build_poll_history.py`); afterwards, the game's monthly polls. Election results replace the poll in their month; dashed lines mark general elections.
@@ -241,7 +249,7 @@ Campaign and media cards can aim at an audience (`SpainGame.target`): students, 
 
 ### 7.5 Election results
 
-Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
+Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
 
 ## 8. Lessons from the original's community
 

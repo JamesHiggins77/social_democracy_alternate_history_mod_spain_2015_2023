@@ -181,7 +181,8 @@ test('demographic targeting moves the right voters, with diminishing returns', (
   const gain2 = Q.vm.classSupport.students.psoe - before - gain1;
   assert.strictEqual(first, 1);
   assert.ok(gain2 < gain1, `${gain1} then ${gain2}`);
-  assert.strictEqual(Q.vm.classSupport.pensioners.psoe, 34);
+  // cross-pressure: courting students costs some pensioners
+  assert.ok(Q.vm.classSupport.pensioners.psoe < 34);
   // women: homemakers are reached far more than the self-employed
   const h = Q.vm.classSupport.homemakers.psoe, se = Q.vm.classSupport.self_employed.psoe;
   G.target(Q, 'psoe', 'women', 4);
@@ -223,4 +224,46 @@ test('government formation runs in weeks; four weeks close the month', () => {
   G.holdInvestiture(Q, 'pp');
   G.recalculate(Q);
   assert.strictEqual(Q.weekly, 0);
+});
+
+test('campaign fatigue: the same effort gains less the more you campaign', () => {
+  const Q = newQ();
+  const s0 = Q.vm.classSupport.workers.psoe;
+  G.campaign(Q, 'psoe', { workers: 3 });
+  const g1 = Q.vm.classSupport.workers.psoe - s0;
+  G.campaign(Q, 'psoe', { workers: 3 });
+  const g2 = Q.vm.classSupport.workers.psoe - s0 - g1;
+  assert.ok(g1 < 3 * 0.65, `first gain ${g1}`);
+  assert.ok(g2 < g1, `${g1} then ${g2}`);
+});
+
+test('a far-left economic position drives moderates to Cs and the PP', () => {
+  const Q = newQ();
+  const se = Q.vm.classSupport.self_employed.psoe;
+  G.position(Q, 8, 0);
+  G.endOfMonth(Q);
+  assert.ok(Q.vm.classSupport.self_employed.psoe < se - 1, `${se} -> ${Q.vm.classSupport.self_employed.psoe}`);
+  assert.ok(Q.econ_left < 8);
+});
+
+test('governing wears the PSOE down and losses hurt more in government', () => {
+  const Q = newQ();
+  Q.year = 2018;
+  Q.psoe_in_government = 1; Q.government_status = 'formed'; Q.pm_party = 'psoe';
+  const w = Q.vm.classSupport.workers.psoe;
+  G.endOfMonth(Q);
+  assert.ok(Q.vm.classSupport.workers.psoe < w);
+  const before = Q.vm.classSupport.students.psoe;
+  G.campaign(Q, 'psoe', { students: -2 });
+  assert.ok(before - Q.vm.classSupport.students.psoe > 2.9);
+});
+
+test('party debt damages Sánchez inside the party', () => {
+  const Q = newQ();
+  Q.funds = -8;
+  const a = Q.sanchez_authority, fc = Q.federal_committee_balance;
+  G.endOfMonth(Q);
+  assert.ok(Q.sanchez_authority < a - 2);
+  assert.ok(Q.federal_committee_balance < fc - 1);
+  assert.strictEqual(Q.deep_debt, 1);
 });
