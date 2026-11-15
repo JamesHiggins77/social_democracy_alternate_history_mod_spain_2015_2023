@@ -9,6 +9,8 @@ const DATA = require('../out/html/spain/election_data.js');
 
 // Official seat totals, grouped by game party id.
 const OFFICIAL = {
+  '2011': { pp: 186, psoe: 110, junts: 16, iu: 11, bildu: 7, upyd: 5, pnv: 5, erc: 3, bng: 2, cc: 2,
+            mp: 1, foro: 1, geroa: 1 },
   '2015': { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, iu: 2, bildu: 2, cc: 1 },
   '2016': { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 },
   '2019a': { psoe: 123, pp: 66, cs: 57, up: 42, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4,

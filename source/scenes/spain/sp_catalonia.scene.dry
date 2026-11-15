@@ -1,0 +1,120 @@
+title: Enforce the law
+new-page: true
+is-card: true
+tags: sp_catalonia
+view-if: catalan_crisis = 1 and cat_155_timer <= 0
+on-arrival: month_actions += 1; cat_155_timer = 3
+
+= Enforce the law
+
+The Constitutional Court's rulings are being ignored. How far should the State go?
+
+- @prosecute: Back the prosecution of the independence leaders
+- @police: Reinforce the police in Catalonia
+- @measured: Act, but with the minimum force the law allows
+- @easy_discard
+
+@prosecute
+on-arrival: {! Q.cat_hard_line += 1; Q.rel_erc -= 12; Q.rel_junts -= 12; Q.rel_cs += 4; Q.regional_leaders_dissent -= 6; if (window.SpainGame) { window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.campaign(Q, 'psoe', {pensioners: 1}); } !}
+
+The rule of law, applied fully. The independence movement now has martyrs.
+
+@police
+on-arrival: {! Q.cat_hard_line += 1; Q.rel_erc -= 8; Q.rel_up -= 4; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {pensioners: -0.5, self_employed: -0.5}); } !}
+
+The State shows it is present. Vox has less to shout about, for now.
+
+@measured
+on-arrival: cat_dialogue += 1; regional_leaders_dissent += 3; rel_erc += 2
+
+Firm but proportionate, says the government. Too soft, says the right; too hard, say the separatists.
+
+@dialogue
+title: A table for dialogue
+new-page: true
+is-card: true
+tags: sp_catalonia
+view-if: catalan_crisis = 1 and cat_dialogue_timer <= 0
+on-arrival: month_actions += 1; cat_dialogue_timer = 3
+
+= A table for dialogue
+
+The PSC proposes a table where the two governments can talk, without preconditions and without a referendum.
+
+- @propose: Propose the table publicly
+- @mediator: Accept an international mediator
+- @no_talks: No talks while the law is being broken
+- @easy_discard
+
+@propose
+on-arrival: cat_dialogue += 1; rel_erc += 8; rel_junts += 5; rel_cs -= 8; regional_leaders_dissent += 8
+
+ERC is interested. Ciudadanos calls it treason; García-Page calls it naive.
+
+@mediator
+on-arrival: cat_dialogue += 2; rel_erc += 10; rel_junts += 10; rel_cs -= 15; rel_pp -= 10; regional_leaders_dissent += 18; institutionalists_dissent += 10; sanchez_authority -= 4
+
+Puigdemont's people are delighted. Within the PSOE, it is a scandal.
+
+@no_talks
+on-arrival: cat_hard_line += 1; rel_erc -= 8; regional_leaders_dissent -= 5; rel_cs += 4
+
+Clear and firm. And the conflict goes on.
+
+@psc
+title: The PSC line
+new-page: true
+is-card: true
+tags: sp_catalonia
+view-if: catalan_crisis = 1 and cat_psc_timer <= 0
+on-arrival: month_actions += 1; cat_psc_timer = 3
+
+= The PSC line
+
+Miquel Iceta needs to win back voters who fled to Ciudadanos without losing those who want a deal. What does the PSOE let him say?
+
+- @iceta_bridge: A bridge: recognise Catalonia as a nation within Spain
+- @iceta_unionist: A clear unionist line, shoulder to shoulder with Cs
+- @iceta_free: Let the PSC set its own line
+- @easy_discard
+
+@iceta_bridge
+on-arrival: {! Q.cat_dialogue += 1; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); } !}
+
+Iceta dances on stage and talks about a "nation of nations". Some voters come back.
+
+@iceta_unionist
+on-arrival: {! Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.03); window.SpainGame.regionalMod(Q, 'Cataluña', 'cs', 1.03); } !}
+
+The PSC competes with Ciudadanos on its own ground, and Ciudadanos is better at it.
+
+@iceta_free
+on-arrival: {! Q.sanchez_authority -= 1; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.04); } !}
+
+The PSC is its own party, after all. Madrid hopes it knows what it is doing.
+
+@federal_reform
+title: A federal answer
+new-page: true
+is-card: true
+tags: sp_catalonia
+view-if: catalan_crisis = 1 and cat_federal_timer <= 0
+on-arrival: month_actions += 1; cat_federal_timer = 6
+
+= A federal answer
+
+The Granada Declaration of 2013 proposed a federal Spain. Is now the moment to put it on the table?
+
+- @propose_reform: Propose a constitutional reform commission
+- @not_now: Not now: first restore the law
+- @easy_discard
+
+@propose_reform
+on-arrival: federal_proposal = 1; constitutional_commission = 1; cat_dialogue += 1; rel_pnv += 6; rel_erc += 4; rel_pp -= 4; regional_leaders_dissent += 4; institutionalists_dissent -= 2
+
+The PP agrees to a commission and to nothing else. It is a start.
+
+@not_now
+on-arrival: regional_leaders_dissent -= 4; rel_pnv -= 3; cat_hard_line += 1
+
+The reform can wait. The question is whether the conflict will.

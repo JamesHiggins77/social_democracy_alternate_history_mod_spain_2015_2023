@@ -41,37 +41,57 @@
   }
 
   // ------------------------------------------------------------------
-  // New game: the morning of 21 December 2015.
+  // New game: 20 November 2015, one month before the general election.
+  // Congress and government are those elected in November 2011.
   // ------------------------------------------------------------------
+  function officialShares(key) {
+    var provs = DATA.elections[key].provinces;
+    var ballots = {};
+    Object.keys(provs).forEach(function (p) {
+      ballots[p] = { lists: provs[p].lists.map(function (l) { return { id: l[0], votes: l[2] }; }) };
+    });
+    return VoteModel.nationalShares(ballots);
+  }
+
   function newGame(Q, difficulty) {
     Q.started = 1;
     Q.spain = 1;
     Q.difficulty = difficulty || 0;
     Q.time = 1;
     Q.year = 2015;
-    Q.month = 12;
+    Q.month = 11;
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'negotiations', 'barons', 'media', 'membership'];
+    Q.timers = ['advisor_action', 'negotiations', 'barons', 'media', 'membership', 'rally',
+                'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
+                'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
+                'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
+                'pensions_campaign', 'feminism', 'europe', 'housing'];
 
-    // Congress after the 20 December 2015 election
-    Q.congress = { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, iu: 2, bildu: 2, cc: 1 };
-    Q.election_records = [{ date: '2015-12', seats: Q.congress }];
+    // Congress elected on 20 November 2011
+    Q.congress = { pp: 186, psoe: 110, junts: 16, iu: 11, bildu: 7, upyd: 5, pnv: 5, erc: 3,
+                   bng: 2, cc: 2, mp: 1, foro: 1, geroa: 1 };
+    Q.vote_shares = officialShares('2011');
+    Q.prev_congress = null;
+    Q.prev_vote_shares = null;
+    Q.elections_held = 0;
+    Q.election_records = [{ date: '2011-11', seats: Q.congress }];
     Q.vm = VoteModel.initialState();
     Q.regions = RegionalModel.startingParliaments(REGIONAL);
 
-    // Government
+    // Government: Rajoy's majority, with the election called for December
     Q.pm = 'Mariano Rajoy';
     Q.pm_party = 'pp';
-    Q.government_status = 'acting';
+    Q.government_status = 'formed';
+    Q.government_type = 'PP majority government';
     Q.psoe_in_government = 0;
-    Q.legislature_start_year = 2016;
-    Q.legislature_start_month = 1;
+    Q.legislature_start_year = 2011;
+    Q.legislature_start_month = 12;
     Q.investiture_clock = -1;   // months to automatic dissolution; -1 = not started
     Q.investiture_votes = 0;
-    Q.election_year = 0;        // scheduled general election, 0 = none
-    Q.election_month = 0;
+    Q.election_year = 2015;     // scheduled general election, 0 = none
+    Q.election_month = 12;
     Q.sanchez_nominated = 0;
     Q.rajoy_declined = 0;
     Q.psoe_stance_pp = 'no';
@@ -83,8 +103,8 @@
     // Sánchez and the PSOE
     Q.sanchez_leader = 1;
     Q.leadership_exception_open = 0;
-    Q.sanchez_authority = 58;
-    Q.member_morale = 55;
+    Q.sanchez_authority = 66;
+    Q.member_morale = 60;
     Q.federal_committee_balance = 48;
     Q.sanchismo = 30;
     Q.institutionalists_strength = 25; Q.institutionalists_dissent = 20;
@@ -96,9 +116,12 @@
     // Relations with other parties (0-100)
     Q.rel_pp = 20; Q.rel_cs = 45; Q.rel_up = 35; Q.rel_iu = 40; Q.rel_erc = 25;
     Q.rel_junts = 20; Q.rel_pnv = 45; Q.rel_bildu = 10; Q.rel_cc = 45;
+    Q.rel_bng = 40; Q.rel_prc = 45; Q.rel_te = 45; Q.rel_geroa = 45; Q.rel_nc = 45; Q.rel_mp = 50;
     Q.up_talks = 0; Q.cs_talks = 0;
     Q.pact_cs = 0; Q.pact_up = 0; Q.red_lines = 0; Q.referendum_offer = 0;
     Q.pp_vox_relation = 50;
+    Q.catalan_crisis = 0;
+    Q.pp_scandal = 0;
 
     updatePolls(Q);
     recalculate(Q);
@@ -126,6 +149,17 @@
      'pp_vox_relation'].forEach(function (k) { Q[k] = clamp(Math.round(Q[k]), 0, 100); });
     RELATIONS.forEach(function (p) { Q['rel_' + p] = clamp(Math.round(Q['rel_' + p]), 0, 100); });
     Q.acting = Q.government_status === 'acting' ? 1 : 0;
+    Q.pp_governs = (Q.pm_party === 'pp' && !Q.acting) ? 1 : 0;
+    Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
+    Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
+      !Q.election_year && Q.sanchez_leader) ? 1 : 0;
+    var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
+    Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;
+    Q.authority_word = UI.word('authority', Q.sanchez_authority);
+    Q.morale_word = UI.word('morale', Q.member_morale);
+    Q.unity_word = UI.word('unity', Q.psoe_unity);
+    Q.committee_word = UI.word('committee', Q.federal_committee_balance);
+    Q.sanchismo_word = UI.word('sanchismo', Q.sanchismo);
     Q.congress_text = congressText(Q.congress);
   }
 
@@ -152,6 +186,59 @@
       var v = changes[c] > 0 ? changes[c] * (1 - Q.dissent) : changes[c];
       Q.vm.classSupport[c][party] = Math.max(0, Q.vm.classSupport[c][party] + v);
     });
+  }
+
+  // Card helpers ------------------------------------------------------
+  // Shift a party's support by class and refresh the polls.
+  function campaign(Q, party, changes) {
+    shiftSupport(Q, party, changes);
+    updatePolls(Q);
+  }
+
+  // Multiply a statewide party's strength in one region (e.g. Cs in
+  // Catalonia during the crisis).
+  function regionalMod(Q, region, party, factor) {
+    Q.vm.regionalMod[region] = Q.vm.regionalMod[region] || {};
+    var cur = Q.vm.regionalMod[region][party] === undefined ? 1 : Q.vm.regionalMod[region][party];
+    Q.vm.regionalMod[region][party] = cur * factor;
+    updatePolls(Q);
+  }
+
+  // Multiply a territorial party's strength in its region.
+  function territorial(Q, region, party, factor) {
+    Q.vm.territorialMod[region] = Q.vm.territorialMod[region] || {};
+    var cur = Q.vm.territorialMod[region][party] === undefined ? 1 : Q.vm.territorialMod[region][party];
+    Q.vm.territorialMod[region][party] = cur * factor;
+    updatePolls(Q);
+  }
+
+  // Motion of no confidence with Sánchez as candidate.
+  function holdCensure(Q) {
+    var v = Parliament.count(Q.congress, Parliament.stancesForCensure(Q));
+    Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
+    Q.censure_passed = v.yes >= Parliament.MAJORITY ? 1 : 0;
+    if (Q.censure_passed) {
+      formGovernment(Q, 'sanchez');
+      Q.government_type = 'PSOE government after a motion of no confidence';
+    }
+    recalculate(Q);
+    return v;
+  }
+
+  // Budget vote for a PSOE government.
+  function holdBudget(Q) {
+    var v = Parliament.count(Q.congress, Parliament.stancesForBudget(Q));
+    Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
+    Q.budget_passed = v.yes > v.no ? 1 : 0;
+    return v;
+  }
+
+  // The Prime Minister calls an early general election (two months on).
+  function callElection(Q) {
+    var d = addMonths(Q.year, Q.month, 2);
+    Q.election_year = d[0];
+    Q.election_month = d[1];
+    recalculate(Q);
   }
 
   function dateKey(y, m) {
@@ -289,9 +376,11 @@
   function runGeneralElection(Q) {
     var r = VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
     var old = Q.congress;
-    Q.previous_congress = old;
+    Q.prev_congress = old;
+    Q.prev_vote_shares = Q.vote_shares;
     Q.congress = r.totals;
-    Q.last_vote_shares = r.voteShares;
+    Q.vote_shares = r.voteShares;
+    Q.elections_held = (Q.elections_held || 0) + 1;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
     Q.election_year = 0;
     Q.election_month = 0;
@@ -377,7 +466,12 @@
     (Q.regional_elections_due || []).forEach(function (region) {
       var reg = Q.regions[region];
       var date = reg.nextElection;
-      var r = RegionalModel.runRegionalElection(Q.vm, base(), REGIONAL, region, date);
+      var ballots = RegionalModel.regionalBallots(Q.vm, base(), REGIONAL, region);
+      var r = lib('SpainRegionalRules', 'regional_rules.js').electRegion(region, ballots, date,
+        REGIONAL.regions[region]);
+      var flat = {};
+      Object.keys(ballots).forEach(function (d) { flat[d] = { lists: ballots[d].lists }; });
+      var shares = VoteModel.nationalShares(flat);
       var before = reg.government;
       var gov = regionalGovernment(r.totals, before);
       var psoeLost = before.party === 'psoe' && gov.party !== 'psoe';
@@ -390,16 +484,23 @@
         Q.regional_leaders_strength += 3;
         Q.sanchez_authority += 3;
       }
+      if (region === 'Cataluña' && Q.cat_crisis_stage === 3) {
+        Q.cat_election_held = 1;
+      }
       if (gov.cabinet.indexOf('vox') !== -1) {
         Q.pp_vox_regional_coalitions = (Q.pp_vox_regional_coalitions || 0) + 1;
       }
+      reg.prevSeats = reg.seats;
+      reg.prevShares = reg.voteShares || null;
       reg.seats = r.totals;
+      reg.voteShares = shares;
       reg.government = gov;
       reg.lastElection = date;
       reg.lastWasSnap = false;
       reg.nextElection = lib('SpainRegionalRules', 'regional_rules.js')
         .nextRegularElection(region, date, false);
-      results.push({ region: region, seats: r.totals, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
+      results.push({ region: region, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
+                     prevShares: reg.prevShares, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
     });
     Q.regional_elections_due = [];
     Q.has_regional_elections = 0;
@@ -442,36 +543,75 @@
     if (!out) {
       return;
     }
-    var v = Parliament.investiture(Q.congress, candidate, Q);
+    var v = candidate === 'censure' ? Parliament.count(Q.congress, Parliament.stancesForCensure(Q))
+      : (candidate === 'budget' ? Parliament.count(Q.congress, Parliament.stancesForBudget(Q))
+        : Parliament.investiture(Q.congress, candidate, Q));
     var label = { yes: 'Yes', abstain: 'Abstain', no: 'No' };
     var rows = Object.keys(Q.congress).sort(function (a, b) { return Q.congress[b] - Q.congress[a]; })
       .map(function (p) {
         return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p) + '"></span>' +
-          UI.partyName(p) + '</td><td class="sp-num">' + Q.congress[p] + '</td><td class="sp-vote-' +
+          UI.shortName(p) + '</td><td class="sp-num">' + Q.congress[p] + '</td><td class="sp-vote-' +
           v.detail[p] + '">' + label[v.detail[p]] + '</td></tr>';
       });
-    out.innerHTML = '<table class="sp-results"><thead><tr><th>Group</th><th class="sp-num">Seats</th>' +
+    out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th>Group</th><th class="sp-num">Seats</th>' +
       '<th>Vote</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>' +
       '<p><strong>Yes ' + v.yes + ' · No ' + v.no + ' · Abstain ' + v.abstain + '</strong></p>';
   }
 
-  function renderCongress(Q, id, seats) {
+  // Congress: full table with changes on election pages, compact in the sidebar.
+  function renderCongress(Q, id, compact) {
     var out = el(id);
-    if (!out) {
+    if (!out || !Q.congress) {
       return;
     }
-    seats = seats || Q.congress;
-    out.innerHTML = '<svg id="' + id + '-svg" class="sp-hemicycle"></svg>' + UI.resultsTable(seats);
-    UI.drawHemicycle('#' + id + '-svg', seats);
+    out.innerHTML = '<svg id="' + id + '-svg" class="sp-hemicycle"></svg>' +
+      UI.resultsTable(Q.congress, compact ? null : Q.vote_shares,
+        { prevSeats: Q.prev_congress, prevShares: Q.prev_vote_shares, compact: compact });
+    UI.drawHemicycle('#' + id + '-svg', Q.congress);
   }
 
+  // Polls compared with the last election.
   function renderPolls(Q, id) {
     var out = el(id);
     if (!out || !Q.poll) {
       return;
     }
-    out.innerHTML = UI.resultsTable(Q.poll_seats, Q.poll);
+    var rows = Object.keys(Q.poll).filter(function (p) { return Q.poll[p] >= 1; })
+      .sort(function (a, b) { return Q.poll[b] - Q.poll[a]; })
+      .map(function (p) {
+        var change = Q.vote_shares && Q.vote_shares[p] !== undefined
+          ? (Q.poll[p] - Q.vote_shares[p]) : null;
+        var ch = change === null ? 'new' : (Math.abs(change) < 0.05 ? '=' :
+          (change > 0 ? '+' : '\u2212') + Math.abs(change).toFixed(1));
+        return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p) + '"></span>' +
+          UI.shortName(p) + '</td><td class="sp-num">' + Q.poll[p].toFixed(1) + '%</td><td class="sp-num sp-change">' +
+          ch + '</td><td class="sp-num">' + (Q.poll_seats[p] || 0) + '</td></tr>';
+      });
+    out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th></th><th class="sp-num">Vote</th>' +
+      '<th class="sp-num">\u00b1</th><th class="sp-num">Seats</th></tr></thead><tbody>' + rows.join('') +
+      '</tbody></table>';
   }
+
+  var SHORT_SURNAMES = {
+    'Guillermo Fernández Vara': 'Fernández Vara', 'Alberto Núñez Feijóo': 'Feijóo',
+    'Miguel Ángel Revilla': 'Revilla', 'Emiliano García-Page': 'García-Page',
+    'Juan Vicente Herrera': 'Herrera', 'José Ignacio Ceniceros': 'Ceniceros',
+    'Pedro Antonio Sánchez': 'P. A. Sánchez'
+  };
+
+  function surname(name) {
+    var clean = name.replace(/\s*\(.*\)$/, '');
+    if (SHORT_SURNAMES[clean]) {
+      return SHORT_SURNAMES[clean];
+    }
+    var parts = clean.split(' ');
+    return parts[parts.length - 1];
+  }
+
+  var REGION_SHORT = {
+    'Castilla-La Mancha': 'C.-La Mancha', 'Castilla y León': 'C. y León',
+    'Comunidad Valenciana': 'Valencia', 'Región de Murcia': 'Murcia', 'País Vasco': 'Basque C.'
+  };
 
   function renderRegions(Q, id) {
     var out = el(id);
@@ -481,12 +621,12 @@
     var rows = Object.keys(Q.regions).sort().map(function (r) {
       var reg = Q.regions[r];
       var g = reg.government;
-      return '<tr><td>' + r + '</td><td><span class="sp-swatch" style="background:' +
-        UI.partyColor(g.party) + '"></span>' + g.president + '</td><td>' +
-        reg.nextElection.slice(0, 7) + '</td></tr>';
+      return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
+        UI.partyColor(g.party) + '"></span>' + surname(g.president) + '</td><td class="sp-num">' +
+        reg.nextElection.slice(0, 4) + '</td></tr>';
     });
-    out.innerHTML = '<table class="sp-results sp-small"><thead><tr><th>Community</th>' +
-      '<th>President</th><th>Next vote</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+    out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th>Region</th>' +
+      '<th>President</th><th class="sp-num">Vote</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
   }
 
   function renderRegionalResults(Q, id) {
@@ -497,7 +637,8 @@
     out.innerHTML = (Q.last_regional_results || []).map(function (res) {
       var note = res.psoeLost ? ' The PSOE loses the presidency.'
         : (res.psoeWon ? ' The PSOE takes the presidency.' : '');
-      return '<h4>' + res.region + '</h4>' + UI.resultsTable(res.seats) +
+      return '<h4>' + res.region + '</h4>' +
+        UI.resultsTable(res.seats, res.shares, { prevSeats: res.prevSeats, prevShares: res.prevShares }) +
         '<p>Government: ' + res.government.president + ' (' +
         res.government.cabinet.map(UI.partyName).join(' + ') + ').' + note + '</p>';
     }).join('');
@@ -508,13 +649,28 @@
     if (!out) {
       return;
     }
+    var short = {
+      institutionalists: 'Institutionalists', regional_leaders: 'Regional Leaders',
+      progressives: 'Progressives', modernisers: 'Modernisers', trade_unionists: 'Unionists'
+    };
     var rows = FACTIONS.map(function (f) {
-      return '<tr><td>' + FACTION_NAMES[f] + '</td><td class="sp-num">' + Math.round(Q[f + '_strength']) +
-        '</td><td class="sp-num">' + Math.round(Q[f + '_dissent']) + '</td></tr>';
+      return '<tr><td>' + short[f] + '</td><td>' + UI.word('strength', Q[f + '_strength']) +
+        '</td><td>' + UI.word('dissent', Q[f + '_dissent']) + '</td></tr>';
     });
-    out.innerHTML = '<table class="sp-results sp-small"><thead><tr><th>Faction</th>' +
-      '<th class="sp-num">Strength</th><th class="sp-num">Dissent</th></tr></thead><tbody>' +
-      rows.join('') + '</tbody></table>';
+    out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th>Faction</th><th>Weight</th>' +
+      '<th>Dissent</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+  }
+
+  function renderRelations(Q, id) {
+    var out = el(id);
+    if (!out) {
+      return;
+    }
+    var rows = RELATIONS.map(function (p) {
+      return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p) + '"></span>' +
+        UI.shortName(p) + '</td><td>' + UI.word('relation', Q['rel_' + p]) + '</td></tr>';
+    });
+    out.innerHTML = '<table class="sp-results sp-compact"><tbody>' + rows.join('') + '</tbody></table>';
   }
 
   var api = {
@@ -537,7 +693,14 @@
     renderPolls: renderPolls,
     renderRegions: renderRegions,
     renderRegionalResults: renderRegionalResults,
-    renderFactions: renderFactions
+    renderFactions: renderFactions,
+    campaign: campaign,
+    regionalMod: regionalMod,
+    territorial: territorial,
+    holdCensure: holdCensure,
+    holdBudget: holdBudget,
+    callElection: callElection,
+    renderRelations: renderRelations
   };
   if (isNode) {
     module.exports = api;

@@ -1,4 +1,4 @@
-title: The morning after
+title: One month to go
 new-page: true
 set-bg: img/spain/bg_congreso_hemiciclo.jpg
 on-arrival: {!
@@ -7,29 +7,38 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 }
 !}
 
-= 21 December 2015 — The morning after
+= 20 November 2015 — One month to go
 
-The general election has broken the old two-party pattern. Mariano Rajoy's People's Party has finished first with 123 seats, far short of the 176 needed for a majority. The PSOE is second with 90, its worst result since the restoration of democracy, but it has not collapsed. Podemos and its regional allies have 69 seats, Ciudadanos 40.
+Mariano Rajoy has called the general election for 20 December. In 2011 his People's Party won an absolute majority, 186 seats, while the PSOE fell to 110, its worst result at the time. Four years of austerity, unemployment above 20% and a stream of corruption cases later, two new parties are reaching for the PSOE's voters: Podemos on the left and Ciudadanos in the centre.
 
-You are **Pedro Sánchez**, Secretary-General of the PSOE since the 2014 primary. Your senior team has gathered at Ferraz. The party faces two opposite accusations: that it will rescue the PP, or that it will hand the country to Podemos. Regional presidents, former leaders and the parliamentary group all have their own ideas about what you should do next.
+You are **Pedro Sánchez**, Secretary-General of the PSOE since the 2014 primary. This is your first general election as candidate. The polls put you in a three-way fight for second place.
 
-How do you position the PSOE this morning?
+The campaign line you choose now shapes not only the vote but how the other parties will see you when the counting is done.
 
-- @responsible: The responsible opposition: no to Rajoy, no promises yet
-- @alternative: An alternative government: announce talks for a change of government
-- @stability: Institutional stability: explore whether any agreement with the PP is possible
+- @change: Change: no deals with Rajoy, a government of progress
+- @governing: A governing party: serious, moderate, ready from day one
+- @vs_podemos: The only real alternative: Podemos is a risk Spain cannot take
 
-@responsible
-on-arrival: posture = 1; sanchez_authority += 2; member_morale += 3; regional_leaders_dissent -= 3
+@change
+on-arrival: {!
+Q.campaign_line = 1; Q.rel_pp -= 8; Q.rel_up += 6; Q.member_morale += 5; Q.progressives_dissent -= 5;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.recalculate(Q); }
+!}
 
-Refusing to back Rajoy while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
+You promise that the PSOE will never make Rajoy Prime Minister. It energises the members and closes a door you may later want open.
 
-@alternative
-on-arrival: posture = 2; rel_up += 10; rel_cs -= 6; member_morale += 7; progressives_dissent -= 5; regional_leaders_dissent += 8; institutionalists_dissent += 4; sanchez_authority += 3
+@governing
+on-arrival: {!
+Q.campaign_line = 2; Q.rel_cs += 6; Q.rel_pnv += 3; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 4;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, professionals: 1, self_employed: 0.5}); window.SpainGame.recalculate(Q); }
+!}
 
-The members are energised. In Seville, Toledo and Mérida, regional presidents read the announcement with alarm.
+The barons approve. Older and middle-class voters hear a party of government; younger ones hear the past.
 
-@stability
-on-arrival: posture = 3; rel_pp += 10; rel_cs += 5; member_morale -= 8; progressives_dissent += 8; institutionalists_dissent -= 5; regional_leaders_dissent -= 3; sanchez_authority -= 3
+@vs_podemos
+on-arrival: {!
+Q.campaign_line = 3; Q.rel_up -= 12; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 5;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1.5, students: -1}); window.SpainGame.recalculate(Q); }
+!}
 
-Institutional voices welcome your responsibility. Among the members, the word "abstention" is already circulating, and your internal opponents take note.
+Your attacks on Iglesias hold the PSOE's older voters. Podemos will remember them when the talking starts.

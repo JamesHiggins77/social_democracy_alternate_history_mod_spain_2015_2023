@@ -66,6 +66,51 @@
     };
   }
 
+  // Motion of no confidence (art. 113) with Sánchez as the alternative
+  // candidate. Needs an absolute majority of yes votes. Q.pp_scandal
+  // (0-5) measures how toxic the PP government has become.
+  function stancesForCensure(Q) {
+    var scandal = Q.pp_scandal || 0;
+    var outWithRajoy = function (id, rel) {
+      return (relation(Q, id, 30) >= rel || scandal >= 3) ? 'yes' : 'abstain';
+    };
+    return {
+      psoe: 'yes', pp: 'no', vox: 'no', upn: 'no',
+      cs: relation(Q, 'cs', 45) >= 75 ? 'yes' : 'no',
+      up: relation(Q, 'up', 35) >= 30 ? 'yes' : 'abstain',
+      iu: relation(Q, 'iu', 40) >= 30 ? 'yes' : 'abstain',
+      mp: 'yes',
+      erc: outWithRajoy('erc', 50),
+      junts: outWithRajoy('junts', 55),
+      cup: 'abstain',
+      pnv: (relation(Q, 'pnv', 45) >= 65 || (scandal >= 3 && relation(Q, 'pnv', 45) >= 40)) ? 'yes' : 'no',
+      bildu: scandal >= 2 || relation(Q, 'bildu', 10) >= 30 ? 'yes' : 'abstain',
+      cc: relation(Q, 'cc', 45) >= 70 ? 'yes' : 'abstain',
+      nc: 'yes', bng: 'yes', geroa: 'yes', prc: 'abstain', te: 'yes', foro: 'no'
+    };
+  }
+
+  // Budget vote for a PSOE government. Q.cat_dialogue (0-3) measures the
+  // dialogue offered to Catalonia, which ERC and Junts demand.
+  function stancesForBudget(Q) {
+    var dialogue = Q.cat_dialogue || 0;
+    return {
+      psoe: 'yes', pp: 'no', vox: 'no', upn: 'no',
+      cs: relation(Q, 'cs', 45) >= 70 ? 'yes' : 'no',
+      up: (Q.pact_up || relation(Q, 'up', 35) >= 50) ? 'yes' : 'no',
+      iu: (Q.pact_up || relation(Q, 'iu', 40) >= 50) ? 'yes' : 'no',
+      mp: relation(Q, 'up', 35) >= 40 ? 'yes' : 'abstain',
+      erc: dialogue >= 2 && relation(Q, 'erc', 25) >= 45 ? 'yes' : 'no',
+      junts: dialogue >= 3 && relation(Q, 'junts', 20) >= 50 ? 'yes' : 'no',
+      cup: 'no',
+      pnv: byRelation(Q, 'pnv', 50, 35),
+      bildu: relation(Q, 'bildu', 10) >= 35 ? 'yes' : (relation(Q, 'bildu', 10) >= 20 ? 'abstain' : 'no'),
+      cc: byRelation(Q, 'cc', 45, 30),
+      nc: 'yes', bng: byRelation(Q, 'bng', 50, 30), geroa: 'yes', prc: byRelation(Q, 'prc', 45, 30),
+      te: 'yes', foro: 'no'
+    };
+  }
+
   // Count a vote. seats: {party: n}. stances: {party: 'yes'|'abstain'|'no'}.
   // Parties without a stance vote no.
   function count(seats, stances) {
@@ -89,6 +134,8 @@
     MAJORITY: MAJORITY,
     stancesForSanchez: stancesForSanchez,
     stancesForPP: stancesForPP,
+    stancesForCensure: stancesForCensure,
+    stancesForBudget: stancesForBudget,
     count: count,
     investiture: investiture
   };

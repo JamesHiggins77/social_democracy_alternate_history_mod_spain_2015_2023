@@ -12,24 +12,50 @@ if (Q.advisor_action_timer <= 0) {
 !}
 max-cards: 3
 
-#The decks are shown here. Clicking a deck draws a card into your hand; clicking a card plays it. Playing a card uses up the month.
+#Decks are shown here. Clicking a deck draws a card into your hand; clicking a card plays it. Playing a card uses up the month.
 
-[? if acting = 1 : Spain has an acting government. ?][? if investiture_clock > 0 : The investiture clock is running: [+ investiture_clock +] month(s) until the Cortes are dissolved. ?][? if election_year > 0 : A general election is called for [+ election_month : month +] [+ election_year +]. ?]
+[? if election_year > 0 : A general election is called for [+ election_month : month +] [+ election_year +]. ?][? if acting = 1 : Spain has an acting government. ?][? if investiture_clock > 0 : The investiture clock is running: [+ investiture_clock +] month(s) until the Cortes are dissolved. ?][? if catalan_crisis = 1 : The Catalan crisis dominates everything. ?]
 
-- @deck_politics
+- @deck_national
 - @deck_party
+- @deck_negotiations
+- @deck_government
+- @deck_catalonia
 - #sp_advisor
 
-@deck_politics
-title: Negotiations and media
+@deck_national
+title: National politics
 card-image: img/spain/deck_congreso_fachada.jpg
 is-deck: true
 
-- #sp_politics
+- #sp_national
 
 @deck_party
-title: The party
+title: Party politics
 card-image: img/spain/deck_ferraz.jpg
 is-deck: true
 
 - #sp_party
+
+@deck_negotiations
+title: Government negotiations
+view-if: seeking_government = 1
+card-image: img/spain/event_rajoy_sanchez.jpg
+is-deck: true
+
+- #sp_negotiations
+
+@deck_government
+title: Government
+view-if: psoe_in_government = 1
+card-image: img/spain/bg_congreso_hemiciclo.jpg
+is-deck: true
+
+- #sp_government
+
+@deck_catalonia
+title: Catalan crisis
+view-if: catalan_crisis = 1
+is-deck: true
+
+- #sp_catalonia

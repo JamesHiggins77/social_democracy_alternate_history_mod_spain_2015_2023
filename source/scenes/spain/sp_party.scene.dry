@@ -54,3 +54,169 @@ An agreement has been signed. You could put it to a vote of the whole membership
 on-arrival: member_morale += 8; sanchez_authority += 6; sanchismo += 5; regional_leaders_dissent += 3; federal_committee_balance += 4
 
 The members back the agreement by a wide margin. The barons cannot argue with the result; they argue instead about the question.
+
+@federal_exec
+title: The Federal Executive
+new-page: true
+is-card: true
+tags: sp_party
+view-if: federal_exec_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; federal_exec_timer = 4
+
+= The Federal Executive
+
+A vacancy in the party leadership gives you the chance to reshape it. Who gets the post?
+
+- @loyalist: A loyalist from your own network
+- @baron: Someone close to the regional presidents
+- @unionist: A figure from the UGT tradition
+- @young: A young moderniser
+- @easy_discard
+
+@loyalist
+on-arrival: sanchismo += 6; federal_committee_balance += 3; regional_leaders_dissent += 5; institutionalists_dissent += 3
+
+Your grip on Ferraz tightens. The barons notice who is being promoted.
+
+@baron
+on-arrival: regional_leaders_dissent -= 8; regional_leaders_strength += 2; sanchismo -= 3
+
+A gesture of peace towards the federations. It costs you a seat at your own table.
+
+@unionist
+on-arrival: trade_unionists_dissent -= 8; trade_unionists_strength += 2; modernisers_dissent += 3
+
+The UGT has a voice at the top again.
+
+@young
+on-arrival: modernisers_dissent -= 6; modernisers_strength += 2; institutionalists_dissent += 4
+
+A fresh face for the cameras. The veterans mutter about inexperience.
+
+@ugt
+title: The UGT
+new-page: true
+is-card: true
+tags: sp_party
+view-if: ugt_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; ugt_timer = 4
+
+= The UGT
+
+The UGT's general secretary asks for a meeting. The union wants the PSOE to commit to repealing the 2012 labour reform and restoring collective bargaining.
+
+- @commit: Commit to repealing the labour reform
+- @partial: Promise to repeal its "most harmful aspects"
+- @distance: Keep a polite distance
+- @easy_discard
+
+@commit
+on-arrival: {! Q.trade_unionists_dissent -= 10; Q.progressives_dissent -= 4; Q.modernisers_dissent += 4; Q.rel_cs -= 4; Q.labour_promise = 2; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, unemployed: 1}); } !}
+
+A clear promise. Business and Ciudadanos will hold you to it, from the other side.
+
+@partial
+on-arrival: trade_unionists_dissent -= 4; labour_promise = 1
+
+Enough to keep the union on side. Not enough to excite anybody.
+
+@distance
+on-arrival: trade_unionists_dissent += 8; modernisers_dissent -= 3; rel_cs += 3
+
+The union leaders leave unhappy. Your economic team is relieved.
+
+@juventudes
+title: Socialist Youth
+new-page: true
+is-card: true
+tags: sp_party
+view-if: juventudes_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; juventudes_timer = 4
+
+= Socialist Youth
+
+The Juventudes Socialistas want a campaign aimed at young voters, most of whom now vote for Podemos or Ciudadanos.
+
+- @housing: Housing and youth rent support
+- @jobs_young: Youth jobs and an end to unpaid internships
+- @digital: A digital campaign run by the young members
+- @easy_discard
+
+@housing
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 2.5, workers: 1}); } Q.modernisers_dissent -= 3; !}
+
+Young renters notice. Some, at least.
+
+@jobs_young
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 2, unemployed: 1.5}); } Q.trade_unionists_dissent -= 2; !}
+
+A practical message for a generation of temporary contracts.
+
+@digital
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 3}); } Q.modernisers_dissent -= 5; Q.institutionalists_dissent += 2; !}
+
+The memes are good. The veterans do not understand them.
+
+@programme
+title: The programme
+new-page: true
+is-card: true
+tags: sp_party
+view-if: programme_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; programme_timer = 6
+
+= The programme
+
+The party's programme conference must settle the PSOE's offer to the country. What is the centrepiece?
+
+- @social: Social democracy: a stronger welfare state and fair taxes
+- @federal: A federal Spain: constitutional reform for the territories
+- @modern: Modernisation: education, science and the digital economy
+- @fiscal: Fiscal credibility: no promise without a figure
+- @easy_discard
+
+@social
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, pensioners: 1, unemployed: 1}); } Q.progressives_dissent -= 6; Q.trade_unionists_dissent -= 4; Q.modernisers_dissent += 3; Q.rel_up += 4; !}
+
+The left of the party is happy. The economists ask who pays.
+
+@federal
+on-arrival: federal_proposal = 1; rel_erc += 4; rel_pnv += 4; regional_leaders_dissent += 4; institutionalists_dissent -= 2; cat_dialogue += 1
+
+The Granada Declaration becomes a programme. The barons support it in principle and fear it in practice.
+
+@modern
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1.5}); } Q.modernisers_dissent -= 6; Q.rel_cs += 3; !}
+
+The PSOE as a party of the future, at least on paper.
+
+@fiscal
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 1.5, self_employed: 1, pensioners: 0.5}); } Q.institutionalists_dissent -= 5; Q.progressives_dissent += 4; Q.rel_cs += 4; !}
+
+Brussels and the markets would approve. The members are less sure what the PSOE is for.
+
+@agrupaciones
+title: The local branches
+new-page: true
+is-card: true
+tags: sp_party
+view-if: membership_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; membership_timer = 3
+
+= The local branches
+
+The PSOE has nearly 190,000 members in thousands of local branches. You could spend a month among them.
+
+- @tour: Tour the branches in your own car
+- @reform_party: Promise more power for the members: primaries for every candidacy
+- @easy_discard
+
+@tour
+on-arrival: sanchismo += 8; member_morale += 6; sanchez_authority += 2; regional_leaders_dissent += 3
+
+You drive from branch to branch, sleeping in small hotels. The members who meet you do not forget it.
+
+@reform_party
+on-arrival: sanchismo += 5; member_morale += 8; regional_leaders_dissent += 8; institutionalists_dissent += 6; federal_committee_balance -= 3
+
+The members cheer. The apparatus that runs the party sees the threat clearly.

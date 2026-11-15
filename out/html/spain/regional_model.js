@@ -57,7 +57,18 @@
     Object.keys(regionalData.regions).forEach(function (r) {
       var els = regionalData.regions[r];
       var d = baselineDate(els, GAME_START);
+      var votes = {};
+      var total = 0;
+      Object.keys(els[d].districts).forEach(function (dn) {
+        els[d].districts[dn].lists.forEach(function (l) {
+          votes[l[0]] = (votes[l[0]] || 0) + l[2];
+          total += l[2];
+        });
+      });
+      var shares = {};
+      Object.keys(votes).forEach(function (id) { shares[id] = 100 * votes[id] / total; });
       out[r] = {
+        voteShares: shares,
         lastElection: d,
         lastWasSnap: false,
         seats: JSON.parse(JSON.stringify(els[d].seats)),

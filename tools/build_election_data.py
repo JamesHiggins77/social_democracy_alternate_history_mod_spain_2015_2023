@@ -23,6 +23,7 @@ SOURCE_COMMIT = "fd5dbbd38dba751d218e91993237956fec19cc56"
 
 ELECTIONS = [
     # (game key, source key, polling date)
+    ("2011", "espana_2011", "2011-11-20"),
     ("2015", "espana_2015", "2015-12-20"),
     ("2016", "espana_2016", "2016-06-26"),
     ("2019a", "espana_2019_abril", "2019-04-28"),
@@ -70,6 +71,9 @@ PARTY_MAP = {
     "PRC": "prc",
     # Empty Spain platforms
     "¡TERUEL EXISTE!": "te", "EXISTE": "te",
+    # 2011 labels
+    "IU-LV": "iu", "AMAIUR": "bildu", "CiU": "junts", "ESQUERRA": "erc",
+    "COMPROMÍS-Q": "mp", "CC-NC-PNC": "cc", "FAC": "foro", "P.R.C.": "prc",
     # Minor statewide lists
     "PACMA": "pacma", "UPYD": "upyd", "UPyD": "upyd",
 }

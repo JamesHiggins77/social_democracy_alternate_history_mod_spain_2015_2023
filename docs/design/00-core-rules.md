@@ -7,7 +7,7 @@ This document covers the rules every chapter and card depends on. Chapter docume
 ## 1. Shape of the game
 
 - **Player:** Pedro Sánchez, not the PSOE. Sánchez's personal authority and the party's institutional strength are separate quantities.
-- **Span:** December 2015 (the morning after the 20 December general election) to the end of 2023.
+- **Span:** 20 November 2015, one month before the general election, to the end of 2023. The game opens with the 2011 Congress and Rajoy's majority government; the 20 December election is run live by the vote model, so the player's pre-campaign line and campaign cards shape the result and their position for coalition talks.
 - **Structure:** month-by-month, as in the Weimar original: draw and play cards, consult advisers, then resolve the month. Scheduled and conditional events happen between turns. Major procedures (investitures, motions of no confidence, Federal Committees, primaries) interrupt the loop as multi-stage sequences.
 - **History:** historical dates are *opportunities with preconditions*, not commands. If the conditions that produced an event are absent, it does not happen or happens differently.
 - **Distribution:** a standalone fork with its own site. The Weimar campaign is removed from the build; it stays in git history for reference.
@@ -195,6 +195,24 @@ One central routine (the Spanish `post_event`), as in the original. Cards change
 7. Route to any due events; otherwise return to the desk.
 
 Card types follow the Chapter I doc §11.4: **action cards**, **event cards**, **pinned adviser and actor cards** and **crisis sequences**.
+
+### 7.1 Decks
+
+| Deck | Available | Examples |
+|---|---|---|
+| National politics | always | interview, rally, televised debate (election called), corruption files, pensions march, 8 March, motion of no confidence (PP governs) |
+| Party politics | always | regional presidents, ask the members, Federal Executive, UGT, Socialist Youth, programme, local branches |
+| Government negotiations | while seeking investiture after an election | negotiating team, the Podemos question, the Ciudadanos channel, the small parties, what the party promises |
+| Government | while the PSOE holds ministries | budget, minimum wage, historical memory, pensions, labour reform, reshuffle |
+| Catalan crisis | from the referendum laws to the post-155 Catalan election | enforce the law, a table for dialogue, the PSC line, a federal answer |
+
+### 7.2 Status words
+
+Values are shown as words, never numbers: authority (Non-existent, Very low ≤9, Low ≤35, Middling ≤60, Strong ≤79, Very strong ≤99, Absolute 100), and matching scales for member morale, unity, relations, faction dissent and weight, the Federal Committee and Sanchismo (`SCALES` in `spain_ui.js`).
+
+### 7.3 Election results
+
+Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election.
 
 ## 8. Lessons from the original's community
 

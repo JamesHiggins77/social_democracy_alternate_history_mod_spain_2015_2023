@@ -1,7 +1,7 @@
 title: Federal Committee: the red lines
 new-page: true
 tags: sp_event
-view-if: red_lines_seen = 0 and year = 2015
+view-if: red_lines_seen = 0 and elections_held >= 1 and morning_seen = 1 and year = 2015
 max-visits: 1
 on-arrival: red_lines_seen = 1
 
@@ -65,7 +65,7 @@ title: The King's consultations
 new-page: true
 face-image: img/spain/event_rajoy_sanchez.jpg
 tags: sp_event
-view-if: acting = 1 and pp_asked < formation_round and time >= 2 and election_year = 0 and investiture_votes = 0
+view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and time >= formation_start_time + 1
 on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}
 
 = Rajoy asks for support
@@ -141,7 +141,7 @@ You tell the King you need more time. Rajoy's strategy depends on everyone else'
 title: The King turns to you
 new-page: true
 tags: sp_event
-view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and time >= 3
+view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and time >= formation_start_time + 2
 on-arrival: {! Q.king_asked = Q.formation_round || 1; !}
 
 = The King turns to you
@@ -193,11 +193,13 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 !}
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
-    window.SpainGame.renderCongress(Q, 'sp-election-result');
+    window.SpainGame.renderCongress(Q, 'sp-election-result', false);
 }
 !}
 
 = General election: [+ month : month +] [+ year +]
+
+Vote share, seats and seat share, with the change since the previous election.
 
 {!<div id="sp-election-result"></div>!}
 
@@ -273,7 +275,7 @@ You are no longer Secretary-General. [? if leadership_exception_open = 1 : A car
 title: The primary
 new-page: true
 tags: sp_event
-view-if: leadership_exception_open = 1 and year >= 2017 and month >= 5
+view-if: leadership_exception_open = 1 and ((year = 2017 and month >= 5) or year >= 2018)
 max-visits: 1
 on-arrival: {!
 Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0;
@@ -304,3 +306,212 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 Months have passed without a candidate facing the chamber, and without a first vote the constitutional clock cannot start. The King proposes the leader of the largest party once more, and this time he goes to the vote.
 
 [? if acting = 1 : He loses it. The two-month clock has started: if no one is invested, the Cortes will be dissolved and Spain will vote again. ?][? if acting = 0 : He wins it. Spain has a government. ?]
+
+@morning_after
+title: The morning after
+new-page: true
+tags: sp_event
+view-if: elections_held >= 1 and morning_seen = 0
+on-arrival: morning_seen = 1
+
+= 21 December 2015 — The morning after
+
+The results are in. Your senior team gathers at Ferraz. The party faces two opposite accusations: that it will rescue the PP, or that it will hand the country to Podemos. Regional presidents, former leaders and the parliamentary group all have their own ideas about what you should do next.
+
+How do you position the PSOE this morning?
+
+- @responsible: The responsible opposition: no to Rajoy, no promises yet
+- @alternative: An alternative government: announce talks for a change of government
+- @stability: Institutional stability: explore whether any agreement with the PP is possible
+
+@responsible
+on-arrival: posture = 1; sanchez_authority += 2; member_morale += 3; regional_leaders_dissent -= 3
+
+Refusing to back Rajoy while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
+
+@alternative
+on-arrival: posture = 2; rel_up += 10; rel_cs -= 6; member_morale += 7; progressives_dissent -= 5; regional_leaders_dissent += 8; institutionalists_dissent += 4; sanchez_authority += 3
+
+The members are energised. In Seville, Toledo and Mérida, regional presidents read the announcement with alarm.
+
+@stability
+on-arrival: posture = 3; rel_pp += 10; rel_cs += 5; member_morale -= 8; progressives_dissent += 8; institutionalists_dissent -= 5; regional_leaders_dissent -= 3; sanchez_authority -= 3; sanchez_authority -= 4 if campaign_line = 1; member_morale -= 6 if campaign_line = 1
+
+Institutional voices welcome your responsibility. Among the members, the word "abstention" is already circulating. [? if campaign_line = 1 : You promised in the campaign that the PSOE would never make Rajoy Prime Minister, and the members have not forgotten. ?]
+
+@gurtel
+title: The Gürtel sentence
+new-page: true
+tags: sp_event
+view-if: gurtel_seen = 0 and ((year = 2018 and month >= 5) or year >= 2019)
+on-arrival: {!
+Q.gurtel_seen = 1;
+Q.pp_scandal = (Q.pp_scandal || 0) + 3;
+if (window.SpainGame) {
+    window.SpainGame.campaign(Q, 'pp', {pensioners: -3, professionals: -3, self_employed: -2, workers: -2, homemakers: -2});
+}
+!}
+
+= The Gürtel sentence
+
+The National Court rules that the People's Party profited from the Gürtel corruption network, and finds that the PP ran a parallel accounting system for years. [? if pp_governs = 1 : Rajoy is Prime Minister of a government whose party has just been convicted as a beneficiary of corruption. Every opposition party is asking the same question: who will table a motion of no confidence? ?][? if pp_governs = 0 : The PP, out of government, takes the blow in the polls. ?]
+
+@cat_referendum_law
+title: The referendum laws
+new-page: true
+tags: sp_event
+view-if: cat_crisis_seen = 0 and catalonia_independentist = 1 and ((year = 2017 and month >= 9) or year >= 2018)
+on-arrival: {!
+Q.cat_crisis_seen = 1; Q.catalan_crisis = 1; Q.cat_crisis_stage = 1; Q.cat_stage_time = Q.time;
+if (window.SpainGame) {
+    window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.1);
+    window.SpainGame.territorial(Q, 'Cataluña', 'junts', 1.1);
+    window.SpainGame.regionalMod(Q, 'Cataluña', 'cs', 1.25);
+    window.SpainGame.campaign(Q, 'vox', {self_employed: 1.5, pensioners: 1, workers: 1, homemakers: 1});
+    window.SpainGame.recalculate(Q);
+}
+!}
+
+= The referendum laws
+
+In two chaotic sessions, the Parliament of Catalonia passes a law calling a referendum on independence for 1 October and a "transitional law" for a new republic. The opposition walks out. The Constitutional Court suspends both laws within days. [? if psoe_in_government = 1 : As Prime Minister, the response is yours to lead. ?][? if psoe_in_government = 0 : Rajoy's government asks the PSOE for unity in defence of the Constitution. ?]
+
+A new deck of cards is available: **Catalan crisis**.
+
+- @state: Stand with the State: the law must be enforced
+- @both: Defend the law, and call for dialogue at the same time
+- @talk: Insist that only negotiation can solve this
+
+@state
+on-arrival: rel_cs += 5; rel_pp += 5; rel_erc -= 15; rel_junts -= 15; regional_leaders_dissent -= 8; progressives_dissent += 5; cat_hard_line += 1
+
+You stand beside the institutions. Miquel Iceta's PSC warns that the PSOE must not disappear from Catalan politics.
+
+@both
+on-arrival: cat_dialogue += 1; regional_leaders_dissent += 2; sanchez_authority += 2
+
+Defend the Constitution, offer a way out. Neither side is convinced, but both keep talking to you.
+
+@talk
+on-arrival: cat_dialogue += 2; rel_erc += 8; rel_junts += 5; rel_cs -= 10; regional_leaders_dissent += 12; institutionalists_dissent += 6
+
+The PSC and Podemos welcome it. Susana Díaz and García-Page say it publicly: the PSOE cannot sound like it is negotiating with lawbreakers.
+
+@cat_1o
+title: 1 October
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and cat_crisis_stage = 1 and time >= cat_stage_time + 1
+on-arrival: {!
+Q.cat_crisis_stage = 2;
+Q.cat_stage_time = Q.time;
+if (window.SpainGame) {
+    window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.08);
+    window.SpainGame.territorial(Q, 'Cataluña', 'junts', 1.08);
+    window.SpainGame.regionalMod(Q, 'Cataluña', 'cs', 1.15);
+    window.SpainGame.campaign(Q, 'vox', {self_employed: 2, pensioners: 1.5, workers: 1.5, homemakers: 1, professionals: 1});
+    window.SpainGame.recalculate(Q);
+}
+!}
+
+= 1 October
+
+The referendum goes ahead without legal guarantees. Police try to stop the voting in hundreds of polling stations; the images of baton charges travel round the world. The Catalan government claims 90% voted yes on a turnout of 43%. Two days later, the King addresses the nation.
+
+- @back_police: Back the State's response without reservation
+- @criticise: Defend legality but criticise the police charges
+- @mediate: Call for mediation and an urgent meeting of the party leaders
+
+@back_police
+on-arrival: rel_pp += 4; rel_cs += 4; rel_up -= 6; rel_erc -= 10; regional_leaders_dissent -= 5; progressives_dissent += 6; cat_hard_line += 1
+
+Order before everything. In Barcelona, PSC mayors take down their posters.
+
+@criticise
+on-arrival: rel_up += 3; rel_erc += 3; regional_leaders_dissent += 3; sanchez_authority += 1
+
+You keep a foot in both camps, and are attacked from both.
+
+@mediate
+on-arrival: cat_dialogue += 1; rel_erc += 6; rel_junts += 4; rel_pp -= 6; regional_leaders_dissent += 8
+
+Mediation goes nowhere, but you are the only national leader still talking to everyone.
+
+@cat_155
+title: Independence and Article 155
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and cat_crisis_stage = 2 and time >= cat_stage_time + 1
+on-arrival: {!
+Q.cat_crisis_stage = 3;
+if (Q.regions && Q.regions['Cataluña']) {
+    var y = Q.year, m = Q.month + 2;
+    if (m > 12) { m -= 12; y += 1; }
+    Q.regions['Cataluña'].nextElection = y + '-' + (m < 10 ? '0' : '') + m + '-21';
+    Q.regions['Cataluña'].lastWasSnap = true;
+}
+!}
+
+= Independence and Article 155
+
+The Parliament of Catalonia votes a declaration of independence. Within hours, the Senate authorises the use of Article 155 of the Constitution: the Catalan government is dismissed and Catalan elections are called for two months' time. Puigdemont leaves for Brussels; members of his government are jailed pending trial.
+
+- @support_155: Support Article 155, limited to calling elections
+- @abstain_155: Refuse to support it: politics, not courts and police
+- @own_155: Support it, and demand a commission on constitutional reform in exchange
+
+@support_155
+on-arrival: rel_pp += 6; rel_cs += 6; rel_erc -= 15; rel_junts -= 20; rel_up -= 8; regional_leaders_dissent -= 10; progressives_dissent += 8; cat_hard_line += 1
+
+The PSOE stands with the State. The PSC's vote holds in Barcelona's suburbs and falls in Girona.
+
+@abstain_155
+on-arrival: rel_pp -= 10; rel_cs -= 10; rel_erc += 6; rel_up += 6; regional_leaders_dissent += 25; institutionalists_dissent += 15; federal_committee_balance -= 8; sanchez_authority -= 4
+
+The barons call it a betrayal of the Constitution. Podemos and the PSC applaud; nobody else does.
+
+@own_155
+on-arrival: rel_pp += 3; rel_cs += 3; rel_erc -= 8; regional_leaders_dissent -= 4; sanchez_authority += 3; constitutional_commission = 1
+
+You get your commission on reforming the territorial model, on paper. It keeps the federal idea alive.
+
+@cat_crisis_end
+title: After the Catalan election
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and cat_crisis_stage = 3 and cat_election_held = 1
+on-arrival: catalan_crisis = 0; cat_crisis_stage = 4
+
+= After the Catalan election
+
+Catalonia has voted. The direct rule of Article 155 ends with the new government, but the crisis has changed Spanish politics: Ciudadanos rode it in Catalonia, and a small party called Vox has made itself known as a private prosecutor in the courts against the independence leaders.
+
+The Catalan crisis deck is closed for now. The questions it raised are not.
+
+@vox_vistalegre
+title: Vox fills Vistalegre
+new-page: true
+tags: sp_event
+view-if: cat_crisis_seen = 1 and vox_rise_seen = 0 and ((year = 2018 and month >= 10) or year >= 2019)
+on-arrival: {!
+Q.vox_rise_seen = 1;
+// The surge feeds on the Catalan crisis: on dialogue the right calls weakness,
+// and on how far the PP has itself moved to the right.
+var push = 8 + 2 * (Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) + (Q.pp_scandal >= 3 ? 2 : 0);
+push = Math.max(3, push);
+Q.vox_push = push;
+if (window.SpainGame) {
+    window.SpainGame.campaign(Q, 'vox', {self_employed: push + 3, pensioners: push - 1, workers: push,
+        homemakers: push - 1, professionals: push - 2, unemployed: push - 1, students: push - 2});
+    window.SpainGame.campaign(Q, 'pp', {self_employed: -2, pensioners: -1});
+    window.SpainGame.recalculate(Q);
+}
+!}
+
+= Vox fills Vistalegre
+
+Ten thousand people pack the Vistalegre arena in Madrid, and thousands more are turned away, for a party that won 0.2% of the vote in 2015. Santiago Abascal promises to suspend Catalan autonomy, deport illegal immigrants and repeal the gender-violence law.
+
+[? if cat_dialogue >= 3 : Abascal's loudest applause comes when he attacks the "dialogue with coup plotters". ?][? if cat_hard_line >= 3 : The State's firmness in Catalonia has taken some of the wind out of his sails, but not all of it. ?]
+
+The polls start to pick it up. Vox is no longer a curiosity.

@@ -1,0 +1,239 @@
+title: The interview
+new-page: true
+is-card: true
+tags: sp_national
+view-if: media_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; media_timer = 2
+
+= The interview
+
+A prime-time interview on La Sexta. What is the message?
+
+- @change: Change: Spain needs a different government
+- @reform: Reform and stability: a serious party for difficult times
+- @attack_podemos: Podemos is not the answer
+- @easy_discard
+
+@change
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, students: 3, unemployed: 2}); } Q.progressives_dissent -= 3; Q.member_morale += 3; !}
+
+Young and working voters respond. Your most cautious barons wince at the word "change".
+
+@reform
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, pensioners: 2, self_employed: 1}); } Q.institutionalists_dissent -= 3; Q.modernisers_dissent -= 2; !}
+
+Older and middle-class voters hear a party of government. Some members hear a party afraid of its own shadow.
+
+@attack_podemos
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 3, homemakers: 2, students: -2}); } Q.rel_up -= 10; Q.regional_leaders_dissent -= 4; Q.progressives_dissent += 4; !}
+
+The barons enjoy it. Iglesias replies within the hour.
+
+@rally
+title: A rally
+new-page: true
+is-card: true
+tags: sp_national
+view-if: rally_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; rally_timer = 2
+
+= A rally
+
+The hall is booked and the buses are on their way. What is tonight's speech about?
+
+- @jobs: Decent jobs: end the precarious contracts of the labour reform
+- @welfare: The welfare state: health, education, dependency care
+- @corruption_speech: Clean politics: end the PP's corruption
+- @spain: One Spain, plural and united
+- @local: Whatever matters most in this town
+- @easy_discard
+
+@jobs
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 3, students: 1}); } Q.trade_unionists_dissent -= 4; Q.progressives_dissent -= 2; !}
+
+The unions applaud. Business organisations call it a step backwards.
+
+@welfare
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 2, workers: 1}); } Q.trade_unionists_dissent -= 2; !}
+
+Classic social democracy, and still the PSOE's strongest ground.
+
+@corruption_speech
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1, workers: 1}); window.SpainGame.campaign(Q, 'pp', {professionals: -1, self_employed: -0.5}); } Q.rel_pp -= 4; !}
+
+The audience chants about Bárcenas. [? if pp_scandal >= 2 : With the PP in the dock, the message lands harder. ?]
+
+@spain
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1, self_employed: 1}); } Q.regional_leaders_dissent -= 4; Q.rel_erc -= 4; !}
+
+A big Spanish flag behind the stage. The barons approve; the PSC is less sure.
+
+@local
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, pensioners: 1, unemployed: 1, homemakers: 0.5}); } !}
+
+Roads, hospitals, the local factory. Nothing memorable, nothing risky.
+
+@debate
+title: The televised debate
+new-page: true
+is-card: true
+tags: sp_national
+view-if: election_year > 0 and debate_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; debate_timer = 3
+
+= The televised debate
+
+The cameras are on. Your opponent is across the table. How do you play it?
+
+- @aggressive: Go for the jugular: question the Prime Minister's decency over corruption
+- @presidential: Look presidential: calm, numbers, proposals
+- @left: Fight Podemos for the left
+- @easy_discard
+
+@aggressive
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, students: 2, unemployed: 2, pensioners: -1}); } Q.rel_pp -= 12; Q.member_morale += 6; Q.institutionalists_dissent += 3; !}
+
+"You are not a decent man," you tell him. The clip is everywhere by midnight. The members love it; the commentators are split.
+
+@presidential
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, professionals: 2, self_employed: 1}); } Q.sanchez_authority += 3; !}
+
+No knockout, no gaffe. The undecided see a possible Prime Minister.
+
+@left
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, unemployed: 2, students: 1}); window.SpainGame.campaign(Q, 'up', {workers: -1, unemployed: -1}); } Q.rel_up -= 8; !}
+
+You claim the left as the PSOE's ground. Podemos's voters listen; Podemos's leaders take note.
+
+@corruption
+title: The corruption files
+new-page: true
+is-card: true
+tags: sp_national
+view-if: scandal_timer <= 0 and sanchez_leader = 1 and pm_is_pp = 1
+on-arrival: month_actions += 1; scandal_timer = 3
+
+= The corruption files
+
+Another sumario arrives from the National Court: Gürtel, Púnica, Lezo, the PP's off-the-books accounts. How hard do you push?
+
+- @commission: Demand a parliamentary commission of inquiry
+- @resign: Demand Rajoy's resignation
+- @restraint: Leave it to the judges
+- @easy_discard
+
+@commission
+on-arrival: {! Q.pp_scandal = (Q.pp_scandal || 0) + 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'pp', {professionals: -1, workers: -1}); } Q.rel_pp -= 6; Q.rel_up += 3; Q.rel_cs += 2; !}
+
+Podemos and Ciudadanos back the commission. The hearings will run for months.
+
+@resign
+on-arrival: {! Q.pp_scandal = (Q.pp_scandal || 0) + 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 1, workers: 1}); } Q.rel_pp -= 12; Q.member_morale += 4; !}
+
+A good headline. Rajoy, as ever, waits for it to pass.
+
+@restraint
+on-arrival: rel_pp += 4; institutionalists_dissent -= 3; member_morale -= 3
+
+Institutional and prudent. Many of your voters wanted more.
+
+@pensions_campaign
+title: The pensions march
+new-page: true
+is-card: true
+tags: sp_national
+view-if: pensions_campaign_timer <= 0 and sanchez_leader = 1 and year >= 2016
+on-arrival: month_actions += 1; pensions_campaign_timer = 4
+
+= The pensions march
+
+Pensioners are marching in Bilbao and Madrid against a 0.25% annual rise. They are the largest group of voters in Spain, and they vote.
+
+- @march: Join the march: index pensions to inflation
+- @pact: Propose a cross-party pact in the Toledo Pact commission
+- @easy_discard
+
+@march
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 4}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 1; !}
+
+You march with the pensioners. Now you have promised them inflation-linked pensions, and they will remember.
+
+@pact
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5}); } Q.rel_cs += 4; Q.rel_pnv += 3; Q.institutionalists_dissent -= 3; !}
+
+Serious, consensual and slow. The pensioners are not impressed; the parties are.
+
+@feminism
+title: 8 March
+new-page: true
+is-card: true
+tags: sp_national
+view-if: feminism_timer <= 0 and sanchez_leader = 1 and year >= 2017
+on-arrival: month_actions += 1; feminism_timer = 6
+
+= 8 March
+
+The feminist strike is one of the largest mobilisations in Spanish history. Millions of women stop work or march.
+
+- @join: Join the strike: the PSOE is a feminist party
+- @law: Commit to an equal pay and parental leave law
+- @easy_discard
+
+@join
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 2, professionals: 2, homemakers: 1, workers: 1}); } Q.rel_up += 3; Q.progressives_dissent -= 3; !}
+
+The images of the PSOE leadership in the march travel far. Vox calls it "gender ideology".
+
+@law
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, homemakers: 1.5, professionals: 1}); } Q.equality_law = 1; Q.modernisers_dissent -= 3; !}
+
+Less spectacular, more concrete: equal paternity and maternity leave becomes a flagship promise.
+
+@censure
+title: Motion of no confidence
+new-page: true
+is-card: true
+tags: sp_national
+view-if: pp_governs = 1 and sanchez_leader = 1 and censure_timer <= 0 and election_year = 0
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderVote(Q, 'sp-censure-count', 'censure');
+}
+!}
+
+= Motion of no confidence
+
+A motion of no confidence must name an alternative Prime Minister, you, and needs an absolute majority: 176 yes votes. If it passes, you take office the next day, without an election. If it fails, it strengthens the government.
+
+Hernando's count of a motion tabled today:
+
+{!<div id="sp-censure-count"></div>!}
+
+- @table: Table the motion
+- @root: Not now
+
+@table
+on-arrival: {!
+Q.month_actions += 1; Q.censure_timer = 6;
+if (window.SpainGame) { window.SpainGame.holdCensure(Q); }
+if (Q.censure_passed) {
+    Q.sanchez_authority += 20; Q.member_morale += 15; Q.sanchismo += 15; Q.federal_committee_balance += 10;
+} else {
+    Q.sanchez_authority -= 10; Q.member_morale -= 5; Q.rel_pp -= 10;
+}
+!}
+go-to: censure_won if censure_passed = 1; censure_lost if censure_passed = 0
+
+@censure_won
+title: Prime Minister
+
+= Prime Minister
+
+Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. For the first time in Spanish democracy, a motion of no confidence succeeds. Pedro Sánchez is President of the Government.
+
+@censure_lost
+title: The motion fails
+
+= The motion fails
+
+Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. The government survives, and its ministers thank you for the show of strength.

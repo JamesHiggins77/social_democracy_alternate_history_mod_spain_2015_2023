@@ -540,3 +540,9 @@ header #game-title, header #game-author {
     padding: 0.15em 0.5em;
     border-radius: 3px;
 }
+/* compact tables for the narrow sidebar */
+.sp-compact, .sp-small { font-size: 0.82em; width: 100%; table-layout: auto; }
+.sp-compact th, .sp-compact td, .sp-small th, .sp-small td { padding: 0.15em 0.3em; }
+.sp-change { color: #666; font-size: 0.9em; white-space: nowrap; }
+.sp-results td.sp-num, .sp-results th.sp-num { white-space: nowrap; }
+.sp-word { font-weight: bold; }

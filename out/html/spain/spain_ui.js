@@ -9,19 +9,54 @@
   var DATA = isNode ? require('./election_data.js') : root.SPAIN_ELECTION_DATA;
   var REGIONAL = isNode ? require('./regional_data.js') : root.SPAIN_REGIONAL_DATA;
 
-  // Left-to-right order for the hemicycle.
+  // Left-to-right order for the hemicycle: [id, full name, colour, short name].
   var PARTIES = [
-    ['cup', 'CUP', '#FFED00'], ['bildu', 'EH Bildu', '#B3A400'], ['erc', 'ERC', '#FFB232'],
-    ['up', 'Podemos / UP / Sumar', '#6B2E68'], ['iu', 'IU', '#A50021'],
-    ['mp', 'Más País / Compromís', '#0FDEC4'], ['bng', 'BNG', '#7FB3E0'],
-    ['geroa', 'Geroa Bai', '#F75E42'], ['psoe', 'PSOE', '#E1001A'], ['pacma', 'PACMA', '#9BC400'],
-    ['te', 'Teruel Existe', '#037252'], ['prc', 'PRC', '#C2CE0C'], ['nc', 'Nueva Canarias', '#9ACD32'],
-    ['cc', 'Coalición Canaria', '#FFD700'], ['pnv', 'EAJ-PNV', '#008000'],
-    ['junts', 'DL / CDC / Junts', '#20C0B2'], ['cs', 'Ciudadanos', '#EB6109'], ['upyd', 'UPyD', '#E9008C'],
-    ['upn', 'UPN / NA+', '#2A52BE'], ['pp', 'PP', '#1D84CE'], ['vox', 'Vox', '#5AC035']
+    ['cup', 'CUP', '#FFED00', 'CUP'], ['bildu', 'EH Bildu', '#B3A400', 'Bildu'],
+    ['erc', 'ERC', '#FFB232', 'ERC'], ['up', 'Podemos / UP / Sumar', '#6B2E68', 'Podemos'],
+    ['iu', 'IU', '#A50021', 'IU'], ['mp', 'Más País / Compromís', '#0FDEC4', 'Más País'],
+    ['bng', 'BNG', '#7FB3E0', 'BNG'], ['geroa', 'Geroa Bai', '#F75E42', 'Geroa'],
+    ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
+    ['te', 'Teruel Existe', '#037252', 'TE'], ['foro', 'Foro Asturias', '#2E73B8', 'Foro'],
+    ['prc', 'PRC', '#C2CE0C', 'PRC'], ['nc', 'Nueva Canarias', '#9ACD32', 'NC'],
+    ['cc', 'Coalición Canaria', '#FFD700', 'CC'], ['pnv', 'EAJ-PNV', '#008000', 'PNV'],
+    ['junts', 'CiU / DL / Junts', '#20C0B2', 'Junts'], ['jxsi', 'Junts pel Sí', '#3AB6A5', 'JxSí'],
+    ['cs', 'Ciudadanos', '#EB6109', 'Cs'], ['upyd', 'UPyD', '#E9008C', 'UPyD'],
+    ['upn', 'UPN / NA+', '#2A52BE', 'UPN'], ['pp', 'PP', '#1D84CE', 'PP'],
+    ['vox', 'Vox', '#5AC035', 'Vox']
   ];
   var META = {};
-  PARTIES.forEach(function (p, i) { META[p[0]] = { name: p[1], color: p[2], order: i }; });
+  PARTIES.forEach(function (p, i) {
+    META[p[0]] = { name: p[1], color: p[2], short: p[3], order: i };
+  });
+
+  // Word scales for the status display: [upper bound, word], ascending.
+  var SCALES = {
+    authority: [[0, 'Non-existent'], [9, 'Very low'], [35, 'Low'], [60, 'Middling'], [79, 'Strong'],
+                [99, 'Very strong'], [100, 'Absolute']],
+    morale: [[0, 'Shattered'], [9, 'Despairing'], [35, 'Low'], [60, 'Steady'], [79, 'High'],
+             [99, 'Fervent'], [100, 'Euphoric']],
+    unity: [[0, 'Broken'], [9, 'Split'], [35, 'Fractious'], [60, 'Uneasy'], [79, 'United'],
+            [99, 'Solid'], [100, 'Monolithic']],
+    relation: [[0, 'Enemies'], [19, 'Hostile'], [39, 'Cold'], [59, 'Wary'], [79, 'Cordial'],
+               [99, 'Close'], [100, 'Allied']],
+    dissent: [[0, 'None'], [9, 'Minimal'], [24, 'Low'], [44, 'Grumbling'], [64, 'Restless'],
+              [84, 'Rebellious'], [100, 'Open revolt']],
+    committee: [[29, 'Lost'], [44, 'Against him'], [54, 'Divided'], [69, 'Behind him'],
+                [100, 'Firmly behind him']],
+    sanchismo: [[19, 'Isolated'], [39, 'Small'], [59, 'Solid'], [79, 'Strong'], [100, 'Dominant']],
+    strength: [[9, 'Marginal'], [19, 'Minor'], [29, 'Significant'], [39, 'Major'], [100, 'Dominant']]
+  };
+
+  function word(scale, value) {
+    var v = Math.round(value || 0);
+    var steps = SCALES[scale];
+    for (var i = 0; i < steps.length; i++) {
+      if (v <= steps[i][0]) {
+        return steps[i][1];
+      }
+    }
+    return steps[steps.length - 1][1];
+  }
 
   var MAJORITY = 176;
   // Defeat thresholds - see docs/design/00-core-rules.md §2.2.
@@ -30,6 +65,10 @@
 
   function partyName(id) {
     return META[id] ? META[id].name : id.replace(/^x:/, '');
+  }
+
+  function shortName(id) {
+    return META[id] ? META[id].short : id.replace(/^x:/, '');
   }
 
   function partyColor(id) {
@@ -65,17 +104,75 @@
     return { lost: false, reason: 'No PP or PP–Vox majority (' + ppVox + ' seats together).' };
   }
 
-  function resultsTable(totals, voteShares) {
-    var ids = Object.keys(totals).sort(function (a, b) { return totals[b] - totals[a]; });
-    var rows = ids.map(function (id) {
-      var share = voteShares ? '<td class="sp-num">' +
-        (voteShares[id] !== undefined ? voteShares[id].toFixed(1) + '%' : '') + '</td>' : '';
-      return '<tr><td><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
-        escapeHtml(partyName(id)) + '</td>' + share + '<td class="sp-num">' + totals[id] + '</td></tr>';
+  function signed(v, digits) {
+    var r = v.toFixed(digits);
+    if (Number(r) === 0) {
+      return '=';
+    }
+    return (v > 0 ? '+' : '\u2212') + Math.abs(v).toFixed(digits);
+  }
+
+  // Results table.
+  //   totals: {party: seats}; voteShares: {party: %} (optional)
+  //   opts.prevSeats / opts.prevShares: the previous election, for changes
+  //   opts.compact: narrow version for the sidebar (party, seats, change)
+  function resultsTable(totals, voteShares, opts) {
+    opts = opts || {};
+    var prevSeats = opts.prevSeats || null;
+    var prevShares = opts.prevShares || null;
+    var size = 0;
+    Object.keys(totals).forEach(function (id) { size += totals[id]; });
+    var ids = {};
+    Object.keys(totals).forEach(function (id) { ids[id] = true; });
+    if (prevSeats && !opts.compact) {
+      Object.keys(prevSeats).forEach(function (id) { if (prevSeats[id] > 0) { ids[id] = true; } });
+    }
+    if (voteShares && !opts.compact) {
+      Object.keys(voteShares).forEach(function (id) { if (voteShares[id] >= 1) { ids[id] = true; } });
+    }
+    ids = Object.keys(ids).sort(function (a, b) {
+      return ((totals[b] || 0) - (totals[a] || 0)) ||
+        (((voteShares || {})[b] || 0) - ((voteShares || {})[a] || 0));
     });
-    return '<table class="sp-results"><thead><tr><th>Party</th>' +
-      (voteShares ? '<th class="sp-num">Votes</th>' : '') +
-      '<th class="sp-num">Seats</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+    var seatChange = function (id) {
+      if (!prevSeats) { return ''; }
+      return signed((totals[id] || 0) - (prevSeats[id] || 0), 0);
+    };
+    var head;
+    var rows;
+    if (opts.compact) {
+      head = '<tr><th></th><th class="sp-num">Seats</th>' + (prevSeats ? '<th class="sp-num">\u00b1</th>' : '') + '</tr>';
+      rows = ids.map(function (id) {
+        return '<tr><td><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
+          escapeHtml(shortName(id)) + '</td><td class="sp-num">' + (totals[id] || 0) + '</td>' +
+          (prevSeats ? '<td class="sp-num sp-change">' + seatChange(id) + '</td>' : '') + '</tr>';
+      });
+    } else {
+      head = '<tr><th>Party</th>' +
+        (voteShares ? '<th class="sp-num">Votes</th>' + (prevShares ? '<th class="sp-num">\u00b1</th>' : '') : '') +
+        '<th class="sp-num">Seats</th><th class="sp-num">%</th>' +
+        (prevSeats ? '<th class="sp-num">\u00b1</th>' : '') + '</tr>';
+      rows = ids.map(function (id) {
+        var cells = '<td><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
+          escapeHtml(partyName(id)) + '</td>';
+        if (voteShares) {
+          var v = voteShares[id] || 0;
+          cells += '<td class="sp-num">' + v.toFixed(1) + '%</td>';
+          if (prevShares) {
+            cells += '<td class="sp-num sp-change">' +
+              (prevShares[id] === undefined && v > 0 ? 'new' : signed(v - (prevShares[id] || 0), 1)) + '</td>';
+          }
+        }
+        cells += '<td class="sp-num">' + (totals[id] || 0) + '</td><td class="sp-num">' +
+          (100 * (totals[id] || 0) / size).toFixed(1) + '%</td>';
+        if (prevSeats) {
+          cells += '<td class="sp-num sp-change">' + seatChange(id) + '</td>';
+        }
+        return '<tr>' + cells + '</tr>';
+      });
+    }
+    return '<table class="sp-results' + (opts.compact ? ' sp-compact' : '') + '"><thead>' + head +
+      '</thead><tbody>' + rows.join('') + '</tbody></table>';
   }
 
   function drawHemicycle(selector, totals) {
@@ -205,6 +302,9 @@
     PP_ALONE_LOSS_SEATS: PP_ALONE_LOSS_SEATS,
     LARGE_MAJORITY_SEATS: LARGE_MAJORITY_SEATS,
     partyName: partyName,
+    shortName: shortName,
+    word: word,
+    SCALES: SCALES,
     partyColor: partyColor,
     noPathToGovernment: noPathToGovernment,
     resultsTable: resultsTable,

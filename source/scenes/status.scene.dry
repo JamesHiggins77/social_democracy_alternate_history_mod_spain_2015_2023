@@ -3,7 +3,7 @@ new-page: true
 is-special: true
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
-    window.SpainGame.renderCongress(Q, 'sp-side-congress');
+    window.SpainGame.renderCongress(Q, 'sp-side-congress', true);
 }
 !}
 
@@ -11,21 +11,21 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
 
 [+ month : month +] [+ year +]
 
-Prime Minister: [+ pm +][? if acting = 1 : (acting) ?]
+PM: [+ pm +][? if acting = 1 : (acting) ?]
 
-[? if psoe_in_government = 1 : The PSOE is in government. ?][? if psoe_in_government = 0 : The PSOE is in opposition. ?]
+[? if psoe_in_government = 1 : PSOE in government ?][? if psoe_in_government = 0 : PSOE in opposition ?]
 
-Sánchez's authority: [+ sanchez_authority +]/100
+Authority: **[+ authority_word +]**
 
-Member morale: [+ member_morale +]/100
+Morale: **[+ morale_word +]**
 
-PSOE unity: [+ psoe_unity +]/100
+Unity: **[+ unity_word +]**
 
-[? if investiture_clock > 0 : Dissolution in [+ investiture_clock +] month(s) unless a candidate is invested. ?]
+[? if investiture_clock > 0 : Dissolution in [+ investiture_clock +] mo. ?]
 
-[? if election_year > 0 : General election: [+ election_month : month +] [+ election_year +] ?]
+[? if election_year > 0 : Election: [+ election_month : month +] [+ election_year +] ?]
 
-= Congress of Deputies
+= Congress
 
 {!<div id="sp-side-congress"></div>!}
 
@@ -34,36 +34,21 @@ title: Politics
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
     window.SpainGame.renderFactions(Q, 'sp-side-factions');
+    window.SpainGame.renderRelations(Q, 'sp-side-relations');
 }
 !}
 
-= PSOE factions
+= PSOE
 
 {!<div id="sp-side-factions"></div>!}
 
-Sanchismo (loyalty network): [+ sanchismo +]/100
+Sanchismo: **[+ sanchismo_word +]**
 
-Federal Committee support for Sánchez: [+ federal_committee_balance +]%
+Fed. Committee: **[+ committee_word +]**
 
 = Relations
 
-PP: [+ rel_pp +]
-
-Ciudadanos: [+ rel_cs +]
-
-Podemos: [+ rel_up +]
-
-IU: [+ rel_iu +]
-
-ERC: [+ rel_erc +]
-
-Junts: [+ rel_junts +]
-
-EAJ-PNV: [+ rel_pnv +]
-
-EH Bildu: [+ rel_bildu +]
-
-Coalición Canaria: [+ rel_cc +]
+{!<div id="sp-side-relations"></div>!}
 
 @paramilitaries
 title: Regions
@@ -73,7 +58,7 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.regions) {
 }
 !}
 
-= Regional governments
+= Regions
 
 {!<div id="sp-side-regions"></div>!}
 
@@ -87,6 +72,6 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.poll) {
 
 = Polls
 
-Estimated vote and seats if an election were held now.
+Change vs. last election.
 
 {!<div id="sp-side-polls"></div>!}

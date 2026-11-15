@@ -9,14 +9,29 @@ function newQ() {
   return Q;
 }
 
-test('new game starts in December 2015 with the real Congress and polls', () => {
+test('new game starts in November 2015 with the 2011 Congress and an election due', () => {
   const Q = newQ();
   assert.strictEqual(Q.year, 2015);
-  assert.strictEqual(Q.congress.psoe, 90);
+  assert.strictEqual(Q.month, 11);
+  assert.strictEqual(Q.congress.pp, 186);
   assert.strictEqual(Q.pm, 'Mariano Rajoy');
+  assert.strictEqual(Q.acting, 0);
   assert.strictEqual(Object.keys(Q.regions).length, 17);
-  G.updatePolls(Q);
-  assert.deepStrictEqual(Q.poll_seats, Q.congress);
+  // polls forecast the real December 2015 result when nothing changes
+  assert.strictEqual(Q.poll_seats.psoe, 90);
+});
+
+test('the December 2015 election reproduces the real Congress and records changes', () => {
+  const Q = newQ();
+  G.endOfMonth(Q);
+  assert.strictEqual(Q.general_election_due, 1);
+  G.runGeneralElection(Q);
+  assert.deepStrictEqual(Q.congress,
+    { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, bildu: 2, iu: 2, cc: 1 });
+  assert.strictEqual(Q.prev_congress.psoe, 110);
+  assert.ok(Q.prev_vote_shares.psoe > 28 && Q.vote_shares.psoe < 23);
+  assert.strictEqual(Q.acting, 1);
+  assert.strictEqual(Q.repeat_elections, 0);
 });
 
 test('a failed investiture starts the clock; dissolution leads to a repeat election', () => {
@@ -65,6 +80,8 @@ test('regional government follows the blocs', () => {
 
 test('repeat elections bring PP-Cs cooperation and pressure on Sánchez', () => {
   const Q = newQ();
+  G.endOfMonth(Q);
+  G.runGeneralElection(Q); // December 2015
   const authority = Q.sanchez_authority;
   G.runGeneralElection(Q); // repeat election with no government formed
   assert.strictEqual(Q.repeat_elections, 1);

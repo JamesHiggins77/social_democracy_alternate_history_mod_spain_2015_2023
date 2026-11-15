@@ -1,0 +1,195 @@
+title: The budget
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and budget_timer <= 0
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderVote(Q, 'sp-budget-count', 'budget');
+}
+!}
+
+= The budget
+
+Without a budget of your own, the government lives on its predecessor's spending plans. María Jesús Montero has a draft ready. This is the likely vote:
+
+{!<div id="sp-budget-count"></div>!}
+
+- @present: Present the budget to Congress
+- @root: Not yet
+
+@present
+on-arrival: {!
+Q.month_actions += 1; Q.budget_timer = 12;
+if (window.SpainGame) { window.SpainGame.holdBudget(Q); }
+if (Q.budget_passed) {
+    Q.sanchez_authority += 8; Q.budget_year = Q.year;
+    if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, workers: 1, unemployed: 1}); }
+} else {
+    Q.sanchez_authority -= 6;
+}
+!}
+go-to: budget_passed if budget_passed = 1; budget_failed if budget_passed = 0
+
+@budget_passed
+title: Budget approved
+
+= Budget approved
+
+Yes [+ inv_yes +], no [+ inv_no +]. The government has its own budget: higher pensions, more for dependency care, more for science.
+
+@budget_failed
+title: Budget defeated
+
+= Budget defeated
+
+Yes [+ inv_yes +], no [+ inv_no +]. Congress throws out your budget. Governing on rolled-over accounts is possible, but every week of it is a week your opponents call you a Prime Minister without a majority.
+
+- @snap: Call an early general election
+- @carry_on: Carry on with the rolled-over budget
+
+@snap
+on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); } Q.member_morale += 3; !}
+
+You announce the dissolution of the Cortes. Spain votes in two months.
+
+@carry_on
+on-arrival: sanchez_authority -= 3
+
+You govern by decree where you can and by patience where you cannot.
+
+@minimum_wage
+title: The minimum wage
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and wage_timer <= 0
+on-arrival: month_actions += 1; wage_timer = 12
+
+= The minimum wage
+
+The minimum wage is €736 a month. The unions want €1,000; business warns of job losses.
+
+- @big_rise: Raise it by 22% in one go
+- @gradual: Raise it gradually over the legislature
+- @easy_discard
+
+@big_rise
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 1.5, students: 1, self_employed: -1.5}); } Q.trade_unionists_dissent -= 8; Q.rel_up += 6; Q.rel_cs -= 6; Q.wage_rise = 2; !}
+
+The largest rise since 1977. The Bank of Spain warns about employment; the workers who get it do not.
+
+@gradual
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, unemployed: 0.5}); } Q.trade_unionists_dissent -= 3; Q.rel_cs += 2; Q.wage_rise = 1; !}
+
+Prudent and predictable. The unions call it a missed opportunity.
+
+@memory
+title: Historical memory
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and memory_timer <= 0
+on-arrival: month_actions += 1; memory_timer = 24
+
+= Historical memory
+
+Franco is still buried in a state monument in the Valley of the Fallen, and tens of thousands of victims of the Civil War and the dictatorship lie in unmarked graves.
+
+- @exhume: Exhume Franco from the Valley of the Fallen
+- @graves: Fund the search for the victims' graves
+- @easy_discard
+
+@exhume
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 1.5, workers: 1, professionals: 1}); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.5, self_employed: 0.5}); } Q.progressives_dissent -= 6; Q.rel_up += 4; Q.rel_pp -= 6; Q.franco_exhumed = 1; !}
+
+It takes a year of court battles. When the helicopter lifts the coffin, the left celebrates and Vox finds a new grievance.
+
+@graves
+on-arrival: progressives_dissent -= 3; rel_up += 2
+
+Quiet, necessary work. Families find their grandparents.
+
+@pensions
+title: Pensions
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and pensions_timer <= 0
+on-arrival: month_actions += 1; pensions_timer = 12
+
+= Pensions
+
+[? if pensions_promise = 1 : You promised the pensioners that their pensions would rise with prices. ?]The Social Security system runs a deficit. What do you do?
+
+- @index: Index pensions to inflation
+- @minimum: Raise the minimum and widows' pensions most
+- @easy_discard
+
+@index
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 3}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 0; !}
+
+Nine million pensioners see it in their next payment.
+
+@minimum
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, homemakers: 1.5}); } Q.progressives_dissent -= 3; if (Q.pensions_promise) { Q.sanchez_authority -= 2; } !}
+
+Targeted and fair, say the economists. [? if pensions_promise = 1 : Not what you promised, say the pensioners' associations. ?]
+
+@labour
+title: The labour reform
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and labour_timer <= 0
+on-arrival: month_actions += 1; labour_timer = 18
+
+= The labour reform
+
+The PP's 2012 labour reform made dismissal cheaper and weakened collective bargaining. Spain has the highest rate of temporary contracts in the EU.
+
+- @repeal: Repeal it outright
+- @social_dialogue: Replace it through an agreement between unions and employers
+- @easy_discard
+
+@repeal
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 1.5, self_employed: -2}); } Q.trade_unionists_dissent -= 10; Q.rel_up += 8; Q.rel_cs -= 10; Q.rel_pnv -= 4; !}
+
+The unions celebrate; the CEOE threatens to take it to Brussels.
+
+@social_dialogue
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, unemployed: 1, professionals: 0.5}); } Q.trade_unionists_dissent -= 6; Q.rel_pnv += 3; Q.sanchez_authority += 3; !}
+
+Months of talks produce a deal signed by unions and employers alike: fewer temporary contracts, stronger sectoral bargaining.
+
+@reshuffle
+title: Reshuffle the cabinet
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and reshuffle_timer <= 0
+on-arrival: month_actions += 1; reshuffle_timer = 12
+
+= Reshuffle the cabinet
+
+A minister is damaged by a scandal over a master's degree. The press is asking how long they will last.
+
+- @loyal_cabinet: Bring in your most loyal allies
+- @barons_cabinet: Give ministries to people close to the barons
+- @experts: Appoint independent experts
+- @easy_discard
+
+@loyal_cabinet
+on-arrival: sanchismo += 6; sanchez_authority += 3; regional_leaders_dissent += 6
+
+A government of trust. Critics call it a court.
+
+@barons_cabinet
+on-arrival: regional_leaders_dissent -= 10; institutionalists_dissent -= 4; sanchismo -= 4
+
+The federations feel represented. Your own people feel overlooked.
+
+@experts
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2}); } Q.modernisers_dissent -= 4; Q.institutionalists_dissent += 3; !}
+
+An astronaut, a judge, an economist from Brussels. The press is impressed for a week.

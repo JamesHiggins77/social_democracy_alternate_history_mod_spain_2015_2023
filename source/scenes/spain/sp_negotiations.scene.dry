@@ -1,8 +1,8 @@
 title: The negotiating team
 new-page: true
 is-card: true
-tags: sp_politics
-view-if: negotiations_timer <= 0 and acting = 1 and psoe_in_government = 0 and sanchez_leader = 1
+tags: sp_negotiations
+view-if: negotiations_timer <= 0 and seeking_government = 1
 on-arrival: month_actions += 1; negotiations_timer = 1
 
 = The negotiating team
@@ -41,37 +41,154 @@ on-arrival: rel_erc += 8; rel_junts += 6; sanchez_authority -= 1; regional_leade
 
 ERC's spokesman repeats that their price is a referendum. [? if red_lines = 1 : Within hours, the barons know about the meeting and remind you of the Federal Committee's resolution. ?]
 
-@media
-title: The interview
+@podemos_question
+title: The Podemos question
 new-page: true
 is-card: true
-tags: sp_politics
-view-if: media_timer <= 0 and sanchez_leader = 1
-on-arrival: month_actions += 1; media_timer = 2
+tags: sp_negotiations
+view-if: podemos_talks_timer <= 0 and seeking_government = 1 and pact_up = 0
+on-arrival: month_actions += 1; podemos_talks_timer = 2
 
-= The interview
+= The Podemos question
 
-A prime-time interview on La Sexta. What is the message?
+Podemos has its own incentives: it wants to overtake the PSOE, not prop it up. What do you offer Pablo Iglesias?
 
-- @change: Change: Spain cannot have four more years of Rajoy
-- @reform: Reform and stability: a serious party for difficult times
-- @attack_podemos: Podemos is not the answer
+- @coalition: Formal talks on a coalition government
+- @programme_deal: A programme agreement without ministries
+- @external: A PSOE government with Podemos's external support
+- @no_podemos: No government that depends on Podemos
 - @easy_discard
 
-@change
-on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {workers: 2, students: 3, unemployed: 2}); window.SpainGame.updatePolls(Q); } !}
-on-departure: progressives_dissent -= 3; member_morale += 3
+@coalition
+on-arrival: up_talks += 1.5; rel_up += 10; rel_cs -= 8; progressives_dissent -= 8; regional_leaders_dissent += 12; institutionalists_dissent += 8
 
-Young and working voters respond. Your most cautious barons wince at the word "change".
+Iglesias wants the vice-presidency and the ministries that control the economy and security. The barons want you to walk away.
 
-@reform
-on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {professionals: 2, pensioners: 2, self_employed: 1}); window.SpainGame.updatePolls(Q); } !}
-on-departure: institutionalists_dissent -= 3; modernisers_dissent -= 2
+@programme_deal
+on-arrival: up_talks += 1; rel_up += 5; progressives_dissent -= 3; regional_leaders_dissent += 4
 
-Older and middle-class voters hear a party of government. Some members hear a party afraid of its own shadow.
+Podemos listens, but says a programme without power is a promise without guarantees.
 
-@attack_podemos
-on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {pensioners: 3, homemakers: 2, students: -2}); window.SpainGame.updatePolls(Q); } !}
-on-departure: rel_up -= 10; regional_leaders_dissent -= 4; progressives_dissent += 4
+@external
+on-arrival: up_talks += 0.5; rel_up -= 2; sanchez_authority += 2
 
-The barons enjoy it. Iglesias replies within the hour.
+Podemos refuses to be "the PSOE's crutch". The offer stays on the table.
+
+@no_podemos
+on-arrival: rel_up -= 15; regional_leaders_dissent -= 10; progressives_dissent += 10; member_morale -= 4
+
+The barons applaud. The arithmetic of any alternative to Rajoy has just become much harder.
+
+@cs_channel
+title: The Ciudadanos channel
+new-page: true
+is-card: true
+tags: sp_negotiations
+view-if: cs_talks_timer <= 0 and seeking_government = 1 and pact_cs = 0
+on-arrival: month_actions += 1; cs_talks_timer = 2
+
+= The Ciudadanos channel
+
+Albert Rivera signals that Ciudadanos will negotiate reforms, but never in a government that depends on Podemos.
+
+- @bilateral: Open bilateral talks
+- @three_way: Propose a three-way arrangement with Podemos
+- @reform_pact: Seek a narrow pact on institutional reform
+- @refuse_cs: Refuse: Ciudadanos's programme is not ours
+- @easy_discard
+
+@bilateral
+on-arrival: cs_talks += 1.5; rel_cs += 10; rel_up -= 8; modernisers_dissent -= 5; progressives_dissent += 6; trade_unionists_dissent += 3
+
+The two teams work fast. A document starts to take shape: 200 measures, from labour contracts to the provincial councils.
+
+@three_way
+on-arrival: cs_talks += 0.5; up_talks += 0.5; rel_cs -= 2; rel_up -= 2; sanchez_authority += 2
+
+Both say no to sitting with the other. You have shown willing, and learned the limits.
+
+@reform_pact
+on-arrival: cs_talks += 1; rel_cs += 5; institutionalists_dissent -= 3
+
+Anti-corruption measures, limits on political appointments. Useful, and not yet a government.
+
+@refuse_cs
+on-arrival: rel_cs -= 15; progressives_dissent -= 6; modernisers_dissent += 6
+
+Clear lines. Fewer options.
+
+@small_parties
+title: The small parties
+new-page: true
+is-card: true
+tags: sp_negotiations
+view-if: small_parties_timer <= 0 and seeking_government = 1
+on-arrival: month_actions += 1; small_parties_timer = 2
+
+= The small parties
+
+Every seat counts in a second ballot, where an abstention is worth as much as a no avoided.
+
+- @pnv_deal: The PNV: respect the Basque fiscal agreement and transfer powers
+- @cc_deal: Coalición Canaria: the islands' economic regime
+- @regionalists: The small regionalists: investment for their provinces
+- @easy_discard
+
+@pnv_deal
+on-arrival: rel_pnv += 12; regional_leaders_dissent += 2
+
+Aitor Esteban takes notes. The PNV never gives its vote cheaply, or early.
+
+@cc_deal
+on-arrival: rel_cc += 12
+
+Ana Oramas will listen to any government that remembers the Canaries exist.
+
+@regionalists
+on-arrival: rel_bng += 8; rel_prc += 8; rel_te += 8; rel_geroa += 8; rel_nc += 8
+
+A motorway here, a train line there. The small groups are pragmatic.
+
+@party_offer
+title: What does the party promise?
+new-page: true
+is-card: true
+tags: sp_negotiations
+view-if: programme_timer <= 0 and seeking_government = 1
+on-arrival: month_actions += 1; programme_timer = 3
+
+= What does the party promise?
+
+The talks have moved from procedure to policy. Every partner wants something different. What do you lead with?
+
+- @offer_jobs: Employment and labour rights
+- @offer_pensions: Pensions and social protection
+- @offer_institutions: Anti-corruption and institutional reform
+- @offer_territory: Constitutional and territorial reform
+- @offer_fiscal: Economic and fiscal credibility
+- @easy_discard
+
+@offer_jobs
+on-arrival: rel_up += 6; rel_cs -= 4; trade_unionists_dissent -= 5; up_talks += 0.5
+
+Podemos and the unions are interested. Ciudadanos wants flexibility, not rights.
+
+@offer_pensions
+on-arrival: rel_up += 3; rel_pnv += 2; rel_cc += 2; trade_unionists_dissent -= 3
+
+Nobody objects to pensions. Nobody is won over by them either.
+
+@offer_institutions
+on-arrival: rel_cs += 6; rel_up += 3; cs_talks += 0.5; institutionalists_dissent -= 3
+
+Common ground with both new parties: the one subject they agree on.
+
+@offer_territory
+on-arrival: rel_pnv += 6; rel_erc += 6; rel_junts += 4; rel_cs -= 6; regional_leaders_dissent += 8; cat_dialogue += 1
+
+The nationalists listen. So do the barons, with alarm.
+
+@offer_fiscal
+on-arrival: rel_cs += 6; rel_pnv += 3; rel_up -= 6; cs_talks += 0.5; progressives_dissent += 4
+
+Brussels would approve. Podemos calls it austerity with a red rose.
