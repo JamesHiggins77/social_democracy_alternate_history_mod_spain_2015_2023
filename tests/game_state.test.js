@@ -455,3 +455,30 @@ test('party income is lower and dues change it', () => {
   Q.dues_level = 2;
   assert.ok(G.fundsIncome(Q) > base + 0.25);
 });
+
+test('sister-party lessons depend on the leader at the time', () => {
+  const Q = newQ();
+  Q.year = 2015; Q.month = 3; assert.strictEqual(G.sisterLeader(Q, 'labour').id, 'miliband');
+  Q.year = 2017; assert.strictEqual(G.sisterLeader(Q, 'labour').id, 'corbyn');
+  Q.year = 2021; assert.strictEqual(G.sisterLeader(Q, 'labour').id, 'starmer');
+  Q.year = 2016; assert.strictEqual(G.sisterLeader(Q, 'denmark').id, 'frederiksen');
+});
+
+test('Corbyn energises the young and progressives but alienates everyone else', () => {
+  const Q = newQ(); Q.year = 2017; Q.month = 6; Q.vm.partyFactor = {}; G.recalculate(Q);
+  const before = JSON.parse(JSON.stringify(Q.vm.classSupport));
+  const prog = Q.progressives_dissent, barons = Q.regional_leaders_dissent;
+  G.learnFrom(Q, 'labour');
+  assert.ok(Q.vm.classSupport.students.psoe > before.students.psoe);
+  assert.ok(Q.vm.classSupport.pensioners.psoe < before.pensioners.psoe);
+  assert.ok(Q.vm.classSupport.professionals.psoe < before.professionals.psoe);
+  assert.ok(Q.progressives_dissent < prog && Q.regional_leaders_dissent > barons);
+});
+
+test('repeating a lesson gives diminishing returns', () => {
+  const Q = newQ(); Q.year = 2019; G.recalculate(Q);
+  assert.strictEqual(G.learnFrom(Q, 'denmark'), 1);
+  assert.strictEqual(G.learnFrom(Q, 'denmark'), 0.5);
+  assert.ok(Math.abs(G.learnFrom(Q, 'denmark') - 1 / 3) < 1e-9);
+  assert.ok(Math.abs(Q.migration_learned - (1 + 0.5 + 1 / 3)) < 1e-9);
+});

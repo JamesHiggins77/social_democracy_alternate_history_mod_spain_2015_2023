@@ -311,14 +311,15 @@ on-arrival: intl_net_timer = 4
 
 = Socialist International and Progressive Alliance
 
-The PSOE belongs to both international families of the centre-left. Party money spent there builds friendships with sister parties, and the chance to learn from what worked for them.
+The PSOE belongs to both international families of the centre-left. Party money spent there builds friendships with sister parties and the chance to learn from them. What you learn depends on who leads them now, and not every lesson helps. Studying the same leadership again teaches less each time.
 
 - @net_host: Host a Progressive Alliance conference in Madrid
-- @net_portugal: Learn from the Portuguese Socialists: governing with the radical left
-- @net_denmark: Learn from the Danish Social Democrats: migration and the welfare state
-- @net_labour: Learn from British Labour: a mass campaign machine
-- @net_nordic: Learn from the Swedish Social Democrats: building a welfare consensus
-- @net_spd: Learn from the German SPD: surviving a grand coalition
+- @net_labour: British Labour under [+ sister_labour +]
+- @net_portugal: The Portuguese Socialists under [+ sister_portugal +]
+- @net_denmark: The Danish Social Democrats under [+ sister_denmark +]
+- @net_germany: The German SPD under [+ sister_germany +]
+- @net_sweden: The Swedish Social Democrats under [+ sister_sweden +]
+- @net_us: The US Democrats: [+ sister_us +]
 - @root: Not now
 
 @net_host
@@ -328,37 +329,47 @@ on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; i
 
 Delegations from forty parties fill a Madrid conference centre. You are photographed with prime ministers and future prime ministers.
 
-@net_portugal
-choose-if: funds >= 0.5 and learned_portugal = 0
-unavailable-subtitle: [? if learned_portugal = 1 : Already learned. ?][? if learned_portugal = 0 : Needs 0.5 in party funds. ?]
-on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.learned_portugal = 1; Q.rel_up += 6; Q.up_talks += 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 4); } !}
+@net_labour
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'labour'); } !}
+go-to: lesson
 
-Costa's people explain how they wrote separate agreements with each partner, and kept them in writing. Talks with Podemos get easier.
+@net_portugal
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'portugal'); } !}
+go-to: lesson
 
 @net_denmark
-choose-if: funds >= 0.5 and migration_learned = 0
-unavailable-subtitle: [? if migration_learned = 1 : Already learned. ?][? if migration_learned = 0 : Needs 0.5 in party funds. ?]
-on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.migration_learned = 1; Q.progressives_dissent += 6; if (window.SpainGame) { window.SpainGame.position(Q, 0, -0.5); } !}
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'denmark'); } !}
+go-to: lesson
 
-A firmer line on borders, paired with a strong welfare state. Vox gains less from migration from now on; your progressives think it is a concession to the right.
+@net_germany
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'germany'); } !}
+go-to: lesson
 
-@net_labour
-choose-if: funds >= 0.5 and campaign_skill < 0.3
-unavailable-subtitle: [? if campaign_skill >= 0.3 : Nothing more to learn. ?][? if campaign_skill < 0.3 : Needs 0.5 in party funds. ?]
-on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.campaign_skill += 0.1; Q.member_morale += 2; !}
+@net_sweden
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'sweden'); } !}
+go-to: lesson
 
-Door-knocking apps, small-donor networks, volunteers trained by the thousand. Your campaigns win a little more from now on.
+@net_us
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'us'); } !}
+go-to: lesson
 
-@net_nordic
-choose-if: funds >= 0.5 and welfare_learned = 0
-unavailable-subtitle: [? if welfare_learned = 1 : Already learned. ?][? if welfare_learned = 0 : Needs 0.5 in party funds. ?]
-on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.welfare_learned = 1; Q.rel_up += 2; Q.trade_unionists_dissent -= 3; !}
+@lesson
+title: The lesson
 
-Universal services, negotiated with unions and employers. The model raises Spain's social cohesion whenever you can apply it.
+= What you learn from [+ learn_leader +]
 
-@net_spd
-choose-if: funds >= 0.5 and learned_spd = 0
-unavailable-subtitle: [? if learned_spd = 1 : Already learned. ?][? if learned_spd = 0 : Needs 0.5 in party funds. ?]
-on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.learned_spd = 1; Q.regional_leaders_dissent -= 5; Q.institutionalists_dissent -= 4; Q.progressives_dissent += 3; Q.rel_pp += 4; !}
+[+ learn_text +]
 
-The SPD's lesson: a grand coalition keeps the State running and slowly eats the junior partner. The barons like the first half.
+[? if learn_times > 1 : Your delegation has studied this leadership [+ learn_times +] times; the lessons are only [+ learn_factor +]% as strong as the first time. ?]

@@ -301,6 +301,7 @@
     Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
+    Object.keys(SISTER_LEADERS).forEach(function (p) { Q['sister_' + p] = sisterLeader(Q, p).name; });
     checkLeadership(Q);
     // flags for conditional world events
     var mad = Q.regions && Q.regions['Madrid'];
@@ -524,7 +525,7 @@
     deriveWorld(Q);
     // social cohesion moves a tenth of the way to its target each month
     var target = 70 - 1.2 * (Q.unemployment - 10) - 0.3 * (Q.chaos || 0) + 1.5 * (Q.social_policy || 0) +
-      (Q.welfare_learned ? 4 : 0);
+      4 * Math.min(1.5, Q.welfare_learned || 0);
     Q.cohesion = clamp((Q.cohesion || 42) + (target - (Q.cohesion || 42)) * 0.1, 0, 100);
     // chaos
     var pandemic = (t >= 2020 * 12 + 3 && t <= 2021 * 12 + 6) ? 12 : 0;
@@ -548,7 +549,7 @@
     var voxReady = Q.year >= 2018 || Q.vox_breakthrough ? 1 : 0.3;
     var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
     // Vox's growth slows as it approaches its ceiling
-    var vox = 0.45 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 16);
+    var vox = 0.45 * c * voxReady * (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0)) * Math.max(0, 1 - voxNow / 16);
     transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
                               professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
     transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
@@ -639,6 +640,135 @@
 
   function fundsUpkeep(Q) {
     return 0.03 + 0.03 * Math.max(0, Q.year - 2014);
+  }
+
+  // Sister parties: who leads them on a given date, and what the PSOE can
+  // learn from each leadership. Lessons can cut both ways, and repeating
+  // the same lesson gives diminishing returns (1, 1/2, 1/3...).
+  var SISTER_LEADERS = {
+    labour: [[201505, 'miliband', 'Ed Miliband'], [201508, 'harman', 'Harriet Harman (interim)'],
+             [202003, 'corbyn', 'Jeremy Corbyn'], [999999, 'starmer', 'Keir Starmer']],
+    portugal: [[201409, 'seguro', 'António José Seguro'], [201510, 'costa_opp', 'António Costa (in opposition)'],
+               [202201, 'costa_gov', 'António Costa (the "contraption")'], [999999, 'costa_maj', 'António Costa (absolute majority)']],
+    denmark: [[201505, 'thorning', 'Helle Thorning-Schmidt'], [999999, 'frederiksen', 'Mette Frederiksen']],
+    germany: [[201702, 'gabriel', 'Sigmar Gabriel'], [201802, 'schulz', 'Martin Schulz'],
+              [202111, 'nahles', 'Andrea Nahles and her successors'], [999999, 'scholz', 'Olaf Scholz']],
+    sweden: [[202110, 'lofven', 'Stefan Löfven'], [999999, 'andersson', 'Magdalena Andersson']],
+    us: [[201701, 'obama', 'Barack Obama'], [202003, 'sanders', 'the Sanders movement'], [999999, 'biden', 'Joe Biden']]
+  };
+
+  function sisterLeader(Q, party) {
+    var k = Q.year * 100 + Q.month;
+    var list = SISTER_LEADERS[party];
+    for (var i = 0; i < list.length; i++) {
+      if (k <= list[i][0]) {
+        return { id: list[i][1], name: list[i][2] };
+      }
+    }
+    return { id: list[list.length - 1][1], name: list[list.length - 1][2] };
+  }
+
+  function learnFrom(Q, party) {
+    var L = sisterLeader(Q, party);
+    var key = party + ':' + L.id;
+    Q.learn_counts = Q.learn_counts || {};
+    var n = Q.learn_counts[key] || 0;
+    Q.learn_counts[key] = n + 1;
+    var f = 1 / (1 + n);
+    var all = function (x) { return x * f; };
+    var text = '';
+    var skill = function (x) { Q.campaign_skill = Math.min(0.3, (Q.campaign_skill || 0) + x * f); };
+    switch (key) {
+      case 'labour:miliband': case 'labour:harman':
+        target(Q, 'psoe', 'working', 1.2 * f); position(Q, 0.3 * f, 0); skill(0.03);
+        text = 'Miliband\'s "cost of living" campaign gives you a sharper message on wages and bills. His 2015 defeat is the other lesson: voters must be able to picture you governing.';
+        break;
+      case 'labour:corbyn':
+        target(Q, 'psoe', 'young', 2.5 * f); skill(0.05);
+        Q.progressives_dissent -= 6 * f; Q.member_morale += 6 * f; Q.sanchismo += 3 * f;
+        Q.regional_leaders_dissent += 6 * f; Q.institutionalists_dissent += 5 * f;
+        transfer(Q, 'psoe', { pp: 0.5, cs: 0.5 }, { pensioners: all(1.2), professionals: all(1), self_employed: all(0.8) });
+        position(Q, 1.2 * f, 0.5 * f);
+        text = 'Corbyn\'s Labour fills halls with young people and turns members into activists. It also frightens older and middle-class voters, and your barons.';
+        break;
+      case 'labour:starmer':
+        target(Q, 'psoe', 'middle', 1.8 * f);
+        Q.modernisers_dissent -= 6 * f; Q.institutionalists_dissent -= 4 * f; Q.progressives_dissent += 6 * f; Q.member_morale -= 3 * f;
+        transfer(Q, 'psoe', 'up', { students: all(0.8), workers: all(0.3) });
+        position(Q, -0.8 * f, 0);
+        text = 'Starmer\'s discipline and caution reassure the middle class. Your left wing calls it a purge of the party\'s soul, and some young voters leave for Podemos.';
+        break;
+      case 'portugal:seguro':
+        Q.rel_up += 1 * f;
+        text = 'Seguro is about to lose his own primary to António Costa. There is little to learn except how not to be outflanked.';
+        break;
+      case 'portugal:costa_opp':
+        Q.rel_up += 3 * f; Q.progressives_dissent -= 2 * f;
+        text = 'Costa is building a programme the radical left could sign. The idea of a left-wing majority starts to feel possible.';
+        break;
+      case 'portugal:costa_gov':
+        Q.rel_up += 6 * f; Q.up_talks += 1 * f; intl(Q, 'south', 3 * f); Q.learned_portugal = 1;
+        text = 'Costa\'s people explain how they wrote a separate written agreement with each partner. Talks with Podemos get easier.';
+        break;
+      case 'portugal:costa_maj':
+        transfer(Q, 'up', 'psoe', { workers: all(1), students: all(0.6), professionals: all(0.6) });
+        Q.rel_up -= 5 * f;
+        text = 'Costa won an absolute majority by squeezing his former partners: the useful vote. It works on some Podemos voters, and Podemos notices.';
+        break;
+      case 'denmark:thorning':
+        Q.rel_cs += 5 * f; Q.progressives_dissent += 3 * f; position(Q, -0.4 * f, 0);
+        text = 'Thorning-Schmidt governs from the centre with liberal partners. Ciudadanos warms to you; your left is unimpressed.';
+        break;
+      case 'denmark:frederiksen':
+        Q.migration_learned = (Q.migration_learned || 0) + f; Q.progressives_dissent += 6 * f;
+        position(Q, 0, -0.6 * f); social(Q, -0.5 * f);
+        text = 'Frederiksen pairs a hard line on migration with a strong welfare state. Vox gains less from migration from now on; your progressives call it a surrender to the right.';
+        break;
+      case 'germany:gabriel':
+        Q.regional_leaders_dissent -= 5 * f; Q.institutionalists_dissent -= 4 * f; Q.progressives_dissent += 3 * f;
+        Q.rel_pp += 4 * f; Q.member_morale -= 2 * f;
+        text = 'Gabriel\'s grand coalition keeps the State running and slowly eats the junior partner. Your barons like the first half; your members fear the second.';
+        break;
+      case 'germany:schulz':
+        Q.member_morale += 5 * f; target(Q, 'psoe', 'working', 1.5 * f); Q.sanchez_authority -= 2 * f;
+        text = 'The "Schulz effect": a surge of enthusiasm that collapsed within months. Your members are energised; the commentators remember how it ended.';
+        break;
+      case 'germany:nahles':
+        Q.progressives_dissent -= 3 * f; Q.rel_pp -= 3 * f; Q.regional_leaders_dissent += 2 * f;
+        text = 'The SPD under Nahles is a party being eaten by its coalition. The lesson your left draws: never prop up the right.';
+        break;
+      case 'germany:scholz':
+        Q.sanchez_authority += 3 * f; target(Q, 'psoe', 'middle', 1.2 * f);
+        text = 'Scholz won from behind with calm competence and a promise of respect for working people. It reads well on you.';
+        break;
+      case 'sweden:lofven':
+        Q.welfare_learned = (Q.welfare_learned || 0) + f; Q.trade_unionists_dissent -= 3 * f; Q.rel_up += 2 * f;
+        text = 'Löfven\'s welfare model is negotiated with unions and employers. Spain\'s social cohesion rises whenever you can apply it.';
+        break;
+      case 'sweden:andersson':
+        Q.welfare_learned = (Q.welfare_learned || 0) + 0.6 * f; intl(Q, 'nato', 3 * f); Q.progressives_dissent += 2 * f;
+        text = 'Andersson\'s Social Democrats have turned towards NATO and a tougher line on crime, keeping the welfare state. A mixed lesson for your party.';
+        break;
+      case 'us:obama':
+        skill(0.06); intl(Q, 'us', 2 * f);
+        text = 'Obama\'s campaign veterans teach data-driven targeting and volunteer networks. Your campaigns win a little more.';
+        break;
+      case 'us:sanders':
+        target(Q, 'psoe', 'young', 2 * f); Q.funds += 0.4 * f; position(Q, 0.8 * f, 0);
+        Q.regional_leaders_dissent += 3 * f; Q.progressives_dissent -= 3 * f;
+        text = 'The Sanders movement runs on small donors and the young. It energises your base; your barons think you are drifting left.';
+        break;
+      case 'us:biden':
+        target(Q, 'psoe', 'working', 1.2 * f); target(Q, 'psoe', 'middle', 0.8 * f); Q.trade_unionists_dissent -= 4 * f; intl(Q, 'us', 3 * f);
+        text = 'Biden won back working-class voters with a pro-union, middle-class pitch. A lesson your trade unionists like.';
+        break;
+    }
+    Q.learn_text = text;
+    Q.learn_leader = L.name;
+    Q.learn_times = n + 1;
+    Q.learn_factor = Math.round(f * 100);
+    recalculate(Q);
+    return f;
   }
 
   // Card helpers ------------------------------------------------------
@@ -2085,6 +2215,8 @@
     social: social,
     migration: migration,
     monthlyWorld: monthlyWorld,
+    learnFrom: learnFrom,
+    sisterLeader: sisterLeader,
     fundsIncome: fundsIncome,
     formationBlame: formationBlame,
     position: position,
