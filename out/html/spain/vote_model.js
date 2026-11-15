@@ -95,10 +95,9 @@
       'Cataluña': 0.5, 'Navarra': 0.6, 'País Vasco': 0.2
     },
     mp: { 'Madrid': 1.6, 'Comunidad Valenciana': 1.4, 'Cataluña': 0.3, 'País Vasco': 0.4 },
-    // Pedro Sánchez's own party, if he founds one: strongest where the PSOE
-    // vote it draws on is strongest, weak where nationalists dominate
-    ps: { 'Andalucía': 1.2, 'Madrid': 1.15, 'Extremadura': 1.2, 'Castilla-La Mancha': 1.1,
-          'Asturias': 1.1, 'Cataluña': 0.6, 'País Vasco': 0.4, 'Navarra': 0.7, 'Galicia': 0.8 }
+    // Pedro Sánchez's own party, if he founds one: its regional pattern is
+    // the left's (see regionalShares); weaker where nationalists dominate
+    ps: { 'Cataluña': 0.8, 'País Vasco': 0.7, 'Navarra': 0.85, 'Galicia': 0.9 }
   };
 
   // Provincial swing: increases are spread partly uniformly and partly in
@@ -122,7 +121,9 @@
       var sum = 0;
       var v = {};
       STATEWIDE.forEach(function (p) {
-        v[p] = Math.max(0, support[c][p] || 0) * (factor[p] === undefined ? 1 : factor[p]);
+        // Sánchez's party is scaled like the PSOE vote it comes from
+        var f = factor[p] === undefined ? (p === 'ps' && factor.psoe !== undefined ? factor.psoe : 1) : factor[p];
+        v[p] = Math.max(0, support[c][p] || 0) * f;
         sum += v[p];
       });
       n[c] = {};
@@ -272,8 +273,10 @@
         if (ESTABLISHED[p]) {
           v = base.M[r][p] * W[r][p];
         } else if (p === 'ps') {
-          // Sánchez's own party inherits the PSOE's regional pattern
-          v = base.M[r].psoe * W[r][p] * ((NEW_PARTY_AFFINITY.ps && NEW_PARTY_AFFINITY.ps[r]) || 1);
+          // Sánchez's own party inherits the regional pattern of the left
+          // vote it draws on (mostly the PSOE's, partly Podemos's)
+          v = (0.7 * base.M[r].psoe + 0.3 * base.M[r].up) * W[r][p] *
+            ((NEW_PARTY_AFFINITY.ps && NEW_PARTY_AFFINITY.ps[r]) || 1);
         } else {
           var aff = (NEW_PARTY_AFFINITY[p] && NEW_PARTY_AFFINITY[p][r]) || 1;
           v = (A[p] || 0) + base.growthScale * aff * (W[r][p] - base.W0[r][p]);

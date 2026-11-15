@@ -233,7 +233,7 @@
     Q.can_join_up = (Q.is_progressive && Q.rel_up >= 55 && Q.true_poll && Q.true_poll.up >= 3) ? 1 : 0;
     var nps = newPartyStrength(Q);
     // rough vote share a new party would poll (fitted to the vote model)
-    Q.new_party_prospect = Math.round(2.5 * nps + 0.25 * nps * nps);
+    Q.new_party_prospect = Math.round(0.6 * nps + 0.035 * nps * nps);
     Q.right_party_name = Q.right_candidate === 'cs' ? 'Ciudadanos' : 'the PP';
     Q.up_rivals_psoe = (Q.congress.up || 0) >= 0.9 * (Q.congress.psoe || 1) ? 1 : 0;
     Q.congress_up_seats = Q.congress.up || 0;
@@ -473,7 +473,34 @@
 
   // Card helpers ------------------------------------------------------
   // Shift a party's support by class and refresh the polls.
+  // Sánchez's own party splits the left rather than growing it: its gains
+  // come out of the PSOE and Podemos, and many voters see it as a vanity
+  // project, so only part of what it wins over sticks (EGO_FACTOR).
+  var EGO_FACTOR = 0.7;
+  var PS_SOURCES = { psoe: 0.65, up: 0.3, mp: 0.05 };
+
   function campaign(Q, party, changes) {
+    if (party === 'ps') {
+      var losses = {};
+      var hasLoss = false;
+      Object.keys(changes).forEach(function (c) {
+        if (changes[c] > 0) {
+          Object.keys(PS_SOURCES).forEach(function (src) {
+            var moved = {};
+            moved[c] = changes[c] * EGO_FACTOR * PS_SOURCES[src];
+            transfer(Q, src, 'ps', moved);
+          });
+        } else if (changes[c] < 0) {
+          losses[c] = changes[c];
+          hasLoss = true;
+        }
+      });
+      if (hasLoss) {
+        shiftSupport(Q, party, losses);
+      }
+      updatePolls(Q);
+      return;
+    }
     shiftSupport(Q, party, changes);
     updatePolls(Q);
   }
@@ -1382,7 +1409,7 @@
   // draw: his personal following and an insurgent, anti-establishment
   // profile matter most.
   function newPartyStrength(Q) {
-    return Math.max(0, (Q.sanchismo || 0) / 30 + 0.45 * (Q.populism || 0) - 0.2);
+    return Math.max(0, (Q.sanchismo || 0) / 15 + 0.9 * (Q.populism || 0) - 0.4);
   }
 
   // Sánchez leaves for another party (or founds one).
@@ -1419,11 +1446,16 @@
       var pop = (Q.populism || 0) / 10;
       var classes = { workers: s, pensioners: s * 0.8, professionals: s * 0.9, students: s * (0.8 + pop),
                       unemployed: s * (0.8 + pop), homemakers: s * 0.6, self_employed: s * 0.5 };
-      transfer(Q, 'psoe', 'ps', classes);
-      var fromOthers = {};
-      Object.keys(classes).forEach(function (c) { fromOthers[c] = classes[c] * pop * 0.6; });
-      transfer(Q, 'up', 'ps', fromOthers);
-      transfer(Q, 'cs', 'ps', fromOthers);
+      // the split: PSOE voters who follow him, and those put off by what
+      // looks like a personal vanity project (some to Podemos, some to the
+      // right, some stay home with the PSOE's rivals)
+      transfer(Q, 'psoe', { ps: EGO_FACTOR, up: 0.15, pp: 0.1, cs: 0.05 }, classes);
+      // an insurgent profile also draws Podemos voters; few come from the right
+      var fromUp = {};
+      Object.keys(classes).forEach(function (c) { fromUp[c] = classes[c] * pop * 0.6 * EGO_FACTOR; });
+      transfer(Q, 'up', 'ps', fromUp);
+      Q.rel_up -= 10;
+      Q.member_morale -= 10;
     }
     Q.joined_from = old;
     recalculate(Q);

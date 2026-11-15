@@ -400,3 +400,19 @@ test('without Sánchez, formation runs automatically with his party\'s line', ()
   assert.deepStrictEqual(Q.govt_parties, ['pp', 'cs']);
   assert.strictEqual(Q.player_in_government, 1);
 });
+
+test('a Sánchez party splits the left vote rather than adding to it', () => {
+  const left = q => ['psoe', 'up', 'ps', 'mp', 'iu'].reduce((a, p) => a + (q.true_poll[p] || 0), 0);
+  const Q = newQ(); Q.year = 2019; Q.sanchismo = 60; Q.populism = 6;
+  const before = left(Q);
+  G.oust(Q, true);
+  const afterOust = left(Q);
+  G.joinParty(Q, 'ps', 'Avanza');
+  assert.ok(left(Q) <= afterOust + 0.01, `founding: ${afterOust} -> ${left(Q)}`);
+  const mid = left(Q);
+  const ps = Q.true_poll.ps;
+  G.campaign(Q, 'psoe', { workers: 3, pensioners: 3, students: 3 });
+  assert.ok(Q.true_poll.ps > ps);
+  assert.ok(left(Q) <= mid + 0.01, `campaign: ${mid} -> ${left(Q)}`);
+  assert.ok(before >= left(Q));
+});

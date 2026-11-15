@@ -117,7 +117,7 @@ view-if: exile_pending = 1
 
 [? if expelled = 1 : You have been expelled from the PSOE. ?][? if expelled = 0 : You are no longer Secretary-General. ?] Your phone keeps ringing anyway. Some calls are offers.
 
-[? if can_join_cs = 1 : Albert Rivera's people suggest that a moderate social democrat would be welcome in Ciudadanos. ?][? if can_join_up = 1 : Podemos sounds you out about joining a broad progressive front. ?] Your own followers want you to start again under a new name. Your pollsters think a party of your own could start at around [+ new_party_prospect +]%; your personal following and an anti-establishment profile are what it would run on.
+[? if can_join_cs = 1 : Albert Rivera's people suggest that a moderate social democrat would be welcome in Ciudadanos. ?][? if can_join_up = 1 : Podemos sounds you out about joining a broad progressive front. ?] Your own followers want you to start again under a new name. Your pollsters think a party of your own could start at around [+ new_party_prospect +]%; your personal following and an anti-establishment profile are what it would run on. Every vote it wins would come out of the PSOE or Podemos, splitting the left in every province, and many voters would see it as a vanity project.
 
 - @join_cs: Join Ciudadanos
 - @join_up: Join Podemos
