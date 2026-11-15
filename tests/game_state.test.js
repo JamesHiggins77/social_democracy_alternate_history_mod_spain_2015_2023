@@ -570,3 +570,22 @@ test('a PP–Vox coalition government ends the game; a grand coalition does not'
   assert.strictEqual(R.psoe_in_government, 1);
   assert.strictEqual(G.lossReason(R), '');
 });
+
+test('cabinet: coalition shares ministries and gates government cards', () => {
+  const Q = newQ();
+  Q.year = 2020; Q.congress = { psoe: 120, up: 35, pp: 89, vox: 52, cs: 10, erc: 13, junts: 8, pnv: 6, bildu: 5, mp: 3 };
+  Q.pact_up = 1; G.formGovernment(Q, 'sanchez'); G.recalculate(Q);
+  assert.strictEqual(Q.cabinet_pending, 1);
+  assert.strictEqual(Q.cabinet.labour.party, 'up');
+  assert.strictEqual(Q.min_finance, 1);
+  assert.strictEqual(Q.min_labour, 0);
+  G.allocateCabinet(Q, 'hard');
+  assert.strictEqual(Q.min_labour, 1);
+  assert.strictEqual(Q.cabinet.deputy.party, 'psoe');
+  G.allocateCabinet(Q, 'generous');
+  assert.ok(Object.values(Q.cabinet).filter(c => c.party === 'up').length >= 4);
+  // a single-party PP government: the PSOE holds nothing
+  const R = newQ(); G.recalculate(R);
+  assert.strictEqual(R.cabinet.finance.name, 'Cristóbal Montoro');
+  assert.strictEqual(R.my_ministries, 0);
+});

@@ -49,7 +49,7 @@ is-deck: true
 
 @deck_government
 title: Government
-view-if: (psoe_in_government = 1 and sanchez_leader = 1) or sanchez_pm = 1
+view-if: player_in_government = 1 and (sanchez_leader = 1 or exiled = 1)
 card-image: img/spain/bg_congreso_hemiciclo.jpg
 is-deck: true
 

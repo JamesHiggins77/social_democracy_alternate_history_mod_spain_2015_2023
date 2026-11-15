@@ -71,3 +71,14 @@ test('party cards: a full sentence and the current leader with their faction', (
     if (sentence) assert.ok(!/ \.|,,|The The/.test(sentence), sentence);
   }
 });
+
+test('foreign sister parties are told apart from Spanish ones', () => {
+  const E = require('../out/html/spain/entities.js');
+  const re = E.regex();
+  const found = s => { re.lastIndex = 0; const out = []; let m; while ((m = re.exec(s))) out.push(E.lookup(m[1]).party); return out; };
+  assert.deepStrictEqual(found('The Portuguese Socialists under António Costa'), ['psportugal', 'psportugal']);
+  assert.deepStrictEqual(found('The Danish Social Democrats under Mette Frederiksen'), ['dksd', 'dksd']);
+  assert.deepStrictEqual(found('The Swedish Social Democrats under Stefan Löfven'), ['sap', 'sap']);
+  assert.deepStrictEqual(found('The US Democrats: Barack Obama'), ['usdem', 'usdem']);
+  assert.deepStrictEqual(found('British Labour under Jeremy Corbyn'), ['labour', 'labour']);
+});

@@ -203,6 +203,9 @@
     Q.fiscal_adj = 0;
     Q.debt_adj = 0;
 
+    Q.govt_parties = ['pp'];
+    allocateCabinet(Q, 'standard');
+    Q.cabinet.deputy.name = 'Soraya Sáenz de Santamaría';
     updatePolls(Q);
     recordPoll(Q);
     recalculate(Q);
@@ -319,6 +322,7 @@
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
     representation(Q);
+    cabinetFlags(Q);
     Object.keys(SISTER_LEADERS).forEach(function (p) { Q['sister_' + p] = sisterLeader(Q, p).name; });
     checkLeadership(Q);
     // flags for conditional world events
@@ -1528,6 +1532,12 @@
       }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
+    allocateCabinet(Q, 'standard');
+    // a coalition with the player's party in it: the agreement is negotiated
+    Q.cabinet_pending = ((Q.govt_parties || []).length > 1 &&
+      (Q.govt_parties || []).indexOf(Q.player_party || 'psoe') !== -1 && (Q.sanchez_leader || Q.exiled)) ? 1 : 0;
+    Q.cabinet_partner = Q.cabinet_pending ? (Q.govt_parties[0] === (Q.player_party || 'psoe') ? Q.govt_parties[1] : Q.govt_parties[0]) : '';
+    Q.cabinet_partner_name = Q.cabinet_partner ? UI.partyName(Q.cabinet_partner) : '';
     if (candidate !== 'grand') {
       Q.grand_coalition = 0;
     }
@@ -2148,6 +2158,133 @@
     recalculate(Q);
   }
 
+  // ------------------------------------------------------------------
+  // The cabinet. Ministries in order of weight; coalition partners share
+  // them out by agreement. Government cards need the matching ministry.
+  // ------------------------------------------------------------------
+  var MINISTRIES = [
+    ['deputy', 'First Deputy Prime Minister'], ['finance', 'Finance'], ['economy', 'Economic Affairs'],
+    ['foreign', 'Foreign Affairs'], ['interior', 'Interior'], ['defence', 'Defence'], ['justice', 'Justice'],
+    ['labour', 'Labour'], ['social_rights', 'Social Rights and Pensions'], ['health', 'Health'],
+    ['education', 'Education'], ['territorial', 'Territorial Policy'], ['ecology', 'Ecological Transition'],
+    ['equality', 'Equality']
+  ];
+  // what each party asks for first as a coalition partner
+  var PARTNER_PREFS = {
+    up: ['social_rights', 'labour', 'equality', 'education', 'health', 'ecology'],
+    psoe: ['finance', 'labour', 'foreign', 'social_rights', 'health', 'territorial'],
+    pp: ['finance', 'interior', 'economy', 'defence', 'justice', 'foreign'],
+    cs: ['economy', 'education', 'foreign', 'justice', 'territorial', 'health'],
+    vox: ['interior', 'defence', 'justice', 'territorial', 'education', 'equality'],
+    ps: ['labour', 'social_rights', 'territorial', 'health', 'education', 'equality']
+  };
+  // ministers by party (historical where the party held the post)
+  var MINISTER_NAMES = {
+    psoe: { pm: 'Pedro Sánchez', deputy: 'Carmen Calvo', finance: 'María Jesús Montero', economy: 'Nadia Calviño',
+            foreign: 'Josep Borrell', interior: 'Fernando Grande-Marlaska', defence: 'Margarita Robles',
+            justice: 'Dolores Delgado', labour: 'Magdalena Valerio', social_rights: 'José Luis Escrivá',
+            health: 'Salvador Illa', education: 'Isabel Celaá', territorial: 'Meritxell Batet', ecology: 'Teresa Ribera',
+            equality: 'Carmen Calvo' },
+    pp: { deputy: 'Soraya Sáenz de Santamaría', finance: 'Cristóbal Montoro', economy: 'Luis de Guindos',
+          foreign: 'José Manuel García-Margallo', interior: 'Jorge Fernández Díaz', defence: 'Pedro Morenés',
+          justice: 'Rafael Catalá', labour: 'Fátima Báñez', social_rights: 'Fátima Báñez', health: 'Alfonso Alonso',
+          education: 'José Ignacio Wert', territorial: 'Soraya Sáenz de Santamaría', ecology: 'Isabel García Tejerina',
+          equality: 'Alfonso Alonso' },
+    up: { deputy: 'Pablo Iglesias', social_rights: 'Pablo Iglesias', labour: 'Yolanda Díaz', equality: 'Irene Montero',
+          education: 'Manuel Castells', health: 'Pablo Echenique', ecology: 'Alberto Garzón', finance: 'Nacho Álvarez',
+          economy: 'Nacho Álvarez', foreign: 'Pablo Bustinduy', territorial: 'Pablo Echenique' },
+    cs: { deputy: 'Inés Arrimadas', economy: 'Luis Garicano', finance: 'Toni Roldán', education: 'Marta Rivera de la Cruz',
+          foreign: 'Luis Garicano', justice: 'Edmundo Bal', territorial: 'Inés Arrimadas', health: 'Francisco Igea' },
+    vox: { deputy: 'Javier Ortega Smith', interior: 'Javier Ortega Smith', defence: 'Agustín Rosety',
+           justice: 'Iván Espinosa de los Monteros', territorial: 'Rocío Monasterio', education: 'Rocío Monasterio' }
+  };
+
+  function ministerName(party, key, Q) {
+    if (key === 'pm') {
+      return Q.pm;
+    }
+    var n = MINISTER_NAMES[party] && MINISTER_NAMES[party][key];
+    return n || ('a ' + UI.shortName(party) + ' nominee');
+  }
+
+  // plan: 'standard', 'generous' or 'hard' (seen from the senior party when
+  // the player leads), or 'economy' / 'social' (the player as junior asks
+  // for the economic or the social ministries).
+  function allocateCabinet(Q, plan) {
+    var parties = (Q.govt_parties || [Q.pm_party]).slice();
+    var senior = parties[0];
+    var cab = { pm: { party: senior, name: Q.pm } };
+    var keys = MINISTRIES.map(function (m) { return m[0]; });
+    if (parties.length === 1) {
+      keys.forEach(function (k) { cab[k] = { party: senior, name: ministerName(senior, k, Q) }; });
+      Q.cabinet = cab;
+      cabinetFlags(Q);
+      return cab;
+    }
+    var partner = parties[1];
+    var sSeats = Q.congress[senior] || 1, pSeats = Q.congress[partner] || 1;
+    var share = Math.max(2, Math.round(keys.length * pSeats / (sSeats + pSeats)));
+    var prefs = (PARTNER_PREFS[partner] || []).slice();
+    var partnerGets = [];
+    if (plan === 'generous') {
+      share += 2;
+      partnerGets.push('deputy');
+    } else if (plan === 'hard') {
+      share = Math.max(1, share - 2);
+      prefs = prefs.filter(function (k) { return ['finance', 'economy', 'labour', 'interior', 'foreign'].indexOf(k) === -1; });
+    } else if (plan === 'economy') {
+      prefs = ['finance', 'economy'].concat(prefs.filter(function (k) { return k !== 'finance' && k !== 'economy'; }));
+    } else if (plan === 'social') {
+      prefs = ['labour', 'social_rights', 'health', 'education', 'equality'].concat(prefs);
+    }
+    if (plan !== 'hard' && partnerGets.indexOf('deputy') === -1 && pSeats >= 0.25 * sSeats) {
+      partnerGets.push('deputy');
+    }
+    prefs.concat(keys).forEach(function (k) {
+      if (partnerGets.length < share && partnerGets.indexOf(k) === -1 && !(plan === 'hard' && k === 'deputy')) {
+        partnerGets.push(k);
+      }
+    });
+    keys.forEach(function (k) {
+      var party = partnerGets.indexOf(k) !== -1 ? partner : senior;
+      cab[k] = { party: party, name: ministerName(party, k, Q) };
+    });
+    Q.cabinet = cab;
+    Q.cabinet_plan = plan;
+    cabinetFlags(Q);
+    return cab;
+  }
+
+  function cabinetFlags(Q) {
+    var me = Q.player_party || 'psoe';
+    var cab = Q.cabinet || {};
+    var count = 0;
+    MINISTRIES.forEach(function (m) {
+      var mine = !Q.acting && cab[m[0]] && cab[m[0]].party === me ? 1 : 0;
+      Q['min_' + m[0]] = mine;
+      count += mine;
+    });
+    Q.min_pm = !Q.acting && cab.pm && cab.pm.party === me ? 1 : 0;
+    Q.my_ministries = count;
+    Q.player_senior = Q.pm_party === me ? 1 : 0;
+  }
+
+  function renderCabinet(Q, id) {
+    var out = el(id);
+    if (!out) {
+      return;
+    }
+    var cab = Q.cabinet || {};
+    var rows = [['pm', 'Prime Minister']].concat(MINISTRIES).map(function (m) {
+      var c = cab[m[0]];
+      if (!c) { return ''; }
+      return '<tr><td>' + m[1] + '</td><td><span class="sp-swatch" style="background:' + UI.partyColor(c.party) +
+        '"></span>' + c.name + '</td></tr>';
+    }).join('');
+    out.innerHTML = (Q.acting ? '<p><em>Acting government.</em></p>' : '') +
+      '<table class="sp-results sp-compact sp-cabinet"><tbody>' + rows + '</tbody></table>';
+  }
+
   // When Sánchez is not leading the PSOE, governments form without him:
   // each week of formation the largest bloc's candidate tries, with the
   // PSOE voting by its new leadership's line and Sánchez's party voting by
@@ -2553,6 +2690,9 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    allocateCabinet: allocateCabinet,
+    renderCabinet: renderCabinet,
+    MINISTRIES: MINISTRIES,
     grandCoalitionOffer: grandCoalitionOffer,
     senateElected: senateElected,
     dhondtSeats: dhondtSeats,

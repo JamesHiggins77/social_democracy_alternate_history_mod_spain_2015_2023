@@ -2,7 +2,7 @@ title: The budget
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and budget_timer <= 0
+view-if: player_in_government = 1 and min_finance = 1 and budget_timer <= 0
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.renderVote(Q, 'sp-budget-count', 'budget');
@@ -63,7 +63,7 @@ title: The minimum wage
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and wage_timer <= 0
+view-if: player_in_government = 1 and min_labour = 1 and wage_timer <= 0
 on-arrival: month_actions += 1; wage_timer = 12
 
 = The minimum wage
@@ -89,7 +89,7 @@ title: Historical memory
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and memory_timer <= 0
+view-if: player_in_government = 1 and (min_justice = 1 or min_deputy = 1) and memory_timer <= 0
 on-arrival: month_actions += 1; memory_timer = 24
 
 = Historical memory
@@ -115,7 +115,7 @@ title: Pensions
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and pensions_timer <= 0
+view-if: player_in_government = 1 and min_social_rights = 1 and pensions_timer <= 0
 on-arrival: month_actions += 1; pensions_timer = 12
 
 = Pensions
@@ -143,7 +143,7 @@ title: The labour reform
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and labour_timer <= 0
+view-if: player_in_government = 1 and min_labour = 1 and labour_timer <= 0
 on-arrival: month_actions += 1; labour_timer = 18
 
 = The labour reform
@@ -169,7 +169,7 @@ title: Reshuffle the cabinet
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and reshuffle_timer <= 0
+view-if: player_in_government = 1 and min_pm = 1 and reshuffle_timer <= 0
 on-arrival: month_actions += 1; reshuffle_timer = 12
 
 = Reshuffle the cabinet
@@ -201,7 +201,7 @@ title: Tax reform
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and tax_timer <= 0
+view-if: player_in_government = 1 and min_finance = 1 and tax_timer <= 0
 on-arrival: month_actions += 1; tax_timer = 12
 
 = Tax reform
@@ -239,7 +239,7 @@ title: Foreign policy
 new-page: true
 is-card: true
 tags: sp_government
-view-if: psoe_in_government = 1 and foreign_timer <= 0
+view-if: player_in_government = 1 and min_foreign = 1 and foreign_timer <= 0
 on-arrival: month_actions += 1; foreign_timer = 3
 
 = Foreign policy
@@ -277,3 +277,55 @@ The bases at Rota and Morón are mentioned warmly. Podemos is less warm.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 7); window.SpainGame.target(Q, 'psoe', 'young', 0.5); } !}
 
 A speech on the 2030 Agenda earns applause in New York and a few headlines at home.
+
+@cabinet_agreement
+title: The coalition agreement
+new-page: true
+tags: sp_event
+view-if: cabinet_pending = 1
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderCabinet(Q, 'sp-cabinet-draft');
+}
+!}
+
+= The coalition agreement
+
+The government's programme is agreed. Now the ministries must be shared with [+ cabinet_partner_name +]. Whoever holds a ministry decides its policy: only the party that holds Finance can write budgets and tax reforms, only Labour can touch the minimum wage and the labour reform, and so on. This is the draft on the table:
+
+{!<div id="sp-cabinet-draft"></div>!}
+
+- @cab_standard: Accept the draft: ministries in proportion to seats
+- @cab_generous: [? if player_senior = 1 : Be generous: a stronger deputy premiership and two more ministries for the partner ?][? if player_senior = 0 : Accept whatever the senior partner offers ?]
+- @cab_hard: Drive a hard bargain: keep every economic and security ministry
+- @cab_economy: Insist on Finance and Economic Affairs
+- @cab_social: Ask for the social ministries: Labour, Social Rights, Health, Education, Equality
+
+@cab_standard
+on-arrival: {! Q.cabinet_pending = 0; !}
+
+The draft is signed as it stands.
+
+@cab_generous
+view-if: player_senior = 1
+on-arrival: {! Q.cabinet_pending = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'generous'); } Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) + 10; Q.regional_leaders_dissent += 4; !}
+
+Your partner is delighted. Your own ministers-in-waiting are not.
+
+@cab_hard
+view-if: player_senior = 1
+on-arrival: {! Q.cabinet_pending = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'hard'); } Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) - 12; Q.sanchez_authority += 3; !}
+
+You keep the levers of power. Your partner signs, and starts counting the slights.
+
+@cab_economy
+view-if: player_senior = 0
+on-arrival: {! Q.cabinet_pending = 0; Q.cab_ok = (Math.random() * 100 < 30 + (Q['rel_' + Q.cabinet_partner] || 40) / 2) ? 1 : 0; if (Q.cab_ok && window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'economy'); } else { Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) - 6; } !}
+
+[? if cab_ok = 1 : After a week of tense talks, the senior partner gives up Finance and Economic Affairs. Your ministers will write the budgets. ?][? if cab_ok = 0 : The senior partner refuses: the economic ministries are not for sale. You keep the draft, and some resentment. ?]
+
+@cab_social
+view-if: player_senior = 0
+on-arrival: {! Q.cabinet_pending = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'social'); } Q.progressives_dissent -= 4; Q.trade_unionists_dissent -= 3; !}
+
+You take the ministries closest to your voters' daily lives.

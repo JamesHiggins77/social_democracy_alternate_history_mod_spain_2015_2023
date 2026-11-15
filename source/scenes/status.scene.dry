@@ -53,6 +53,7 @@ on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
     window.SpainGame.renderFactions(Q, 'sp-side-factions');
     window.SpainGame.renderRelations(Q, 'sp-side-relations');
+    window.SpainGame.renderCabinet(Q, 'sp-side-cabinet');
 }
 !}
 
@@ -69,6 +70,12 @@ Sanchismo: **[+ sanchismo_word +]**
 Style: **[+ style_word +]**
 
 Fed. Committee: **[+ committee_word +]**
+
+= Cabinet
+
+[? if player_in_government = 1 : [+ my_party_cap +] holds [+ my_ministries +] of 14 ministries. ?]
+
+{!<div id="sp-side-cabinet"></div>!}
 
 = Representation
 

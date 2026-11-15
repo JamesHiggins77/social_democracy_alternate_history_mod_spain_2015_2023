@@ -54,6 +54,28 @@
     [['José Luis Rodríguez Zapatero', 'Zapatero'], 'psoe', 'Prime Minister 2004–11', 'Progressives'],
     [['Miquel Iceta', 'Iceta'], 'psoe', 'Leader of the PSC', 'Catalan socialists, federalist'],
     [['Salvador Illa', 'Illa'], 'psoe', 'PSC; Minister of Health', 'Catalan socialists'],
+    [['Nadia Calviño', 'Calviño'], 'psoe', 'Minister of Economic Affairs', 'Independent technocrat (EU Commission)'],
+    [['Josep Borrell', 'Borrell'], 'psoe', 'Minister of Foreign Affairs', 'Federalist, pro-European'],
+    [['Fernando Grande-Marlaska', 'Grande-Marlaska'], 'psoe', 'Minister of the Interior', 'Independent judge'],
+    [['Margarita Robles'], 'psoe', 'Minister of Defence', 'Independent judge, institutionalist'],
+    [['Dolores Delgado'], 'psoe', 'Minister of Justice', 'Prosecutor, sanchista'],
+    [['Magdalena Valerio'], 'psoe', 'Minister of Labour', 'Trade unionists'],
+    [['José Luis Escrivá', 'Escrivá'], 'psoe', 'Minister of Social Security', 'Independent economist'],
+    [['Isabel Celaá', 'Celaá'], 'psoe', 'Minister of Education', 'Basque socialists'],
+    [['Meritxell Batet', 'Batet'], 'psoe', 'Minister of Territorial Policy', 'Catalan socialists, federalist'],
+    [['Teresa Ribera', 'Ribera'], 'psoe', 'Minister for the Ecological Transition', 'Green wing'],
+    [['Luis de Guindos', 'Guindos'], 'pp', 'Minister of Economy', 'Liberal technocrat'],
+    [['Fátima Báñez', 'Báñez'], 'pp', 'Minister of Employment', 'Author of the 2012 labour reform'],
+    [['José Manuel García-Margallo', 'Margallo'], 'pp', 'Minister of Foreign Affairs', 'Pro-European, Gibraltar hawk'],
+    [['Jorge Fernández Díaz'], 'pp', 'Minister of the Interior', 'Conservative Catholic'],
+    [['Pedro Morenés'], 'pp', 'Minister of Defence', 'Conservative'],
+    [['Rafael Catalá'], 'pp', 'Minister of Justice', 'Moderate'],
+    [['Alfonso Alonso'], 'pp', 'Minister of Health', 'Basque PP, moderate'],
+    [['José Ignacio Wert', 'Wert'], 'pp', 'Minister of Education', 'Conservative'],
+    [['Isabel García Tejerina'], 'pp', 'Minister of Agriculture and Environment', 'Conservative'],
+    [['Manuel Castells', 'Castells'], 'up', 'Minister of Universities', 'Independent sociologist'],
+    [['Nacho Álvarez'], 'up', 'Podemos economic spokesperson', 'Pablismo'],
+    [['Luis Garicano', 'Garicano'], 'cs', 'Ciudadanos economic spokesperson', 'Liberal economist'],
     [['Iván Redondo'], 'nonpartisan', 'Political consultant, Sánchez\'s chief of staff', 'No party; formerly worked for the PP'],
     // PP
     [['Mariano Rajoy', 'Rajoy'], 'pp', 'Prime Minister; leader of the PP', 'Conservative pragmatist'],
@@ -174,7 +196,8 @@
     compromis: 'Coalició Compromís', upn: "Navarrese People's Union", prc: 'Regionalist Party of Cantabria',
     bng: 'Galician Nationalist Bloc', te: 'Teruel Existe', geroa: 'Geroa Bai', upyd: 'Union, Progress and Democracy',
     labour: 'Labour Party (UK)', spd: 'Social Democratic Party of Germany', syriza: 'Syriza',
-    usdem: 'Democratic Party (United States)', polisario: 'Polisario Front'
+    usdem: 'Democratic Party (United States)', polisario: 'Polisario Front',
+    psportugal: 'Socialist Party (Portugal)', dksd: 'Social Democrats (Denmark)', sap: 'Swedish Social Democratic Party'
   };
   var NAME_WIKI = { PSC: "Socialists' Party of Catalonia", Sumar: 'Sumar (electoral alliance)', CiU: 'Convergence and Union',
                     'Unidas Podemos': 'Unidas Podemos', 'Unidos Podemos': 'Unidas Podemos' };
@@ -222,13 +245,15 @@
 
   // party names as they appear in the text
   var PARTY_NAMES = [
-    [['PSOE', 'Socialists', 'PSC'], 'psoe'], [['PP', "People's Party", 'Partido Popular'], 'pp'],
+    [['PSOE', 'PSC'], 'psoe'], [['PP', "People's Party", 'Partido Popular'], 'pp'],
     [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar'], 'up'], [['Ciudadanos', 'Cs'], 'cs'], [['Vox'], 'vox'],
     [['IU', 'Izquierda Unida'], 'iu'], [['ERC'], 'erc'], [['Junts', 'JxCat', 'Convergència', 'CiU'], 'junts'],
     [['PNV'], 'pnv'], [['EH Bildu', 'Bildu'], 'bildu'], [['CUP'], 'cup'], [['Coalición Canaria'], 'cc'],
     [['Más País'], 'mp'], [['Compromís'], 'compromis'], [['UPN'], 'upn'], [['PRC'], 'prc'], [['BNG'], 'bng'],
     [['Teruel Existe'], 'te'], [['Geroa Bai'], 'geroa'], [['UPyD'], 'upyd'], [['Pedro Sánchez List'], 'ps'],
-    [['Labour'], 'labour'], [['SPD'], 'spd'], [['Syriza'], 'syriza'], [['Democrats'], 'usdem'],
+    [['British Labour', 'Labour'], 'labour'], [['German SPD', 'SPD'], 'spd'], [['Syriza'], 'syriza'],
+    [['US Democrats', 'Democratic Party'], 'usdem'], [['Portuguese Socialists'], 'psportugal'],
+    [['Danish Social Democrats'], 'dksd'], [['Swedish Social Democrats'], 'sap'],
     [['Polisario'], 'polisario']
   ];
 
