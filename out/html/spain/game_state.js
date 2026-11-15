@@ -548,7 +548,7 @@
     var voxReady = Q.year >= 2018 || Q.vox_breakthrough ? 1 : 0.3;
     var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
     // Vox's growth slows as it approaches its ceiling
-    var vox = 0.45 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 18);
+    var vox = 0.45 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 16);
     transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
                               professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
     transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
@@ -565,11 +565,11 @@
                unemployed: x, students: x, homemakers: x };
     };
     if (!Q.acting && (Q.govt_parties || []).indexOf('cs') !== -1 && Q.pm_party !== 'cs') {
-      transfer(Q, 'cs', { pp: 0.6, vox: 0.25, psoe: 0.15 }, all(0.25));
+      transfer(Q, 'cs', { pp: 0.7, vox: 0.15, psoe: 0.15 }, all(0.25));
     }
     var voxPoll = (Q.true_poll && Q.true_poll.vox) || 0;
     if (Q.year >= 2019 && voxPoll >= 5) {
-      transfer(Q, 'cs', { pp: 0.5, vox: 0.5 }, all(0.012 * voxPoll));
+      transfer(Q, 'cs', { pp: 0.7, vox: 0.3 }, all(0.012 * voxPoll));
     }
     // Podemos's internal strife slowly erodes it from 2017
     if (Q.year >= 2017) {
