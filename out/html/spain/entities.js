@@ -232,16 +232,182 @@
     [['Polisario'], 'polisario']
   ];
 
-  var IDEOLOGY = {
-    psoe: 'Social democracy', pp: 'Conservatism, Christian democracy', up: 'Left-wing populism', cs: 'Liberalism, anti-nationalism',
-    vox: 'National conservatism, right-wing populism', iu: 'Communism, eco-socialism', erc: 'Catalan independence, left',
-    junts: 'Catalan independence, centre-right', pnv: 'Basque nationalism, Christian democracy', bildu: 'Basque independence, left',
-    cup: 'Catalan independence, anticapitalist', cc: 'Canarian nationalism', mp: 'Green left', compromis: 'Valencian left',
-    upn: 'Navarrese regionalism, conservative', prc: 'Cantabrian regionalism', bng: 'Galician nationalism, left',
-    te: 'Rural localism', geroa: 'Basque nationalism (Navarre)', upyd: 'Social liberalism, centralism',
-    ps: 'Sanchismo: personalist social democracy', labour: 'Social democracy', spd: 'Social democracy',
-    syriza: 'Radical left', usdem: 'Liberalism'
+  // Party descriptions: native name, English name, ideology, and what it
+  // is known for, written as "The <native> (en: <English>) is a <ideology>
+  // party ... which ...".
+  var PARTY_DESC = {
+    psoe: ['Partido Socialista Obrero Español', "Spanish Socialist Workers' Party", 'social-democratic',
+      'founded in 1879, the oldest party in Spain, which has governed for longer than any other party since the return of democracy'],
+    pp: ['Partido Popular', "People's Party", 'conservative and Christian-democratic',
+      "the main party of the Spanish centre-right since 1989, which governed under Aznar and Rajoy and was convicted as a beneficiary of the Gürtel corruption network"],
+    up: ['Podemos', 'We Can', 'left-wing populist',
+      'born in 2014 out of the 15-M anti-austerity movement, which promised to break the PP–PSOE two-party system'],
+    cs: ['Ciudadanos', 'Citizens', 'liberal and anti-nationalist',
+      'founded in Catalonia in 2006 against Catalan nationalism, which went national in 2015 promising to regenerate Spanish politics'],
+    vox: ['Vox', 'Voice', 'national-conservative, right-wing populist',
+      'founded in 2013 by former PP members, which opposes regional autonomy, feminism laws and immigration'],
+    iu: ['Izquierda Unida', 'United Left', 'communist and eco-socialist',
+      'founded in 1986 around the Communist Party of Spain (PCE), which has long been the main force to the left of the PSOE'],
+    erc: ['Esquerra Republicana de Catalunya', 'Republican Left of Catalonia', 'left-wing, pro-independence',
+      'founded in 1931, which governed Catalonia during the Second Republic and seeks a Catalan republic'],
+    junts: ['Junts per Catalunya', 'Together for Catalonia', 'centre-right, pro-independence',
+      "heir to Jordi Pujol's Convergència, which led the 2017 independence push under Carles Puigdemont"],
+    pnv: ['Euzko Alderdi Jeltzalea – Partido Nacionalista Vasco', 'Basque Nationalist Party', 'Christian-democratic, Basque nationalist',
+      'founded in 1895, which has governed the Basque Country for most of the democratic period and trades its votes in Madrid for investment and powers'],
+    bildu: ['Euskal Herria Bildu', 'Basque Country Unite', 'left-wing, Basque pro-independence',
+      'formed in 2012 by the abertzale left and allies, which entered institutions after ETA ended its violence'],
+    cup: ["Candidatura d'Unitat Popular", 'Popular Unity Candidacy', 'anticapitalist, Catalan pro-independence',
+      'an assembly-based party, which forced Artur Mas out of the presidency in 2016'],
+    cc: ['Coalición Canaria', 'Canarian Coalition', 'Canarian nationalist and centrist',
+      'founded in 1993, which has governed the Canary Islands for most of the period with partners from left and right'],
+    mp: ['Más País', 'More Country', 'green-left',
+      "founded in 2019 by Íñigo Errejón after his break with Podemos, which allied with Compromís in Valencia"],
+    compromis: ['Coalició Compromís', 'Commitment Coalition', 'Valencian left-wing and green',
+      'a coalition of Valencian nationalists and greens, which governed Valencia with the PSOE from 2015'],
+    upn: ['Unión del Pueblo Navarro', "Navarrese People's Union", 'conservative, Navarrese regionalist',
+      'founded in 1979, which defends Navarre as separate from the Basque Country and long allied with the PP'],
+    prc: ['Partido Regionalista de Cantabria', 'Regionalist Party of Cantabria', 'centrist, Cantabrian regionalist',
+      "led by Miguel Ángel Revilla, which governs Cantabria and lends its single deputy to whoever offers Cantabria the most"],
+    bng: ['Bloque Nacionalista Galego', 'Galician Nationalist Bloc', 'left-wing, Galician nationalist',
+      'founded in 1982, which became the main opposition in Galicia in 2020'],
+    te: ['Teruel Existe', 'Teruel Exists', 'rural localist',
+      "a citizens' platform for depopulated rural Spain, which won a seat in 2019 and decided Sánchez's investiture"],
+    geroa: ['Geroa Bai', 'Yes to the Future', 'Basque nationalist',
+      'the Basque nationalist coalition of Navarre, which led its government under Uxue Barkos from 2015'],
+    upyd: ['Unión, Progreso y Democracia', 'Union, Progress and Democracy', 'social-liberal and centralist',
+      'founded in 2007 by Rosa Díez, which was overtaken by Ciudadanos and lost all its seats in 2015'],
+    ps: ['Lista Pedro Sánchez', 'Pedro Sánchez List', 'personalist social-democratic',
+      "founded by Pedro Sánchez after his break with the PSOE, which competes with it for the same voters"],
+    labour: ['Labour Party', 'Labour Party', 'social-democratic',
+      'founded in 1900, the main party of the British left, which governed under Attlee, Wilson and Blair'],
+    spd: ['Sozialdemokratische Partei Deutschlands', 'Social Democratic Party of Germany', 'social-democratic',
+      'founded in 1863, the oldest party in Germany, which spent most of the 2010s as junior partner in grand coalitions'],
+    syriza: ['Synaspismós Rizospastikís Aristerás (Syriza)', 'Coalition of the Radical Left', 'radical left',
+      'which won the Greek election of 2015 against austerity and then accepted a third bailout'],
+    usdem: ['Democratic Party', 'Democratic Party', 'liberal',
+      'one of the two major parties of the United States, which held the presidency under Obama and Biden'],
+    polisario: ['Frente Polisario', 'Polisario Front', 'Sahrawi nationalist',
+      'a liberation movement, which claims independence for Western Sahara against Morocco'],
+    psportugal: ['Partido Socialista', 'Socialist Party', 'social-democratic',
+      "Portugal's main centre-left party, which governed with the support of the radical left from 2015"],
+    dksd: ['Socialdemokratiet', 'Social Democrats', 'social-democratic',
+      "Denmark's largest party, which combined a strict line on migration with the welfare state under Mette Frederiksen"],
+    sap: ['Sveriges socialdemokratiska arbetareparti', "Swedish Social Democratic Workers' Party", 'social-democratic',
+      'the architect of the Swedish welfare state, which has governed Sweden for most of the last century'],
+    ukcon: ['Conservative Party', 'Conservative Party', 'conservative',
+      'the governing party of the United Kingdom from 2010, which held the Brexit referendum'],
+    cdu: ['Christlich Demokratische Union Deutschlands', 'Christian Democratic Union of Germany', 'Christian-democratic',
+      "Germany's main centre-right party, which governed under Angela Merkel from 2005 to 2021"],
+    usrep: ['Republican Party', 'Republican Party', 'conservative',
+      'one of the two major parties of the United States, which won the presidency with Donald Trump in 2016'],
+    lega: ['Lega', 'League', 'right-wing populist',
+      'once a northern separatist party, which became a national anti-immigration party under Matteo Salvini'],
+    lrem: ['La République En Marche', 'The Republic on the Move', 'liberal centrist',
+      'founded in 2016 by Emmanuel Macron, which won the French presidency and parliament in 2017'],
+    psfrance: ['Parti socialiste', 'Socialist Party', 'social-democratic',
+      'which held the French presidency under Hollande and fell to 6% in the 2017 election'],
+    unitedrussia: ['Yedinaya Rossiya', 'United Russia', 'nationalist and conservative',
+      "Russia's ruling party, which backs Vladimir Putin"],
+    servant: ['Sluha Narodu', 'Servant of the People', 'centrist',
+      'founded in 2018 and named after the TV series that made Volodymyr Zelensky famous'],
+    bcomu: ['Barcelona en Comú', 'Barcelona in Common', 'left-wing municipalist',
+      'which won Barcelona city hall in 2015 with Ada Colau as mayor'],
+    ahoramadrid: ['Ahora Madrid', 'Madrid Now', 'left-wing municipalist',
+      'which won Madrid city hall in 2015 with Manuela Carmena as mayor']
   };
+  var PLACE = { labour: 'the United Kingdom', ukcon: 'the United Kingdom', spd: 'Germany', cdu: 'Germany', syriza: 'Greece',
+                usdem: 'the United States', usrep: 'the United States', psportugal: 'Portugal', dksd: 'Denmark',
+                sap: 'Sweden', lega: 'Italy', lrem: 'France', psfrance: 'France', unitedrussia: 'Russia', servant: 'Ukraine',
+                polisario: 'Western Sahara' };
+
+  // single-word names that take no article ("Podemos is", not "The Podemos is")
+  var NO_ARTICLE = { up: 1, vox: 1, cs: 1, mp: 1, te: 1, geroa: 1, bildu: 1, junts: 1, syriza: 1, lega: 1,
+                     ahoramadrid: 1, bcomu: 1, servant: 1, ps: 1 };
+
+  function partySentence(id) {
+    var d = PARTY_DESC[id];
+    if (!d) {
+      return '';
+    }
+    var name = (NO_ARTICLE[id] ? '' : 'The ') + d[0] + (d[0] === d[1] ? '' : ' (en: ' + d[1] + ')');
+    var art = /^[aeiou]/i.test(d[2]) ? 'an ' : 'a ';
+    var fact = /^which/.test(d[3]) ? ' ' + d[3] : ', ' + d[3];
+    return name + ' is ' + art + d[2] + ' party in ' + (PLACE[id] || 'Spain') + fact + '.';
+  }
+
+  // Current leaders. PSOE, PP, Podemos, Cs and the sister parties follow
+  // the game (window.SpainGame); the rest change on their real dates.
+  var LEADER_DATES = {
+    vox: [[201409, 'Alejo Vidal-Quadras'], [999999, 'Santiago Abascal']],
+    iu: [[201606, 'Cayo Lara'], [999999, 'Alberto Garzón']],
+    erc: [[999999, 'Oriol Junqueras']],
+    junts: [[201601, 'Artur Mas'], [999999, 'Carles Puigdemont']],
+    pnv: [[999999, 'Andoni Ortuzar']], bildu: [[999999, 'Arnaldo Otegi']],
+    cc: [[201506, 'Paulino Rivero'], [999999, 'Fernando Clavijo']], mp: [[999999, 'Íñigo Errejón']],
+    compromis: [[999999, 'Mónica Oltra']], upn: [[201503, 'Yolanda Barcina'], [999999, 'Javier Esparza']],
+    prc: [[999999, 'Miguel Ángel Revilla']], bng: [[999999, 'Ana Pontón']], te: [[999999, 'Tomás Guitarte']],
+    geroa: [[999999, 'Uxue Barkos']], upyd: [[201507, 'Rosa Díez'], [999999, 'Andrés Herzog']],
+    ukcon: [[201607, 'David Cameron'], [201907, 'Theresa May'], [202209, 'Boris Johnson'], [999999, 'Rishi Sunak']],
+    cdu: [[201812, 'Angela Merkel'], [202101, 'Annegret Kramp-Karrenbauer'], [202201, 'Armin Laschet'], [999999, 'Friedrich Merz']],
+    usrep: [[999999, 'Donald Trump']], lega: [[999999, 'Matteo Salvini']], syriza: [[202306, 'Alexis Tsipras'], [999999, 'Stefanos Kasselakis']],
+    lrem: [[999999, 'Emmanuel Macron']], psfrance: [[201703, 'François Hollande'], [201804, 'Benoît Hamon'], [999999, 'Olivier Faure']],
+    unitedrussia: [[999999, 'Vladimir Putin']], servant: [[999999, 'Volodymyr Zelensky']],
+    polisario: [[201605, 'Mohamed Abdelaziz'], [999999, 'Brahim Ghali']],
+    bcomu: [[999999, 'Ada Colau']], ahoramadrid: [[999999, 'Manuela Carmena']]
+  };
+  var SISTER_OF = { labour: 'labour', psportugal: 'portugal', dksd: 'denmark', spd: 'germany', sap: 'sweden', usdem: 'us' };
+  // factions for leaders the game introduces who are not in PEOPLE
+  var EXTRA_WINGS = {
+    'Alejo Vidal-Quadras': 'Founder; liberal-conservative wing', 'Javier Esparza': 'Navarrese regionalist right',
+    'Ana Pontón': 'Galician nationalist left', 'Tomás Guitarte': 'Rural platform', 'Rosa Díez': 'Founder; centralist',
+    'Andrés Herzog': 'Centralist', 'Rishi Sunak': 'Fiscal conservative', 'Annegret Kramp-Karrenbauer': "Merkel's centrist wing",
+    'Armin Laschet': "Merkel's centrist wing", 'Friedrich Merz': 'Conservative wing', 'Stefanos Kasselakis': 'Outsider',
+    'Olivier Faure': 'Party mainstream', 'Mohamed Abdelaziz': 'Founding leadership', 'Eduardo Madina': 'Modernisers'
+  };
+
+  function gameQ() {
+    try {
+      return root.dendryUI && root.dendryUI.dendryEngine.state.qualities;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function currentLeader(id, Q) {
+    Q = Q || gameQ() || { year: 2014, month: 7 };
+    var G = root.SpainGame;
+    var name = null;
+    if (id === 'psoe') {
+      name = Q.sanchez_leader === 0 && Q.psoe_leader ? Q.psoe_leader : 'Pedro Sánchez';
+    } else if (id === 'pp') {
+      name = Q.pp_leader || 'Mariano Rajoy';
+    } else if ((id === 'up' || id === 'cs') && G && G.leaderOf && Q.year) {
+      name = G.leaderOf(Q, id);
+    } else if (id === 'ps') {
+      name = 'Pedro Sánchez';
+    } else if (SISTER_OF[id] && G && G.sisterLeader && Q.year) {
+      name = G.sisterLeader(Q, SISTER_OF[id]).name.replace(/ \(.*\)$/, '');
+      if (/movement/.test(name)) {
+        name = null;
+      }
+    } else if (LEADER_DATES[id]) {
+      var k = (Q.year || 2014) * 100 + (Q.month || 7);
+      var list = LEADER_DATES[id];
+      for (var i = 0; i < list.length; i++) {
+        if (k <= list[i][0]) { name = list[i][1]; break; }
+      }
+    }
+    if (!name) {
+      return null;
+    }
+    var person = INDEX[name] && INDEX[name].kind === 'person' ? PEOPLE[INDEX[name].i] : null;
+    var wing = person ? person[3] : (EXTRA_WINGS[name] || '');
+    if (name === 'Pedro Sánchez' && id === 'ps') {
+      wing = 'Founder';
+    }
+    return { name: name, wing: wing };
+  }
+
 
   function partyInfo(id) {
     var UI = root.SpainUI;
@@ -395,8 +561,11 @@
       return '<div class="sp-ent-head">' + badge + '<div><strong>' + info.name + '</strong><br>' + pi.name +
         '</div></div><div>' + info.role + '</div>' + (info.wing ? '<div class="sp-ent-wing">' + info.wing + '</div>' : '') + more;
     }
+    var desc = partySentence(info.party);
+    var lead = currentLeader(info.party);
     return '<div class="sp-ent-head">' + badge + '<div><strong>' + pi.name + '</strong></div></div>' +
-      (IDEOLOGY[info.party] ? '<div class="sp-ent-wing">' + IDEOLOGY[info.party] + '</div>' : '') + more;
+      (desc ? '<div class="sp-ent-desc">' + desc + '</div>' : '') +
+      (lead ? '<div class="sp-ent-lead"><b>Leader:</b> ' + lead.name + (lead.wing ? ' <span class="sp-ent-wing">(' + lead.wing + ')</span>' : '') + '</div>' : '') + more;
   }
 
   // Browser: annotate the story and sidebar as they change, and show a
@@ -451,7 +620,7 @@
     run();
   }
 
-  var api = { PEOPLE: PEOPLE, PARTY_NAMES: PARTY_NAMES, TOPICS: TOPICS, wikiUrl: wikiUrl, lookup: lookup, cardHtml: cardHtml, annotate: annotate,
+  var api = { partySentence: partySentence, currentLeader: currentLeader, PEOPLE: PEOPLE, PARTY_NAMES: PARTY_NAMES, TOPICS: TOPICS, wikiUrl: wikiUrl, lookup: lookup, cardHtml: cardHtml, annotate: annotate,
               install: install, regex: function () { return RE; } };
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;

@@ -587,3 +587,5 @@ a .sp-ent { border-bottom: none; }
 a.sp-ent { text-decoration: none; }
 .sp-topic { color: #3d3a73; font-weight: 500; }
 .sp-ent-more { margin-top: 4px; color: #3d3a73; font-size: 12px; }
+.sp-ent-desc { margin-top: 2px; }
+.sp-ent-lead { margin-top: 4px; }

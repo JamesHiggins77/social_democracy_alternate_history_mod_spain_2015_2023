@@ -58,3 +58,16 @@ test('minor regional lists get readable names', () => {
   }
   assert.deepStrictEqual([...bad], []);
 });
+
+test('party cards: a full sentence and the current leader with their faction', () => {
+  const E = require('../out/html/spain/entities.js');
+  assert.ok(/^The Partido Socialista Obrero Español \(en: Spanish Socialist Workers' Party\) is a social-democratic party in Spain, /.test(E.partySentence('psoe')));
+  assert.ok(/^Podemos \(en: We Can\) is a left-wing populist party/.test(E.partySentence('up')));
+  assert.strictEqual(E.currentLeader('pp', { year: 2019, pp_leader: 'Pablo Casado' }).name, 'Pablo Casado');
+  assert.ok(/Regional Leaders/.test(E.currentLeader('psoe', { year: 2018, sanchez_leader: 0, psoe_leader: 'Susana Díaz' }).wing));
+  assert.strictEqual(E.currentLeader('iu', { year: 2015, month: 3 }).name, 'Cayo Lara');
+  for (const id of Object.keys(require('../out/html/spain/spain_ui.js').PARTIES.reduce((a, p) => (a[p[0]] = 1, a), {}))) {
+    const sentence = E.partySentence(id);
+    if (sentence) assert.ok(!/ \.|,,|The The/.test(sentence), sentence);
+  }
+});
