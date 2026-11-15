@@ -309,7 +309,11 @@ Portugal — Seguro (2014): little; Costa in opposition (2014–15): a programme
 Denmark — Thorning-Schmidt (to 2015): governing with liberals, warmer Cs; Frederiksen (2015–): Vox gains less from migration (20% less per full lesson, up to 30%), progressives object, socially more conservative.
 Germany — Gabriel (to 2017): grand-coalition stability, warmer PP, members uneasy; Schulz (2017–18): a short burst of enthusiasm, then doubt; Nahles and successors (2018–21): "never prop up the right"; Scholz (2021–): calm competence, middle-class appeal.
 Sweden — Löfven (to 2021): the negotiated welfare model raises cohesion; Andersson (2021–): welfare plus a NATO turn.
-US Democrats — Obama (to 2017): data-driven campaigning; the Sanders movement (2017–20): small donors and the young, a drift left; Biden (2020–): union and middle-class pitch.
+US Democrats' leadership — Obama (to January 2017): data-driven campaigning; Pelosi and Schumer (2017–21): leading a broad coalition and getting things done (easier partners, calmer barons and institutionalists, angers the left); Biden (from 2021): union and middle-class pitch.
+US Democrats' progressives (from February 2017) — Bernie Sanders, joined by Alexandria Ocasio-Cortez from November 2018 (stronger): energise the progressives and the young and grow sanchismo; alienate the barons and the institutionalists.
+Italian Democratic Party — Renzi (to 2018): centrist modernisation, unions and progressives angry; Martina (2018–19): little; Zingaretti (2019–21): governing with populist partners, easier talks with Podemos; Letta (2021–23): pro-European seriousness; Schlein (2023–): a turn left, young voters and progressives.
+PASOK — the closest analogy to the PSOE and Podemos: Venizelos (to 2015): the price of austerity and grand coalitions (steels the left, cools the PP); Gennimata (2015–21): holding the centre-left against Syriza (wins back Podemos voters, colder Podemos); Androulakis (2021–): a slow recovery as the radical left fades.
+Every option that costs party funds says so on the choice ("Costs N in party funds").
 Campaign skill (from Labour and Obama) adds up to +30% to campaign gains. Each option shows a one-line hint of what the current leadership teaches and, if studied before, how strong the next lesson will be.
 
 **Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 2% a month back towards 55 without attention.

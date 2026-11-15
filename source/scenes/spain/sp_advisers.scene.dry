@@ -162,7 +162,7 @@ A political consultant who once worked for the PP and now works for you. He beli
 
 @redondo_poll
 title: Commission private polling
-subtitle: See the PSOE's real support, without the published polls' error.
+subtitle: See the PSOE's real support, without the published polls' error. · Costs 0.5 in party funds
 choose-if: advisor_action_timer = 0 and funds >= 0.5
 unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?][? if advisor_action_timer = 0 : Needs 0.5 in party funds. ?]
 on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.funds -= 0.5; Q.internal_psoe = Math.round(((Q.true_poll && Q.true_poll.psoe) || 0) * 10) / 10; Q.published_psoe = Math.round(((Q.poll && Q.poll.psoe) || 0) * 10) / 10; !}

@@ -51,6 +51,7 @@ Each big-hall theme costs 1 in party funds; a local event costs nothing.
 - @easy_discard
 
 @jobs
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 3, students: 1}); } Q.trade_unionists_dissent -= 4; Q.progressives_dissent -= 2; if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0); } !}
@@ -58,6 +59,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 The unions applaud. Business organisations call it a step backwards.
 
 @welfare
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 2, workers: 1}); } Q.trade_unionists_dissent -= 2; if (window.SpainGame) { window.SpainGame.position(Q, 0.3, 0); } !}
@@ -65,6 +67,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 Classic social democracy, and still the PSOE's strongest ground.
 
 @corruption_speech
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1, workers: 1}); window.SpainGame.campaign(Q, 'pp', {professionals: -1, self_employed: -0.5}); } Q.rel_pp -= 4; !}
@@ -72,6 +75,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 The audience chants about Bárcenas. [? if pp_scandal >= 2 : With the PP in the dock, the message lands harder. ?]
 
 @spain
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1, self_employed: 1}); } Q.regional_leaders_dissent -= 4; Q.rel_erc -= 4; if (window.SpainGame) { window.SpainGame.position(Q, 0, -0.5); } !}
@@ -164,6 +168,7 @@ Pensioners are marching in Bilbao and Madrid against a 0.25% annual rise. They a
 - @easy_discard
 
 @march
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 4}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 1; if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0); } !}
@@ -273,6 +278,7 @@ The agency has a TV, radio and online campaign ready. It costs 2 in party funds,
 - @easy_discard
 
 @ads_students
+subtitle: Costs 2 in party funds.
 title: Students
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -281,6 +287,7 @@ on-arrival: {! Q.funds -= 2; Q.modernisers_dissent -= 1; if (window.SpainGame) {
 The ads run for three weeks, aimed at students. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_young
+subtitle: Costs 2 in party funds.
 title: Young people
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -289,6 +296,7 @@ on-arrival: {! Q.funds -= 2; Q.modernisers_dissent -= 1; if (window.SpainGame) {
 The ads run for three weeks, aimed at young people. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_pensioners
+subtitle: Costs 2 in party funds.
 title: Pensioners
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -297,6 +305,7 @@ on-arrival: {! Q.funds -= 2; Q.institutionalists_dissent -= 1; if (window.SpainG
 The ads run for three weeks, aimed at pensioners. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_working
+subtitle: Costs 2 in party funds.
 title: The working class
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -305,6 +314,7 @@ on-arrival: {! Q.funds -= 2; Q.trade_unionists_dissent -= 2; if (window.SpainGam
 The ads run for three weeks, aimed at the working class. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_middle
+subtitle: Costs 2 in party funds.
 title: The middle class
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -313,6 +323,7 @@ on-arrival: {! Q.funds -= 2; Q.modernisers_dissent -= 2; if (window.SpainGame) {
 The ads run for three weeks, aimed at the middle class. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_women
+subtitle: Costs 2 in party funds.
 title: Women
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -321,6 +332,7 @@ on-arrival: {! Q.funds -= 2; Q.progressives_dissent -= 1; if (window.SpainGame) 
 The ads run for three weeks, aimed at women. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_unemployed
+subtitle: Costs 2 in party funds.
 title: The unemployed
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -329,6 +341,7 @@ on-arrival: {! Q.funds -= 2; Q.trade_unionists_dissent -= 1; if (window.SpainGam
 The ads run for three weeks, aimed at the unemployed. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @ads_rural
+subtitle: Costs 2 in party funds.
 title: Rural Spain
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
@@ -356,6 +369,7 @@ Your press office has offers from every kind of outlet. Each reaches a different
 - @easy_discard
 
 @tv
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1, pensioners: 1, professionals: 0.8, students: 0.8, unemployed: 0.8, homemakers: 0.8, self_employed: 0.5}); window.SpainGame.recalculate(Q); } !}
@@ -363,6 +377,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 Millions watch. Nobody remembers much the next day, but it helps.
 
 @radio
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.target(Q, 'psoe', 'middle', 1.5); window.SpainGame.recalculate(Q); } !}
@@ -370,6 +385,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.target(Q, 
 An hour of serious questions on Cadena SER and COPE. Older and middle-class listeners take you seriously.
 
 @streamers
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.modernisers_dissent -= 2; Q.institutionalists_dissent += 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2.5); window.SpainGame.recalculate(Q); } !}
@@ -377,6 +393,7 @@ on-arrival: {! Q.funds -= 1; Q.modernisers_dissent -= 2; Q.institutionalists_dis
 The clips go viral, some for the right reasons. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @morning_tv
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.progressives_dissent -= 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2.5); window.SpainGame.recalculate(Q); } !}
@@ -384,6 +401,7 @@ on-arrival: {! Q.funds -= 1; Q.progressives_dissent -= 1; if (window.SpainGame) 
 Childcare, equal pay, gender violence: an audience the big debates often ignore. [? if last_target_factor < 100 : This audience has heard it before: the effect is [+ last_target_factor +]% of a fresh campaign. ?]
 
 @regional_press
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.regional_leaders_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 2.5); window.SpainGame.recalculate(Q); } !}
@@ -410,6 +428,7 @@ The election is close. Where do you spend the last weeks? Each stop costs 1 in p
 - @easy_discard
 
 @tour_andalucia
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.regional_leaders_dissent -= 3; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Andalucía', 'psoe', 1.04); window.SpainGame.recalculate(Q); } !}
@@ -417,6 +436,7 @@ on-arrival: {! Q.funds -= 1; Q.regional_leaders_dissent -= 3; if (window.SpainGa
 Rallies, markets and local television across Andalusia. The PSOE's vote there firms up.
 
 @tour_cataluna
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.04); window.SpainGame.recalculate(Q); } !}
@@ -424,6 +444,7 @@ on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalM
 Rallies, markets and local television across Catalonia. The PSOE's vote there firms up.
 
 @tour_madrid
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'psoe', 1.04); window.SpainGame.recalculate(Q); } !}
@@ -431,6 +452,7 @@ on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalM
 Rallies, markets and local television across Madrid. The PSOE's vote there firms up.
 
 @tour_valencia
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Comunidad Valenciana', 'psoe', 1.04); window.SpainGame.recalculate(Q); } !}
@@ -438,6 +460,7 @@ on-arrival: {! Q.funds -= 1;  if (window.SpainGame) { window.SpainGame.regionalM
 Rallies, markets and local television across Valencia. The PSOE's vote there firms up.
 
 @tour_rural
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; Q.regional_leaders_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 3); window.SpainGame.recalculate(Q); } !}
@@ -462,16 +485,19 @@ As leader of the opposition you have no ministry, but you do have the Party of E
 - @root: Not this month
 
 @pes_congress
+subtitle: Costs 0.2 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); } Q.sanchez_authority += 1; Q.funds -= 0.2; !}
 
 Social democrats from twenty-seven countries applaud the man who might govern Spain.
 
 @pes_lisbon
+subtitle: Costs 0.2 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 4); } Q.rel_up += 1; Q.funds -= 0.2; !}
 
 Costa explains, over lunch, how to govern with the radical left without being swallowed by it.
 
 @pes_washington
+subtitle: Costs 0.3 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 4); window.SpainGame.intl(Q, 'nato', 2); } Q.funds -= 0.3; !}
 
 The photos with senators look prime-ministerial. The bill is not cheap.

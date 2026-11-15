@@ -18,6 +18,8 @@
     usrep: ['Republican Party (US)', '#E81B23', 'GOP'],
     lega: ['Lega (Italy)', '#008C45', 'Lega'],
     syriza: ['Syriza (Greece)', '#E2007A', 'SYR'],
+    pasok: ['PASOK (Greece)', '#00843D', 'PASOK'],
+    pditaly: ['Democratic Party (Italy)', '#EF1C27', 'PD'],
     lrem: ['La République En Marche (France)', '#FFB400', 'LREM'],
     psfrance: ['Socialist Party (France)', '#ED1651', 'PS'],
     unitedrussia: ['United Russia', '#1D3F94', 'UR'],
@@ -166,7 +168,18 @@
     [['Magdalena Andersson', 'Andersson'], 'sap', 'Prime Minister of Sweden (2021–22)', 'Social democrat'],
     [['Barack Obama', 'Obama'], 'usdem', 'President of the United States (2009–17)', 'Liberal Democrat'],
     [['Joe Biden', 'Biden'], 'usdem', 'President of the United States (from 2021)', 'Centrist Democrat, pro-union'],
-    [['Bernie Sanders', 'Sanders'], 'usdem', 'US Senator', 'Democratic socialist'],
+    [['Bernie Sanders', 'Sanders'], 'usdem', 'US Senator', 'Progressive wing, democratic socialist'],
+    [['Alexandria Ocasio-Cortez', 'Ocasio-Cortez', 'AOC'], 'usdem', 'US Representative (from 2019)', 'Progressive wing, democratic socialist'],
+    [['Nancy Pelosi', 'Pelosi'], 'usdem', 'Democratic leader in the House', 'Party leadership, liberal mainstream'],
+    [['Chuck Schumer', 'Schumer'], 'usdem', 'Democratic leader in the Senate', 'Party leadership, liberal mainstream'],
+    [['Matteo Renzi', 'Renzi'], 'pditaly', 'Prime Minister of Italy (2014–16), PD leader to 2018', 'Centrist moderniser'],
+    [['Maurizio Martina'], 'pditaly', 'PD leader (2018–19)', 'Caretaker'],
+    [['Nicola Zingaretti', 'Zingaretti'], 'pditaly', 'PD leader (2019–21)', 'Left of the party'],
+    [['Enrico Letta', 'Letta'], 'pditaly', 'PD leader (2021–23)', 'Pro-European centre-left'],
+    [['Elly Schlein', 'Schlein'], 'pditaly', 'PD leader (from 2023)', 'Progressive left'],
+    [['Evangelos Venizelos', 'Venizelos'], 'pasok', 'PASOK leader (2012–15), Deputy Prime Minister', 'Grand-coalition pragmatist'],
+    [['Fofi Gennimata', 'Gennimata'], 'pasok', 'PASOK leader (2015–21)', 'Social democrat'],
+    [['Nikos Androulakis', 'Androulakis'], 'pasok', 'PASOK leader (from 2021)', 'Social democrat'],
     [['Donald Trump', 'Trump'], 'usrep', 'President of the United States (2017–21)', 'Right-wing populist'],
     [['Matteo Salvini', 'Salvini'], 'lega', 'Interior Minister of Italy (2018–19)', 'Hard-right populist'],
     [['Alexis Tsipras', 'Tsipras'], 'syriza', 'Prime Minister of Greece (2015–19)', 'Radical left'],
@@ -197,7 +210,7 @@
     bng: 'Galician Nationalist Bloc', te: 'Teruel Existe', geroa: 'Geroa Bai', upyd: 'Union, Progress and Democracy',
     labour: 'Labour Party (UK)', spd: 'Social Democratic Party of Germany', syriza: 'Syriza',
     usdem: 'Democratic Party (United States)', polisario: 'Polisario Front',
-    psportugal: 'Socialist Party (Portugal)', dksd: 'Social Democrats (Denmark)', sap: 'Swedish Social Democratic Party'
+    pditaly: 'Democratic Party (Italy)', pasok: 'PASOK', psportugal: 'Socialist Party (Portugal)', dksd: 'Social Democrats (Denmark)', sap: 'Swedish Social Democratic Party'
   };
   var NAME_WIKI = { PSC: "Socialists' Party of Catalonia", Sumar: 'Sumar (electoral alliance)', CiU: 'Convergence and Union',
                     'Unidas Podemos': 'Unidas Podemos', 'Unidos Podemos': 'Unidas Podemos' };
@@ -251,6 +264,7 @@
     [['PNV'], 'pnv'], [['EH Bildu', 'Bildu'], 'bildu'], [['CUP'], 'cup'], [['Coalición Canaria'], 'cc'],
     [['Más País'], 'mp'], [['Compromís'], 'compromis'], [['UPN'], 'upn'], [['PRC'], 'prc'], [['BNG'], 'bng'],
     [['Teruel Existe'], 'te'], [['Geroa Bai'], 'geroa'], [['UPyD'], 'upyd'], [['Pedro Sánchez List'], 'ps'],
+    [['Italian Democratic Party'], 'pditaly'], [['PASOK'], 'pasok'],
     [['British Labour', 'Labour'], 'labour'], [['German SPD', 'SPD'], 'spd'], [['Syriza'], 'syriza'],
     [['US Democrats', 'Democratic Party'], 'usdem'], [['Portuguese Socialists'], 'psportugal'],
     [['Danish Social Democrats'], 'dksd'], [['Swedish Social Democrats'], 'sap'],
@@ -313,6 +327,10 @@
       'one of the two major parties of the United States, which held the presidency under Obama and Biden'],
     polisario: ['Frente Polisario', 'Polisario Front', 'Sahrawi nationalist',
       'a liberation movement, which claims independence for Western Sahara against Morocco'],
+    pditaly: ['Partito Democratico', 'Democratic Party', 'centre-left',
+      'founded in 2007 by merging the post-communist and Christian-left traditions, which led Italy under Renzi and later governed with the Five Star Movement'],
+    pasok: ['Panellinio Sosialistiko Kinima', 'Panhellenic Socialist Movement', 'social-democratic',
+      'which dominated Greek politics for three decades, then collapsed after 2012 as Syriza took its voters, giving the world the word "Pasokification"'],
     psportugal: ['Partido Socialista', 'Socialist Party', 'social-democratic',
       "Portugal's main centre-left party, which governed with the support of the radical left from 2015"],
     dksd: ['Socialdemokratiet', 'Social Democrats', 'social-democratic',
@@ -343,7 +361,7 @@
   var PLACE = { labour: 'the United Kingdom', ukcon: 'the United Kingdom', spd: 'Germany', cdu: 'Germany', syriza: 'Greece',
                 usdem: 'the United States', usrep: 'the United States', psportugal: 'Portugal', dksd: 'Denmark',
                 sap: 'Sweden', lega: 'Italy', lrem: 'France', psfrance: 'France', unitedrussia: 'Russia', servant: 'Ukraine',
-                polisario: 'Western Sahara' };
+                polisario: 'Western Sahara', pditaly: 'Italy', pasok: 'Greece' };
 
   // single-word names that take no article ("Podemos is", not "The Podemos is")
   var NO_ARTICLE = { up: 1, vox: 1, cs: 1, mp: 1, te: 1, geroa: 1, bildu: 1, junts: 1, syriza: 1, lega: 1,
@@ -380,14 +398,15 @@
     polisario: [[201605, 'Mohamed Abdelaziz'], [999999, 'Brahim Ghali']],
     bcomu: [[999999, 'Ada Colau']], ahoramadrid: [[999999, 'Manuela Carmena']]
   };
-  var SISTER_OF = { labour: 'labour', psportugal: 'portugal', dksd: 'denmark', spd: 'germany', sap: 'sweden', usdem: 'us' };
+  var SISTER_OF = { labour: 'labour', psportugal: 'portugal', dksd: 'denmark', spd: 'germany', sap: 'sweden', usdem: 'us',
+                    pditaly: 'italy', pasok: 'greece' };
   // factions for leaders the game introduces who are not in PEOPLE
   var EXTRA_WINGS = {
     'Alejo Vidal-Quadras': 'Founder; liberal-conservative wing', 'Javier Esparza': 'Navarrese regionalist right',
     'Ana Pontón': 'Galician nationalist left', 'Tomás Guitarte': 'Rural platform', 'Rosa Díez': 'Founder; centralist',
     'Andrés Herzog': 'Centralist', 'Rishi Sunak': 'Fiscal conservative', 'Annegret Kramp-Karrenbauer': "Merkel's centrist wing",
     'Armin Laschet': "Merkel's centrist wing", 'Friedrich Merz': 'Conservative wing', 'Stefanos Kasselakis': 'Outsider',
-    'Olivier Faure': 'Party mainstream', 'Mohamed Abdelaziz': 'Founding leadership', 'Eduardo Madina': 'Modernisers'
+    'Olivier Faure': 'Party mainstream', 'Nancy Pelosi and Chuck Schumer': 'Congressional leadership, liberal mainstream', 'Mohamed Abdelaziz': 'Founding leadership', 'Eduardo Madina': 'Modernisers'
   };
 
   function gameQ() {
@@ -412,9 +431,7 @@
       name = 'Pedro Sánchez';
     } else if (SISTER_OF[id] && G && G.sisterLeader && Q.year) {
       name = G.sisterLeader(Q, SISTER_OF[id]).name.replace(/ \(.*\)$/, '');
-      if (/movement/.test(name)) {
-        name = null;
-      }
+
     } else if (LEADER_DATES[id]) {
       var k = (Q.year || 2014) * 100 + (Q.month || 7);
       var list = LEADER_DATES[id];

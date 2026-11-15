@@ -323,6 +323,7 @@
     Q.congress_text = congressText(Q.congress);
     representation(Q);
     cabinetFlags(Q);
+    Q.us_left_open = Q.year * 100 + Q.month >= 201702 ? 1 : 0;
     Object.keys(SISTER_LEADERS).forEach(function (p) {
       Q['sister_' + p] = sisterLeader(Q, p).name;
       Q['hint_' + p] = lessonHint(Q, p);
@@ -801,7 +802,11 @@
     germany: [[201702, 'gabriel', 'Sigmar Gabriel'], [201802, 'schulz', 'Martin Schulz'],
               [202111, 'nahles', 'Andrea Nahles and her successors'], [999999, 'scholz', 'Olaf Scholz']],
     sweden: [[202110, 'lofven', 'Stefan Löfven'], [999999, 'andersson', 'Magdalena Andersson']],
-    us: [[201701, 'obama', 'Barack Obama'], [202003, 'sanders', 'the Sanders movement'], [999999, 'biden', 'Joe Biden']]
+    us: [[201701, 'obama', 'Barack Obama'], [202101, 'pelosi', 'Nancy Pelosi and Chuck Schumer'], [999999, 'biden', 'Joe Biden']],
+    us_left: [[201810, 'sanders', 'Bernie Sanders'], [999999, 'sanders_aoc', 'Bernie Sanders and Alexandria Ocasio-Cortez']],
+    italy: [[201802, 'renzi', 'Matteo Renzi'], [201902, 'martina', 'Maurizio Martina'], [202102, 'zingaretti', 'Nicola Zingaretti'],
+            [202302, 'letta', 'Enrico Letta'], [999999, 'schlein', 'Elly Schlein']],
+    greece: [[201505, 'venizelos', 'Evangelos Venizelos'], [202111, 'gennimata', 'Fofi Gennimata'], [999999, 'androulakis', 'Nikos Androulakis']]
   };
 
   // One-line hints of what each lesson does, shown under the options.
@@ -823,8 +828,18 @@
     'sweden:lofven': 'Higher social cohesion; union goodwill',
     'sweden:andersson': 'Some cohesion, warmer NATO; progressives uneasy',
     'us:obama': 'Campaign skill; warmer United States',
-    'us:sanders': 'Young voters and small donors; nudges you left; barons uneasy',
-    'us:biden': 'Working and middle class, union goodwill; warmer United States'
+    'us:pelosi': 'Leading a broad coalition and getting things done: easier partners, calmer barons; angers the left',
+    'us:biden': 'Working and middle class, union goodwill; warmer United States',
+    'us_left:sanders': 'Energises progressives and the young, more sanchismo; alienates barons and institutionalists',
+    'us_left:sanders_aoc': 'Energises progressives and the young even more, more sanchismo; alienates barons and institutionalists',
+    'italy:renzi': 'Middle class and modernisers up, a move to the centre; unions and progressives angry',
+    'italy:martina': 'A caretaker: very little to learn',
+    'italy:zingaretti': 'Governing with populist partners: better relations and talks with Podemos',
+    'italy:letta': 'Pro-European seriousness: calmer institutionalists, warmer EU',
+    'italy:schlein': 'Young voters and progressives up, a move left; barons uneasy',
+    'greece:venizelos': 'The price of austerity and grand coalitions: steels the left, cools the PP',
+    'greece:gennimata': 'Holding the centre-left against a radical rival: win back Podemos voters, colder Podemos',
+    'greece:androulakis': 'A slow recovery as the radical left fades: working and middle class, a little authority'
   };
 
   function lessonHint(Q, party) {
@@ -930,10 +945,55 @@
         skill(0.06); intl(Q, 'us', 2 * f);
         text = 'Obama\'s campaign veterans teach data-driven targeting and volunteer networks. Your campaigns win a little more.';
         break;
-      case 'us:sanders':
-        target(Q, 'psoe', 'young', 2 * f); Q.funds += 0.4 * f; position(Q, 0.8 * f, 0);
-        Q.regional_leaders_dissent += 3 * f; Q.progressives_dissent -= 3 * f;
-        text = 'The Sanders movement runs on small donors and the young. It energises your base; your barons think you are drifting left.';
+      case 'us:pelosi':
+        Q.rel_up += 3 * f; Q.rel_pnv += 3 * f; Q.up_talks += 0.5 * f; Q.sanchez_authority += 2 * f;
+        Q.institutionalists_dissent -= 4 * f; Q.regional_leaders_dissent -= 3 * f; Q.progressives_dissent += 5 * f;
+        target(Q, 'psoe', 'middle', 0.8 * f);
+        text = 'Pelosi and Schumer hold together a party from socialists to conservatives and still pass their bills. Counting votes and keeping partners on side gets easier; your left calls it horse-trading.';
+        break;
+      case 'us_left:sanders': case 'us_left:sanders_aoc':
+        var aoc = L.id === 'sanders_aoc' ? 1.3 : 1;
+        target(Q, 'psoe', 'young', 2 * aoc * f); Q.funds += 0.3 * f; position(Q, 0.8 * f, 0.3 * f);
+        Q.progressives_dissent -= 5 * aoc * f; Q.sanchismo += 4 * aoc * f; Q.member_morale += 2 * f;
+        Q.regional_leaders_dissent += 5 * f; Q.institutionalists_dissent += 4 * f;
+        text = aoc > 1 ? 'Sanders and Ocasio-Cortez show how a movement of the young can take on its own party\'s establishment. Your progressives and your followers are thrilled; the barons and the institutionalists are not.'
+          : 'The Sanders movement runs on small donors and the young. It energises your progressives and your own followers; the barons and the institutionalists think you are drifting left.';
+        break;
+      case 'italy:renzi':
+        target(Q, 'psoe', 'middle', 1.5 * f); Q.modernisers_dissent -= 6 * f; position(Q, -1 * f, 0);
+        Q.trade_unionists_dissent += 6 * f; Q.progressives_dissent += 4 * f;
+        text = 'Renzi, the "scrapper", modernised the Italian left and passed a labour reform the unions hated, then staked everything on a referendum and lost. Your modernisers love him; your unionists do not.';
+        break;
+      case 'italy:martina':
+        Q.member_morale += 1 * f;
+        text = 'Martina is a caretaker after the PD\'s 2018 defeat. Little to learn but sympathy.';
+        break;
+      case 'italy:zingaretti':
+        Q.rel_up += 4 * f; Q.up_talks += 0.5 * f; Q.progressives_dissent -= 2 * f;
+        text = 'Zingaretti took the PD into government with the populist Five Star Movement. The lessons transfer to dealing with Podemos.';
+        break;
+      case 'italy:letta':
+        Q.institutionalists_dissent -= 4 * f; intl(Q, 'eu', 3 * f);
+        text = 'Letta, a former prime minister, offers pro-European seriousness. Your institutionalists approve; Brussels notices.';
+        break;
+      case 'italy:schlein':
+        target(Q, 'psoe', 'young', 1.5 * f); Q.progressives_dissent -= 4 * f; Q.regional_leaders_dissent += 3 * f;
+        position(Q, 0.7 * f, 0.5 * f);
+        text = 'Schlein won the PD from outside its apparatus with a turn to the left. Young voters and progressives respond; the barons worry.';
+        break;
+      case 'greece:venizelos':
+        Q.progressives_dissent -= 4 * f; Q.trade_unionists_dissent -= 3 * f; Q.rel_pp -= 4 * f; Q.regional_leaders_dissent += 2 * f;
+        Q.pasok_lesson = (Q.pasok_lesson || 0) + f;
+        text = 'PASOK went from 44% to 4.7% after imposing austerity and governing with the right; Syriza took its voters. "Pasokification" is now a word. Your left draws the lesson: never again.';
+        break;
+      case 'greece:gennimata':
+        transfer(Q, 'up', 'psoe', { students: all(0.6), workers: all(0.6), professionals: all(0.4) });
+        Q.member_morale += 2 * f; Q.rel_up -= 3 * f; Q.pasok_lesson = (Q.pasok_lesson || 0) + f;
+        text = 'Gennimata kept PASOK alive against Syriza by defending the centre-left\'s own space. The PSOE learns to compete for Podemos\'s voters instead of envying them.';
+        break;
+      case 'greece:androulakis':
+        target(Q, 'psoe', 'working', 1 * f); target(Q, 'psoe', 'middle', 0.6 * f); Q.sanchez_authority += 1 * f;
+        text = 'Androulakis is rebuilding PASOK as Syriza fades. Patience, and a return to the working and middle class.';
         break;
       case 'us:biden':
         target(Q, 'psoe', 'working', 1.2 * f); target(Q, 'psoe', 'middle', 0.8 * f); Q.trade_unionists_dissent -= 4 * f; intl(Q, 'us', 3 * f);

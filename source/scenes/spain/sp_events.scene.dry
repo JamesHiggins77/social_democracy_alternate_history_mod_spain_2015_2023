@@ -735,6 +735,7 @@ Susana Díaz breaks her coalition with Izquierda Unida and calls an Andalusian e
 - @distance_diaz: Let her run her own campaign
 
 @campaign_with_diaz
+subtitle: Costs 1 in party funds.
 on-arrival: {! Q.funds -= 1; Q.diaz_relation += 6; Q.regional_leaders_dissent -= 5; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Andalucía', 'psoe', 1.03); window.SpainGame.recalculate(Q); } !}
 
 The two of you share stages from Almería to Huelva. If she wins, you can share the credit; she will not forget that you came.
@@ -1121,48 +1122,56 @@ Each spend costs 1 in party funds.
 - @final_campaign: Back
 
 @fcc_young
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'young'); } !}
 go-to: final_campaign
 
 @fcc_students
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'students'); } !}
 go-to: final_campaign
 
 @fcc_pensioners
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'pensioners'); } !}
 go-to: final_campaign
 
 @fcc_working
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'working'); } !}
 go-to: final_campaign
 
 @fcc_middle
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'middle'); } !}
 go-to: final_campaign
 
 @fcc_women
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'women'); } !}
 go-to: final_campaign
 
 @fcc_unemployed
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'unemployed'); } !}
 go-to: final_campaign
 
 @fcc_rural
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'class', 'rural'); } !}
@@ -1191,42 +1200,49 @@ Each spend costs 1 in party funds. Big communities elect more deputies; close pr
 - @final_campaign: Back
 
 @fcr_andalucia
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Andalucía'); } !}
 go-to: final_campaign
 
 @fcr_cataluna
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Cataluña'); } !}
 go-to: final_campaign
 
 @fcr_madrid
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Madrid'); } !}
 go-to: final_campaign
 
 @fcr_comunidad_valenciana
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Comunidad Valenciana'); } !}
 go-to: final_campaign
 
 @fcr_galicia
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Galicia'); } !}
 go-to: final_campaign
 
 @fcr_castilla_y_leon
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Castilla y León'); } !}
 go-to: final_campaign
 
 @fcr_pais_vasco
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'País Vasco'); } !}
@@ -1239,30 +1255,35 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 
 go-to: final_campaign
 
 @fcr_canarias
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Canarias'); } !}
 go-to: final_campaign
 
 @fcr_region_de_murcia
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Región de Murcia'); } !}
 go-to: final_campaign
 
 @fcr_aragon
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Aragón'); } !}
 go-to: final_campaign
 
 @fcr_extremadura
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Extremadura'); } !}
 go-to: final_campaign
 
 @fcr_asturias
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Asturias'); } !}
@@ -1283,12 +1304,14 @@ Each spend costs 1 in party funds. Attack ads drive a rival's voters to stay at 
 - @final_campaign: Back
 
 @fca_pp
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'pp'); } !}
 go-to: final_campaign
 
 @fca_cs
+subtitle: Costs 1 in party funds.
 view-if: player_is_cs = 0
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
@@ -1296,6 +1319,7 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 
 go-to: final_campaign
 
 @fca_up
+subtitle: Costs 1 in party funds.
 view-if: player_is_up = 0
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
@@ -1303,12 +1327,14 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 
 go-to: final_campaign
 
 @fca_vox
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'vox'); } !}
 go-to: final_campaign
 
 @fca_psoe
+subtitle: Costs 1 in party funds.
 view-if: exiled = 1
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.

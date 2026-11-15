@@ -231,9 +231,9 @@ test('after an election the polls get a new error drawn from history', () => {
   assert.ok(Q.last_poll_miss.cs > 3, `Cs miss ${Q.last_poll_miss.cs}`);
   // repeated draws centre on the historical bias: PSOE underestimated
   let sum = 0;
-  for (let i = 0; i < 400; i++) { G.drawPollError(Q, null); sum += Q.poll_error.psoe; }
+  for (let i = 0; i < 3000; i++) { G.drawPollError(Q, null); sum += Q.poll_error.psoe; }
   // relative error: about -1.3 points on a typical 25% share
-  assert.ok(sum / 400 < -0.025 && sum / 400 > -0.085, `mean PSOE relative error ${sum / 400}`);
+  assert.ok(sum / 3000 < -0.025 && sum / 3000 > -0.085, `mean PSOE relative error ${sum / 3000}`);
 });
 
 test('government formation runs in weeks; four weeks close the month', () => {
@@ -588,4 +588,22 @@ test('cabinet: coalition shares ministries and gates government cards', () => {
   const R = newQ(); G.recalculate(R);
   assert.strictEqual(R.cabinet.finance.name, 'Cristóbal Montoro');
   assert.strictEqual(R.my_ministries, 0);
+});
+
+test('US Democrats split into leadership and progressives after Obama; Italy and Greece added', () => {
+  const Q = newQ();
+  Q.year = 2016; Q.month = 6; G.recalculate(Q);
+  assert.strictEqual(Q.us_left_open, 0);
+  assert.strictEqual(G.sisterLeader(Q, 'us').id, 'obama');
+  Q.year = 2018; Q.month = 6; G.recalculate(Q);
+  assert.strictEqual(Q.us_left_open, 1);
+  assert.strictEqual(G.sisterLeader(Q, 'us').id, 'pelosi');
+  assert.strictEqual(G.sisterLeader(Q, 'us_left').id, 'sanders');
+  Q.year = 2019; assert.strictEqual(G.sisterLeader(Q, 'us_left').id, 'sanders_aoc');
+  Q.year = 2021; Q.month = 3; assert.strictEqual(G.sisterLeader(Q, 'us').id, 'biden');
+  const barons = Q.regional_leaders_dissent, sanch = Q.sanchismo;
+  G.learnFrom(Q, 'us_left');
+  assert.ok(Q.sanchismo > sanch && Q.regional_leaders_dissent > barons);
+  Q.year = 2017; assert.strictEqual(G.sisterLeader(Q, 'greece').id, 'gennimata');
+  assert.strictEqual(G.sisterLeader(Q, 'italy').id, 'renzi');
 });

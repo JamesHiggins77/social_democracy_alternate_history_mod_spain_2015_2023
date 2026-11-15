@@ -51,6 +51,7 @@ An agreement has been signed. You could put it to a vote of the whole membership
 - @easy_discard
 
 @consult
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: funds -= 1; member_morale += 8; sanchez_authority += 6; sanchismo += 5; regional_leaders_dissent += 3; federal_committee_balance += 4
@@ -145,6 +146,7 @@ The Juventudes Socialistas want a campaign aimed at young voters, most of whom n
 - @easy_discard
 
 @housing
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 2.5, workers: 1}); } Q.modernisers_dissent -= 3; if (window.SpainGame) { window.SpainGame.position(Q, 0.5, 0); } !}
@@ -152,6 +154,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 Young renters notice. Some, at least.
 
 @jobs_young
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 2, unemployed: 1.5}); } Q.trade_unionists_dissent -= 2; !}
@@ -159,6 +162,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 A practical message for a generation of temporary contracts.
 
 @digital
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 3}); } Q.modernisers_dissent -= 5; Q.institutionalists_dissent += 2; !}
@@ -221,6 +225,7 @@ The PSOE has nearly 190,000 members in thousands of local branches. You could sp
 - @easy_discard
 
 @tour
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
 on-arrival: funds -= 1; sanchismo += 8; member_morale += 6; sanchez_authority += 2; regional_leaders_dissent += 3
@@ -319,11 +324,14 @@ The PSOE belongs to both international families of the centre-left. Party money 
 - @net_denmark: The Danish Social Democrats under [+ sister_denmark +]
 - @net_germany: The German SPD under [+ sister_germany +]
 - @net_sweden: The Swedish Social Democrats under [+ sister_sweden +]
-- @net_us: The US Democrats: [+ sister_us +]
+- @net_us: The US Democrats' leadership: [+ sister_us +]
+- @net_us_left: The US Democrats' progressives: [+ sister_us_left +]
+- @net_italy: The Italian Democratic Party under [+ sister_italy +]
+- @net_greece: PASOK under [+ sister_greece +]
 - @root: Not now
 
 @net_host
-subtitle: Better relations with the EU, southern Europe, the US and the Maghreb; a little authority
+subtitle: Better relations with the EU, southern Europe, the US and the Maghreb; a little authority · Costs 1.5 in party funds
 choose-if: funds >= 1.5
 unavailable-subtitle: Needs 1.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', 4); window.SpainGame.intl(Q, 'us', 2); window.SpainGame.intl(Q, 'maghreb', 2); } !}
@@ -331,45 +339,67 @@ on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; i
 Delegations from forty parties fill a Madrid conference centre. You are photographed with prime ministers and future prime ministers.
 
 @net_labour
-subtitle: [+ hint_labour +]
+subtitle: [+ hint_labour +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'labour'); } !}
 go-to: lesson
 
 @net_portugal
-subtitle: [+ hint_portugal +]
+subtitle: [+ hint_portugal +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'portugal'); } !}
 go-to: lesson
 
 @net_denmark
-subtitle: [+ hint_denmark +]
+subtitle: [+ hint_denmark +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'denmark'); } !}
 go-to: lesson
 
 @net_germany
-subtitle: [+ hint_germany +]
+subtitle: [+ hint_germany +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'germany'); } !}
 go-to: lesson
 
 @net_sweden
-subtitle: [+ hint_sweden +]
+subtitle: [+ hint_sweden +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'sweden'); } !}
 go-to: lesson
 
 @net_us
-subtitle: [+ hint_us +]
+subtitle: [+ hint_us +] · Costs 0.5 in party funds
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'us'); } !}
+go-to: lesson
+
+@net_us_left
+view-if: us_left_open = 1
+subtitle: [+ hint_us_left +] · Costs 0.5 in party funds
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'us_left'); } !}
+go-to: lesson
+
+@net_italy
+subtitle: [+ hint_italy +] · Costs 0.5 in party funds
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'italy'); } !}
+go-to: lesson
+
+@net_greece
+subtitle: [+ hint_greece +] · Costs 0.5 in party funds
+choose-if: funds >= 0.5
+unavailable-subtitle: Needs 0.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'greece'); } !}
 go-to: lesson
 
 @lesson

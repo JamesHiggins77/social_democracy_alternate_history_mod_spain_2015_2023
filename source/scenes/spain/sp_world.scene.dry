@@ -273,6 +273,7 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 6); window
 A few exemptions, a lot of photographs.
 
 @tariffs_farmers
+subtitle: Costs 1 in party funds in opposition.
 on-arrival: {! Q.regional_leaders_dissent -= 4; if (Q.psoe_in_government) { Q.fiscal_adj += 0.1; } else { Q.funds -= 1; } if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 2); } !}
 
 [? if psoe_in_government = 1 : Aid reaches the cooperatives within months. ?][? if psoe_in_government = 0 : The PSOE funds a campaign tour of the olive groves and promises aid. ?]
@@ -477,6 +478,7 @@ In Murcia, Ciudadanos tries to topple the PP with the PSOE's help, and fails. In
 - @madrid_local: Let the Madrid socialists run their own campaign
 
 @madrid_all_in
+subtitle: Costs 2 in party funds.
 choose-if: funds >= 2
 unavailable-subtitle: Not enough party funds (needs 2).
 on-arrival: {! Q.funds -= 2; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Madrid', 'psoe', 1.04); } !}

@@ -59,6 +59,7 @@ A new party needs branches in fifty-two provinces, candidates, lawyers and money
 - @org_movement: Run it as a movement: open primaries and online votes
 
 @org_branches
+subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaignRaw(Q, 'ps', {workers: 0.8, pensioners: 0.6, professionals: 0.6, unemployed: 0.6, students: 0.5, homemakers: 0.4, self_employed: 0.3}); } !}
