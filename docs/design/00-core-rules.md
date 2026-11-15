@@ -196,6 +196,10 @@ One central routine (the Spanish `post_event`), as in the original. Cards change
 
 Card types follow the Chapter I doc §11.4: **action cards**, **event cards**, **pinned adviser and actor cards** and **crisis sequences**.
 
+### 7.0 Weekly turns during government formation
+
+From a general election until a government is invested or the Cortes are dissolved, each turn is one week ("Week 2, January 2016"); four weeks close the month, which runs the usual monthly routine (funds, poll record, regional elections, drift). The investiture clock counts eight weeks from the first vote. Government Negotiations cards cool down in weeks; other cards cool down at a quarter-month per week. Formation events are timed in weeks since the election: the King's consultations from week 2, Iglesias's offer from week 3, the King turning to Sánchez from week 5, the forced vote at week 16.
+
 ### 7.1 Decks
 
 | Deck | Available | Examples |

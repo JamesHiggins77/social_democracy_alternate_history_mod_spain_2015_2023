@@ -105,7 +105,9 @@
     Q.psoe_in_government = 0;
     Q.legislature_start_year = 2011;
     Q.legislature_start_month = 12;
-    Q.investiture_clock = -1;   // months to automatic dissolution; -1 = not started
+    Q.investiture_clock = -1;   // weeks to automatic dissolution; -1 = not started
+    Q.week = 1;                 // week of the month during government formation
+    Q.formation_weeks = 0;      // weeks since the last general election
     Q.investiture_votes = 0;
     Q.election_year = 2015;     // scheduled general election, 0 = none
     Q.election_month = 12;
@@ -173,6 +175,7 @@
      'pp_vox_relation'].forEach(function (k) { Q[k] = clamp(Math.round(Q[k]), 0, 100); });
     RELATIONS.forEach(function (p) { Q['rel_' + p] = clamp(Math.round(Q['rel_' + p]), 0, 100); });
     Q.acting = Q.government_status === 'acting' ? 1 : 0;
+    Q.weekly = formationMode(Q);
     Q.pp_governs = (Q.pm_party === 'pp' && !Q.acting) ? 1 : 0;
     Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
     Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
@@ -405,17 +408,56 @@
   // ------------------------------------------------------------------
   // The monthly routine (called from post_event once a month has passed).
   // ------------------------------------------------------------------
-  function endOfMonth(Q) {
+  // ------------------------------------------------------------------
+  // Weekly turns during government formation: from an election until a
+  // government is invested or the Cortes are dissolved.
+  // ------------------------------------------------------------------
+  var WEEKLY_TIMERS = ['negotiations', 'podemos_talks', 'cs_talks', 'small_parties', 'programme', 'catalans'];
+
+  function formationMode(Q) {
+    return (Q.government_status === 'acting' && Q.elections_held >= 1 && !Q.election_year) ? 1 : 0;
+  }
+
+  function endOfWeek(Q) {
+    Q.month_actions = 0;
+    Q.formation_weeks = (Q.formation_weeks || 0) + 1;
+    (Q.timers || []).forEach(function (t) {
+      if (Q[t + '_timer'] > 0) {
+        var step = WEEKLY_TIMERS.indexOf(t) !== -1 ? 1 : 0.25;
+        Q[t + '_timer'] = Math.max(0, Q[t + '_timer'] - step);
+      }
+    });
+    // investiture clock (art. 99.5), in weeks
+    if (Q.investiture_clock > 0) {
+      Q.investiture_clock -= 1;
+      if (Q.investiture_clock === 0) {
+        Q.dissolution_due = 1;
+      }
+    }
+    if (Q.week >= 4) {
+      endOfMonth(Q, true);
+    } else {
+      Q.week += 1;
+      updatePolls(Q);
+      recalculate(Q);
+      checkLeadership(Q);
+    }
+  }
+
+  function endOfMonth(Q, fromWeekly) {
     var next = addMonths(Q.year, Q.month, 1);
     Q.year = next[0];
     Q.month = next[1];
     Q.time += 1;
+    Q.week = 1;
     Q.month_actions = 0;
-    (Q.timers || []).forEach(function (t) {
-      if (Q[t + '_timer'] > 0) {
-        Q[t + '_timer'] -= 1;
-      }
-    });
+    if (!fromWeekly) {
+      (Q.timers || []).forEach(function (t) {
+        if (Q[t + '_timer'] > 0) {
+          Q[t + '_timer'] = Math.max(0, Q[t + '_timer'] - 1);
+        }
+      });
+    }
 
     // campaign effects fade: support for the established parties drifts
     // back towards its underlying level by 1.5% of the gap each month
@@ -446,9 +488,10 @@
     Q.brussels_due = (Q.psoe_in_government && Q.deficit > 3.5 &&
       (Q.brussels_year || 0) < Q.year) ? 1 : 0;
 
-    // investiture clock (art. 99.5)
-    if (Q.investiture_clock > 0) {
-      Q.investiture_clock -= 1;
+    // a running investiture clock outside formation mode (should not
+    // happen, but never leave it stuck): count the month as four weeks
+    if (!fromWeekly && Q.investiture_clock > 0) {
+      Q.investiture_clock = Math.max(0, Q.investiture_clock - 4);
       if (Q.investiture_clock === 0) {
         Q.dissolution_due = 1;
       }
@@ -556,7 +599,7 @@
     var v = projectedVote(Q, candidate);
     Q.investiture_votes += 1;
     if (Q.investiture_clock < 0) {
-      Q.investiture_clock = 2;
+      Q.investiture_clock = 8;
     }
     if (v.passes) {
       formGovernment(Q, candidate);
@@ -664,6 +707,8 @@
     Q.government_status = 'acting';
     Q.formation_round = (Q.formation_round || 1) + 1;
     Q.formation_start_time = Q.time;
+    Q.formation_weeks = 0;
+    Q.week = 1;
     Q.psoe_stance_pp = 'no';
     // Repeat elections: the right regroups and the party blames the leader.
     var wasActing = statusBefore === 'acting';
@@ -1061,6 +1106,7 @@
     updatePolls: updatePolls,
     shiftSupport: shiftSupport,
     endOfMonth: endOfMonth,
+    endOfWeek: endOfWeek,
     projectedVote: projectedVote,
     holdInvestiture: holdInvestiture,
     formGovernment: formGovernment,

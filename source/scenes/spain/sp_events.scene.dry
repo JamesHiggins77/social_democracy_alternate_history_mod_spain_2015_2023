@@ -34,7 +34,7 @@ The vote is close. You keep your freedom to negotiate, but Susana Díaz has coun
 title: Iglesias's offer
 new-page: true
 tags: sp_event
-view-if: year = 2016 and month >= 1 and month <= 3 and acting = 1 and psoe_in_government = 0 and rel_up >= 25
+view-if: year = 2016 and month >= 1 and month <= 3 and acting = 1 and psoe_in_government = 0 and rel_up >= 25 and formation_weeks >= 3
 max-visits: 1
 
 = Pablo Iglesias makes an offer
@@ -65,7 +65,7 @@ title: The King's consultations
 new-page: true
 face-image: img/spain/event_rajoy_sanchez.jpg
 tags: sp_event
-view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and time >= formation_start_time + 1
+view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2
 on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}
 
 = Rajoy asks for support
@@ -141,7 +141,7 @@ You tell the King you need more time. Rajoy's strategy depends on everyone else'
 title: The King turns to you
 new-page: true
 tags: sp_event
-view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and time >= formation_start_time + 2
+view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and formation_weeks >= 5
 on-arrival: {! Q.king_asked = Q.formation_round || 1; !}
 
 = The King turns to you
@@ -179,7 +179,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 
 = The Cortes are dissolved
 
-Two months have passed since the first investiture vote without a Prime Minister being elected. The King signs the decree of dissolution. Spain will vote again in [+ election_month : month +] [+ election_year +].
+Eight weeks, two months, have passed since the first investiture vote without a Prime Minister being elected. The King signs the decree of dissolution. Spain will vote again in [+ election_month : month +] [+ election_year +].
 
 @general_election
 title: General election
@@ -306,7 +306,7 @@ if (Q.primary_won) {
 title: The King forces a vote
 new-page: true
 tags: sp_event
-view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and time >= formation_start_time + 4
+view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and formation_weeks >= 16
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.holdInvestiture(Q, 'pp');

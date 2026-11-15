@@ -43,8 +43,8 @@ test('a failed investiture starts the clock; dissolution leads to a repeat elect
   Q.pact_cs = 1;
   const v = G.holdInvestiture(Q, 'sanchez');
   assert.strictEqual(v.passes, false);
-  assert.strictEqual(Q.investiture_clock, 2);
-  G.endOfMonth(Q); G.endOfMonth(Q);
+  assert.strictEqual(Q.investiture_clock, 8);
+  for (let i = 0; i < 8; i++) G.endOfWeek(Q);
   assert.strictEqual(Q.dissolution_due, 1);
   G.dissolve(Q);
   G.endOfMonth(Q); G.endOfMonth(Q);
@@ -174,4 +174,28 @@ test('after an election the polls get a new error drawn from history', () => {
   let sum = 0;
   for (let i = 0; i < 400; i++) { G.drawPollError(Q, null); sum += Q.poll_error.psoe; }
   assert.ok(sum / 400 < -0.8 && sum / 400 > -1.9, `mean PSOE error ${sum / 400}`);
+});
+
+test('government formation runs in weeks; four weeks close the month', () => {
+  const Q = newQ();
+  G.endOfMonth(Q);           // December 2015
+  G.runGeneralElection(Q);
+  G.recalculate(Q);
+  assert.strictEqual(Q.weekly, 1);
+  Q.negotiations_timer = 1; Q.rally_timer = 2;
+  G.endOfWeek(Q);
+  assert.strictEqual(Q.week, 2);
+  assert.strictEqual(Q.month, 12);
+  assert.strictEqual(Q.negotiations_timer, 0);  // negotiation cards: weekly
+  assert.strictEqual(Q.rally_timer, 1.75);       // others: a quarter per week
+  G.endOfWeek(Q); G.endOfWeek(Q); G.endOfWeek(Q);
+  assert.strictEqual(Q.month, 1);
+  assert.strictEqual(Q.year, 2016);
+  assert.strictEqual(Q.week, 1);
+  assert.strictEqual(Q.formation_weeks, 4);
+  // forming a government ends weekly turns
+  Q.psoe_stance_pp = 'abstain'; Q.pact_pp_cs = 1;
+  G.holdInvestiture(Q, 'pp');
+  G.recalculate(Q);
+  assert.strictEqual(Q.weekly, 0);
 });

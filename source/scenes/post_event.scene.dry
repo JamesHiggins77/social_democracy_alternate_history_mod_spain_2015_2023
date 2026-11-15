@@ -4,7 +4,11 @@ on-arrival: {!
 Q.last_advisor_action = 0;
 if (typeof window !== 'undefined' && window.SpainGame) {
     if (Q.month_actions >= 1) {
-        window.SpainGame.endOfMonth(Q);
+        if (Q.weekly) {
+            window.SpainGame.endOfWeek(Q);
+        } else {
+            window.SpainGame.endOfMonth(Q);
+        }
     } else {
         window.SpainGame.recalculate(Q);
     }
@@ -22,7 +26,7 @@ if (choices && choices.length && choices[0].title != "Continue...") {
 !}
 go-to: game_over if is_lost = 1; game_over.survived if reached_end = 1; events_choice if has_event = 1; main if has_event = 0
 
-= [+ month : month +] [+ year +]
+= [? if weekly = 1 : Week [+ week +], ?][+ month : month +] [+ year +]
 
 @events_choice
 

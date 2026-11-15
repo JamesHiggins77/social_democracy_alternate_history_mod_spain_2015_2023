@@ -95,4 +95,4 @@ if (Q.inv_yes >= 130) { Q.sanchez_authority += 2; } else { Q.sanchez_authority -
 
 Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. The chamber rejects your candidacy in both ballots.
 
-[? if investiture_clock > 0 : The two-month clock has started. If no one is invested before it runs out, the Cortes will be dissolved. ?]
+[? if investiture_clock > 0 : The two-month clock has started: eight weeks. If no one is invested before it runs out, the Cortes will be dissolved. ?]

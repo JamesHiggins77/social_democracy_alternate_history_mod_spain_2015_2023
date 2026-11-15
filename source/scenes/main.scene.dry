@@ -12,9 +12,9 @@ if (Q.advisor_action_timer <= 0) {
 !}
 max-cards: 3
 
-#Decks are shown here. Clicking a deck draws a card into your hand; clicking a card plays it. Playing a card uses up the month.
+#Decks are shown here. Clicking a deck draws a card into your hand; clicking a card plays it. Playing a card uses up the turn: a month, or a week during government formation.
 
-[? if election_year > 0 : A general election is called for [+ election_month : month +] [+ election_year +]. ?][? if acting = 1 : Spain has an acting government. ?][? if investiture_clock > 0 : The investiture clock is running: [+ investiture_clock +] month(s) until the Cortes are dissolved. ?][? if catalan_crisis = 1 : The Catalan crisis dominates everything. ?]
+[? if weekly = 1 : Government formation: each turn is one week. ?][? if election_year > 0 : A general election is called for [+ election_month : month +] [+ election_year +]. ?][? if acting = 1 : Spain has an acting government. ?][? if investiture_clock > 0 : The investiture clock is running: [+ investiture_clock +] week(s) until the Cortes are dissolved. ?][? if catalan_crisis = 1 : The Catalan crisis dominates everything. ?]
 
 - @deck_national
 - @deck_party
