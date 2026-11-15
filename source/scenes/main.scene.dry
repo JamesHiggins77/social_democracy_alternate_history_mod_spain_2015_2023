@@ -29,6 +29,7 @@ is-deck: true
 
 @deck_party
 title: The party
+card-image: img/spain/deck_ferraz.jpg
 is-deck: true
 
 - #sp_party

@@ -1,5 +1,6 @@
 title: Antonio Hernando
 is-pinned-card: true
+card-image: img/spain/portrait_hernando.jpg
 tags: sp_advisor
 view-if: sanchez_leader = 1
 new-page: true
@@ -52,6 +53,7 @@ Aitor Esteban is courteous and noncommittal. That, from the PNV, is a good sign.
 @candidacy
 title: Seek investiture
 is-pinned-card: true
+card-image: img/spain/portrait_sanchez_2015.jpg
 tags: sp_advisor
 view-if: sanchez_nominated = 1 and psoe_in_government = 0 and sanchez_leader = 1
 go-to: sp_investiture

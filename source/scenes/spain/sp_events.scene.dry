@@ -63,6 +63,7 @@ The barons applaud. Many members, who voted for change, do not.
 @pp_round
 title: The King's consultations
 new-page: true
+face-image: img/spain/event_rajoy_sanchez.jpg
 tags: sp_event
 view-if: acting = 1 and pp_asked < formation_round and time >= 2 and election_year = 0 and investiture_votes = 0
 on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}

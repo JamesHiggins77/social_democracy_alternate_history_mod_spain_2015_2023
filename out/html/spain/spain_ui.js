@@ -94,7 +94,8 @@
     });
     var parliament = root.d3.parliament();
     parliament.width(width).height(width).innerRadiusCoef(0.4);
-    parliament.enter.fromCenter(true).smallToBig(true);
+    // no grow-in animation: the sidebar redraws on every update
+    parliament.enter.fromCenter(false).smallToBig(false);
     root.d3.select(selector).datum(data).call(parliament);
   }
 

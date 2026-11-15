@@ -533,3 +533,10 @@ table {
 .sp-swatch { display: inline-block; width: 0.8em; height: 0.8em; margin-right: 0.5em; border-radius: 2px; vertical-align: baseline; }
 .sp-verdict { font-weight: bold; }
 .sp-lost { color: #c0392b; }
+/* keep the title readable over the photographic background */
+header #game-title, header #game-author {
+    display: inline-block;
+    background: rgba(243, 243, 243, 0.92);
+    padding: 0.15em 0.5em;
+    border-radius: 3px;
+}
