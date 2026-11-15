@@ -140,3 +140,23 @@ test('abstaining for Rajoy moves left-wing voters to Podemos', () => {
   assert.ok(Q.poll.psoe < before.psoe - 2, `${before.psoe} -> ${Q.poll.psoe}`);
   assert.ok(Q.poll.up > before.up + 1.5, `${before.up} -> ${Q.poll.up}`);
 });
+
+test('demographic targeting moves the right voters, with diminishing returns', () => {
+  const Q = newQ();
+  const before = Q.vm.classSupport.students.psoe;
+  const first = G.target(Q, 'psoe', 'students', 4);
+  const gain1 = Q.vm.classSupport.students.psoe - before;
+  G.target(Q, 'psoe', 'students', 4);
+  const gain2 = Q.vm.classSupport.students.psoe - before - gain1;
+  assert.strictEqual(first, 1);
+  assert.ok(gain2 < gain1, `${gain1} then ${gain2}`);
+  assert.strictEqual(Q.vm.classSupport.pensioners.psoe, 34);
+  // women: homemakers are reached far more than the self-employed
+  const h = Q.vm.classSupport.homemakers.psoe, se = Q.vm.classSupport.self_employed.psoe;
+  G.target(Q, 'psoe', 'women', 4);
+  assert.ok(Q.vm.classSupport.homemakers.psoe - h > 2 * (Q.vm.classSupport.self_employed.psoe - se));
+  // rural Spain: PSOE strength rises in Extremadura, not in Madrid
+  G.target(Q, 'psoe', 'rural', 4);
+  assert.ok(Q.vm.regionalMod['Extremadura'].psoe > 1);
+  assert.strictEqual((Q.vm.regionalMod['Madrid'] || {}).psoe, undefined);
+});

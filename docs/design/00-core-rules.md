@@ -219,6 +219,10 @@ Values are shown as words, never numbers: authority (Non-existent, Very low ≤9
 
 Major decisions transfer support between parties class by class (`SpainGame.transfer`): abstaining for a PP government sends left-wing voters to Podemos and shrinks the Progressives; pacts, the Catalan choices, ousters and repeat elections all move votes. Campaign-card effects on the PSOE, PP and Ciudadanos fade by 1.5% of the gap each month.
 
+### 7.5 Targeting demographics
+
+Campaign and media cards can aim at an audience (`SpainGame.target`): students, young people, pensioners, the working class (workers and the unemployed), the middle class (professionals and the self-employed), women, the unemployed, or rural Spain (a regional boost in Castilla y León, Castilla-La Mancha, Extremadura, Aragón, Galicia and La Rioja). Women are reached through every class in proportion to its share of women (approximate INE shares, to be replaced by CIS microdata). Each repeat use of the same target is weaker (1/(1 + 0.25 × uses)), recovering slowly. Cards: **Campaign ads** (2 funds, strongest), **Media appearance** (the outlet decides the audience), **Campaign tour** (election only, 1 fund per regional stop).
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.

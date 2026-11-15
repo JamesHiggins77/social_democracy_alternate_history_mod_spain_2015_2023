@@ -77,7 +77,7 @@
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
-                'pensions_campaign', 'feminism', 'europe', 'housing'];
+                'pensions_campaign', 'feminism', 'europe', 'housing', 'ads', 'appearance', 'tour', 'fundraising', 'tax'];
 
     // Congress elected on 20 November 2011
     Q.congress = { pp: 186, psoe: 110, junts: 16, iu: 11, bildu: 7, upyd: 5, pnv: 5, erc: 3,
@@ -218,6 +218,51 @@
     updatePolls(Q);
   }
 
+  // Demographic targeting for campaigns and media. Each target spreads a
+  // campaign effect over the classes it reaches. Women: each class weighted
+  // by its approximate share of women (INE labour force survey, rounded;
+  // to be replaced by CIS microdata).
+  var FEMALE_SHARE = { professionals: 0.48, self_employed: 0.33, workers: 0.42, pensioners: 0.55,
+                       unemployed: 0.50, students: 0.53, homemakers: 0.90 };
+  var TARGETS = {
+    students: { name: 'students', classes: { students: 1 } },
+    young: { name: 'young people', classes: { students: 1, workers: 0.3, unemployed: 0.3 } },
+    pensioners: { name: 'pensioners', classes: { pensioners: 1 } },
+    working: { name: 'the working class', classes: { workers: 1, unemployed: 0.6 } },
+    middle: { name: 'the middle class', classes: { professionals: 1, self_employed: 0.8 } },
+    women: { name: 'women', classes: FEMALE_SHARE },
+    unemployed: { name: 'the unemployed', classes: { unemployed: 1 } },
+    rural: { name: 'rural Spain', regions: ['Castilla y León', 'Castilla-La Mancha', 'Extremadura',
+                                             'Aragón', 'Galicia', 'La Rioja'] }
+  };
+
+  // Campaign aimed at a demographic. `strength` is in support points for a
+  // fully reached class; repeated use of the same target gives diminishing
+  // returns (each earlier use cuts the effect by a quarter, recovering
+  // slowly as campaign effects fade).
+  function target(Q, party, key, strength) {
+    var t = TARGETS[key];
+    Q.target_uses = Q.target_uses || {};
+    var uses = Q.target_uses[key] || 0;
+    var factor = 1 / (1 + 0.25 * uses);
+    Q.target_uses[key] = uses + 1;
+    if (t.regions) {
+      t.regions.forEach(function (r) {
+        Q.vm.regionalMod[r] = Q.vm.regionalMod[r] || {};
+        var cur = Q.vm.regionalMod[r][party] === undefined ? 1 : Q.vm.regionalMod[r][party];
+        Q.vm.regionalMod[r][party] = cur * (1 + 0.012 * strength * factor * (1 - Q.dissent));
+      });
+      updatePolls(Q);
+    } else {
+      var changes = {};
+      Object.keys(t.classes).forEach(function (c) { changes[c] = strength * factor * t.classes[c]; });
+      campaign(Q, party, changes);
+    }
+    Q.last_target = t.name;
+    Q.last_target_factor = Math.round(factor * 100);
+    return factor;
+  }
+
   // Move support from one party to others, class by class. `to` is a party
   // id or {party: share} splitting the moved points. Unlike campaign gains,
   // losses are not damped by party unity: voters leave whatever the mood.
@@ -312,6 +357,10 @@
         var cur = Q.vm.classSupport[c][p];
         Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * 0.015;
       });
+    });
+
+    Object.keys(Q.target_uses || {}).forEach(function (k) {
+      Q.target_uses[k] = Math.max(0, Q.target_uses[k] - 0.1);
     });
 
     // party finances: dues and the public subsidy, scaled by seats
@@ -889,6 +938,8 @@
     renderFactions: renderFactions,
     campaign: campaign,
     transfer: transfer,
+    target: target,
+    TARGETS: TARGETS,
     regionalMod: regionalMod,
     territorial: territorial,
     holdCensure: holdCensure,
