@@ -1438,8 +1438,8 @@
       transfer(Q, 'psoe', party, { workers: gain, pensioners: gain * 0.8, professionals: gain,
                                     students: gain * 0.8, unemployed: gain * 0.6, homemakers: gain * 0.5 });
     } else {
-      UI.setPartyName('ps', name || 'Avanza', name || 'Avanza');
-      Q.new_party_name = name || 'Avanza';
+      Q.new_party_name = name || 'Pedro Sánchez List';
+      UI.setPartyName('ps', Q.new_party_name, 'PSL');
       Q.rel_psoe = 15;
       Q.funds = Math.max(1, (Q.sanchismo || 0) / 12);
       var s = newPartyStrength(Q);

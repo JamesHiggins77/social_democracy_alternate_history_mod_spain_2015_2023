@@ -140,26 +140,7 @@ on-arrival: {! window.SpainGame.joinParty(Q, 'up'); Q.month_actions += 1; !}
 You join Podemos's lists as an independent. The left calls it the end of the PSOE's monopoly; the PSOE calls it the end of Pedro Sánchez.
 
 @new_party
-title: Found your own party
-
-= A new party
-
-What do you call it?
-
-- @name_avanza: Avanza
-- @name_rumbo: Nuevo Rumbo
-- @name_alternativa: La Alternativa
-
-@name_avanza
-on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Avanza'); Q.month_actions += 1; !}
-go-to: founded
-
-@name_rumbo
-on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Nuevo Rumbo'); Q.month_actions += 1; !}
-go-to: founded
-
-@name_alternativa
-on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'La Alternativa'); Q.month_actions += 1; !}
+on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Pedro Sánchez List'); Q.month_actions += 1; !}
 go-to: founded
 
 @founded

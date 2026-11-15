@@ -369,7 +369,7 @@ test('losing a primary ousts Sánchez and opens the exile choice', () => {
 test('a new party takes votes in proportion to following and populism', () => {
   const weak = newQ(); weak.year = 2019; weak.sanchismo = 20; weak.populism = 1;
   const strong = newQ(); strong.year = 2019; strong.sanchismo = 70; strong.populism = 8;
-  [weak, strong].forEach(q => { G.oust(q, true); G.joinParty(q, 'ps', 'Avanza'); });
+  [weak, strong].forEach(q => { G.oust(q, true); G.joinParty(q, 'ps', 'Pedro Sánchez List'); });
   assert.ok(strong.true_poll.ps > weak.true_poll.ps + 3, `${strong.true_poll.ps} vs ${weak.true_poll.ps}`);
   assert.strictEqual(strong.exiled, 1);
   assert.strictEqual(strong.player_party, 'ps');
@@ -407,7 +407,7 @@ test('a Sánchez party splits the left vote rather than adding to it', () => {
   const before = left(Q);
   G.oust(Q, true);
   const afterOust = left(Q);
-  G.joinParty(Q, 'ps', 'Avanza');
+  G.joinParty(Q, 'ps', 'Pedro Sánchez List');
   assert.ok(left(Q) <= afterOust + 0.01, `founding: ${afterOust} -> ${left(Q)}`);
   const mid = left(Q);
   const ps = Q.true_poll.ps;
