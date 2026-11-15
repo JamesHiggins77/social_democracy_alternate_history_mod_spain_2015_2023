@@ -23,7 +23,7 @@ on-arrival: {!
 Q.month_actions += 1; Q.budget_timer = 12;
 if (window.SpainGame) { window.SpainGame.holdBudget(Q); }
 if (Q.budget_passed) {
-    Q.sanchez_authority += 8; Q.budget_year = Q.year;
+    Q.sanchez_authority += 8; Q.budget_year = Q.year; Q.fiscal_adj += 0.2;
     if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, workers: 1, unemployed: 1}); }
 } else {
     Q.sanchez_authority -= 6;
@@ -127,12 +127,14 @@ on-arrival: month_actions += 1; pensions_timer = 12
 - @easy_discard
 
 @index
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 3}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 0; !}
+subtitle: Deficit +0.3 points
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 3}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 0; Q.fiscal_adj += 0.3; !}
 
 Nine million pensioners see it in their next payment.
 
 @minimum
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, homemakers: 1.5}); } Q.progressives_dissent -= 3; if (Q.pensions_promise) { Q.sanchez_authority -= 2; } !}
+subtitle: Deficit +0.1 points
+on-arrival: {! Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, homemakers: 1.5}); } Q.progressives_dissent -= 3; if (Q.pensions_promise) { Q.sanchez_authority -= 2; } !}
 
 Targeted and fair, say the economists. [? if pensions_promise = 1 : Not what you promised, say the pensioners' associations. ?]
 
@@ -193,3 +195,41 @@ The federations feel represented. Your own people feel overlooked.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2}); } Q.modernisers_dissent -= 4; Q.institutionalists_dissent += 3; !}
 
 An astronaut, a judge, an economist from Brussels. The press is impressed for a week.
+
+@tax_reform
+title: Tax reform
+new-page: true
+is-card: true
+tags: sp_government
+view-if: psoe_in_government = 1 and tax_timer <= 0
+on-arrival: month_actions += 1; tax_timer = 12
+
+= Tax reform
+
+The government's deficit is [+ deficit_text +]% of GDP, with public debt at [+ debt +]%. The Treasury proposes options.
+
+- @corporate: A minimum corporate tax rate for large companies (deficit −0.3)
+- @wealth: A tax on large fortunes and a levy on banks (deficit −0.4)
+- @green: Green taxes on fuel and flights (deficit −0.2)
+- @tax_cut: Cut income tax for low earners (deficit +0.3)
+- @easy_discard
+
+@corporate
+on-arrival: {! Q.fiscal_adj -= 0.3; Q.rel_up += 4; Q.rel_cs -= 4; Q.rel_pnv -= 2; Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.recalculate(Q); } !}
+
+The IBEX-35 companies grumble; the public mostly approves.
+
+@wealth
+on-arrival: {! Q.fiscal_adj -= 0.4; Q.rel_up += 6; Q.rel_cs -= 8; Q.rel_pp -= 6; Q.progressives_dissent -= 5; Q.modernisers_dissent += 3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {self_employed: -1, professionals: -0.5, workers: 0.5}); window.SpainGame.recalculate(Q); } !}
+
+Madrid's regional government promises to cancel it on its territory. The fight over tax becomes a fight between regions.
+
+@green
+on-arrival: {! Q.fiscal_adj -= 0.2; Q.rel_up += 2; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 1, self_employed: -1, workers: -0.5}); window.SpainGame.recalculate(Q); } !}
+
+Young urban voters approve. Truck drivers and farmers do not.
+
+@tax_cut
+on-arrival: {! Q.fiscal_adj += 0.3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, homemakers: 1, pensioners: 0.5}); window.SpainGame.recalculate(Q); } !}
+
+Popular at home. In Brussels, someone opens a spreadsheet.

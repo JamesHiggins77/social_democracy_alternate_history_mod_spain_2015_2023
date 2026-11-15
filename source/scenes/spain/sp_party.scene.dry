@@ -51,7 +51,9 @@ An agreement has been signed. You could put it to a vote of the whole membership
 - @easy_discard
 
 @consult
-on-arrival: member_morale += 8; sanchez_authority += 6; sanchismo += 5; regional_leaders_dissent += 3; federal_committee_balance += 4
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: funds -= 1; member_morale += 8; sanchez_authority += 6; sanchismo += 5; regional_leaders_dissent += 3; federal_committee_balance += 4
 
 The members back the agreement by a wide margin. The barons cannot argue with the result; they argue instead about the question.
 
@@ -153,7 +155,9 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {stu
 A practical message for a generation of temporary contracts.
 
 @digital
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 3}); } Q.modernisers_dissent -= 5; Q.institutionalists_dissent += 2; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {students: 3}); } Q.modernisers_dissent -= 5; Q.institutionalists_dissent += 2; !}
 
 The memes are good. The veterans do not understand them.
 
@@ -212,7 +216,9 @@ The PSOE has nearly 190,000 members in thousands of local branches. You could sp
 - @easy_discard
 
 @tour
-on-arrival: sanchismo += 8; member_morale += 6; sanchez_authority += 2; regional_leaders_dissent += 3
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: funds -= 1; sanchismo += 8; member_morale += 6; sanchez_authority += 2; regional_leaders_dissent += 3
 
 You drive from branch to branch, sleeping in small hotels. The members who meet you do not forget it.
 
@@ -220,3 +226,35 @@ You drive from branch to branch, sleeping in small hotels. The members who meet 
 on-arrival: sanchismo += 5; member_morale += 8; regional_leaders_dissent += 8; institutionalists_dissent += 6; federal_committee_balance -= 3
 
 The members cheer. The apparatus that runs the party sees the threat clearly.
+
+@fundraising
+title: Party finances
+new-page: true
+is-card: true
+tags: sp_party
+view-if: fundraising_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; fundraising_timer = 4
+
+= Party finances
+
+The party treasurer reports funds of [+ funds_display +]. Campaigns cost money, and the next one is never far away.
+
+- @donors: A dinner with business donors (+3)
+- @microdonations: An online appeal to members and sympathisers (+2)
+- @bank_loan: A bank loan against future subsidies (+4, lower income for a year)
+- @easy_discard
+
+@donors
+on-arrival: funds += 3; institutionalists_dissent -= 2; progressives_dissent += 4; member_morale -= 2
+
+The cheques arrive. So do questions from the left of the party about who the PSOE listens to.
+
+@microdonations
+on-arrival: funds += 2; sanchismo += 3; member_morale += 3
+
+Thousands of small donations. The members feel the party is theirs.
+
+@bank_loan
+on-arrival: funds += 4; loan_months = 12
+
+The bank is happy to lend to a party with a guaranteed state subsidy. The interest will come out of future income.

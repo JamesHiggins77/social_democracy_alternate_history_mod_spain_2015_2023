@@ -28,6 +28,16 @@
   // Territorial parties that lead their own community when largest.
   var TERRITORIAL_LEADERS = ['pnv', 'cc', 'prc', 'jxsi', 'junts', 'erc', 'geroa'];
 
+  // General government deficit and debt (% of GDP), Eurostat/Bank of Spain
+  // figures by year. The game adds the player's policy adjustments on top.
+  var DEFICIT_BY_YEAR = { 2015: 5.2, 2016: 4.3, 2017: 3.0, 2018: 2.5, 2019: 3.1, 2020: 10.1,
+                          2021: 6.7, 2022: 4.7, 2023: 3.5 };
+  var DEBT_BY_YEAR = { 2015: 103.3, 2016: 102.7, 2017: 101.8, 2018: 100.4, 2019: 98.2, 2020: 120.3,
+                       2021: 116.8, 2022: 111.6, 2023: 107.7 };
+  function yearValue(table, year) {
+    return table[Math.max(2015, Math.min(2023, year))];
+  }
+
   var cachedBase = null;
   function base() {
     if (!cachedBase) {
@@ -123,6 +133,13 @@
     Q.catalan_crisis = 0;
     Q.pp_scandal = 0;
 
+    // Party finances: an abstract fund, earned monthly and spent on campaigns.
+    Q.funds = 6;
+    // Government finances: policy adjustment to the deficit (points of GDP)
+    // and its cumulative effect on debt.
+    Q.fiscal_adj = 0;
+    Q.debt_adj = 0;
+
     updatePolls(Q);
     recalculate(Q);
   }
@@ -155,6 +172,12 @@
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
     var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
     Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;
+    Q.funds_income = Math.round((0.5 + (Q.congress.psoe || 0) / 200) * 10) / 10;
+    Q.funds_display = Math.floor(Q.funds);
+    Q.in_debt = Q.funds < 0 ? 1 : 0;
+    Q.deficit = Math.round((yearValue(DEFICIT_BY_YEAR, Q.year) + (Q.fiscal_adj || 0)) * 10) / 10;
+    Q.debt = Math.round(yearValue(DEBT_BY_YEAR, Q.year) + (Q.debt_adj || 0));
+    Q.deficit_text = Q.deficit.toFixed(1);
     Q.authority_word = UI.word('authority', Q.sanchez_authority);
     Q.morale_word = UI.word('morale', Q.member_morale);
     Q.unity_word = UI.word('unity', Q.psoe_unity);
@@ -192,6 +215,22 @@
   // Shift a party's support by class and refresh the polls.
   function campaign(Q, party, changes) {
     shiftSupport(Q, party, changes);
+    updatePolls(Q);
+  }
+
+  // Move support from one party to others, class by class. `to` is a party
+  // id or {party: share} splitting the moved points. Unlike campaign gains,
+  // losses are not damped by party unity: voters leave whatever the mood.
+  function transfer(Q, from, to, changes) {
+    var split = typeof to === 'string' ? (function () { var o = {}; o[to] = 1; return o; })() : to;
+    Object.keys(changes).forEach(function (c) {
+      var cur = Q.vm.classSupport[c][from] || 0;
+      var moved = Math.min(cur, changes[c]);
+      Q.vm.classSupport[c][from] = cur - moved;
+      Object.keys(split).forEach(function (p) {
+        Q.vm.classSupport[c][p] = (Q.vm.classSupport[c][p] || 0) + moved * split[p];
+      });
+    });
     updatePolls(Q);
   }
 
@@ -264,6 +303,31 @@
         Q[t + '_timer'] -= 1;
       }
     });
+
+    // campaign effects fade: support for the established parties drifts
+    // back towards its underlying level by 1.5% of the gap each month
+    var initial = VoteModel.initialState().classSupport;
+    Object.keys(Q.vm.classSupport).forEach(function (c) {
+      ['psoe', 'pp', 'cs'].forEach(function (p) {
+        var cur = Q.vm.classSupport[c][p];
+        Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * 0.015;
+      });
+    });
+
+    // party finances: dues and the public subsidy, scaled by seats
+    Q.funds += 0.5 + (Q.congress.psoe || 0) / 200;
+    if (Q.loan_months > 0) {
+      Q.funds -= 0.4;
+      Q.loan_months -= 1;
+    }
+    if (Q.funds < 0) {
+      Q.member_morale -= 1;
+      Q.sanchez_authority -= 0.5;
+    }
+    // government finances: policy adjustments accumulate into debt
+    Q.debt_adj = (Q.debt_adj || 0) + (Q.fiscal_adj || 0) / 12;
+    Q.brussels_due = (Q.psoe_in_government && Q.deficit > 3.5 &&
+      (Q.brussels_year || 0) < Q.year) ? 1 : 0;
 
     // investiture clock (art. 99.5)
     if (Q.investiture_clock > 0) {
@@ -373,6 +437,31 @@
   // ------------------------------------------------------------------
   // General election
   // ------------------------------------------------------------------
+  // Party with most votes in each ballot district.
+  function provinceWinners(ballots) {
+    var out = {};
+    Object.keys(ballots).forEach(function (p) {
+      var best = null;
+      ballots[p].lists.forEach(function (l) {
+        var id = Array.isArray(l) ? l[0] : l.id;
+        var v = Array.isArray(l) ? l[2] : l.votes;
+        if (!best || v > best.v) { best = { id: id, v: v }; }
+      });
+      if (best) { out[p] = best.id; }
+    });
+    return out;
+  }
+
+  // Regional districts mostly are provinces, with local spellings
+  // ("Alicante/Alacant", "Santa Cruz de Tenerife"); islands and Asturias's
+  // districts take the regional winner.
+  function districtToProvince(name) {
+    var n = name.split('/')[0].trim();
+    var alias = { 'Santa Cruz de Tenerife': 'SC de Tenerife', 'Región de Murcia': 'Murcia',
+                  'Álava': 'Araba' };
+    return alias[n] || n;
+  }
+
   function runGeneralElection(Q) {
     var r = VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
     var old = Q.congress;
@@ -381,6 +470,9 @@
     Q.congress = r.totals;
     Q.vote_shares = r.voteShares;
     Q.elections_held = (Q.elections_held || 0) + 1;
+    Q.funds -= 4;
+    Q.map_winners = provinceWinners(r.ballots);
+    Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
     Q.election_year = 0;
     Q.election_month = 0;
@@ -407,6 +499,9 @@
     var repeat = Q.repeat_elections;
     if (repeat >= 1) {
       Q.pact_pp_cs = 1;
+      // voters punish the parties they blame for the deadlock, the PSOE included
+      transfer(Q, 'psoe', { pp: 0.5, cs: 0.2, up: 0.3 },
+        { workers: repeat, pensioners: repeat, professionals: repeat, homemakers: repeat });
       Q.regional_leaders_dissent += 12 * repeat;
       Q.institutionalists_dissent += 8 * repeat;
       Q.sanchez_authority -= 6 * repeat;
@@ -427,38 +522,83 @@
   // ------------------------------------------------------------------
   // Regional elections
   // ------------------------------------------------------------------
-  function regionalGovernment(seats, previous) {
+  // Parties willing to sit in a cabinet with the bloc leader (the others
+  // give external support at most).
+  var COALITION_PARTNERS = {
+    psoe: ['up', 'iu', 'mp', 'compromis', 'mes', 'cha', 'prc', 'cc', 'geroa', 'nc', 'x:I-E'],
+    pp: ['cs', 'upn', 'par', 'foro', 'cc', 'prc'],
+    pnv: ['psoe'], cc: ['psoe', 'pp', 'nc', 'asg'], prc: ['psoe', 'pp'],
+    geroa: ['psoe', 'up', 'iu'], jxsi: [], junts: ['erc'], erc: ['junts', 'up']
+  };
+
+  // Forms a regional government: the leading party, cabinet partners and
+  // supporting parties needed to reach a majority, and the type of
+  // government. `ppVoxRelation` decides whether Vox enters PP cabinets.
+  function regionalGovernment(seats, previous, ppVoxRelation) {
     var total = 0;
     Object.keys(seats).forEach(function (id) { total += seats[id]; });
     var majority = Math.floor(total / 2) + 1;
     var sum = function (list) {
       return list.reduce(function (a, id) { return a + (seats[id] || 0); }, 0);
     };
-    var largest = Object.keys(seats).sort(function (a, b) { return seats[b] - seats[a]; })[0];
+    var bySize = function (list) {
+      return list.filter(function (id) { return seats[id]; })
+        .sort(function (a, b) { return seats[b] - seats[a]; });
+    };
+    var largest = bySize(Object.keys(seats))[0];
+    var leftPlus = LEFT_BLOC.concat(['erc', 'bildu', 'cup', 'pnv', 'cc', 'prc', 'nc', 'te']);
+    var rightPlus = RIGHT_BLOC.concat(['cc', 'prc', 'upn']);
     var left = sum(LEFT_BLOC);
     var right = sum(RIGHT_BLOC);
-    var lead = function (bloc) {
-      return bloc.filter(function (id) { return seats[id]; })
-        .sort(function (a, b) { return seats[b] - seats[a]; })[0];
-    };
     var party;
+    var bloc;
     if (TERRITORIAL_LEADERS.indexOf(largest) !== -1 && seats[largest] >= total * 0.3) {
       party = largest;
+      bloc = Object.keys(seats);
     } else if (right >= majority || (right > left && right >= total * 0.45)) {
-      party = lead(RIGHT_BLOC);
+      party = bySize(RIGHT_BLOC)[0];
+      bloc = rightPlus;
     } else if (left >= majority || left > right) {
-      party = lead(LEFT_BLOC);
+      party = bySize(LEFT_BLOC)[0];
+      bloc = leftPlus;
     } else {
       party = largest;
+      bloc = Object.keys(seats);
     }
     var cabinet = [party];
-    if (party === 'pp' && (seats.pp || 0) < majority && (seats.pp || 0) + (seats.cs || 0) < majority &&
-        (seats.vox || 0) > 0) {
-      cabinet.push('vox');
+    var support = [];
+    var count = seats[party] || 0;
+    var willing = (COALITION_PARTNERS[party] || []).slice();
+    if (party === 'pp' && (ppVoxRelation || 50) >= 60) {
+      willing.push('vox');
+    }
+    // add partners, largest first, until a majority is reached
+    bySize(bloc.concat(party === 'pp' ? ['vox'] : [])).forEach(function (id) {
+      if (id === party || count >= majority) {
+        return;
+      }
+      if (willing.indexOf(id) !== -1 && cabinet.length < 3) {
+        cabinet.push(id);
+      } else {
+        support.push(id);
+      }
+      count += seats[id];
+    });
+    var type;
+    if (cabinet.length === 1 && seats[party] >= majority) {
+      type = 'Majority';
+    } else if (cabinet.length > 1 && sum(cabinet) >= majority) {
+      type = 'Coalition majority';
+    } else if (cabinet.length > 1) {
+      type = 'Minority coalition' + (support.length ? ' with external support' : '');
+    } else if (support.length && count >= majority) {
+      type = 'Minority with external support';
+    } else {
+      type = 'Minority';
     }
     var president = previous && previous.party === party ? previous.president
       : UI.partyName(party) + ' president';
-    return { president: president, party: party, cabinet: cabinet, support: [] };
+    return { president: president, party: party, cabinet: cabinet, support: support, type: type };
   }
 
   function runDueRegionalElections(Q) {
@@ -473,7 +613,7 @@
       Object.keys(ballots).forEach(function (d) { flat[d] = { lists: ballots[d].lists }; });
       var shares = VoteModel.nationalShares(flat);
       var before = reg.government;
-      var gov = regionalGovernment(r.totals, before);
+      var gov = regionalGovernment(r.totals, before, Q.pp_vox_relation);
       var psoeLost = before.party === 'psoe' && gov.party !== 'psoe';
       var psoeWon = before.party !== 'psoe' && gov.party === 'psoe';
       if (psoeLost) {
@@ -499,12 +639,26 @@
       reg.lastWasSnap = false;
       reg.nextElection = lib('SpainRegionalRules', 'regional_rules.js')
         .nextRegularElection(region, date, false);
-      results.push({ region: region, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
+      var dw = {};
+      var byDistrict = provinceWinners(ballots);
+      Object.keys(byDistrict).forEach(function (d) { dw[districtToProvince(d)] = byDistrict[d]; });
+      results.push({ region: region, districtWinners: dw, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
                      prevShares: reg.prevShares, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
     });
     Q.regional_elections_due = [];
     Q.has_regional_elections = 0;
     Q.last_regional_results = results;
+    if (results.length) {
+      Q.funds -= 1;
+      var winners = {};
+      var provs = DATA.regions;
+      results.forEach(function (res) {
+        var overall = Object.keys(res.shares).sort(function (a, b) { return res.shares[b] - res.shares[a]; })[0];
+        provs[res.region].forEach(function (p) { winners[p] = res.districtWinners[p] || overall; });
+      });
+      Q.map_winners = winners;
+      Q.map_title = 'Regional elections, ' + Q.month + '/' + Q.year;
+    }
     recalculate(Q);
     return results;
   }
@@ -581,8 +735,7 @@
       .map(function (p) {
         var change = Q.vote_shares && Q.vote_shares[p] !== undefined
           ? (Q.poll[p] - Q.vote_shares[p]) : null;
-        var ch = change === null ? 'new' : (Math.abs(change) < 0.05 ? '=' :
-          (change > 0 ? '+' : '\u2212') + Math.abs(change).toFixed(1));
+        var ch = change === null ? 'new' : UI.signed(change, 1);
         return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p) + '"></span>' +
           UI.shortName(p) + '</td><td class="sp-num">' + Q.poll[p].toFixed(1) + '%</td><td class="sp-num sp-change">' +
           ch + '</td><td class="sp-num">' + (Q.poll_seats[p] || 0) + '</td></tr>';
@@ -618,15 +771,52 @@
     if (!out) {
       return;
     }
-    var rows = Object.keys(Q.regions).sort().map(function (r) {
+    var regions = Object.keys(Q.regions).sort();
+    var selected = root.spSelectedRegion && Q.regions[root.spSelectedRegion] ? root.spSelectedRegion : '';
+    var rows = regions.map(function (r) {
       var reg = Q.regions[r];
       var g = reg.government;
       return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
         UI.partyColor(g.party) + '"></span>' + surname(g.president) + '</td><td class="sp-num">' +
         reg.nextElection.slice(0, 4) + '</td></tr>';
     });
-    out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th>Region</th>' +
+    var options = '<option value="">Choose a community…</option>' + regions.map(function (r) {
+      return '<option value="' + r + '"' + (r === selected ? ' selected' : '') + '>' + r + '</option>';
+    }).join('');
+    out.innerHTML = '<select id="' + id + '-select" class="sp-select">' + options + '</select>' +
+      '<div id="' + id + '-detail"></div>' +
+      '<table class="sp-results sp-compact"><thead><tr><th>Region</th>' +
       '<th>President</th><th class="sp-num">Vote</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+    var select = el(id + '-select');
+    var show = function (r) {
+      root.spSelectedRegion = r;
+      var detail = el(id + '-detail');
+      if (!r) {
+        detail.innerHTML = '';
+        return;
+      }
+      var reg = Q.regions[r];
+      var g = reg.government;
+      var names = function (list) {
+        return (list || []).map(function (p) { return UI.shortName(p); }).join(' + ');
+      };
+      detail.innerHTML = '<p class="sp-gov"><strong>' + g.president + '</strong><br>' +
+        (g.type || '') + '<br>Cabinet: ' + names(g.cabinet) +
+        (g.support && g.support.length ? '<br>Support: ' + names(g.support) : '') +
+        '<br>Next vote: ' + reg.nextElection.slice(0, 7) + '</p>' +
+        '<svg id="' + id + '-hemi" class="sp-hemicycle"></svg>' +
+        UI.resultsTable(reg.seats, null, { prevSeats: reg.prevSeats, compact: true });
+      UI.drawHemicycle('#' + id + '-hemi', reg.seats);
+    };
+    select.onchange = function () { show(select.value); };
+    show(selected);
+  }
+
+  function renderMap(Q, id) {
+    var out = el(id);
+    if (out && Q.map_winners) {
+      UI.drawMap(out, Q.map_winners, 'Most-voted party by province');
+    }
   }
 
   function renderRegionalResults(Q, id) {
@@ -640,7 +830,9 @@
       return '<h4>' + res.region + '</h4>' +
         UI.resultsTable(res.seats, res.shares, { prevSeats: res.prevSeats, prevShares: res.prevShares }) +
         '<p>Government: ' + res.government.president + ' (' +
-        res.government.cabinet.map(UI.partyName).join(' + ') + ').' + note + '</p>';
+        res.government.cabinet.map(UI.partyName).join(' + ') + (res.government.support.length
+          ? ', with support from ' + res.government.support.map(UI.partyName).join(' and ') : '') +
+        '). ' + (res.government.type || '') + '.' + note + '</p>';
     }).join('');
   }
 
@@ -686,6 +878,7 @@
     dissolve: dissolve,
     runGeneralElection: runGeneralElection,
     regionalGovernment: regionalGovernment,
+    provinceWinners: provinceWinners,
     runDueRegionalElections: runDueRegionalElections,
     lossReason: lossReason,
     renderVote: renderVote,
@@ -695,12 +888,14 @@
     renderRegionalResults: renderRegionalResults,
     renderFactions: renderFactions,
     campaign: campaign,
+    transfer: transfer,
     regionalMod: regionalMod,
     territorial: territorial,
     holdCensure: holdCensure,
     holdBudget: holdBudget,
     callElection: callElection,
-    renderRelations: renderRelations
+    renderRelations: renderRelations,
+    renderMap: renderMap
   };
   if (isNode) {
     module.exports = api;

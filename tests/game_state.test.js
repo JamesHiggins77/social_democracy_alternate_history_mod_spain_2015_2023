@@ -88,3 +88,55 @@ test('repeat elections bring PP-Cs cooperation and pressure on Sánchez', () => 
   assert.strictEqual(Q.pact_pp_cs, 1);
   assert.ok(Q.sanchez_authority < authority);
 });
+
+test('Andalusia 2018: a PP-Cs coalition with Vox support', () => {
+  const g = G.regionalGovernment({ psoe: 33, pp: 26, cs: 21, up: 17, vox: 12 }, null, 50);
+  assert.strictEqual(g.party, 'pp');
+  assert.deepStrictEqual(g.cabinet, ['pp', 'cs']);
+  assert.deepStrictEqual(g.support, ['vox']);
+  assert.strictEqual(g.type, 'Minority coalition with external support');
+  // with warm PP-Vox relations, Vox enters the cabinet (Castilla y León 2022)
+  const cyl = G.regionalGovernment({ pp: 31, psoe: 28, vox: 13, upl: 3, sy: 3, cs: 1, xav: 1, up: 1 }, null, 70);
+  assert.deepStrictEqual(cyl.cabinet, ['pp', 'vox']);
+  assert.strictEqual(cyl.type, 'Coalition majority');
+});
+
+test('party funds grow monthly and campaigns cost money', () => {
+  const Q = newQ();
+  const start = Q.funds;
+  G.endOfMonth(Q);
+  assert.ok(Q.funds > start);
+  const before = Q.funds;
+  G.runGeneralElection(Q);
+  assert.strictEqual(Math.round((before - Q.funds) * 10) / 10, 4);
+});
+
+test('government deficit follows the year and policy adjustments', () => {
+  const Q = newQ();
+  Q.year = 2018; G.recalculate(Q);
+  assert.strictEqual(Q.deficit, 2.5);
+  Q.fiscal_adj = 0.4; G.recalculate(Q);
+  assert.strictEqual(Q.deficit, 2.9);
+  Q.year = 2020; G.recalculate(Q);
+  assert.ok(Q.deficit > 10);
+});
+
+test('province winners feed the results map', () => {
+  const Q = newQ();
+  G.endOfMonth(Q);
+  G.runGeneralElection(Q);
+  assert.strictEqual(Object.keys(Q.map_winners).length, 52);
+  assert.strictEqual(Q.map_winners['Sevilla'], 'psoe');
+  assert.strictEqual(Q.map_winners['Barcelona'], 'up');
+  assert.strictEqual(Q.map_winners['Madrid'], 'pp');
+});
+
+test('abstaining for Rajoy moves left-wing voters to Podemos', () => {
+  const Q = newQ();
+  G.endOfMonth(Q);
+  G.runGeneralElection(Q);
+  const before = { psoe: Q.poll.psoe, up: Q.poll.up };
+  G.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 5, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
+  assert.ok(Q.poll.psoe < before.psoe - 2, `${before.psoe} -> ${Q.poll.psoe}`);
+  assert.ok(Q.poll.up > before.up + 1.5, `${before.up} -> ${Q.poll.up}`);
+});

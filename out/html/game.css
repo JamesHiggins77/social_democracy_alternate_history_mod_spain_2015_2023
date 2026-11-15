@@ -546,3 +546,14 @@ header #game-title, header #game-author {
 .sp-change { color: #666; font-size: 0.9em; white-space: nowrap; }
 .sp-results td.sp-num, .sp-results th.sp-num { white-space: nowrap; }
 .sp-word { font-weight: bold; }
+/* change markers */
+.sp-up { color: #1e8a3a; }
+.sp-down { color: #c0392b; }
+.sp-same { color: #888; }
+/* results map */
+.sp-map { width: 100%; max-width: 560px; display: block; margin: 0 auto; }
+.sp-map-legend { font-size: 0.85em; text-align: center; }
+.sp-legend { margin: 0 0.4em; white-space: nowrap; }
+/* sidebar region selector */
+.sp-select { width: 100%; margin: 0.3em 0 0.5em; font-size: 0.9em; }
+.sp-gov { font-size: 0.85em; line-height: 1.4; }

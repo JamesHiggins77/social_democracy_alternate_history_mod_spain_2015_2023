@@ -25,7 +25,7 @@ title: Sign a government agreement with Ciudadanos
 subtitle: Ciudadanos will vote yes; Podemos will vote no.
 choose-if: cs_talks >= 2 and pact_cs = 0 and pact_up = 0
 unavailable-subtitle: [? if pact_up = 1 : Ciudadanos will not join an agreement that includes Podemos. ?][? if pact_up = 0 and cs_talks < 2 : The talks with Ciudadanos are not far enough advanced. ?]
-on-arrival: pact_cs = 1; rel_cs += 10; rel_up -= 15; modernisers_dissent -= 5; institutionalists_dissent -= 3; progressives_dissent += 10; trade_unionists_dissent += 5
+on-arrival: {! Q.pact_cs = 1; Q.rel_cs += 10; Q.rel_up -= 15; Q.modernisers_dissent -= 5; Q.institutionalists_dissent -= 3; Q.progressives_dissent += 10; Q.trade_unionists_dissent += 5; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.campaign(Q, 'psoe', {professionals: 1.5, self_employed: 0.5}); } !}
 go-to: sp_investiture
 
 @sign_up
@@ -33,14 +33,14 @@ title: Sign a government agreement with Podemos
 subtitle: Podemos will vote yes; Ciudadanos will vote no.
 choose-if: up_talks >= 2 and pact_up = 0 and pact_cs = 0
 unavailable-subtitle: [? if pact_cs = 1 : Podemos will not support a government built on a deal with Ciudadanos. ?][? if pact_cs = 0 and up_talks < 2 : The talks with Podemos are not far enough advanced. ?]
-on-arrival: pact_up = 1; rel_up += 10; rel_cs -= 15; progressives_dissent -= 10; regional_leaders_dissent += 12 + 8*barons_veto; institutionalists_dissent += 6
+on-arrival: {! Q.pact_up = 1; Q.rel_up += 10; Q.rel_cs -= 15; Q.progressives_dissent -= 10; Q.regional_leaders_dissent += 12 + 8 * (Q.barons_veto || 0); Q.institutionalists_dissent += 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {cs: 0.6, pp: 0.4}, {pensioners: 1.5, self_employed: 1.5, homemakers: 1}); window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1.5, unemployed: 1}); } !}
 go-to: sp_investiture
 
 @referendum
 title: Offer the Catalan parties talks on their demands
 subtitle: Could turn ERC and Convergència's votes into abstentions.
 view-if: pact_cs = 0 and referendum_offer = 0
-on-arrival: referendum_offer = 1; rel_erc += 15; rel_junts += 15; regional_leaders_dissent += 25 if red_lines = 1; federal_committee_balance -= 12 if red_lines = 1; sanchez_authority -= 6 if red_lines = 1; regional_leaders_dissent += 10 if red_lines = 0
+on-arrival: {! Q.referendum_offer = 1; Q.rel_erc += 15; Q.rel_junts += 15; if (Q.red_lines) { Q.regional_leaders_dissent += 25; Q.federal_committee_balance -= 12; Q.sanchez_authority -= 6; } else { Q.regional_leaders_dissent += 10; } if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, cs: 0.5}, {pensioners: 2, homemakers: 1.5, self_employed: 1}); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.05); } !}
 go-to: sp_investiture
 
 [? if red_lines = 1 : You have broken the Federal Committee's resolution. The barons are openly discussing your removal. ?][? if red_lines = 0 : The barons are furious, but the Federal Committee never bound you. ?]

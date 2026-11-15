@@ -21,6 +21,10 @@ Morale: **[+ morale_word +]**
 
 Unity: **[+ unity_word +]**
 
+Party funds: **[+ funds_display +]** (+[+ funds_income +]/mo)[? if in_debt = 1 : , in debt ?]
+
+[? if psoe_in_government = 1 : Deficit: **[+ deficit_text +]%** of GDP, debt [+ debt +]% ?]
+
 [? if investiture_clock > 0 : Dissolution in [+ investiture_clock +] mo. ?]
 
 [? if election_year > 0 : Election: [+ election_month : month +] [+ election_year +] ?]

@@ -41,6 +41,8 @@ on-arrival: month_actions += 1; rally_timer = 2
 
 The hall is booked and the buses are on their way. What is tonight's speech about?
 
+Each big-hall theme costs 1 in party funds; a local event costs nothing.
+
 - @jobs: Decent jobs: end the precarious contracts of the labour reform
 - @welfare: The welfare state: health, education, dependency care
 - @corruption_speech: Clean politics: end the PP's corruption
@@ -49,22 +51,30 @@ The hall is booked and the buses are on their way. What is tonight's speech abou
 - @easy_discard
 
 @jobs
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 3, students: 1}); } Q.trade_unionists_dissent -= 4; Q.progressives_dissent -= 2; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 3, unemployed: 3, students: 1}); } Q.trade_unionists_dissent -= 4; Q.progressives_dissent -= 2; !}
 
 The unions applaud. Business organisations call it a step backwards.
 
 @welfare
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 2, workers: 1}); } Q.trade_unionists_dissent -= 2; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 2, workers: 1}); } Q.trade_unionists_dissent -= 2; !}
 
 Classic social democracy, and still the PSOE's strongest ground.
 
 @corruption_speech
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1, workers: 1}); window.SpainGame.campaign(Q, 'pp', {professionals: -1, self_employed: -0.5}); } Q.rel_pp -= 4; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1, workers: 1}); window.SpainGame.campaign(Q, 'pp', {professionals: -1, self_employed: -0.5}); } Q.rel_pp -= 4; !}
 
 The audience chants about Bárcenas. [? if pp_scandal >= 2 : With the PP in the dock, the message lands harder. ?]
 
 @spain
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1, self_employed: 1}); } Q.regional_leaders_dissent -= 4; Q.rel_erc -= 4; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1, self_employed: 1}); } Q.regional_leaders_dissent -= 4; Q.rel_erc -= 4; !}
 
 A big Spanish flag behind the stage. The barons approve; the PSC is less sure.
 
@@ -154,7 +164,9 @@ Pensioners are marching in Bilbao and Madrid against a 0.25% annual rise. They a
 - @easy_discard
 
 @march
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 4}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 1; !}
+choose-if: funds >= 1
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 4}); } Q.trade_unionists_dissent -= 4; Q.pensions_promise = 1; !}
 
 You march with the pensioners. Now you have promised them inflation-linked pensions, and they will remember.
 

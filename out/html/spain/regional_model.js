@@ -20,25 +20,25 @@
 
   // Who governs each community when the game starts (December 2015).
   var GOVERNMENTS_2015 = {
-    'Andalucía': { president: 'Susana Díaz', party: 'psoe', cabinet: ['psoe'], support: ['cs'] },
-    'Aragón': { president: 'Javier Lambán', party: 'psoe', cabinet: ['psoe', 'cha'], support: ['up', 'iu'] },
-    'Asturias': { president: 'Javier Fernández', party: 'psoe', cabinet: ['psoe'], support: [] },
-    'Baleares': { president: 'Francina Armengol', party: 'psoe', cabinet: ['psoe', 'mes'], support: ['up'] },
-    'Canarias': { president: 'Fernando Clavijo', party: 'cc', cabinet: ['cc', 'psoe'], support: [] },
-    'Cantabria': { president: 'Miguel Ángel Revilla', party: 'prc', cabinet: ['prc', 'psoe'], support: [] },
-    'Castilla-La Mancha': { president: 'Emiliano García-Page', party: 'psoe', cabinet: ['psoe'], support: ['up'] },
-    'Castilla y León': { president: 'Juan Vicente Herrera', party: 'pp', cabinet: ['pp'], support: [] },
-    'Cataluña': { president: 'Artur Mas (acting)', party: 'jxsi', cabinet: ['jxsi'], support: [],
+    'Andalucía': { type: 'Minority with external support', president: 'Susana Díaz', party: 'psoe', cabinet: ['psoe'], support: ['cs'] },
+    'Aragón': { type: 'Minority coalition with external support', president: 'Javier Lambán', party: 'psoe', cabinet: ['psoe', 'cha'], support: ['up', 'iu'] },
+    'Asturias': { type: 'Minority', president: 'Javier Fernández', party: 'psoe', cabinet: ['psoe'], support: [] },
+    'Baleares': { type: 'Minority coalition with external support', president: 'Francina Armengol', party: 'psoe', cabinet: ['psoe', 'mes'], support: ['up'] },
+    'Canarias': { type: 'Coalition majority', president: 'Fernando Clavijo', party: 'cc', cabinet: ['cc', 'psoe'], support: [] },
+    'Cantabria': { type: 'Minority coalition', president: 'Miguel Ángel Revilla', party: 'prc', cabinet: ['prc', 'psoe'], support: [] },
+    'Castilla-La Mancha': { type: 'Minority with external support', president: 'Emiliano García-Page', party: 'psoe', cabinet: ['psoe'], support: ['up'] },
+    'Castilla y León': { type: 'Minority', president: 'Juan Vicente Herrera', party: 'pp', cabinet: ['pp'], support: [] },
+    'Cataluña': { type: 'Acting (no investiture yet)', president: 'Artur Mas (acting)', party: 'jxsi', cabinet: ['jxsi'], support: [],
                   note: 'JxSí needs the CUP for an investiture; the CUP refuses Mas.' },
-    'Comunidad Valenciana': { president: 'Ximo Puig', party: 'psoe', cabinet: ['psoe', 'compromis'], support: ['up'] },
-    'Extremadura': { president: 'Guillermo Fernández Vara', party: 'psoe', cabinet: ['psoe'], support: [] },
-    'Galicia': { president: 'Alberto Núñez Feijóo', party: 'pp', cabinet: ['pp'], support: [] },
-    'La Rioja': { president: 'José Ignacio Ceniceros', party: 'pp', cabinet: ['pp'], support: ['cs'] },
-    'Madrid': { president: 'Cristina Cifuentes', party: 'pp', cabinet: ['pp'], support: ['cs'] },
-    'Región de Murcia': { president: 'Pedro Antonio Sánchez', party: 'pp', cabinet: ['pp'], support: ['cs'] },
-    'Navarra': { president: 'Uxue Barkos', party: 'geroa', cabinet: ['geroa', 'up', 'x:I-E'],
+    'Comunidad Valenciana': { type: 'Minority coalition with external support', president: 'Ximo Puig', party: 'psoe', cabinet: ['psoe', 'compromis'], support: ['up'] },
+    'Extremadura': { type: 'Minority', president: 'Guillermo Fernández Vara', party: 'psoe', cabinet: ['psoe'], support: [] },
+    'Galicia': { type: 'Majority', president: 'Alberto Núñez Feijóo', party: 'pp', cabinet: ['pp'], support: [] },
+    'La Rioja': { type: 'Minority with external support', president: 'José Ignacio Ceniceros', party: 'pp', cabinet: ['pp'], support: ['cs'] },
+    'Madrid': { type: 'Minority with external support', president: 'Cristina Cifuentes', party: 'pp', cabinet: ['pp'], support: ['cs'] },
+    'Región de Murcia': { type: 'Minority with external support', president: 'Pedro Antonio Sánchez', party: 'pp', cabinet: ['pp'], support: ['cs'] },
+    'Navarra': { type: 'Minority coalition with external support', president: 'Uxue Barkos', party: 'geroa', cabinet: ['geroa', 'up', 'x:I-E'],
                  support: ['bildu'] },
-    'País Vasco': { president: 'Iñigo Urkullu', party: 'pnv', cabinet: ['pnv'], support: [] }
+    'País Vasco': { type: 'Minority', president: 'Iñigo Urkullu', party: 'pnv', cabinet: ['pnv'], support: [] }
   };
 
   function baselineDate(elections, asOf) {

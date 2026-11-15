@@ -14,11 +14,18 @@
     ['cup', 'CUP', '#FFED00', 'CUP'], ['bildu', 'EH Bildu', '#B3A400', 'Bildu'],
     ['erc', 'ERC', '#FFB232', 'ERC'], ['up', 'Podemos / UP / Sumar', '#6B2E68', 'Podemos'],
     ['iu', 'IU', '#A50021', 'IU'], ['mp', 'Más País / Compromís', '#0FDEC4', 'Más País'],
+    ['compromis', 'Compromís', '#F39200', 'Compromís'], ['mes', 'Més per Mallorca', '#C4D600', 'Més'],
+    ['mxme', 'Més per Menorca', '#9FBF1F', 'MxMe'], ['cha', 'Chunta Aragonesista', '#3A8A3A', 'CHA'],
+    ['aa', 'Adelante Andalucía', '#2E8B57', 'AA'],
     ['bng', 'BNG', '#7FB3E0', 'BNG'], ['geroa', 'Geroa Bai', '#F75E42', 'Geroa'],
     ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
     ['te', 'Teruel Existe', '#037252', 'TE'], ['foro', 'Foro Asturias', '#2E73B8', 'Foro'],
     ['prc', 'PRC', '#C2CE0C', 'PRC'], ['nc', 'Nueva Canarias', '#9ACD32', 'NC'],
-    ['cc', 'Coalición Canaria', '#FFD700', 'CC'], ['pnv', 'EAJ-PNV', '#008000', 'PNV'],
+    ['cc', 'Coalición Canaria', '#FFD700', 'CC'], ['asg', 'Agrupación Socialista Gomera', '#E3242B', 'ASG'],
+    ['ahi', 'Agrupación Herreña', '#F2C200', 'AHI'], ['upl', 'Unión del Pueblo Leonés', '#9B1B30', 'UPL'],
+    ['xav', 'Por Ávila', '#2B7A9E', 'XAV'], ['x:SY', 'Soria ¡Ya!', '#2F6E3B', 'Soria Ya'],
+    ['sy', 'Soria ¡Ya!', '#2F6E3B', 'Soria Ya'], ['par', 'Partido Aragonés', '#E8B500', 'PAR'],
+    ['elpi', 'El Pi', '#7A1E3A', 'El Pi'], ['pnv', 'EAJ-PNV', '#008000', 'PNV'],
     ['junts', 'CiU / DL / Junts', '#20C0B2', 'Junts'], ['jxsi', 'Junts pel Sí', '#3AB6A5', 'JxSí'],
     ['cs', 'Ciudadanos', '#EB6109', 'Cs'], ['upyd', 'UPyD', '#E9008C', 'UPyD'],
     ['upn', 'UPN / NA+', '#2A52BE', 'UPN'], ['pp', 'PP', '#1D84CE', 'PP'],
@@ -104,12 +111,14 @@
     return { lost: false, reason: 'No PP or PP–Vox majority (' + ppVox + ' seats together).' };
   }
 
+  // Change marker: green up triangle, red down triangle, (-) if unchanged.
   function signed(v, digits) {
-    var r = v.toFixed(digits);
+    var r = Math.abs(v).toFixed(digits);
     if (Number(r) === 0) {
-      return '=';
+      return '<span class="sp-same">(-)</span>';
     }
-    return (v > 0 ? '+' : '\u2212') + Math.abs(v).toFixed(digits);
+    return v > 0 ? '<span class="sp-up">\u25b2' + r + '</span>'
+      : '<span class="sp-down">\u25bc' + r + '</span>';
   }
 
   // Results table.
@@ -173,6 +182,39 @@
     }
     return '<table class="sp-results' + (opts.compact ? ' sp-compact' : '') + '"><thead>' + head +
       '</thead><tbody>' + rows.join('') + '</tbody></table>';
+  }
+
+  // Province map coloured by the party with most votes. winners:
+  // {province: party}; provinces not in winners are drawn grey.
+  function drawMap(container, winners, title) {
+    var map = root.SPAIN_MAP;
+    if (!map || !container) {
+      return;
+    }
+    var paths = Object.keys(map.provinces).map(function (p) {
+      var w = winners && winners[p];
+      return '<path d="' + map.provinces[p] + '" fill="' + (w ? partyColor(w) : '#ddd') +
+        '" stroke="#fff" stroke-width="0.6"><title>' + escapeHtml(p + (w ? ': ' + partyName(w) : '')) +
+        '</title></path>';
+    });
+    var box = map.canariesBox.slice();
+    box[0] = Math.max(1, box[0]);
+    box[1] = Math.max(1, box[1]);
+    box[2] = Math.min(box[2], map.width - box[0] - 1);
+    box[3] = Math.min(box[3], map.height - box[1] - 1);
+    var inset = '<rect x="' + box[0] + '" y="' + box[1] + '" width="' + box[2] + '" height="' + box[3] +
+      '" fill="none" stroke="#999" stroke-width="0.8"/>';
+    var used = {};
+    Object.keys(winners || {}).forEach(function (p) { used[winners[p]] = true; });
+    var legend = Object.keys(used).sort(function (a, b) {
+      return (META[a] ? META[a].order : 99) - (META[b] ? META[b].order : 99);
+    }).map(function (id) {
+      return '<span class="sp-legend"><span class="sp-swatch" style="background:' + partyColor(id) +
+        '"></span>' + escapeHtml(shortName(id)) + '</span>';
+    }).join(' ');
+    container.innerHTML = (title ? '<h4>' + escapeHtml(title) + '</h4>' : '') +
+      '<svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' + paths.join('') + inset +
+      '</svg><p class="sp-map-legend">' + legend + '</p>';
   }
 
   function drawHemicycle(selector, totals) {
@@ -309,6 +351,8 @@
     noPathToGovernment: noPathToGovernment,
     resultsTable: resultsTable,
     drawHemicycle: drawHemicycle,
+    drawMap: drawMap,
+    signed: signed,
     SCENARIOS: SCENARIOS,
     runScenario: runScenario,
     renderLab: renderLab

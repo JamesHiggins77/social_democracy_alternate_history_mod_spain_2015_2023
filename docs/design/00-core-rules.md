@@ -210,9 +210,18 @@ Card types follow the Chapter I doc §11.4: **action cards**, **event cards**, *
 
 Values are shown as words, never numbers: authority (Non-existent, Very low ≤9, Low ≤35, Middling ≤60, Strong ≤79, Very strong ≤99, Absolute 100), and matching scales for member morale, unity, relations, faction dissent and weight, the Federal Committee and Sanchismo (`SCALES` in `spain_ui.js`).
 
-### 7.3 Election results
+### 7.3 Finances
 
-Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election.
+- **Party funds** (abstract units): start at 6, earn 0.5 + PSOE seats/200 a month (dues and public subsidy). A general election campaign costs 4, a round of regional campaigns 1, and big-hall rallies, the branch tour, digital campaigns and member consultations cost 1 each. The *Party finances* card raises funds (donors, micro-donations, or a bank loan repaid from income). Debt lowers morale and authority each month.
+- **Government finances** (shown while the PSOE governs): deficit and debt follow the real path for each year (2015–2023, including the 2020 pandemic) plus the player's policy adjustments (`fiscal_adj`), which also accumulate into debt. Above 3.5% of GDP, Brussels writes.
+
+### 7.4 Decisions move votes
+
+Major decisions transfer support between parties class by class (`SpainGame.transfer`): abstaining for a PP government sends left-wing voters to Podemos and shrinks the Progressives; pacts, the Catalan choices, ousters and repeat elections all move votes. Campaign-card effects on the PSOE, PP and Ciudadanos fade by 1.5% of the gap each month.
+
+### 7.5 Election results
+
+Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
 
 ## 8. Lessons from the original's community
 
