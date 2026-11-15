@@ -1628,7 +1628,12 @@
     Q.elections_held = (Q.elections_held || 0) + 1;
     // no fixed campaign cost: the party spends what it chooses in the
     // final campaign
+    // the previous general election's winners, to mark provinces that flip
+    Q.prev_general_winners = Q.general_winners ||
+      provinceWinners(DATA.elections['2011'].provinces);
     Q.map_winners = provinceWinners(r.ballots);
+    Q.general_winners = Q.map_winners;
+    Q.map_prev_winners = Q.prev_general_winners;
     Q.map_shares = districtShares(r.ballots, 5);
     Q.map_kind = 'general';
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
@@ -2407,7 +2412,8 @@
     var out = el(id);
     if (out && Q.map_winners) {
       UI.drawMap(out, Q.map_winners, 'Most-voted party by province (hover for vote shares)',
-        { shares: Q.map_shares, outlines: Q.map_kind === 'regional' ? 'bold' : 'light' });
+        { shares: Q.map_shares, outlines: Q.map_kind === 'regional' ? 'bold' : 'light',
+          prevWinners: Q.map_kind === 'general' ? Q.map_prev_winners : null });
     }
   }
 

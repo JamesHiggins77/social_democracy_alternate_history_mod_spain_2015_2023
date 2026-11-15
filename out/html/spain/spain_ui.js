@@ -350,10 +350,22 @@
     }
     opts = opts || {};
     var shares = opts.shares || {};
+    var prev = opts.prevWinners || null;
+    var flips = 0;
+    var flipped = function (p) {
+      var w = winners && winners[p];
+      return !!(prev && w && prev[p] && prev[p] !== w);
+    };
     var paths = Object.keys(map.provinces).map(function (p) {
       var w = winners && winners[p];
+      var fill = w ? partyColor(w) : '#ddd';
+      if (flipped(p)) {
+        // a province that changed hands is drawn darker
+        fill = mix(fill, '#000000', 0.4);
+        flips += 1;
+      }
       return '<path class="sp-prov" data-prov="' + escapeHtml(p) + '" d="' + map.provinces[p] + '" fill="' +
-        (w ? partyColor(w) : '#ddd') + '" stroke="#fff" stroke-width="0.6"></path>';
+        fill + '" stroke="#fff" stroke-width="0.6"></path>';
     });
     var outlineWidth = opts.outlines === 'bold' ? 2.2 : (opts.outlines === 'light' ? 1 : 0);
     var outlines = outlineWidth && map.regions ? Object.keys(map.regions).map(function (r) {
@@ -378,7 +390,9 @@
     container.innerHTML = (title ? '<h4>' + escapeHtml(title) + '</h4>' : '') +
       '<div class="sp-map-wrap"><svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' +
       paths.join('') + outlines + inset + '</svg><div class="sp-map-tip"></div></div>' +
-      '<p class="sp-map-legend">' + legend + '</p>';
+      '<p class="sp-map-legend">' + legend + '</p>' +
+      (prev ? '<p class="sp-map-legend">' + (flips ? 'Darker shade: ' + flips + ' province' + (flips === 1 ? '' : 's') +
+        ' won by a different party than at the last general election.' : 'No province changed hands.') + '</p>' : '');
     var tip = container.querySelector('.sp-map-tip');
     var wrap = container.querySelector('.sp-map-wrap');
     Array.prototype.forEach.call(container.querySelectorAll('.sp-prov'), function (el) {
@@ -388,7 +402,8 @@
           return '<div><span class="sp-swatch" style="background:' + partyColor(s[0]) + '"></span>' +
             escapeHtml(shortName(s[0])) + ' <b>' + s[1].toFixed(1) + '%</b></div>';
         }).join('');
-        tip.innerHTML = '<strong>' + escapeHtml(p) + '</strong>' + (rows || '<div>No data</div>');
+        var flipNote = flipped(p) ? '<div><em>Gained from ' + escapeHtml(shortName(prev[p])) + '</em></div>' : '';
+        tip.innerHTML = '<strong>' + escapeHtml(p) + '</strong>' + flipNote + (rows || '<div>No data</div>');
         var r = wrap.getBoundingClientRect();
         var x = ev.clientX - r.left + 12;
         var y = ev.clientY - r.top + 12;
