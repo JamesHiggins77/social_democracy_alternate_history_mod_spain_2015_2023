@@ -192,3 +192,57 @@ The nationalists listen. So do the barons, with alarm.
 on-arrival: {! Q.rel_cs += 6; Q.rel_pnv += 3; Q.rel_up -= 6; Q.cs_talks += 0.5; Q.progressives_dissent += 4; if (window.SpainGame) { window.SpainGame.position(Q, -1, 0); } !}
 
 Brussels would approve. Podemos calls it austerity with a red rose.
+
+@back_iglesias
+title: Back Iglesias for Prime Minister?
+new-page: true
+is-card: true
+tags: sp_negotiations
+view-if: seeking_government = 1 and up_rivals_psoe = 1 and iglesias_round < formation_round
+on-arrival: {! Q.iglesias_round = Q.formation_round || 1; Q.month_actions += 1; !}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    Q.psoe_backs_iglesias = 'coalition';
+    window.SpainGame.renderVote(Q, 'sp-iglesias-count', 'up');
+    Q.psoe_backs_iglesias = 0;
+}
+!}
+
+= Back Iglesias for Prime Minister?
+
+Podemos has [+ congress_up_seats +] seats to the PSOE's [+ congress_psoe_seats +]. Pablo Iglesias says the left's leader should be the left's largest party, and asks for the PSOE's votes. This is how his investiture would go with them:
+
+{!<div id="sp-iglesias-count"></div>!}
+
+- @iglesias_coalition: Back him, in a coalition with PSOE ministers
+- @iglesias_external: Back him from outside the government
+- @no_iglesias: Refuse: the PSOE does not follow Podemos
+
+@iglesias_coalition
+on-arrival: {!
+Q.psoe_backs_iglesias = 'coalition';
+if (window.SpainGame) { window.SpainGame.holdInvestiture(Q, 'up'); }
+Q.iglesias_result = Q.inv_passes ? 1 : 0;
+Q.sanchez_authority -= 10; Q.regional_leaders_dissent += 25; Q.institutionalists_dissent += 15; Q.progressives_dissent -= 10; Q.rel_up += 15; Q.rel_cs -= 15;
+if (window.SpainGame) { window.SpainGame.position(Q, 2, 1); }
+if (!Q.inv_passes) { Q.psoe_backs_iglesias = 0; }
+!}
+
+[? if iglesias_result = 1 : Pablo Iglesias is invested Prime Minister. The PSOE enters a coalition as junior partner, with a vice-presidency and ministries. Half your party is appalled; the other half wonders whether you have saved the left or surrendered it. ?][? if iglesias_result = 0 : Even with your votes, Iglesias falls short. The two-month clock is running. ?]
+
+@iglesias_external
+on-arrival: {!
+Q.psoe_backs_iglesias = 'external';
+if (window.SpainGame) { window.SpainGame.holdInvestiture(Q, 'up'); }
+Q.iglesias_result = Q.inv_passes ? 1 : 0;
+Q.sanchez_authority -= 6; Q.regional_leaders_dissent += 18; Q.institutionalists_dissent += 10; Q.rel_up += 8;
+if (window.SpainGame) { window.SpainGame.position(Q, 1, 0.5); }
+if (!Q.inv_passes) { Q.psoe_backs_iglesias = 0; }
+!}
+
+[? if iglesias_result = 1 : Iglesias governs alone, with the PSOE's votes from the opposition benches. Every law will need you; every failure will be shared. ?][? if iglesias_result = 0 : Even with your votes, Iglesias falls short. The two-month clock is running. ?]
+
+@no_iglesias
+on-arrival: {! Q.rel_up -= 10; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 6; !}
+
+The PSOE will lead or it will not govern. Iglesias calls it arrogance.

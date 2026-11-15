@@ -48,3 +48,29 @@ test('A PSOE budget without Catalan dialogue fails (February 2019 arithmetic)', 
   const v = P.count(seats2016, P.stancesForBudget({ rel_up: 60, rel_pnv: 60, rel_cc: 50, cat_dialogue: 0 }));
   assert.ok(v.yes <= v.no, `${v.yes} vs ${v.no}`);
 });
+
+test('Ciudadanos will not share a majority with independence parties', () => {
+  const Q = { rel_cs: 75, referendum_offer: 1, red_lines: 0 };
+  const st = P.stancesForSanchez(Q);
+  assert.strictEqual(st.erc, 'abstain');
+  assert.strictEqual(st.cs, 'no');
+});
+
+test('Iglesias can be invested when Podemos leads the left and the PSOE backs him', () => {
+  const seats = { up: 95, psoe: 80, pp: 110, cs: 30, erc: 9, junts: 8, pnv: 6, bildu: 2, iu: 0, cc: 1 };
+  assert.strictEqual(P.investiture(seats, 'up', {}).passes, false);
+  const v = P.investiture(seats, 'up', { psoe_backs_iglesias: 'coalition' });
+  assert.ok(v.passes, `${v.yes} yes vs ${v.no} no`);
+});
+
+test('Rivera as the right candidate: PP and Cs vote together, the PSOE decides', () => {
+  const seats = { cs: 90, pp: 70, psoe: 100, up: 60, erc: 9, junts: 8, pnv: 6, bildu: 4, cc: 2, iu: 1 };
+  assert.ok(P.investiture(seats, 'cs', { pact_pp_cs: 1, psoe_stance_pp: 'abstain' }).passes);
+  assert.ok(!P.investiture(seats, 'cs', { pact_pp_cs: 1, psoe_stance_pp: 'no' }).passes);
+});
+
+test('a PSOE government can depend on the independence parties', () => {
+  const seats = { psoe: 120, up: 42, cs: 57, pp: 66, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4, cc: 2, upn: 2, mp: 1, prc: 1 };
+  const st = P.stancesForSanchez({ pact_up: 1, rel_pnv: 70, rel_bildu: 45, referendum_offer: 1, red_lines: 0, rel_cc: 50 });
+  assert.ok(P.dependsOnIndependentists(seats, st));
+});

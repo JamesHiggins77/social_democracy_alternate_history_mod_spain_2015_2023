@@ -192,6 +192,21 @@
     Q.weekly = formationMode(Q);
     Q.pp_governs = (Q.pm_party === 'pp' && !Q.acting) ? 1 : 0;
     Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
+    Q.right_candidate = (Q.congress.cs || 0) > (Q.congress.pp || 0) ? 'cs' : 'pp';
+    Q.right_is_cs = Q.right_candidate === 'cs' ? 1 : 0;
+    Q.right_leader = Q.right_candidate === 'cs' ? LEADERS.cs : (Q.pp_leader || 'Mariano Rajoy');
+    Q.right_party_name = Q.right_candidate === 'cs' ? 'Ciudadanos' : 'the PP';
+    Q.up_rivals_psoe = (Q.congress.up || 0) >= 0.9 * (Q.congress.psoe || 1) ? 1 : 0;
+    Q.congress_up_seats = Q.congress.up || 0;
+    Q.psoe_largest = (Q.congress.psoe || 0) > Math.max(Q.congress.pp || 0, Q.congress.cs || 0, Q.congress.up || 0) ? 1 : 0;
+    Q.congress_psoe_seats = Q.congress.psoe || 0;
+    Q.iglesias_round = Q.iglesias_round || 0;
+    Q.cs_up_word = UI.word('relation', Parliament.between(Q, 'cs', 'up'));
+    Q.cs_indep_word = UI.word('relation', Math.min(Parliament.between(Q, 'cs', 'erc'), Parliament.between(Q, 'cs', 'junts')));
+    Q.pp_vox_word = UI.word('relation', Parliament.between(Q, 'pp', 'vox'));
+    Q.pp_cs_word = UI.word('relation', Parliament.between(Q, 'cs', 'pp'));
+    Q.up_indep_word = UI.word('relation', Parliament.between(Q, 'erc', 'up'));
+    Q.pnv_pp_word = UI.word('relation', Parliament.between(Q, 'pnv', 'pp'));
     Q.pp_majority = (Q.congress.pp || 0) >= 176 ? 1 : 0;
     Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
@@ -362,8 +377,21 @@
       transfer(Q, 'psoe', { pp: 0.7, vox: 0.3 },
         { pensioners: 0.25 * so, homemakers: 0.25 * so, self_employed: 0.1 * so });
     }
+    // moving to the centre or right: left-wing voters go to Podemos and IU
+    var r = Math.max(0, -1 - (Q.econ_left || 0)) + 0.5 * Math.max(0, -1 - (Q.social_prog || 0));
+    if (r > 0) {
+      transfer(Q, 'psoe', { up: 0.8, iu: 0.2 },
+        { workers: 0.35 * r, students: 0.35 * r, unemployed: 0.3 * r, professionals: 0.1 * r });
+    }
     Q.econ_left = (Q.econ_left || 0) * 0.97;
     Q.social_prog = (Q.social_prog || 0) * 0.97;
+  }
+
+  // Change a relation between two other parties (clamped 0-100).
+  function partyRel(Q, a, b, delta) {
+    Q.party_rel = Q.party_rel || {};
+    var k = Parliament.pairKey(a, b);
+    Q.party_rel[k] = Math.max(0, Math.min(100, Parliament.between(Q, a, b) + delta));
   }
 
   // Governing wears a party down: a little support leaves every month for
@@ -739,24 +767,74 @@
     return v;
   }
 
+  var LEADERS = { cs: 'Albert Rivera', up: 'Pablo Iglesias' };
+
   function formGovernment(Q, candidate) {
     Q.government_status = 'formed';
     Q.repeat_elections = 0;
     Q.investiture_clock = -1;
     Q.dissolution_due = 0;
+    Q.depends_on_catalans = 0;
     if (candidate === 'sanchez') {
       Q.pm = 'Pedro Sánchez';
       Q.pm_party = 'psoe';
       Q.psoe_in_government = 1;
-      Q.government_type = Q.pact_up ? 'PSOE government with Podemos support'
-        : (Q.pact_cs ? 'PSOE government with Ciudadanos support' : 'PSOE minority government');
+      Q.govt_parties = Q.pact_up ? ['psoe', 'up'] : ['psoe'];
+      Q.government_type = Q.pact_up ? 'PSOE–Podemos coalition government'
+        : (Q.pact_cs ? 'PSOE minority government with a Ciudadanos agreement' : 'PSOE minority government');
+      if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForSanchez(Q))) {
+        Q.depends_on_catalans = 1;
+        Q.government_type += ', relying on the Catalan and Basque nationalists';
+      }
+    } else if (candidate === 'up') {
+      Q.pm = LEADERS.up;
+      Q.pm_party = 'up';
+      Q.psoe_in_government = Q.psoe_backs_iglesias === 'coalition' ? 1 : 0;
+      Q.govt_parties = Q.psoe_in_government ? ['up', 'psoe'] : ['up'];
+      Q.government_type = Q.psoe_in_government ? 'Podemos–PSOE coalition government'
+        : 'Podemos minority government with PSOE support';
+      if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForUP(Q))) {
+        Q.depends_on_catalans = 1;
+      }
+    } else if (candidate === 'cs') {
+      Q.pm = LEADERS.cs;
+      Q.pm_party = 'cs';
+      Q.psoe_in_government = 0;
+      Q.govt_parties = ['cs', 'pp'];
+      Q.government_type = 'Ciudadanos–PP coalition government';
     } else {
       Q.pm = Q.pp_leader || 'Mariano Rajoy';
       Q.pm_party = 'pp';
       Q.psoe_in_government = 0;
-      Q.government_type = 'PP minority government';
+      var cs = Q.congress.cs || 0;
+      var vox = Q.congress.vox || 0;
+      if (Q.pact_pp_cs && cs >= 20) {
+        Q.govt_parties = ['pp', 'cs'];
+        Q.government_type = 'PP–Ciudadanos coalition government';
+      } else if (vox >= 15 && (Q.pp_vox_relation || 50) >= 60 && (Q.congress.pp || 0) + cs < 176) {
+        Q.govt_parties = ['pp', 'vox'];
+        Q.government_type = 'PP–Vox coalition government';
+      } else {
+        Q.govt_parties = ['pp'];
+        Q.government_type = (Q.congress.pp || 0) >= 176 ? 'PP majority government' : 'PP minority government';
+      }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
+  }
+
+  // Who is to blame when no government forms? If the PSOE had a workable
+  // majority within reach (a deal with Podemos and the nationalists, or with
+  // Ciudadanos and Podemos's abstention) it gets the blame; otherwise the
+  // largest party of the right does.
+  function formationBlame(Q) {
+    var tryDeal = function (changes) {
+      var h = JSON.parse(JSON.stringify(Q));
+      Object.keys(changes).forEach(function (k) { h[k] = changes[k]; });
+      return Parliament.investiture(Q.congress, 'sanchez', h).passes;
+    };
+    var psoeCould = tryDeal({ pact_up: 1, pact_cs: 0, rel_pnv: 70, rel_cc: 70, rel_bildu: 45 }) ||
+      tryDeal({ pact_cs: 1, pact_up: 0, rel_up: 85 });
+    return psoeCould ? 'psoe' : 'right';
   }
 
   // Automatic dissolution: election 54 days after the decree (two months
@@ -767,6 +845,23 @@
     Q.election_month = d[1];
     Q.dissolution_due = 0;
     Q.investiture_clock = -1;
+    // voters punish whoever they blame for the failure
+    var all = function (x) {
+      return { workers: x, professionals: x, pensioners: x, self_employed: x,
+               unemployed: x, students: x, homemakers: x };
+    };
+    Q.formation_blame = formationBlame(Q);
+    if (Q.formation_blame === 'psoe') {
+      transfer(Q, 'psoe', { up: 0.4, cs: 0.3, pp: 0.3 }, all(1.8));
+      Q.sanchez_authority -= 6;
+    } else {
+      var right = Q.right_candidate || 'pp';
+      var hasVox = (Q.true_poll && Q.true_poll.vox >= 1) || (Q.congress.vox || 0) > 0;
+      var to = right === 'pp' ? (hasVox ? { psoe: 0.45, cs: 0.35, vox: 0.2 } : { psoe: 0.55, cs: 0.45 })
+        : (hasVox ? { psoe: 0.45, pp: 0.35, vox: 0.2 } : { psoe: 0.55, pp: 0.45 });
+      transfer(Q, right, to, all(1.5));
+    }
+    recalculate(Q);
   }
 
   // ------------------------------------------------------------------
@@ -868,9 +963,6 @@
     var repeat = Q.repeat_elections;
     if (repeat >= 1) {
       Q.pact_pp_cs = 1;
-      // voters punish the parties they blame for the deadlock, the PSOE included
-      transfer(Q, 'psoe', { pp: 0.5, cs: 0.2, up: 0.3 },
-        { workers: repeat, pensioners: repeat, professionals: repeat, homemakers: repeat });
       Q.regional_leaders_dissent += 12 * repeat;
       Q.institutionalists_dissent += 8 * repeat;
       Q.sanchez_authority -= 6 * repeat;
@@ -1090,6 +1182,7 @@
     var v = candidate === 'censure' ? Parliament.count(Q.congress, Parliament.stancesForCensure(Q))
       : (candidate === 'budget' ? Parliament.count(Q.congress, Parliament.stancesForBudget(Q))
         : Parliament.investiture(Q.congress, candidate, Q));
+    // candidates: 'sanchez', 'pp', 'cs', 'up', or 'censure' / 'budget'
     var label = { yes: 'Yes', abstain: 'Abstain', no: 'No' };
     var rows = Object.keys(Q.congress).sort(function (a, b) { return Q.congress[b] - Q.congress[a]; })
       .map(function (p) {
@@ -1298,6 +1391,8 @@
     renderFactions: renderFactions,
     campaign: campaign,
     transfer: transfer,
+    partyRel: partyRel,
+    formationBlame: formationBlame,
     position: position,
     trueVote: trueVote,
     drawPollError: drawPollError,

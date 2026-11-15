@@ -267,3 +267,33 @@ test('party debt damages Sánchez inside the party', () => {
   assert.ok(Q.federal_committee_balance < fc - 1);
   assert.strictEqual(Q.deep_debt, 1);
 });
+
+test('who is blamed for a repeat election', () => {
+  const Q = newQ();
+  toDecember2015(Q);
+  // 2015: no PSOE majority within reach without the independentists -> the PP
+  assert.strictEqual(G.formationBlame(Q), 'right');
+  const pp = Q.vm.classSupport.workers.pp;
+  G.dissolve(Q);
+  assert.ok(Q.vm.classSupport.workers.pp < pp);
+  // a Congress where a PSOE-Podemos deal would have worked -> the PSOE
+  const R = newQ();
+  R.congress = { psoe: 120, up: 60, pp: 100, cs: 40, pnv: 6, cc: 2, erc: 9, junts: 8, bildu: 2, iu: 3 };
+  assert.strictEqual(G.formationBlame(R), 'psoe');
+});
+
+test('a PP investiture with Cs ministers forms a PP-Cs coalition', () => {
+  const Q = newQ();
+  Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'abstain';
+  G.holdInvestiture(Q, 'pp');
+  assert.strictEqual(Q.government_type, 'PP–Ciudadanos coalition government');
+});
+
+test('moving the PSOE to the right sends left voters to Podemos', () => {
+  const Q = newQ();
+  const up = Q.vm.classSupport.students.up;
+  G.position(Q, -6, 0);
+  G.endOfMonth(Q);
+  assert.ok(Q.vm.classSupport.students.up > up + 1, `${up} -> ${Q.vm.classSupport.students.up}`);
+});

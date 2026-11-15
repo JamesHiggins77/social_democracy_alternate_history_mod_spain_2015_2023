@@ -10,6 +10,49 @@
     return v === undefined ? fallback : v;
   }
 
+  // Relations between other parties (0-100), independent of the PSOE.
+  // Stored in Q.party_rel under 'a-b' keys (alphabetical); these defaults
+  // describe 2014-15. Events move them.
+  var PARTY_REL = {
+    'cs-erc': 5, 'cs-junts': 8, 'bildu-cs': 0, 'cs-up': 20, 'cs-pnv': 35, 'cs-pp': 55, 'cs-vox': 30,
+    'erc-pp': 10, 'junts-pp': 20, 'bildu-pp': 0, 'pp-up': 5, 'pnv-pp': 45, 'pp-vox': 45, 'cc-pp': 60,
+    'erc-up': 50, 'junts-up': 30, 'bildu-up': 45, 'pnv-up': 40, 'pnv-vox': 0, 'junts-pnv': 55,
+    'erc-junts': 55, 'erc-vox': 0, 'junts-vox': 0, 'up-vox': 0, 'iu-up': 70, 'bildu-pnv': 25
+  };
+
+  function pairKey(a, b) {
+    return a < b ? a + '-' + b : b + '-' + a;
+  }
+
+  function between(Q, a, b) {
+    var k = pairKey(a, b);
+    if (Q.party_rel && Q.party_rel[k] !== undefined) {
+      return Q.party_rel[k];
+    }
+    return PARTY_REL[k] === undefined ? 40 : PARTY_REL[k];
+  }
+
+  // Parties that refuse to share a majority: if `a` votes yes or abstains
+  // alongside parties it detests, it votes no instead.
+  function vetoes(Q, stances) {
+    var helping = function (p) { return stances[p] === 'yes' || stances[p] === 'abstain'; };
+    // Ciudadanos will not share a majority with independence parties
+    if (helping('cs') && ['erc', 'junts', 'bildu'].some(function (p) {
+      return helping(p) && between(Q, 'cs', p) < 30;
+    })) {
+      stances.cs = 'no';
+    }
+    // the PNV will not back a government that depends on Vox
+    if (helping('pnv') && helping('vox') && between(Q, 'pnv', 'vox') < 20) {
+      stances.pnv = 'no';
+    }
+    // Podemos will not share a majority with Ciudadanos unless relations thaw
+    if (stances.up === 'yes' && stances.cs === 'yes' && between(Q, 'cs', 'up') < 40) {
+      stances.up = 'abstain';
+    }
+    return stances;
+  }
+
   function byRelation(Q, id, yesAt, abstainAt) {
     var r = relation(Q, id, 35);
     return r >= yesAt ? 'yes' : (r >= abstainAt ? 'abstain' : 'no');
@@ -32,7 +75,7 @@
       up = relation(Q, 'up', 35) >= 60 ? 'abstain' : 'no';
     }
     var independence = (!Q.red_lines && Q.referendum_offer && !Q.pact_cs) ? 'abstain' : 'no';
-    return {
+    return vetoes(Q, {
       psoe: 'yes',
       pp: 'no', vox: 'no', upn: 'no',
       cs: cs,
@@ -50,20 +93,46 @@
       prc: byRelation(Q, 'prc', 50, 30),
       te: byRelation(Q, 'te', 50, 30),
       geroa: byRelation(Q, 'geroa', 50, 30)
-    };
+    });
   }
 
   // How each group votes on Mariano Rajoy's (or another PP leader's)
   // investiture. Q.psoe_stance_pp: 'no' or 'abstain', the player's choice.
   function stancesForPP(Q) {
-    return {
-      pp: 'yes', vox: 'yes', upn: 'yes',
+    return vetoes(Q, {
+      pp: 'yes', vox: between(Q, 'pp', 'vox') >= 30 ? 'yes' : 'abstain', upn: 'yes',
       psoe: Q.psoe_stance_pp || 'no',
       cs: Q.pact_cs ? 'no' : (Q.pact_pp_cs ? 'yes' : 'abstain'),
-      cc: 'yes',
+      cc: between(Q, 'cc', 'pp') >= 50 ? 'yes' : 'abstain',
       up: 'no', iu: 'no', mp: 'no', erc: 'no', junts: 'no', cup: 'no', bildu: 'no',
-      pnv: 'no', nc: 'no', bng: 'no', prc: 'abstain', te: 'no', geroa: 'no'
-    };
+      pnv: between(Q, 'pnv', 'pp') >= 65 ? 'yes' : 'no',
+      nc: 'no', bng: 'no', prc: 'abstain', te: 'no', geroa: 'no'
+    });
+  }
+
+  // Albert Rivera (Ciudadanos) as the right's candidate, when Cs leads it.
+  function stancesForCs(Q) {
+    var st = stancesForPP(Q);
+    st.cs = 'yes';
+    st.pp = Q.pact_pp_cs || between(Q, 'cs', 'pp') >= 50 ? 'yes' : 'abstain';
+    st.psoe = Q.psoe_stance_pp || 'no';
+    st.pnv = between(Q, 'cs', 'pnv') >= 50 ? 'abstain' : 'no';
+    return vetoes(Q, st);
+  }
+
+  // Pablo Iglesias (Podemos) as candidate, with the PSOE's support
+  // (Q.psoe_backs_iglesias: 'coalition' or 'external').
+  function stancesForUP(Q) {
+    var psoeYes = !!Q.psoe_backs_iglesias;
+    return vetoes(Q, {
+      up: 'yes', iu: 'yes', mp: 'yes', psoe: psoeYes ? 'yes' : 'no',
+      pp: 'no', vox: 'no', upn: 'no', cs: 'no',
+      erc: between(Q, 'erc', 'up') >= 45 ? 'abstain' : 'no',
+      junts: between(Q, 'junts', 'up') >= 45 ? 'abstain' : 'no',
+      bildu: between(Q, 'bildu', 'up') >= 40 ? 'yes' : 'abstain',
+      pnv: between(Q, 'pnv', 'up') >= 55 ? 'yes' : 'abstain',
+      cup: 'abstain', cc: 'no', nc: 'abstain', bng: 'yes', prc: 'no', te: 'abstain', geroa: 'yes'
+    });
   }
 
   // Motion of no confidence (art. 113) with Sánchez as the alternative
@@ -127,13 +196,33 @@
   }
 
   function investiture(seats, candidate, Q) {
-    return count(seats, candidate === 'sanchez' ? stancesForSanchez(Q) : stancesForPP(Q));
+    var st = candidate === 'sanchez' ? stancesForSanchez(Q)
+      : (candidate === 'up' ? stancesForUP(Q) : (candidate === 'cs' ? stancesForCs(Q) : stancesForPP(Q)));
+    return count(seats, st);
+  }
+
+  // Did a vote depend on the independence parties? True if it passes with
+  // their votes or abstentions but would fail if they voted no.
+  function dependsOnIndependentists(seats, stances) {
+    var with_ = count(seats, stances);
+    if (!with_.passes) {
+      return false;
+    }
+    var without = JSON.parse(JSON.stringify(stances));
+    ['erc', 'junts', 'bildu', 'cup'].forEach(function (p) { without[p] = 'no'; });
+    return !count(seats, without).passes;
   }
 
   var api = {
     MAJORITY: MAJORITY,
     stancesForSanchez: stancesForSanchez,
     stancesForPP: stancesForPP,
+    stancesForCs: stancesForCs,
+    stancesForUP: stancesForUP,
+    between: between,
+    pairKey: pairKey,
+    PARTY_REL: PARTY_REL,
+    dependsOnIndependentists: dependsOnIndependentists,
     stancesForCensure: stancesForCensure,
     stancesForBudget: stancesForBudget,
     count: count,

@@ -60,6 +60,21 @@ All rules sit in one module so every card uses the same arithmetic.
 - **Clock:** two months after the first investiture vote, if no candidate has won, the Cortes are dissolved automatically and an election follows (54 days after the decree, LOREG). With no first vote, the clock does not start (the 2016 debate).
 - Arrangements are distinct states: coalition, legislative agreement, confidence-and-supply, issue-by-issue, abstention. Each has different costs and stability.
 
+### 3.1b Who can govern
+
+- **The right's candidate** is the leader of the larger of the PP and Ciudadanos: Rajoy, or Rivera if Cs overtakes the PP. A PP investiture with Cs votes and at least 20 Cs seats forms a **PP–Ciudadanos coalition**; with a warm PP–Vox relation and Vox needed, a **PP–Vox coalition**; a Rivera investiture forms a **Ciudadanos–PP coalition**.
+- **If the PSOE is the largest party**, the King nominates Sánchez first.
+- **If Podemos is level with or ahead of the PSOE**, the *Back Iglesias* card lets the PSOE invest Iglesias, as junior coalition partner (PSOE ministers) or from outside.
+- **PSOE governments** are recorded as coalition, agreement-based or minority, and flagged when they depend on the independence parties (`depends_on_catalans`). During the Catalan crisis such a government faces its partners' price (concede, a dialogue table, or refuse and lose the majority), and a PSOE Prime Minister decides Article 155 himself (with elections, indefinitely, or refuse).
+
+### 3.1c Relations between other parties
+
+Pairwise relations (`Q.party_rel`, defaults in `parliament.js`) decide who will vote together: Ciudadanos will not share a majority with ERC, Junts or Bildu; the PNV will not back a government that depends on Vox; Podemos and Cs will not vote together while relations are cold. Events move them (the Catalan crisis pushes Cs and the PP away from Junts and ERC; Vox's rise brings the PP and Vox closer). Shown in the Politics tab.
+
+### 3.1d Who is blamed for a repeat election
+
+At dissolution the game checks whether the PSOE had a workable majority within reach (a deal with Podemos and the PNV/CC, or with Cs and Podemos's abstention). If so, voters blame the PSOE (support moves to Podemos, Cs and the PP, and Sánchez loses authority); if not, they blame the right's candidate (support moves to the PSOE, Cs or the PP, and Vox if it exists).
+
 ### 3.2 Motion of no confidence (art. 113)
 
 - Constructive: it must name an alternative candidate and needs an absolute majority (176).
@@ -237,7 +252,7 @@ Campaign and media cards can aim at an audience (`SpainGame.target`): students, 
 
 - **Harder gains:** PSOE campaign gains are scaled by 0.6, then by campaign fatigue, 1/(1 + fatigue), where every point gained adds 0.08 fatigue and fatigue falls by a quarter each month. Repeat targeting of the same audience: 1/(1 + uses), recovering 0.15 a month.
 - **Cross-pressure:** courting students or the young loses pensioners to the PP; courting pensioners loses students to Podemos; working-class appeals lose professionals and the self-employed to Cs and the PP; middle-class appeals lose workers to Podemos; women-focused appeals lose a few self-employed men.
-- **Position:** `econ_left` and `social_prog` rise with left-wing economic promises (labour-reform repeal, wealth tax, public ownership) and progressive social ones (feminism, memory, abortion, territorial concessions), and fall with moderating choices; both fade 3% a month. Above 3, moderates leave every month: professionals and the self-employed to Cs and the PP (economic), pensioners and homemakers to the PP and Vox (social). Shown as words in the Politics tab.
+- **Position:** moving to the centre or right (`econ_left` or `social_prog` below −1) sends workers, students and the unemployed to Podemos and IU. `econ_left` and `social_prog` rise with left-wing economic promises (labour-reform repeal, wealth tax, public ownership) and progressive social ones (feminism, memory, abortion, territorial concessions), and fall with moderating choices; both fade 3% a month. Above 3, moderates leave every month: professionals and the self-employed to Cs and the PP (economic), pensioners and homemakers to the PP and Vox (social). Shown as words in the Politics tab.
 - **Grievances outlast favours:** gains fade at 3% of the gap a month, losses recover at 1%. In government, PSOE gains count ×0.7 and losses ×1.5, and every month a party in government (from 2016) loses a little support to the opposition.
 - **Money:** every campaign action costs funds and cannot be taken without them. In debt, Sánchez loses authority and Federal Committee support monthly and the Institutionalists and Regional Leaders grow restless; at −5 the treasurer's crisis, and a revolt becomes possible; at −10, with a hostile Federal Committee, removal for mismanagement.
 

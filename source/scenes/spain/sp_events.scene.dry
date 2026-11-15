@@ -65,16 +65,16 @@ title: The King's consultations
 new-page: true
 face-image: img/spain/event_rajoy_sanchez.jpg
 tags: sp_event
-view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2
+view-if: acting = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2 and psoe_largest = 0
 on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}
 
-= Rajoy asks for support
+= [+ right_leader +] asks for support
 
-The King has finished his consultations and offered the nomination to the largest party's leader. Before deciding whether to accept, Rajoy calls you. He wants the PSOE to let him govern: a vote in favour, or at least an abstention. Many of the PSOE's voters, and most of its younger ones, will never forgive a PSOE that hands Rajoy another term.
+The King has finished his consultations and offered the nomination to [+ right_leader +], the leader of the largest party of the right. Before deciding whether to accept, [+ right_leader +] calls you. [? if right_is_cs = 1 : Ciudadanos has overtaken the PP; Rivera offers a government of Ciudadanos and the PP, ?][? if right_is_cs = 0 : Rajoy wants the PSOE to let him govern, ?] with your vote in favour, or at least an abstention. Many of the PSOE's voters, and most of its younger ones, will never forgive a PSOE that hands the right another term.
 
 What will the PSOE do?
 
-- @against: Vote against Rajoy
+- @against: Vote against [+ right_leader +]
 - @abstain: Abstain and let a PP government be formed
 - @limited: Negotiate a limited agreement in exchange for abstention
 - @other_candidate: Demand a different PP candidate
@@ -98,9 +98,10 @@ go-to: pp_decides
 @pp_decides
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainParliament) {
-    var v = window.SpainParliament.investiture(Q.congress, 'pp', Q);
+    var cand = Q.right_candidate || 'pp';
+    var v = window.SpainParliament.investiture(Q.congress, cand, Q);
     if (v.passes) {
-        window.SpainGame.holdInvestiture(Q, 'pp');
+        window.SpainGame.holdInvestiture(Q, cand);
         Q.pp_invested_now = 1;
     } else {
         Q.pp_invested_now = 0;
@@ -111,18 +112,18 @@ if (typeof window !== 'undefined' && window.SpainParliament) {
 go-to: pp_invested if pp_invested_now = 1; pp_declines if pp_invested_now = 0
 
 @pp_invested
-title: A PP government
+title: A government of the right
 
-= A PP government
+= A government of the right
 
-With the PSOE's abstention, the PP's candidate is invested Prime Minister in the second vote. The country has a government. In the PSOE, the argument about who allowed it has only begun. Membership cards are torn up on social media, and the polls show left-wing voters moving to Podemos.
+With the PSOE's abstention, [+ right_leader +] is invested Prime Minister: [+ government_type +]. The country has a government. In the PSOE, the argument about who allowed it has only begun. Membership cards are torn up on social media, and the polls show left-wing voters moving to Podemos.
 
 @pp_declines
-title: Rajoy declines
+title: The right's candidate declines
 
-= Rajoy declines the nomination
+= [+ right_leader +] declines the nomination
 
-Without the votes, Rajoy does something no candidate has done before: he declines the King's offer, and waits for others to fail. The initiative passes to you, if you want it.
+Without the votes, [+ right_leader +] does something no candidate had done before: declines the King's offer, and waits for others to fail. The initiative passes to you, if you want it.
 
 - @offer: Tell the King you are ready to seek the investiture
 - @hold: Hold back and keep negotiating
@@ -135,7 +136,7 @@ The King proposes you as candidate. The Speaker will set the date of the debate 
 @hold
 on-arrival: sanchez_authority -= 2
 
-You tell the King you need more time. Rajoy's strategy depends on everyone else's patience running out first.
+You tell the King you need more time. [+ right_leader +]'s strategy depends on everyone else's patience running out first.
 
 @king_turns
 title: The King turns to you
@@ -149,7 +150,7 @@ on-arrival: {! Q.king_asked = Q.formation_round || 1; !}
 After a second round of consultations, the King asks whether you will stand. If no one does, the investiture clock never starts and the country stays in limbo.
 
 - @king_accept: Accept the nomination
-- @king_refuse: Refuse: Rajoy must face the chamber first
+- @king_refuse: Refuse: [+ right_leader +] must face the chamber first
 
 @king_accept
 on-arrival: sanchez_nominated = 1; sanchez_authority += 4
@@ -159,12 +160,12 @@ You are the candidate. (Use the "Seek investiture" card when you are ready.)
 @king_refuse
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
-    window.SpainGame.holdInvestiture(Q, 'pp');
+    window.SpainGame.holdInvestiture(Q, Q.right_candidate || 'pp');
 }
 Q.sanchez_authority -= 3;
 !}
 
-The King proposes Rajoy, who this time goes to the vote and loses it. The two-month clock has started: if no one is invested, Spain votes again.
+The King proposes [+ right_leader +], who this time goes to the vote and loses it. The two-month clock has started: if no one is invested, Spain votes again.
 
 @dissolution
 title: The Cortes are dissolved
@@ -309,13 +310,13 @@ tags: sp_event
 view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and formation_weeks >= 16
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
-    window.SpainGame.holdInvestiture(Q, 'pp');
+    window.SpainGame.holdInvestiture(Q, Q.right_candidate || 'pp');
 }
 !}
 
 = The King forces a vote
 
-Months have passed without a candidate facing the chamber, and without a first vote the constitutional clock cannot start. The King proposes the leader of the largest party once more, and this time he goes to the vote.
+Months have passed without a candidate facing the chamber, and without a first vote the constitutional clock cannot start. The King proposes [+ right_leader +] once more, and this time the vote goes ahead.
 
 [? if acting = 1 : He loses it. The two-month clock has started: if no one is invested, the Cortes will be dissolved and Spain will vote again. ?][? if acting = 0 : He wins it. Spain has a government. ?]
 
@@ -375,6 +376,7 @@ tags: sp_event
 view-if: cat_crisis_seen = 0 and catalonia_independentist = 1 and ((year = 2017 and month >= 9) or year >= 2018)
 on-arrival: {!
 Q.cat_crisis_seen = 1; Q.catalan_crisis = 1; Q.cat_crisis_stage = 1; Q.cat_stage_time = Q.time;
+if (window.SpainGame) { window.SpainGame.partyRel(Q, 'cs', 'erc', -5); window.SpainGame.partyRel(Q, 'cs', 'junts', -8); window.SpainGame.partyRel(Q, 'pp', 'junts', -10); window.SpainGame.partyRel(Q, 'pnv', 'junts', 5); }
 if (window.SpainGame) {
     window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.1);
     window.SpainGame.territorial(Q, 'Cataluña', 'junts', 1.1);
@@ -453,7 +455,7 @@ Mediation goes nowhere, but you are the only national leader still talking to ev
 title: Independence and Article 155
 new-page: true
 tags: sp_event
-view-if: catalan_crisis = 1 and cat_crisis_stage = 2 and time >= cat_stage_time + 1
+view-if: catalan_crisis = 1 and cat_crisis_stage = 2 and time >= cat_stage_time + 1 and psoe_in_government = 0
 on-arrival: {!
 Q.cat_crisis_stage = 3;
 if (Q.regions && Q.regions['Cataluña']) {
@@ -512,6 +514,7 @@ Q.vox_rise_seen = 1;
 var push = 8 + 2 * (Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) + (Q.pp_scandal >= 3 ? 2 : 0);
 push = Math.max(3, push);
 Q.vox_push = push;
+if (window.SpainGame) { window.SpainGame.partyRel(Q, 'pp', 'vox', 10); window.SpainGame.partyRel(Q, 'cs', 'vox', 5); }
 if (window.SpainGame) {
     window.SpainGame.campaign(Q, 'vox', {self_employed: push + 3, pensioners: push - 1, workers: push,
         homemakers: push - 1, professionals: push - 2, unemployed: push - 1, students: push - 2});
@@ -939,3 +942,88 @@ if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, cs: 0.5},
 With the party unable to pay its own campaign debts, the Federal Committee meets in emergency session. The regional leaders, the old guard and even some of your own executive vote to remove you for "the ruinous management of the party". A caretaker committee takes over Ferraz.
 
 [? if leadership_exception_open = 1 : The members have not spoken yet. The next primary is due in May 2017. ?]
+
+@cat_155_gov
+title: Independence declared
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and cat_crisis_stage = 2 and time >= cat_stage_time + 1 and psoe_in_government = 1
+on-arrival: {! Q.cat_crisis_stage = 3; !}
+
+= Independence declared
+
+The Parliament of Catalonia votes a declaration of independence. The decision is yours: as Prime Minister, only you can ask the Senate to authorise Article 155, and the PP's majority there will grant it. [? if depends_on_catalans = 1 : Your government survives on the votes of the very parties that have just declared independence. ?]
+
+- @gov_155_elections: Apply Article 155 and call Catalan elections at once
+- @gov_155_long: Apply Article 155 indefinitely, until order is restored
+- @gov_no_155: Refuse Article 155: negotiate with the Generalitat
+
+@gov_155_elections
+on-arrival: {!
+Q.rel_pp += 8; Q.rel_cs += 8; Q.rel_erc -= 20; Q.rel_junts -= 25; Q.rel_up -= 6; Q.regional_leaders_dissent -= 10; Q.progressives_dissent += 6; Q.cat_hard_line += 1;
+if (Q.regions && Q.regions['Cataluña']) { var y = Q.year, m = Q.month + 2; if (m > 12) { m -= 12; y += 1; } Q.regions['Cataluña'].nextElection = y + '-' + (m < 10 ? '0' : '') + m + '-21'; Q.regions['Cataluña'].lastWasSnap = true; }
+if (Q.depends_on_catalans) { Q.depends_on_catalans = 0; Q.lost_majority = 1; }
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, homemakers: 1, self_employed: 0.5}); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 0.97); window.SpainGame.partyRel(Q, 'erc', 'up', -5); window.SpainGame.position(Q, 0, -1); }
+!}
+
+The Catalan government is dismissed and elections are called. Most of Spain backs you; the PSC holds its own. [? if lost_majority = 1 : ERC and Junts will never vote with you again: your government no longer has a majority. ?]
+
+@gov_155_long
+on-arrival: {!
+Q.rel_pp += 10; Q.rel_cs += 10; Q.rel_erc -= 30; Q.rel_junts -= 30; Q.rel_up -= 15; Q.rel_pnv -= 10; Q.progressives_dissent += 15; Q.regional_leaders_dissent -= 12; Q.cat_hard_line += 2;
+if (Q.regions && Q.regions['Cataluña']) { var y = Q.year + 1, m = Q.month; Q.regions['Cataluña'].nextElection = y + '-' + (m < 10 ? '0' : '') + m + '-21'; Q.regions['Cataluña'].lastWasSnap = true; }
+if (Q.depends_on_catalans) { Q.depends_on_catalans = 0; Q.lost_majority = 1; }
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1.5}); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, workers: 1}); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 0.92); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.1); window.SpainGame.position(Q, 0, -2); }
+!}
+
+Direct rule from Madrid for a year. The State is in control; in Catalonia, the independence movement has never been stronger, and the PNV is alarmed.
+
+@gov_no_155
+on-arrival: {!
+Q.rel_pp -= 20; Q.rel_cs -= 25; Q.rel_erc += 10; Q.rel_junts += 10; Q.rel_up += 6; Q.regional_leaders_dissent += 35; Q.institutionalists_dissent += 20; Q.federal_committee_balance -= 15; Q.sanchez_authority -= 10; Q.cat_dialogue += 2;
+if (Q.regions && Q.regions['Cataluña']) { var y = Q.year, m = Q.month + 4; if (m > 12) { m -= 12; y += 1; } Q.regions['Cataluña'].nextElection = y + '-' + (m < 10 ? '0' : '') + m + '-21'; Q.regions['Cataluña'].lastWasSnap = true; }
+if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.4, cs: 0.4, vox: 0.2}, {pensioners: 3, homemakers: 2.5, self_employed: 2, workers: 1.5, professionals: 1}); window.SpainGame.campaign(Q, 'vox', {pensioners: 2, self_employed: 2, workers: 1.5}); window.SpainGame.position(Q, 0, 3); }
+!}
+
+You refuse to suspend autonomy and open talks. The PP and Ciudadanos call it treason and fill the streets of Madrid; the barons openly discuss replacing you. The Generalitat agrees to new Catalan elections in four months.
+
+@partners_price
+title: Your partners' price
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and psoe_in_government = 1 and depends_on_catalans = 1 and partners_price_seen = 0
+on-arrival: partners_price_seen = 1
+
+= Your partners' price
+
+ERC and Junts remind you that your government exists because of their votes. Their price for keeping it alive: a negotiation on a self-determination referendum, and the release of the jailed independence leaders.
+
+- @concede_talks: Open talks that include their demands
+- @dialogue_only: A dialogue table, but no referendum
+- @refuse_partners: Refuse: you will not negotiate the unity of Spain
+
+@concede_talks
+on-arrival: {! Q.rel_erc += 15; Q.rel_junts += 15; Q.cat_dialogue += 2; Q.regional_leaders_dissent += 25; Q.rel_cs -= 20; Q.rel_pp -= 15; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.4, cs: 0.35, vox: 0.25}, {pensioners: 2.5, homemakers: 2, self_employed: 1.5, workers: 1}); window.SpainGame.position(Q, 0, 2.5); window.SpainGame.partyRel(Q, 'cs', 'pp', 10); } !}
+
+Your majority survives. Ciudadanos and the PP accuse you of selling Spain; across the country, moderates are listening to them.
+
+@dialogue_only
+on-arrival: {! Q.rel_erc += 5; Q.rel_junts -= 5; Q.cat_dialogue += 1; Q.regional_leaders_dissent += 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, cs: 0.5}, {pensioners: 1, homemakers: 1}); window.SpainGame.position(Q, 0, 1); } !}
+
+ERC accepts the table, for now. Junts calls it a trap. Your majority hangs on ERC's patience.
+
+@refuse_partners
+on-arrival: {! Q.rel_erc -= 20; Q.rel_junts -= 20; Q.depends_on_catalans = 0; Q.lost_majority = 1; Q.regional_leaders_dissent -= 10; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, homemakers: 1}); window.SpainGame.position(Q, 0, -1); } !}
+
+The country's majority applauds. In Congress, you no longer have one: every vote from now on is a negotiation.
+
+@king_nominates_psoe
+title: The King nominates you
+new-page: true
+tags: sp_event
+view-if: acting = 1 and psoe_largest = 1 and pp_asked < formation_round and election_year = 0 and investiture_votes = 0 and formation_weeks >= 2 and sanchez_leader = 1
+on-arrival: {! Q.pp_asked = Q.formation_round || 1; Q.sanchez_nominated = 1; Q.sanchez_authority += 5; Q.member_morale += 5; !}
+
+= The King nominates you
+
+The PSOE is the largest party in Congress. After his consultations, the King proposes you as candidate for President of the Government. The right will vote against; everything depends on the deals you can strike. (Use the "Seek investiture" card when you are ready.)
