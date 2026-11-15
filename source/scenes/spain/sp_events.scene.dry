@@ -1033,7 +1033,7 @@ The PSOE is the largest party in Congress. After his consultations, the King pro
 title: The King's second round
 new-page: true
 tags: sp_event
-view-if: acting = 1 and investiture_votes >= 1 and investiture_clock > 0 and sanchez_nominated = 0 and sanchez_leader = 1 and election_year = 0 and king_second_asked < formation_round
+view-if: acting = 1 and right_failed_vote = 1 and investiture_clock > 0 and sanchez_nominated = 0 and sanchez_leader = 1 and election_year = 0 and king_second_asked < formation_round
 on-arrival: {! Q.king_second_asked = Q.formation_round || 1; !}
 
 = The King's second round

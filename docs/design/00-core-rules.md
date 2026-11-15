@@ -288,7 +288,7 @@ Advisers (pinned, sharing one action timer): Antonio Hernando (parliament), the 
 
 **Chaos** (0–100, shown as Stability: Calm, Restless, Turbulent, Chaotic, In turmoil) is recalculated monthly from: unemployment above 13% and negative growth; an acting government (10, plus 2 a month up to 15) and repeat elections (6 each); migration (a background level by year, highest in 2018 and 2020–21, plus event tension: the Aquarius, Ceuta, the Canary route, Ukraine); the Catalan crisis (15) and its aftermath (the 2019 sentence adds tension that fades); PP corruption while the PP governs; the pandemic (March 2020 to June 2021); and low social cohesion. It is smoothed (70% last month, 30% new).
 
-From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos every month: Vox takes from the PP, Cs and (a little) the PSOE, at 30% strength until it breaks through (2018, or its first regional seats) and slowing as it nears 25%; learning the Danish model cuts its migration-driven gains by a fifth. When chaos falls below 20, Vox's protest voters drift back to the PP. Vox's first regional seats trigger a breakthrough event with a further jump.
+From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos every month: Vox takes from the PP, Cs and (a little) the PSOE, at 30% strength until it breaks through (2018, or its first regional seats) and slowing as it nears 18%; learning the Danish model cuts its migration-driven gains by a fifth. When chaos falls below 30, Vox's protest voters drift back to the PP. Vox's first regional seats trigger a breakthrough event with a further jump.
 
 **Ciudadanos**: its losses no longer recover from 2016. As the junior partner of a PP government it is absorbed (mostly by the PP), and from 2019, once Vox polls 5% or more, the right consolidates at its expense. **Podemos** loses 0.8% of its support a month from 2017 to internal strife, plus the Vistalegre II (2017) and Galapagar chalet (2018) events.
 
@@ -298,9 +298,9 @@ From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos
 
 **Investiture**: ERC abstains on a Sánchez investiture backed by a Podemos coalition if the red lines are gone and there is a dialogue table (or relations of 50+), as in January 2020; Bildu abstains from relations of 30. Winning a primary lifts the 2016 red lines. After the right's candidate loses a vote, the King offers Sánchez the nomination.
 
-**Party money**: income is 0.2 + seats/350 a month plus 0.15 per dues level; running costs are 0.05 + 0.04 per year since 2014; a general election costs 4 + 0.4 per year since 2015. The Party dues card raises dues (money, but members and some voters leave) or cuts them (members and goodwill, less money). The Socialist International and Progressive Alliance card spends money on hosting a conference (relations abroad) or learning from sister parties: Portugal (talks with Podemos), Denmark (Vox gains less from migration; progressives object), British Labour (campaign gains +10% each, up to +30%), Sweden (higher cohesion), the SPD (calmer barons, warmer PP).
+**Party money**: income is 0.2 + seats/350 a month plus 0.15 per dues level; running costs are 0.03 + 0.03 per year since 2014; a general election costs 4 + 0.25 per year since 2015. The Party dues card raises dues (money, but members and some voters leave) or cuts them (members and goodwill, less money). The Socialist International and Progressive Alliance card spends money on hosting a conference (relations abroad) or learning from sister parties: Portugal (talks with Podemos), Denmark (Vox gains less from migration; progressives object), British Labour (campaign gains +10% each, up to +30%), Sweden (higher cohesion), the SPD (calmer barons, warmer PP).
 
-**Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 3% a month back towards 55 without attention.
+**Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 2% a month back towards 55 without attention.
 
 ### 7.5 Election results
 

@@ -548,7 +548,7 @@
     var voxReady = Q.year >= 2018 || Q.vox_breakthrough ? 1 : 0.3;
     var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
     // Vox's growth slows as it approaches its ceiling
-    var vox = 0.8 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 25);
+    var vox = 0.45 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 18);
     transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
                               professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
     transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
@@ -576,8 +576,8 @@
       transfer(Q, 'up', { psoe: 0.6, iu: 0.15, mp: 0.25 }, share(Q, 'up', 0.008));
     }
     // when things calm down, Vox's protest voters drift back to the PP
-    if (Q.chaos < 20 && voxPoll > 3) {
-      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (20 - Q.chaos) / 10));
+    if (Q.chaos < 30 && voxPoll > 3) {
+      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (30 - Q.chaos) / 10));
     }
     // the economy judges the government: unemployment above its
     // historical level costs the governing party
@@ -638,7 +638,7 @@
   }
 
   function fundsUpkeep(Q) {
-    return 0.05 + 0.04 * Math.max(0, Q.year - 2014);
+    return 0.03 + 0.03 * Math.max(0, Q.year - 2014);
   }
 
   // Card helpers ------------------------------------------------------
@@ -890,7 +890,7 @@
     monthlyWorld(Q);
     // foreign relations drift back towards a neutral 55 without attention
     Object.keys(Q.intl || {}).forEach(function (k) {
-      Q.intl[k] += (55 - Q.intl[k]) * 0.03;
+      Q.intl[k] += (55 - Q.intl[k]) * 0.02;
     });
 
     Object.keys(Q.target_uses || {}).forEach(function (k) {
@@ -1036,6 +1036,8 @@
     }
     if (v.passes) {
       formGovernment(Q, candidate);
+    } else {
+      Q.right_failed_vote = (candidate === 'pp' || candidate === 'cs') ? 1 : 0;
     }
     return v;
   }
@@ -1240,7 +1242,7 @@
     Q.congress = r.totals;
     Q.vote_shares = r.voteShares;
     Q.elections_held = (Q.elections_held || 0) + 1;
-    Q.funds -= 4 + 0.4 * Math.max(0, Q.year - 2015);
+    Q.funds -= 4 + 0.25 * Math.max(0, Q.year - 2015);
     Q.map_winners = provinceWinners(r.ballots);
     Q.map_shares = districtShares(r.ballots, 5);
     Q.map_kind = 'general';
@@ -1265,6 +1267,7 @@
     // a new legislature: talks and pacts start again
     Q.investiture_clock = -1;
     Q.investiture_votes = 0;
+    Q.right_failed_vote = 0;
     Q.sanchez_nominated = 0;
     Q.rajoy_declined = 0;
     Q.pact_cs = 0;
