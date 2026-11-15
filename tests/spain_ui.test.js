@@ -42,3 +42,19 @@ test('entities: people and parties are recognised, longest name first', () => {
   assert.strictEqual(E.lookup('Susana Díaz').party, 'psoe');
   assert.ok(/Regional Leaders/.test(E.lookup('Susana Díaz').wing));
 });
+
+test('minor regional lists get readable names', () => {
+  const U = require('../out/html/spain/spain_ui.js');
+  assert.strictEqual(U.partyName('x:eb_escanos_en_blanco'), 'Escaños en Blanco');
+  assert.strictEqual(U.partyName('x:scd_sociedad_civil_y_democracia'), 'Sociedad Civil y Democracia');
+  assert.strictEqual(U.partyName('x:cx_g_compromiso_por_galicia'), 'Compromiso por Galicia');
+  assert.strictEqual(U.partyName('x:p_c_p_e'), 'PCPE');
+  assert.strictEqual(U.shortName('x:I-E'), 'Izquierda-Ezkerra');
+  // no raw slugs anywhere in the regional data
+  const R = require('../out/html/spain/regional_data.js');
+  const bad = new Set();
+  for (const r of Object.keys(R.regions)) for (const d of Object.keys(R.regions[r])) for (const dn of Object.keys(R.regions[r][d].districts)) {
+    for (const l of R.regions[r][d].districts[dn].lists) { const n = U.partyName(l[0]); if (/_|\?/.test(n)) bad.add(n); }
+  }
+  assert.deepStrictEqual([...bad], []);
+});

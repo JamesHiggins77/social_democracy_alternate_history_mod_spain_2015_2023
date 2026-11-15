@@ -72,12 +72,63 @@
   var PP_ALONE_LOSS_SEATS = 186;   // a clear PP majority, not a bare one
   var LARGE_MAJORITY_SEATS = 193;  // PP + Vox above 55% of 350
 
+  // Minor lists in the regional data keep the source's labels: lowercase
+  // slugs ("x:eb_escanos_en_blanco"), uppercase acronyms ("x:PxC") or
+  // labels with lost accents. These turn them into readable names.
+  var KNOWN_MINOR = {
+    pacma: 'PACMA', pacma_partido_animalista_contra_o_maltrato_animal: 'PACMA', otros_partidos: 'Others', otros: 'Others',
+    fe_de_las_jons: 'FE de las JONS', 'fe de las jons': 'FE de las JONS', eb: 'Escaños en Blanco', cenb: 'Ciudadanos en Blanco',
+    pum_j: 'PUM+J', ecolo: 'Ecolo-Verdes', uleg: 'Unión del Pueblo Leonés', cilus: 'CILUS',
+    do_democracia_ourensana: 'Democracia Ourensana', mc_regional_mc_reg: 'MC Regional',
+    coalicion_municipalista_mc_ccd_cifa_pitp_uxa_mc_ccd: 'Coalición Municipalista',
+    movimiento_ciudadano_campo_de_cartagena_mc_cartagena: 'MC Cartagena',
+    en_marea_compromiso_por_galicia_partido_galeguista: 'En Marea–CxG–PG', 'i-e': 'Izquierda-Ezkerra'
+  };
+  var SMALL_WORDS = { de: 1, del: 1, la: 1, las: 1, los: 1, el: 1, y: 1, e: 1, por: 1, para: 1, o: 1, a: 1, en: 1,
+                      contra: 1, i: 1, d: 1, da: 1, do: 1, das: 1, dos: 1, per: 1, amb: 1 };
+  var ACCENTS = { region: 'Región', union: 'Unión', coalicion: 'Coalición', escanos: 'Escaños', accion: 'Acción',
+                  politica: 'Política', aragon: 'Aragón', leon: 'León', andalucia: 'Andalucía', espana: 'España',
+                  democratica: 'Democrática', civica: 'Cívica', publica: 'Pública', ciudadania: 'Ciudadanía',
+                  republica: 'República', galeguista: 'Galeguista', asamblea: 'Asamblea', comun: 'Común',
+                  extremena: 'Extremeña', riojana: 'Riojana', canaria: 'Canaria', murciana: 'Murciana' };
+
+  function prettyMinor(raw) {
+    var key = raw.toLowerCase();
+    if (KNOWN_MINOR[key]) {
+      return KNOWN_MINOR[key];
+    }
+    var label = raw.replace(/\?A/g, 'ÑA').replace(/\?/g, 'Ñ');
+    if (label.indexOf('_') === -1) {
+      return label;  // already a label or acronym from the source
+    }
+    var t = label.split('_').filter(Boolean);
+    if (t.every(function (w) { return w.length === 1; })) {
+      return t.join('').toUpperCase();   // p_c_p_e -> PCPE
+    }
+    // drop a leading acronym ("eb_", "cx_g_", "scd_") when words follow
+    while (t.length > 2 && t[0].length <= 3 && !SMALL_WORDS[t[0]]) {
+      t.shift();
+    }
+    // "somos_region_somos_region": drop a repeated second half
+    var half = t.length / 2;
+    if (t.length % 2 === 0 && t.slice(0, half).join('_') === t.slice(half).join('_')) {
+      t = t.slice(0, half);
+    }
+    var words = t.map(function (w, i) {
+      if (ACCENTS[w]) { return ACCENTS[w]; }
+      if (i > 0 && SMALL_WORDS[w]) { return w; }
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    });
+    var out = words.join(' ');
+    return out.length > 40 ? out.slice(0, 38).replace(/\s+\S*$/, '') + '…' : out;
+  }
+
   function partyName(id) {
-    return META[id] ? META[id].name : id.replace(/^x:/, '');
+    return META[id] ? META[id].name : prettyMinor(id.replace(/^x:/, ''));
   }
 
   function shortName(id) {
-    return META[id] ? META[id].short : id.replace(/^x:/, '');
+    return META[id] ? META[id].short : prettyMinor(id.replace(/^x:/, ''));
   }
 
   // Rename a party at runtime (the name Sánchez gives his own party).
@@ -624,6 +675,7 @@
   var api = {
     PARTIES: PARTIES,
     setPartyName: setPartyName,
+    prettyMinor: prettyMinor,
     regionControl: regionControl,
     controlColor: controlColor,
     drawRegionMap: drawRegionMap,
