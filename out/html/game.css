@@ -556,3 +556,12 @@ table {
     text-decoration: underline;
     text-decoration-style: dotted;
 }
+
+/* Spanish game: results tables and hemicycle */
+.sp-hemicycle { width: 100%; max-width: 500px; display: block; margin: 0 auto 1em; }
+.sp-results { border-collapse: collapse; margin: 0.5em 0 1em; font-size: 0.9em; }
+.sp-results th, .sp-results td { padding: 0.2em 0.8em; border-bottom: 1px solid rgba(128,128,128,0.35); text-align: left; }
+.sp-results .sp-num { text-align: right; font-variant-numeric: tabular-nums; }
+.sp-swatch { display: inline-block; width: 0.8em; height: 0.8em; margin-right: 0.5em; border-radius: 2px; vertical-align: baseline; }
+.sp-verdict { font-weight: bold; }
+.sp-lost { color: #c0392b; }

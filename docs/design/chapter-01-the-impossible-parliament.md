@@ -103,17 +103,70 @@ Each adviser has:
 
 Advisers may disagree privately, leak concerns, refuse assignments or make their own contacts. Disagreement is not automatically betrayal: professional disagreement and personal loyalty can coexist.
 
-## 6. PSOE internal politics
+## 6. PSOE internal politics and faction system
 
-The PSOE is not a single actor. Introduce competing networks without assigning every politician a permanent faction label.
+The PSOE has five permanent internal factions. These factions represent political networks, interests and organising traditions; they are not rigid ideological blocs. Individual politicians have their own multidimensional ideological positions, personal ambitions and loyalties, which may cut across faction lines.
 
-- **Sánchez's leadership team:** people whose positions or influence derive from his 2014 victory. César Luena, as Secretary of Organisation, is especially important.
-- **Institutional and regional leadership:** autonomous-community presidents, regional secretaries-general and senior officials concerned with governability, electoral risk and their own regional mandates.
-- **Left and labour networks:** MPs, activists and union-linked figures wary of facilitating a PP government and more open to cooperation with Podemos.
-- **Federalist and territorial reformers:** figures favouring constitutional reform and recognition of territorial diversity, but not necessarily independence or a referendum.
-- **Former national leadership and elders:** Felipe González, José Luis Rodríguez Zapatero and Alfredo Pérez Rubalcaba. They have influence, but no formal right to direct Sánchez.
+### The five factions
 
-Networks overlap. A regional president may favour federal reform while opposing a Podemos agreement; a moderate economic voice may support Sánchez personally; a left-wing MP may distrust his negotiating tactics. Track relationships person by person.
+1. **Institutionalists** — Senior national party figures, former ministers, veteran politicians, federal executive members and party officials. They value organisational continuity, party unity, institutional credibility and disciplined decision-making. This faction incorporates what might otherwise be described as the PSOE's Old Guard: historical seniority and attachment to the party's traditional identity are part of its character, not a separate faction.
+2. **Regional Leaders** — Autonomous-community presidents, regional secretaries-general, territorial party organisations and regional power-brokers. Their influence comes from territorial mandates, regional electoral machines and control of local party structures. They are not ideologically uniform: their positions on federalism, national strategy and coalition-building vary.
+3. **Progressives** — Left-wing social democrats, democratic socialists, progressive activists and members who favour a more ambitious social and economic programme. Many are open to cooperation with Podemos, but this is not a universal or automatic position.
+4. **Modernisers** — Reform-minded politicians, younger party figures, electoral strategists and advocates of organisational renewal. They prioritise making the PSOE electorally competitive, improving its public image and adapting its organisation and message. Modernisers may be economically moderate or left-wing; their defining characteristic is political and organisational renewal, not a fixed economic position.
+5. **Trade Unionists** — UGT-linked politicians, trade union representatives, labour activists and figures rooted in the organised labour movement. They prioritise workers' rights, collective bargaining, employment protections, social security and the PSOE's relationship with organised labour. They are not automatically the party's most left-wing faction: labour priorities and social or territorial positions can differ between members.
+
+### Distinguishing faction, ideology and loyalty
+
+Every significant PSOE politician should be tracked through three separate attributes:
+
+- **Faction:** the political network or institutional interest with which the politician is primarily associated.
+- **Ideology:** a multidimensional outlook covering economic policy, social policy, territorial organisation, constitutional questions and political strategy. Do not reduce this to a single left–right score.
+- **Personal loyalty:** the politician's current allegiance to Pedro Sánchez, Susana Díaz, another party figure or no particular leader. Loyalty can change through appointments, disagreements, political success, exclusion or personal relationships.
+
+Do not make faction membership determine a politician's policy positions or votes automatically. A Progressive may oppose a particular Podemos agreement; a Trade Unionist may be socially moderate; a Moderniser may favour interventionist economics; a Regional Leader may support Sánchez while opposing his territorial policy; and an Institutionalist may back substantial policy change if it protects the party's position.
+
+### Personal movements and leadership networks
+
+**Sanchismo is not a sixth faction.** It is a personal loyalty network around Pedro Sánchez, capable of attracting politicians from all five factions. Its membership, cohesion and influence should develop dynamically in response to Sánchez's decisions, appointments, electoral fortunes and conflicts with other party figures.
+
+The same principle applies to rival personal networks, including those around Susana Díaz or other prominent leaders. They should be tracked as overlapping alliances and relationships rather than permanent ideological factions. Sánchez must be able to change his political positioning without the faction system itself being rewritten.
+
+At the opening of the game, Sánchez should broadly reflect his 2014 leadership-campaign identity: a modernising, pragmatic, mainstream social democrat. The player can maintain that moderate trajectory or move towards the more explicitly progressive positioning associated with his 2017 return to the leadership. This is a player-driven development, not a predetermined historical sequence.
+
+### Comparison with the original Weimar faction model
+
+The original Weimar game uses five factions that primarily represent competing interpretations and traditions within socialism:
+
+| Weimar faction | Main organising principle |
+|---|---|
+| Left Marxists | Revolutionary and radical Marxist politics |
+| Centre Marxists | Orthodox Marxism, ideological continuity and party unity |
+| Reformist Marxists | Parliamentary socialism and gradual reform |
+| Labour | Trade unionism and organised working-class interests |
+| Neorevisionists | Revision and adaptation of socialist ideas to modern conditions |
+
+The Spanish PSOE model also has five factions, but it should not copy the Weimar ideological structure directly. The PSOE's internal conflicts in 2015 are shaped by leadership, territorial power, electoral strategy, organisational influence, labour relations and competing social-democratic approaches—not by five rival interpretations of Marxism.
+
+The closest comparisons are functional rather than exact:
+
+- **Weimar Labour / PSOE Trade Unionists:** the clearest parallel; both represent organised labour and trade union interests.
+- **Weimar Centre Marxists / PSOE Institutionalists:** both can value unity and continuity, but Centre Marxists are defined by ideological orthodoxy while Institutionalists are defined by organisational position and institutional stability.
+- **Weimar Reformist Marxists / PSOE Modernisers:** both are associated with adaptation and reform, but Modernisers focus on electoral, organisational and political renewal rather than a particular route to socialism.
+- **Weimar Left Marxists / PSOE Progressives:** both occupy the more left-wing part of their respective party systems, but PSOE Progressives remain within a pluralist social-democratic party and should not be treated as revolutionary Marxists.
+- **Weimar Neorevisionists:** there is no exact PSOE equivalent. Elements of revision, adaptation and ideological pragmatism may appear among Modernisers, Institutionalists and individual politicians rather than forming a single faction.
+
+The PSOE's **Regional Leaders** have no direct equivalent in the Weimar model. Their separate place reflects the importance of Spain's autonomous communities and the territorial organisation of the PSOE.
+
+### Design and gameplay rules
+
+- Factions should influence internal votes, leadership contests, appointments, conference decisions, policy debates and party discipline, but never dictate every member's behaviour.
+- Track faction strength through identifiable politicians, regional organisations, parliamentary support, union relationships and activist networks—not through an unexplained abstract percentage alone.
+- Factions may gain or lose influence, split internally, cooperate on specific issues or form temporary alliances.
+- Regional Leaders must be modelled as a collection of distinct territorial actors, not as a unified bloc with identical preferences.
+- Trade Unionists should have meaningful relationships with UGT and the wider labour movement, while retaining their own political agency.
+- Old Guard is not a separate faction; its veteran figures belong primarily within Institutionalists, though individual veterans may have other primary affiliations.
+- Sánchez's personal network and rival leadership networks are tracked separately from the five factions.
+- The faction system should remain stable even if Sánchez changes ideological direction. A politician's faction, ideology and personal loyalty can each change independently.
 
 **Initial pressure points**
 
@@ -219,6 +272,16 @@ This is a design specification, not yet a scene-code implementation. Before conv
 - Contemporary reporting on the PSOE negotiating team and January–February 2016 investiture negotiations.
 
 Historical figures and procedural details should be checked against official election and constitutional records during implementation. Preserve the distinction between the historical baseline and player-created outcomes.
+
+## Visual assets and image sourcing
+
+Source suitable historical and contextual images for the game's backgrounds, decision/event cards and political figures. Use Wikipedia and Wikimedia Commons as starting points, alongside other reputable archives and collections that provide public-domain or openly licensed material.
+
+- **Backgrounds:** find photographs of the Spanish Congress, parliamentary chambers, party headquarters, campaign rallies, streets and locations relevant to the events.
+- **Cards:** source images that visually reinforce each event, negotiation, political controversy or policy decision.
+- **Figures:** find portraits and photographs of Pedro Sánchez, PSOE politicians, party leaders, advisers and other relevant public figures.
+
+Check the rights for every individual image before including it. Prefer public-domain material or images with licences that permit the intended use. Record the source, creator, licence and any required attribution; comply with licence conditions such as attribution or share-alike, and do not assume that an image is free to reuse simply because it appears on Wikipedia or Wikimedia Commons. Keep an asset/source list with the project.
 
 
 ## 11. Lessons from the original Social Democracy game: advisers and cards
@@ -348,6 +411,8 @@ This will test the original game's proven scene architecture while ensuring the 
 
 
 ## 12. Spanish adviser roster organised by PSOE faction
+
+> **Superseded faction model.** This roster predates the five-faction model in §6. Its six groupings (`sanchista`, `institutionalist`, `regionalist`, `social_left`, `federalist`, `old_guard`) are kept for the people and roles they describe; for faction membership, use §6 (Institutionalists, Regional Leaders, Progressives, Modernisers, Trade Unionists, with Sanchismo tracked as a loyalty network).
 
 The Spanish version should follow the original game's faction-organised adviser structure. In the Weimar game, advisers are not presented as one undifferentiated cabinet of experts: each pinned character card carries a faction tag (for example `left`, `labor` or `centrist`), and the adviser roster makes the party's internal balance visible. The Spanish mod should do the same. The player should be able to see who represents each current of the PSOE, what their priorities are, and which political resources they can bring to bear.
 
