@@ -69,8 +69,7 @@
 
   var MAJORITY = 176;
   // Defeat thresholds - see docs/design/00-core-rules.md §2.2.
-  var PP_ALONE_LOSS_SEATS = 186;   // a clear PP majority, not a bare one
-  var LARGE_MAJORITY_SEATS = 193;  // PP + Vox above 55% of 350
+  var PP_ALONE_LOSS_SEATS = 176;   // a PP absolute majority
 
   // Minor lists in the regional data keep the source's labels: lowercase
   // slugs ("x:eb_escanos_en_blanco"), uppercase acronyms ("x:PxC") or
@@ -151,25 +150,23 @@
     });
   }
 
-  // Defeat check from docs/design/00-core-rules.md §2.2.
+  // Defeat check from docs/design/00-core-rules.md §2.2: a PP absolute
+  // majority ends the game at once. A PP + Vox majority does not, by
+  // itself: the game ends only if the two form a coalition government
+  // (see formGovernment), which a PSOE offer of a grand coalition can stop.
   function noPathToGovernment(totals) {
     var pp = totals.pp || 0;
     var ppVox = pp + (totals.vox || 0);
+    var grand = pp + (totals.psoe || 0);
     if (pp >= PP_ALONE_LOSS_SEATS) {
-      return { lost: true, reason: 'The PP has a clear majority on its own (' + pp + ' seats).' };
-    }
-    if (pp >= MAJORITY) {
-      return { lost: false, reason: 'The PP has a bare majority on its own (' + pp +
-        ' seats). A few defections or a by-election could still bring it down.' };
-    }
-    if (ppVox >= LARGE_MAJORITY_SEATS) {
-      return { lost: true, reason: 'PP and Vox hold ' + ppVox + ' seats, a majority of more than 55%.' };
+      return { lost: true, reason: 'The PP has an absolute majority on its own (' + pp + ' seats).' };
     }
     if (ppVox >= MAJORITY) {
-      return { lost: false, reason: 'PP and Vox hold a narrow majority (' + ppVox +
-        ' seats). Their arrangement is fragile; a motion of no confidence remains possible.' };
+      return { lost: false, reason: 'PP and Vox hold ' + ppVox + ' seats between them. If they form a coalition ' +
+        'government, the game is over' + (grand >= MAJORITY ? ', unless the PSOE offers the PP a grand coalition (' +
+        grand + ' seats) instead.' : '.') };
     }
-    return { lost: false, reason: 'No PP or PP–Vox majority (' + ppVox + ' seats together).' };
+    return { lost: false, reason: 'No PP majority and no PP–Vox majority (' + ppVox + ' seats together).' };
   }
 
   // Change marker: green up triangle, red down triangle, (-) if unchanged.
@@ -681,7 +678,6 @@
     drawRegionMap: drawRegionMap,
     BLOC_NAMES: BLOC_NAMES,
     PP_ALONE_LOSS_SEATS: PP_ALONE_LOSS_SEATS,
-    LARGE_MAJORITY_SEATS: LARGE_MAJORITY_SEATS,
     partyName: partyName,
     shortName: shortName,
     word: word,

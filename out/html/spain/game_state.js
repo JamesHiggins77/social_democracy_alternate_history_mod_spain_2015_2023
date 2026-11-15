@@ -284,6 +284,8 @@
     Q.up_indep_word = UI.word('relation', Parliament.between(Q, 'erc', 'up'));
     Q.pnv_pp_word = UI.word('relation', Parliament.between(Q, 'pnv', 'pp'));
     Q.pp_majority = (Q.congress.pp || 0) >= 176 ? 1 : 0;
+    Q.pp_vox_majority = ((Q.congress.pp || 0) + (Q.congress.vox || 0)) >= 176 ? 1 : 0;
+    Q.grand_possible = ((Q.congress.pp || 0) + (Q.congress.psoe || 0)) >= 176 ? 1 : 0;
     Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
     var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
@@ -1463,7 +1465,15 @@
     Q.investiture_clock = -1;
     Q.dissolution_due = 0;
     Q.depends_on_catalans = 0;
-    if (candidate === 'ps') {
+    if (candidate === 'grand') {
+      // PP–PSOE grand coalition: the PP's leader is Prime Minister
+      Q.pm = Q.pp_leader || 'Mariano Rajoy';
+      Q.pm_party = 'pp';
+      Q.psoe_in_government = 1;
+      Q.govt_parties = ['pp', 'psoe'];
+      Q.government_type = 'PP–PSOE grand coalition';
+      Q.grand_coalition = 1;
+    } else if (candidate === 'ps') {
       Q.pm = 'Pedro Sánchez';
       Q.pm_party = 'ps';
       Q.psoe_in_government = Q.player_line_left === 'coalition' ? 1 : 0;
@@ -1518,6 +1528,14 @@
       }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
+    if (candidate !== 'grand') {
+      Q.grand_coalition = 0;
+    }
+    // a PP–Vox coalition government ends the game
+    if ((Q.govt_parties || []).indexOf('pp') !== -1 && (Q.govt_parties || []).indexOf('vox') !== -1) {
+      Q.loss_reason = 'The PP and Vox form a coalition government with a majority in Congress. ' +
+        'There is no route back to government for the left before the end of the period.';
+    }
     if (ppHadPower && Q.pm_party !== 'pp') {
       ppSetback(Q, 3);
     }
@@ -2169,6 +2187,30 @@
     return st;
   }
 
+  // Will the PP accept a grand coalition with the PSOE instead of Vox?
+  // Easier with a moderate PP leader, warm PSOE–PP relations and cold
+  // PP–Vox relations; harder with a hard-liner.
+  function grandCoalitionOffer(Q) {
+    var seats = (Q.congress.pp || 0) + (Q.congress.psoe || 0);
+    Q.grand_possible = seats >= Parliament.MAJORITY ? 1 : 0;
+    var score = (Q.rel_pp || 20) + (Q.pp_style_moderate ? 20 : 0) - (Q.pp_style_hard ? 20 : 0) +
+      (50 - Parliament.between(Q, 'pp', 'vox')) / 2 + (Q.learned_spd ? 8 : 0) + 20 * (Math.random() - 0.5);
+    Q.grand_score = Math.round(score);
+    Q.grand_accepted = (Q.grand_possible && score >= 40) ? 1 : 0;
+    if (Q.grand_accepted) {
+      Q.investiture_votes += 1;
+      formGovernment(Q, 'grand');
+      // the PSOE's left-wing voters and members do not forgive it
+      transfer(Q, 'psoe', { up: 0.8, iu: 0.1, mp: 0.1 }, { workers: 4, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
+      Q.progressives_dissent += 25; Q.trade_unionists_dissent += 12; Q.member_morale -= 18; Q.sanchismo -= 8;
+      Q.regional_leaders_dissent -= 10; Q.institutionalists_dissent -= 8; Q.rel_pp += 15; Q.rel_up -= 25;
+      recalculate(Q);
+    } else {
+      Q.rel_pp -= 5;
+    }
+    return Q.grand_accepted;
+  }
+
   function autoFormation(Q) {
     if (Q.sanchez_leader || !Q.acting || Q.election_year || (Q.formation_weeks || 0) < 3 || Q.elections_held < 1) {
       return null;
@@ -2511,6 +2553,7 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    grandCoalitionOffer: grandCoalitionOffer,
     senateElected: senateElected,
     dhondtSeats: dhondtSeats,
     europeanElection: europeanElection,

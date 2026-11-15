@@ -28,13 +28,12 @@ Checked after every general election and whenever a government is formed:
 
 | Situation | Result |
 |---|---|
-| PP alone holds a clear majority (≥ 186 seats) | **Game over** |
-| PP alone holds a bare majority (176–185) | Game continues. Defections, scandals or a breakdown in discipline can still bring it down. |
-| PP + Vox hold ≥ 55% of Congress (≥ 193 seats) | **Game over** |
-| PP + Vox hold a narrow majority (176–192) | Game continues. The government is fragile and a motion of no confidence remains possible with defections or a coalition breakdown. |
-| PP minority government | Game continues |
+| PP alone holds an absolute majority (≥ 176 seats) | **Game over** |
+| PP and Vox form a coalition government | **Game over** |
+| PP + Vox hold a majority but have not formed a coalition | Game continues |
+| PP minority government, or PP governing with Vox's outside support | Game continues |
 
-Both thresholds are constants (`PP_ALONE_LOSS_SEATS` = 186, `LARGE_MAJORITY_SEATS` = 193) so they can be tuned.
+When the PP asks for the PSOE's support and PP + PSOE hold a majority, the player can offer a grand coalition so the PP does not need Vox. The PP accepts depending on PSOE–PP relations, its leader (a moderate is likelier, a hard-liner less likely), how cold PP–Vox relations are, and the SPD lesson. A grand coalition keeps the game going with the PSOE as junior partner, but costs heavily: left-wing voters move to Podemos and IU, the progressives and unions revolt, and morale falls. The constant `PP_ALONE_LOSS_SEATS` (176) can be tuned.
 
 ### 2.3 PP–Vox relations are not automatic
 

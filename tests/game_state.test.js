@@ -553,3 +553,20 @@ test('European Parliament: 2014 result, then a national D\'Hondt vote in May 201
   assert.strictEqual(Q.ep_election_due, 1);
   assert.deepStrictEqual(G.dhondtSeats({ a: 60, b: 30, c: 10 }, 10), { a: 6, b: 3, c: 1 });
 });
+
+test('a PP–Vox coalition government ends the game; a grand coalition does not', () => {
+  const Q = newQ();
+  Q.congress = { pp: 140, vox: 50, psoe: 100, up: 30, cs: 10, erc: 10, junts: 10 };
+  Q.pp_vox_relation = 70;
+  G.formGovernment(Q, 'pp');
+  assert.deepStrictEqual(Q.govt_parties, ['pp', 'vox']);
+  assert.ok(/PP and Vox form a coalition/.test(G.lossReason(Q)));
+  const R = newQ();
+  R.congress = { pp: 140, vox: 50, psoe: 100, up: 30, cs: 10, erc: 10, junts: 10 };
+  R.rel_pp = 90; R.pp_style_moderate = 1;
+  G.recalculate(R);
+  assert.strictEqual(G.grandCoalitionOffer(R), 1);
+  assert.deepStrictEqual(R.govt_parties, ['pp', 'psoe']);
+  assert.strictEqual(R.psoe_in_government, 1);
+  assert.strictEqual(G.lossReason(R), '');
+});
