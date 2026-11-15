@@ -28,14 +28,13 @@ Checked after every general election and whenever a government is formed:
 
 | Situation | Result |
 |---|---|
-| PP alone holds an absolute majority (≥ 176 seats) | **Game over** |
+| PP alone holds a clear majority (≥ 186 seats) | **Game over** |
+| PP alone holds a bare majority (176–185) | Game continues. Defections, scandals or a breakdown in discipline can still bring it down. |
 | PP + Vox hold ≥ 55% of Congress (≥ 193 seats) | **Game over** |
 | PP + Vox hold a narrow majority (176–192) | Game continues. The government is fragile and a motion of no confidence remains possible with defections or a coalition breakdown. |
 | PP minority government | Game continues |
 
-The 193-seat threshold is a single constant (`LARGE_MAJORITY_SEATS`) so it can be tuned.
-
-> Interpretation to confirm: a PP-only majority ends the game at 176 seats, while PP + Vox ends it at 193. This follows "PP majority" and "large PP-Vox majority" in the brief.
+Both thresholds are constants (`PP_ALONE_LOSS_SEATS` = 186, `LARGE_MAJORITY_SEATS` = 193) so they can be tuned.
 
 ### 2.3 PP–Vox relations are not automatic
 
@@ -201,7 +200,6 @@ From player discussion of the Weimar game:
 
 ## 10. Open questions
 
-1. Confirm the PP-only threshold in §2.2: 176 seats, or 193 like PP + Vox?
-2. The class list and support values (§4.1) are first-pass. Do you want different classes, for example a religious-conservative dimension?
-3. Should Ceuta and Melilla's assemblies be simulated, or only their Congress seats?
-4. Senate: a simple ledger, or full elections (208 elected senators, limited-vote system)?
+1. The class list and support values (§4.1) are first-pass. Do you want different classes, for example a religious-conservative dimension?
+2. Should Ceuta and Melilla's assemblies be simulated, or only their Congress seats?
+3. Senate: a simple ledger, or full elections (208 elected senators, limited-vote system)?

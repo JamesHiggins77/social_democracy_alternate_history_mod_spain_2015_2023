@@ -1,0 +1,77 @@
+title: The negotiating team
+new-page: true
+is-card: true
+tags: sp_politics
+view-if: negotiations_timer <= 0 and acting = 1 and psoe_in_government = 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; negotiations_timer = 1
+
+= The negotiating team
+
+Antonio Hernando, Meritxell Batet, José Enrique Serrano, Jordi Sevilla, Rodolfo Ares and María Luisa Carcedo wait for instructions. Who do they sit down with this month?
+
+- @podemos: Podemos: work towards a government agreement
+- @cs: Ciudadanos: work towards a reform agreement
+- @both: Both at once: try for a three-way arrangement
+- @pnv_cc: The PNV and Coalición Canaria
+- @catalans: Sound out ERC and Convergència
+- @easy_discard
+
+@podemos
+on-arrival: up_talks += 1; rel_up += 8; rel_cs -= 4; progressives_dissent -= 5; regional_leaders_dissent += 5; institutionalists_dissent += 3
+
+Podemos's team arrives with a 98-page document and a list of ministries. [? if up_talks >= 2 : The talks are now serious enough to sign something, if you want to. ?]
+
+@cs
+on-arrival: cs_talks += 1; rel_cs += 8; rel_up -= 5; modernisers_dissent -= 4; institutionalists_dissent -= 2; progressives_dissent += 5; trade_unionists_dissent += 2
+
+Albert Rivera's negotiators want labour-market flexibility, an end to the provincial councils and a hard line on Catalonia. [? if cs_talks >= 2 : An agreement is within reach. ?]
+
+@both
+on-arrival: up_talks += 0.5; cs_talks += 0.5; rel_up += 3; rel_cs += 3; sanchez_authority += 2; regional_leaders_dissent += 2
+
+Podemos will not share a table with Ciudadanos, and Ciudadanos will not sit in a government with Podemos. Your team shuttles between rooms. It makes you look like the centre of every solution, and it makes everyone suspicious of you.
+
+@pnv_cc
+on-arrival: rel_pnv += 8; rel_cc += 8
+
+The PNV wants its fiscal arrangements respected and transfers of powers to Euskadi; Coalición Canaria wants the islands' economic regime. Both are small, both are reliable, and both know what their votes are worth.
+
+@catalans
+on-arrival: rel_erc += 8; rel_junts += 6; sanchez_authority -= 1; regional_leaders_dissent += 10 if red_lines = 1; federal_committee_balance -= 4 if red_lines = 1
+
+ERC's spokesman repeats that their price is a referendum. [? if red_lines = 1 : Within hours, the barons know about the meeting and remind you of the Federal Committee's resolution. ?]
+
+@media
+title: The interview
+new-page: true
+is-card: true
+tags: sp_politics
+view-if: media_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; media_timer = 2
+
+= The interview
+
+A prime-time interview on La Sexta. What is the message?
+
+- @change: Change: Spain cannot have four more years of Rajoy
+- @reform: Reform and stability: a serious party for difficult times
+- @attack_podemos: Podemos is not the answer
+- @easy_discard
+
+@change
+on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {workers: 2, young: 3, unemployed: 2}); window.SpainGame.updatePolls(Q); } !}
+on-departure: progressives_dissent -= 3; member_morale += 3
+
+Young and working voters respond. Your most cautious barons wince at the word "change".
+
+@reform
+on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {professionals: 2, pensioners: 2, self_employed: 1}); window.SpainGame.updatePolls(Q); } !}
+on-departure: institutionalists_dissent -= 3; modernisers_dissent -= 2
+
+Older and middle-class voters hear a party of government. Some members hear a party afraid of its own shadow.
+
+@attack_podemos
+on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {pensioners: 3, rural: 2, young: -2}); window.SpainGame.updatePolls(Q); } !}
+on-departure: rel_up -= 10; regional_leaders_dissent -= 4; progressives_dissent += 4
+
+The barons enjoy it. Iglesias replies within the hour.

@@ -1,7 +1,7 @@
 {
-  "name": " social_democracy_alternate_history",
+  "name": "social_democracy_spain_2015_2023",
   "version": "0.11.1",
-  "description": "Building the game:",
+  "description": "Social Democracy: Spain 2015-2023 - a mod of Autumn Chen's Social Democracy: An Alternate History",
   "main": "out/html/index.html",
   "scripts": {
     "dendrynexus": "dendrynexus",
@@ -9,15 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://aucchen@github.com/aucchen/social_democracy_alternate_history.git"
+    "url": "git+https://github.com/JamesHiggins77/social_democracy_alternate_history_mod_spain_2015_2023.git"
   },
   "keywords": [],
-  "author": "Autumn Chen",
+  "author": "JamesHiggins77 (Spain mod); Autumn Chen (original game)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/aucchen/social_democracy_alternate_history/issues"
-  },
-  "homepage": "https://github.com/aucchen/social_democracy_alternate_history",
+  "homepage": "https://github.com/JamesHiggins77/social_democracy_alternate_history_mod_spain_2015_2023",
   "dependencies": {
     "dendrynexus": "^0.0.1",
     "parliament-svg": "^3.0.0"

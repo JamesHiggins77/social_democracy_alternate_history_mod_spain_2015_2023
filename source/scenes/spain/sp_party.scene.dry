@@ -1,0 +1,56 @@
+title: The regional presidents
+new-page: true
+is-card: true
+tags: sp_party
+view-if: barons_timer <= 0 and sanchez_leader = 1
+on-arrival: month_actions += 1; barons_timer = 2
+
+= The regional presidents
+
+Susana Díaz in Andalusia, Emiliano García-Page in Castilla-La Mancha, Guillermo Fernández Vara in Extremadura, Javier Lambán in Aragón, Ximo Puig in Valencia, Javier Fernández in Asturias: each governs, each has their own electorate, and each has a view on what you should do in Madrid.
+
+- @convene: Convene the regional presidents before deciding anything
+- @executive: Consult the Federal Executive first
+- @announce: Announce your strategy, then inform them
+- @formal_role: Offer the barons a formal role in the negotiations
+- @easy_discard
+
+@convene
+on-arrival: regional_leaders_dissent -= 8; sanchez_authority -= 2; federal_committee_balance += 3
+
+The meeting runs for five hours. You leave with their grudging support and the feeling that you now need their permission.
+
+@executive
+on-arrival: institutionalists_dissent -= 5; modernisers_dissent -= 3; regional_leaders_dissent += 4; federal_executive_backing = 1
+
+Your executive backs you. The barons note that they were not asked.
+
+@announce
+on-arrival: sanchez_authority += 5; member_morale += 3; regional_leaders_dissent += 12; federal_committee_balance -= 5
+
+You set the line on television. In Seville, the reaction is icy.
+
+@formal_role
+on-arrival: regional_leaders_dissent -= 15; regional_leaders_strength += 4; sanchez_authority -= 6; barons_veto = 1
+
+The barons join the negotiating structure. Nothing will be signed without them, which reassures them and limits you.
+
+@membership
+title: Ask the members
+new-page: true
+is-card: true
+tags: sp_party
+view-if: (pact_cs = 1 or pact_up = 1) and membership_round < formation_round and membership_timer <= 0 and sanchez_leader = 1
+on-arrival: {! Q.month_actions += 1; Q.membership_timer = 2; Q.membership_round = Q.formation_round || 1; !}
+
+= Ask the members
+
+An agreement has been signed. You could put it to a vote of the whole membership, something the PSOE has never done, before the Federal Committee can bury it.
+
+- @consult: Hold the consultation
+- @easy_discard
+
+@consult
+on-arrival: member_morale += 8; sanchez_authority += 6; sanchismo += 5; regional_leaders_dissent += 3; federal_committee_balance += 4
+
+The members back the agreement by a wide margin. The barons cannot argue with the result; they argue instead about the question.

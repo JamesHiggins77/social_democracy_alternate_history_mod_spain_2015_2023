@@ -1,0 +1,35 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert');
+const P = require('../out/html/spain/parliament.js');
+
+const CONGRESS_2015 = { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, iu: 2, bildu: 2, cc: 1 };
+
+test('March 2016: Sánchez with the Ciudadanos pact fails both ballots', () => {
+  // Historical result: 130 yes (PSOE 90, Cs 40), 219 no, 1 abstention (CC).
+  // The game's CC votes yes under the pact; the outcome is the same.
+  const Q = { pact_cs: 1, red_lines: 1, rel_up: 40, rel_pnv: 50, rel_cc: 50 };
+  const v = P.investiture(CONGRESS_2015, 'sanchez', Q);
+  assert.strictEqual(v.yes, 131);
+  assert.strictEqual(v.passes, false);
+});
+
+test('A Podemos deal plus abstentions can win the second ballot', () => {
+  const Q = { pact_up: 1, rel_pnv: 70, rel_bildu: 45, rel_cc: 70, referendum_offer: 1 };
+  const v = P.investiture(CONGRESS_2015, 'sanchez', Q);
+  assert.strictEqual(v.firstBallot, false);
+  assert.ok(v.secondBallot, `${v.yes} yes vs ${v.no} no`);
+});
+
+test('The Federal Committee red lines block independence-party abstentions', () => {
+  const Q = { pact_up: 1, rel_pnv: 70, rel_cc: 70, referendum_offer: 1, red_lines: 1 };
+  const v = P.investiture(CONGRESS_2015, 'sanchez', Q);
+  assert.strictEqual(v.detail.erc, 'no');
+  assert.strictEqual(v.passes, false);
+});
+
+test('Rajoy wins only if the PSOE abstains (2016 arithmetic)', () => {
+  const seats2016 = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  assert.strictEqual(P.investiture(seats2016, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1 }).passes, false);
+  assert.strictEqual(P.investiture(seats2016, 'pp', { psoe_stance_pp: 'abstain', pact_pp_cs: 1 }).passes, true);
+});

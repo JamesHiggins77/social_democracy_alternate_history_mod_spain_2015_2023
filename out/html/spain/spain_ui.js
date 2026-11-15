@@ -24,7 +24,9 @@
   PARTIES.forEach(function (p, i) { META[p[0]] = { name: p[1], color: p[2], order: i }; });
 
   var MAJORITY = 176;
-  var LARGE_MAJORITY_SEATS = 193; // 55% of 350 - see docs/design/00-core-rules.md
+  // Defeat thresholds - see docs/design/00-core-rules.md §2.2.
+  var PP_ALONE_LOSS_SEATS = 186;   // a clear PP majority, not a bare one
+  var LARGE_MAJORITY_SEATS = 193;  // PP + Vox above 55% of 350
 
   function partyName(id) {
     return META[id] ? META[id].name : id.replace(/^x:/, '');
@@ -46,8 +48,12 @@
   function noPathToGovernment(totals) {
     var pp = totals.pp || 0;
     var ppVox = pp + (totals.vox || 0);
+    if (pp >= PP_ALONE_LOSS_SEATS) {
+      return { lost: true, reason: 'The PP has a clear majority on its own (' + pp + ' seats).' };
+    }
     if (pp >= MAJORITY) {
-      return { lost: true, reason: 'The PP has an absolute majority on its own (' + pp + ' seats).' };
+      return { lost: false, reason: 'The PP has a bare majority on its own (' + pp +
+        ' seats). A few defections or a by-election could still bring it down.' };
     }
     if (ppVox >= LARGE_MAJORITY_SEATS) {
       return { lost: true, reason: 'PP and Vox hold ' + ppVox + ' seats, a majority of more than 55%.' };
@@ -80,7 +86,8 @@
     if (!el) {
       return;
     }
-    var width = Math.min(500, (root.document.getElementById('content') || el).offsetWidth - 20);
+    var container = el.parentElement || el;
+    var width = Math.max(150, Math.min(500, container.offsetWidth - 10));
     el.style.height = (width / 2 + 10) + 'px';
     var data = sortedIds(totals).map(function (id) {
       return { id: id, legend: partyName(id), name: partyName(id), seats: totals[id], color: partyColor(id) };
@@ -194,6 +201,7 @@
 
   var api = {
     PARTIES: PARTIES,
+    PP_ALONE_LOSS_SEATS: PP_ALONE_LOSS_SEATS,
     LARGE_MAJORITY_SEATS: LARGE_MAJORITY_SEATS,
     partyName: partyName,
     partyColor: partyColor,

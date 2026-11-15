@@ -19,10 +19,10 @@ d3.linegraph = function(noTicks, noDots, parties, partyColors, partyNames, dataM
         parties = ['psoe', 'iu', 'up', 'ind', '', '', '', 'other'];
     }
     if (!partyColors) {
-        partyColors = {'spd': '#E3000F', 'kpd': '#8B0000', 'ddp': '#DCCA4A', 'z': '#000', 'dvp': '#D5AC27', 'dnvp': '#3f7bc1', 'nsdap': '#954B00', 'other': '#a0a0a0'};
+        partyColors = {'psoe': '#E1001A', 'pp': '#1D84CE', 'vox': '#5AC035', 'up': '#6B2E68', 'cs': '#EB6109', 'other': '#a0a0a0'};
     }
     if (!partyNames) {
-        partyNames = {'spd': 'SPD', 'kpd': 'KPD', 'ddp': 'DDP', 'z': 'Z + BVP', 'dvp': 'DVP', 'dnvp': 'DNVP', 'nsdap': 'NSDAP', 'other': 'Others'};
+        partyNames = {'psoe': 'PSOE', 'pp': 'PP', 'vox': 'Vox', 'up': 'Podemos / UP / Sumar', 'cs': 'Ciudadanos', 'other': 'Others'};
     }
     if (!additionalMonths) {
         additionalMonths = 10;
@@ -44,7 +44,7 @@ d3.linegraph = function(noTicks, noDots, parties, partyColors, partyNames, dataM
 
       // Declare the x (horizontal position) scale.
       const maxDate = d3.max(dates);
-      const xScale = d3.scaleUtc([new Date(1928, 0), addMonths(maxDate, additionalMonths)], [marginLeft, width - marginRight]);
+      const xScale = d3.scaleUtc([new Date(2015, 11), addMonths(maxDate, additionalMonths)], [marginLeft, width - marginRight]);
 
       var xaxis = d3.axisBottom()
         .tickFormat(d3.timeFormat('%b %Y'))
@@ -59,9 +59,9 @@ d3.linegraph = function(noTicks, noDots, parties, partyColors, partyNames, dataM
 
       // Declare the y (vertical position) scale.
       if (!dataMax) {
-          const maxSPD = d3.max(data, d => d.spd);
-          const maxNSDAP = d3.max(data, d => d.nsdap);
-          dataMax = maxSPD >= maxNSDAP ? maxSPD + 10 : maxNSDAP + 10;
+          const maxPSOE = d3.max(data, d => d.psoe);
+          const maxPP = d3.max(data, d => d.pp);
+          dataMax = Math.max(maxPSOE || 0, maxPP || 0) + 10;
           dataMin = 0;
       }
       const yScale = d3.scaleLinear([dataMin, dataMax], [height - marginBottom, marginTop]);

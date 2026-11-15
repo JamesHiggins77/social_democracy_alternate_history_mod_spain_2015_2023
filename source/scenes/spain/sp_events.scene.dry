@@ -1,0 +1,305 @@
+title: Federal Committee: the red lines
+new-page: true
+tags: sp_event
+view-if: red_lines_seen = 0 and year = 2015
+max-visits: 1
+on-arrival: red_lines_seen = 1
+
+= 28 December 2015 — The Federal Committee
+
+The regional barons arrive at Ferraz with a resolution already drafted. The PSOE will not negotiate with any party that supports a self-determination referendum for Catalonia, and Sánchez must bring any agreement back to the Federal Committee.
+
+Susana Díaz's allies call it a guarantee of the party's identity. Your team calls it a cage.
+
+- @accept: Accept the red lines as written
+- @soften: Accept the principle, but negotiate the wording
+- @defy: Refuse: the leadership must be free to negotiate
+
+@accept
+on-arrival: red_lines = 1; regional_leaders_dissent -= 10; institutionalists_dissent -= 5; sanchez_authority -= 5; federal_committee_balance -= 3
+
+The barons are satisfied. Talks with ERC and Convergència are now off the table, and everyone knows who wrote the rules.
+
+@soften
+on-arrival: red_lines = 1; regional_leaders_dissent += 3; sanchez_authority += 2; member_morale += 2
+
+The final text bars any referendum, but leaves you to decide which parties you talk to. It is a draw, and both sides claim it.
+
+@defy
+on-arrival: red_lines = 0; regional_leaders_dissent += 20; institutionalists_dissent += 10; federal_committee_balance -= 8; sanchez_authority += 4; member_morale += 4
+
+The vote is close. You keep your freedom to negotiate, but Susana Díaz has counted her votes, and so have you.
+
+@iglesias_offer
+title: Iglesias's offer
+new-page: true
+tags: sp_event
+view-if: year = 2016 and month >= 1 and month <= 3 and acting = 1 and psoe_in_government = 0 and rel_up >= 25
+max-visits: 1
+
+= Pablo Iglesias makes an offer
+
+Leaving his audience with the King, Pablo Iglesias announces to the press that he is offering the PSOE a coalition government: Sánchez as Prime Minister, Iglesias as Vice-President, and Podemos ministers in key portfolios. You learn of it from the television.
+
+- @welcome: Welcome the offer and invite Podemos to formal talks
+- @programme: Say talks must start from the programme, not from posts
+- @reject: Reject it publicly as an ultimatum
+
+@welcome
+on-arrival: rel_up += 10; up_talks += 1; progressives_dissent -= 6; regional_leaders_dissent += 10; institutionalists_dissent += 6; rel_cs -= 6
+
+Podemos claims the initiative. Your barons say you have been humiliated in public and thanked Iglesias for it.
+
+@programme
+on-arrival: rel_up += 3; sanchez_authority += 3; regional_leaders_dissent += 2
+
+You keep the door open without walking through it on Iglesias's terms. The commentators call it a good afternoon's work.
+
+@reject
+on-arrival: rel_up -= 12; rel_cs += 5; regional_leaders_dissent -= 6; progressives_dissent += 8; member_morale -= 3
+
+The barons applaud. Many members, who voted for change, do not.
+
+@pp_round
+title: The King's consultations
+new-page: true
+tags: sp_event
+view-if: acting = 1 and pp_asked < formation_round and time >= 2 and election_year = 0 and investiture_votes = 0
+on-arrival: {! Q.pp_asked = Q.formation_round || 1; !}
+
+= Rajoy asks for support
+
+The King has finished his consultations and offered the nomination to the largest party's leader. Before deciding whether to accept, Rajoy calls you. He wants the PSOE to let him govern: a vote in favour, or at least an abstention.
+
+What will the PSOE do?
+
+- @against: Vote against Rajoy
+- @abstain: Abstain and let a PP government be formed
+- @limited: Negotiate a limited agreement in exchange for abstention
+- @other_candidate: Demand a different PP candidate
+
+@against
+on-arrival: {! Q.psoe_stance_pp = "no"; Q.member_morale += 4; Q.rel_pp -= 6; Q.sanchez_authority += 2; !}
+go-to: pp_decides
+
+@abstain
+on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 15; Q.progressives_dissent += 20; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 8; Q.institutionalists_dissent -= 6; Q.rel_pp += 10; Q.sanchez_authority -= 10; Q.sanchismo -= 5; !}
+go-to: pp_decides
+
+@limited
+on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 10; Q.progressives_dissent += 12; Q.institutionalists_dissent -= 4; Q.rel_pp += 6; Q.sanchez_authority -= 5; !}
+go-to: pp_decides
+
+@other_candidate
+on-arrival: {! Q.psoe_stance_pp = "no"; Q.rel_pp -= 10; Q.sanchez_authority += 3; Q.institutionalists_dissent += 3; !}
+go-to: pp_decides
+
+@pp_decides
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainParliament) {
+    var v = window.SpainParliament.investiture(Q.congress, 'pp', Q);
+    if (v.passes) {
+        window.SpainGame.holdInvestiture(Q, 'pp');
+        Q.pp_invested_now = 1;
+    } else {
+        Q.pp_invested_now = 0;
+        Q.rajoy_declined = 1;
+    }
+}
+!}
+go-to: pp_invested if pp_invested_now = 1; pp_declines if pp_invested_now = 0
+
+@pp_invested
+title: A PP government
+
+= A PP government
+
+With the PSOE's abstention, the PP's candidate is invested Prime Minister in the second vote. The country has a government. In the PSOE, the argument about who allowed it has only begun.
+
+@pp_declines
+title: Rajoy declines
+
+= Rajoy declines the nomination
+
+Without the votes, Rajoy does something no candidate has done before: he declines the King's offer, and waits for others to fail. The initiative passes to you, if you want it.
+
+- @offer: Tell the King you are ready to seek the investiture
+- @hold: Hold back and keep negotiating
+
+@offer
+on-arrival: sanchez_nominated = 1; sanchez_authority += 5; member_morale += 4
+
+The King proposes you as candidate. The Speaker will set the date of the debate when you are ready. (Use the "Seek investiture" card.)
+
+@hold
+on-arrival: sanchez_authority -= 2
+
+You tell the King you need more time. Rajoy's strategy depends on everyone else's patience running out first.
+
+@king_turns
+title: The King turns to you
+new-page: true
+tags: sp_event
+view-if: rajoy_declined = 1 and sanchez_nominated = 0 and investiture_votes = 0 and acting = 1 and election_year = 0 and king_asked < formation_round and time >= 3
+on-arrival: {! Q.king_asked = Q.formation_round || 1; !}
+
+= The King turns to you
+
+After a second round of consultations, the King asks whether you will stand. If no one does, the investiture clock never starts and the country stays in limbo.
+
+- @king_accept: Accept the nomination
+- @king_refuse: Refuse: Rajoy must face the chamber first
+
+@king_accept
+on-arrival: sanchez_nominated = 1; sanchez_authority += 4
+
+You are the candidate. (Use the "Seek investiture" card when you are ready.)
+
+@king_refuse
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.holdInvestiture(Q, 'pp');
+}
+Q.sanchez_authority -= 3;
+!}
+
+The King proposes Rajoy, who this time goes to the vote and loses it. The two-month clock has started: if no one is invested, Spain votes again.
+
+@dissolution
+title: The Cortes are dissolved
+new-page: true
+tags: sp_event
+view-if: dissolution_due = 1
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.dissolve(Q);
+}
+!}
+
+= The Cortes are dissolved
+
+Two months have passed since the first investiture vote without a Prime Minister being elected. The King signs the decree of dissolution. Spain will vote again in [+ election_month : month +] [+ election_year +].
+
+@general_election
+title: General election
+new-page: true
+tags: sp_event
+view-if: general_election_due = 1
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.runGeneralElection(Q);
+}
+!}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderCongress(Q, 'sp-election-result');
+}
+!}
+
+= General election: [+ month : month +] [+ year +]
+
+{!<div id="sp-election-result"></div>!}
+
+[+ election_verdict +]
+
+@regional_elections
+title: Regional elections
+new-page: true
+tags: sp_event
+view-if: has_regional_elections = 1
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.runDueRegionalElections(Q);
+}
+!}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderRegionalResults(Q, 'sp-regional-results');
+}
+!}
+
+= Regional elections
+
+{!<div id="sp-regional-results"></div>!}
+
+@federal_committee
+title: Revolt in the Federal Committee
+new-page: true
+tags: sp_event
+view-if: revolt_possible = 1 and sanchez_leader = 1 and revolt_round < formation_round
+on-arrival: {! Q.revolt_round = Q.formation_round || 1; !}
+
+= Revolt in the Federal Committee
+
+Half of the Federal Executive resigns at once, intending to force your fall. The critics demand a caretaker committee and an end to your strategy.
+
+- @fight: Fight it out in the Federal Committee
+- @members: Resign and take your case to the members
+
+@fight
+on-arrival: {!
+Q.committee_won = (Q.federal_committee_balance + Q.member_morale / 5 >= 55) ? 1 : 0;
+if (Q.committee_won) {
+    Q.sanchez_authority += 10; Q.regional_leaders_dissent -= 10; Q.federal_committee_balance += 5;
+} else {
+    Q.sanchez_leader = 0;
+    if (Q.in_leadership_window) {
+        Q.leadership_exception_open = 1;
+    }
+}
+!}
+go-to: fight_won if committee_won = 1; ousted if committee_won = 0
+
+@fight_won
+title: You survive
+
+= You survive
+
+After a day of shouting in the corridors of Ferraz, the vote goes your way. Your critics will wait for another chance.
+
+@members
+on-arrival: sanchez_leader = 0; leadership_exception_open = 1 if in_leadership_window = 1
+go-to: ousted
+
+@ousted
+title: Sánchez falls
+
+= Sánchez falls
+
+You are no longer Secretary-General. [? if leadership_exception_open = 1 : A caretaker committee takes over Ferraz. Your seat in Congress, your car, your office: all gone. But the members have not spoken yet, and the next primary is due in May 2017. ?]
+
+@primary
+title: The primary
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and year >= 2017 and month >= 5
+max-visits: 1
+on-arrival: {!
+Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0;
+Q.leadership_exception_open = 0;
+if (Q.primary_won) {
+    Q.sanchez_leader = 1; Q.sanchez_authority = 70; Q.sanchismo += 20; Q.member_morale += 10;
+    Q.federal_committee_balance = 60;
+}
+!}
+
+= The primary
+
+[? if primary_won = 1 : The members vote, and they vote for you. Against the barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. ?][? if primary_won = 0 : The members vote, and they do not vote for you. ?]
+
+@deadlock_vote
+title: The King forces a vote
+new-page: true
+tags: sp_event
+view-if: acting = 1 and investiture_votes = 0 and election_year = 0 and time >= formation_start_time + 4
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.holdInvestiture(Q, 'pp');
+}
+!}
+
+= The King forces a vote
+
+Months have passed without a candidate facing the chamber, and without a first vote the constitutional clock cannot start. The King proposes the leader of the largest party once more, and this time he goes to the vote.
+
+[? if acting = 1 : He loses it. The two-month clock has started: if no one is invested, the Cortes will be dissolved and Spain will vote again. ?][? if acting = 0 : He wins it. Spain has a government. ?]

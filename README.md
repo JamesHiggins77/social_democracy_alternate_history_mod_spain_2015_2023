@@ -1,4 +1,4 @@
-# Social Democracy: An Alternate History
+# Social Democracy: Spain 2015–2023
 
 ## Included Libraries
 

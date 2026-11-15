@@ -1,0 +1,34 @@
+title: The morning after
+new-page: true
+on-arrival: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.newGame(Q, 0);
+}
+!}
+
+= 21 December 2015 — The morning after
+
+The general election has broken the old two-party pattern. Mariano Rajoy's People's Party has finished first with 123 seats, far short of the 176 needed for a majority. The PSOE is second with 90, its worst result since the restoration of democracy, but it has not collapsed. Podemos and its regional allies have 69 seats, Ciudadanos 40.
+
+You are **Pedro Sánchez**, Secretary-General of the PSOE since the 2014 primary. Your senior team has gathered at Ferraz. The party faces two opposite accusations: that it will rescue the PP, or that it will hand the country to Podemos. Regional presidents, former leaders and the parliamentary group all have their own ideas about what you should do next.
+
+How do you position the PSOE this morning?
+
+- @responsible: The responsible opposition: no to Rajoy, no promises yet
+- @alternative: An alternative government: announce talks for a change of government
+- @stability: Institutional stability: explore whether any agreement with the PP is possible
+
+@responsible
+on-arrival: posture = 1; sanchez_authority += 2; member_morale += 3; regional_leaders_dissent -= 3
+
+Refusing to back Rajoy while keeping every other door open reassures anti-PP voters and most of the party. Your critics will call it indecision.
+
+@alternative
+on-arrival: posture = 2; rel_up += 10; rel_cs -= 6; member_morale += 7; progressives_dissent -= 5; regional_leaders_dissent += 8; institutionalists_dissent += 4; sanchez_authority += 3
+
+The members are energised. In Seville, Toledo and Mérida, regional presidents read the announcement with alarm.
+
+@stability
+on-arrival: posture = 3; rel_pp += 10; rel_cs += 5; member_morale -= 8; progressives_dissent += 8; institutionalists_dissent -= 5; regional_leaders_dissent -= 3; sanchez_authority -= 3
+
+Institutional voices welcome your responsibility. Among the members, the word "abstention" is already circulating, and your internal opponents take note.

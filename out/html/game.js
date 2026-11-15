@@ -16,14 +16,8 @@
     // Add your custom code here.
   };
 
-  var TITLE = "Social Democracy: An Alternate History" + '_' + "Autumn Chen";
+  var TITLE = "Social Democracy: Spain 2015-2023" + "_" + "spain-mod";
 
-  // the url is a link to game.json
-  // test url: https://aucchen.github.io/social_democracy_mods/v0.1.json
-  // TODO; 
-  window.loadMod = function(url) {
-      ui.loadGame(url);
-  };
 
   window.showStats = function() {
     if (window.dendryUI.dendryEngine.state.sceneId.startsWith('library')) {
@@ -33,14 +27,6 @@
     }
   };
 
-  window.showMods = function() {
-    window.hideOptions();
-    if (window.dendryUI.dendryEngine.state.sceneId.startsWith('mod_loader')) {
-        window.dendryUI.dendryEngine.goToScene('backSpecialScene');
-    } else {
-        window.dendryUI.dendryEngine.goToScene('mod_loader');
-    }
-  };
   
   window.showOptions = function() {
       var save_element = document.getElementById('options');
@@ -167,10 +153,18 @@
   // TODO: have some code for tabbed sidebar browsing.
   window.updateSidebar = function() {
       $('#qualities').empty();
+      if (!dendryUI.dendryEngine.state.qualities.started) {
+          $('#qualities').append('<p>Start a campaign to see the state of Spain and of the PSOE.</p>');
+          return;
+      }
       var scene = dendryUI.game.scenes[window.statusTab];
       dendryUI.dendryEngine._runActions(scene.onArrival);
       var displayContent = dendryUI.dendryEngine._makeDisplayContent(scene.content, true);
       $('#qualities').append(dendryUI.contentToHTML.convert(displayContent));
+      // Spanish game: sidebar scenes may draw tables and charts on display.
+      if (scene.onDisplay) {
+          dendryUI.dendryEngine._runActions(scene.onDisplay);
+      }
   };
 
   window.changeTab = function(newTab, tabId) {
@@ -231,7 +225,7 @@
 
   window.onload = function() {
     window.dendryUI.loadSettings({show_portraits: false});
-    window.pinnedCardsDescription = "Advisor cards - actions are only usable once per 6 months.";
+    window.pinnedCardsDescription = "Advisers and key actors";
   };
 
 }());

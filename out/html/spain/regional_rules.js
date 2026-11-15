@@ -111,6 +111,13 @@
       if (!b && d === 'Regional') {
         b = mergeBallots(ballots);
       }
+      if (!b && Object.keys(ballots).length === 1 && Object.keys(mags).length === 1) {
+        // single-district chamber whose district was renamed in the source
+        b = ballots[Object.keys(ballots)[0]];
+      }
+      if (!b) {
+        throw new Error(region + ': no ballots for district ' + d);
+      }
       districts[d] = {
         seats: mags[d], blank: b.blank,
         lists: b.lists.map(function (l) { return Array.isArray(l) ? { id: l[0], votes: l[2] } : l; })

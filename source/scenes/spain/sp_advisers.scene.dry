@@ -1,0 +1,57 @@
+title: Antonio Hernando
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1
+new-page: true
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderVote(Q, 'sp-hernando-count', 'sanchez');
+}
+!}
+
+= Antonio Hernando
+
+Spokesperson of the parliamentary group and a central negotiator. Hernando lives by arithmetic: who votes yes, who abstains, who can be moved. Faction: Institutionalists. Loyal to the leadership, for now.
+
+His current count for your investiture:
+
+{!<div id="sp-hernando-count"></div>!}
+
+- @cs_channel
+- @group
+- @pnv
+- @root: Back
+
+@cs_channel
+title: Work the Ciudadanos channel
+subtitle: Talks with Ciudadanos advance; Podemos notices.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: cs_talks += 1; rel_cs += 6; rel_up -= 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Hernando knows Ciudadanos's parliamentary team well. The talks move a step forward.
+
+@group
+title: Hold the parliamentary group together
+subtitle: Lower dissent among Institutionalists and Modernisers.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: institutionalists_dissent -= 6; modernisers_dissent -= 3; sanchez_authority += 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+A week of meetings with deputies, one by one. Nobody leaks for a while.
+
+@pnv
+title: Sound out the PNV
+subtitle: Better relations with the Basque nationalists.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: rel_pnv += 10; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
+
+Aitor Esteban is courteous and noncommittal. That, from the PNV, is a good sign.
+
+@candidacy
+title: Seek investiture
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_nominated = 1 and psoe_in_government = 0 and sanchez_leader = 1
+go-to: sp_investiture
