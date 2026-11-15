@@ -198,6 +198,151 @@
   //   winners: {province: party}; provinces not in winners are drawn grey
   //   opts.shares: {province: [[party, %], ...]} shown on hover
   //   opts.outlines: 'bold' or 'light' outlines around autonomous communities
+  // ------------------------------------------------------------------
+  // Who controls each autonomous community, and how much a party (or
+  // bloc) holds in it: 'majority' (presidency with its own absolute
+  // majority), 'president', 'junior' (coalition partner), 'supply'
+  // (external support) or 'none' (opposition or absent).
+  // ------------------------------------------------------------------
+  var STATEWIDE_IDS = ['psoe', 'pp', 'up', 'cs', 'vox', 'iu', 'mp', 'ps', 'upyd', 'pacma'];
+  var BLOCS = {
+    psoe: ['psoe'], pp: ['pp'], up: ['up'], cs: ['cs'], vox: ['vox'],
+    iu: ['iu', 'x:I-E'],
+    regionalist: null   // every party that is not statewide
+  };
+  var CONTROL_RANK = { majority: 4, president: 3, junior: 2, supply: 1, none: 0 };
+  var CONTROL_LABEL = { majority: 'Majority government', president: 'Holds the presidency',
+                        junior: 'Junior coalition partner', supply: 'Supports the government',
+                        none: 'In opposition' };
+
+  function inBloc(bloc, id) {
+    if (bloc === 'regionalist') {
+      return STATEWIDE_IDS.indexOf(id) === -1 && id !== 'x:I-E';
+    }
+    return (BLOCS[bloc] || [bloc]).indexOf(id) !== -1;
+  }
+
+  function regionControl(gov, seats, bloc) {
+    if (!gov) {
+      return 'none';
+    }
+    var total = 0;
+    Object.keys(seats || {}).forEach(function (k) { total += seats[k]; });
+    var best = 'none';
+    var consider = function (id, status) {
+      if (inBloc(bloc, id) && CONTROL_RANK[status] > CONTROL_RANK[best]) {
+        best = status;
+      }
+    };
+    var ids = gov.party === 'jxsi' ? ['jxsi', 'erc', 'junts'] : [gov.party];
+    ids.forEach(function (id) {
+      var own = (seats || {})[gov.party] || 0;
+      consider(id, own > total / 2 ? 'majority' : 'president');
+    });
+    (gov.cabinet || []).forEach(function (id) { if (id !== gov.party) { consider(id, 'junior'); } });
+    (gov.support || []).forEach(function (id) { consider(id, 'supply'); });
+    return best;
+  }
+
+  function mix(hex, other, t) {
+    var a = hex.replace('#', ''), b = other.replace('#', '');
+    var out = '#';
+    for (var i = 0; i < 3; i++) {
+      var x = parseInt(a.substr(i * 2, 2), 16), y = parseInt(b.substr(i * 2, 2), 16);
+      out += ('0' + Math.round(x + (y - x) * t).toString(16)).slice(-2);
+    }
+    return out;
+  }
+
+  var BLOC_COLOR = { regionalist: '#C9A227', iu: '#A50021' };
+
+  function controlColor(bloc, status) {
+    var base = BLOC_COLOR[bloc] || partyColor(bloc);
+    return { majority: mix(base, '#000000', 0.35), president: base, junior: mix(base, '#ffffff', 0.45),
+             supply: mix(base, '#ffffff', 0.72), none: '#f2f0ec' }[status];
+  }
+
+  // regions: {name: {government, seats}}; mode: 'presidency' or a bloc id.
+  function drawRegionMap(container, regions, mode, opts) {
+    var map = root.SPAIN_MAP;
+    if (!map || !container) {
+      return;
+    }
+    opts = opts || {};
+    mode = mode || 'presidency';
+    var paths = Object.keys(map.regions).map(function (r) {
+      var reg = regions[r];
+      var fill = '#e4e1dc';
+      if (reg && reg.government) {
+        fill = mode === 'presidency' ? partyColor(reg.government.party)
+          : controlColor(mode, regionControl(reg.government, reg.seats, mode));
+      }
+      return '<path class="sp-reg" data-reg="' + escapeHtml(r) + '" d="' + map.regions[r] + '" fill="' + fill +
+        '" stroke="#333" stroke-width="1" stroke-linejoin="round"' + (reg ? ' style="cursor:pointer"' : '') + '></path>';
+    });
+    var box = map.canariesBox.slice();
+    box[0] = Math.max(1, box[0]);
+    box[1] = Math.max(1, box[1]);
+    box[2] = Math.min(box[2], map.width - box[0] - 1);
+    box[3] = Math.min(box[3], map.height - box[1] - 1);
+    var inset = '<rect x="' + box[0] + '" y="' + box[1] + '" width="' + box[2] + '" height="' + box[3] +
+      '" fill="none" stroke="#999" stroke-width="0.8"/>';
+    var legend;
+    if (mode === 'presidency') {
+      var used = {};
+      Object.keys(regions).forEach(function (r) { if (regions[r].government) { used[regions[r].government.party] = true; } });
+      legend = Object.keys(used).map(function (id) {
+        return '<span class="sp-legend"><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
+          escapeHtml(shortName(id)) + '</span>';
+      }).join(' ');
+    } else {
+      legend = ['majority', 'president', 'junior', 'supply', 'none'].map(function (st) {
+        return '<span class="sp-legend"><span class="sp-swatch" style="background:' + controlColor(mode, st) +
+          ';border:1px solid #bbb"></span>' + CONTROL_LABEL[st] + '</span>';
+      }).join(' ');
+    }
+    container.innerHTML = (opts.title ? '<h4>' + escapeHtml(opts.title) + '</h4>' : '') +
+      '<div class="sp-map-wrap"><svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' +
+      paths.join('') + inset + '</svg><div class="sp-map-tip"></div></div>' +
+      '<p class="sp-map-legend">' + legend + '</p>';
+    var tip = container.querySelector('.sp-map-tip');
+    var wrap = container.querySelector('.sp-map-wrap');
+    Array.prototype.forEach.call(container.querySelectorAll('.sp-reg'), function (el) {
+      var r = el.getAttribute('data-reg');
+      var reg = regions[r];
+      el.addEventListener('mousemove', function (ev) {
+        var g = reg && reg.government;
+        var line = '';
+        if (g) {
+          line = '<div><span class="sp-swatch" style="background:' + partyColor(g.party) + '"></span>' +
+            escapeHtml(g.president) + ' (' + escapeHtml(shortName(g.party)) + ')</div><div>' + escapeHtml(g.type || '') + '</div>';
+          if (mode !== 'presidency') {
+            line += '<div><b>' + escapeHtml(BLOC_NAMES[mode] || shortName(mode)) + ':</b> ' +
+              CONTROL_LABEL[regionControl(g, reg.seats, mode)] + '</div>';
+          }
+        }
+        tip.innerHTML = '<strong>' + escapeHtml(r) + '</strong>' + (line || '<div>No regional parliament in the game</div>');
+        var b = wrap.getBoundingClientRect();
+        var x = ev.clientX - b.left + 12, y = ev.clientY - b.top + 12;
+        if (x > b.width - 150) { x -= 170; }
+        tip.style.left = x + 'px';
+        tip.style.top = y + 'px';
+        tip.style.display = 'block';
+        el.setAttribute('stroke-width', '2.4');
+      });
+      el.addEventListener('mouseleave', function () {
+        tip.style.display = 'none';
+        el.setAttribute('stroke-width', '1');
+      });
+      if (reg && opts.onSelect) {
+        el.addEventListener('click', function () { opts.onSelect(r); });
+      }
+    });
+  }
+
+  var BLOC_NAMES = { presidency: 'Presidency', psoe: 'PSOE', pp: 'PP', up: 'Podemos', cs: 'Ciudadanos',
+                     vox: 'Vox', iu: 'IU', regionalist: 'Regionalist parties' };
+
   function drawMap(container, winners, title, opts) {
     var map = root.SPAIN_MAP;
     if (!map || !container) {
@@ -464,6 +609,10 @@
   var api = {
     PARTIES: PARTIES,
     setPartyName: setPartyName,
+    regionControl: regionControl,
+    controlColor: controlColor,
+    drawRegionMap: drawRegionMap,
+    BLOC_NAMES: BLOC_NAMES,
     PP_ALONE_LOSS_SEATS: PP_ALONE_LOSS_SEATS,
     LARGE_MAJORITY_SEATS: LARGE_MAJORITY_SEATS,
     partyName: partyName,

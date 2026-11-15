@@ -564,3 +564,26 @@ header #game-title, header #game-author {
   border: 1px solid #999; border-radius: 3px; padding: 0.3em 0.5em; font-size: 0.8em; line-height: 1.35;
   box-shadow: 0 1px 4px rgba(0,0,0,0.25); white-space: nowrap; color: #222; }
 .sp-prov { cursor: default; }
+
+/* Regions tab: clickable rows and the community map */
+.sp-reg-row { cursor: pointer; }
+.sp-reg-row:hover td, .sp-reg-row:focus td { background: rgba(0,0,0,0.06); }
+.sp-reg-row:focus { outline: 2px solid #8a1a1a; outline-offset: -2px; }
+.sp-reg-selected td { background: rgba(225,0,26,0.10); font-weight: 600; }
+.sp-reg { transition: stroke-width 0.1s; }
+
+/* People and parties in the text */
+.sp-ent { font-weight: 600; border-bottom: 1px dotted currentColor; cursor: help; }
+.sp-ent:focus { outline: 2px solid currentColor; outline-offset: 1px; }
+a .sp-ent { border-bottom: none; }
+.sp-ent-tip { display: none; position: fixed; z-index: 1000; max-width: 280px; padding: 8px 10px; background: #fffdf8;
+  color: #222; border: 1px solid #b9b1a3; border-radius: 4px; box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  font: 13px/1.4 system-ui, sans-serif; pointer-events: none; }
+.sp-ent-head { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+.sp-ent-logo { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 26px;
+  padding: 0 5px; border-radius: 4px; color: #fff; font-weight: 700; font-size: 11px; letter-spacing: 0.02em;
+  text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+.sp-ent-wing { color: #6a6157; font-style: italic; margin-top: 2px; }
+a.sp-ent { text-decoration: none; }
+.sp-topic { color: #3d3a73; font-weight: 500; }
+.sp-ent-more { margin-top: 4px; color: #3d3a73; font-size: 12px; }

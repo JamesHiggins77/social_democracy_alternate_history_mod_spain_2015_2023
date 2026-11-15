@@ -796,3 +796,21 @@ Arrivals slow. Human rights groups and your own left are unhappy.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 2); } !}
 
 Brussels promises a pact on migration, eventually.
+
+@european_election
+title: European elections
+new-page: true
+tags: sp_event
+view-if: ep_election_due = 1
+on-arrival: ep_election_due = 0
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) {
+    window.SpainGame.renderEuropean(Q, 'sp-ep-result');
+}
+!}
+
+= European elections
+
+On the same Sunday as the regional and municipal elections, Spain elects its 54 members of the European Parliament in a single national constituency, with no threshold. (After Brexit, Spain will gain five more seats on the same result.)
+
+{!<div id="sp-ep-result"></div>!}

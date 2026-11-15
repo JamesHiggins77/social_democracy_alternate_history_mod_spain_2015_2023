@@ -534,3 +534,22 @@ test('repeating a lesson gives diminishing returns', () => {
   assert.ok(Math.abs(G.learnFrom(Q, 'denmark') - 1 / 3) < 1e-9);
   assert.ok(Math.abs(Q.migration_learned - (1 + 0.5 + 1 / 3)) < 1e-9);
 });
+
+test('Senate: 208 elected by limited vote plus 58 appointed by the regions', () => {
+  const D = require('../out/html/spain/election_data.js');
+  const el = G.senateElected(D.elections['2011'].provinces);
+  assert.strictEqual(Object.values(el).reduce((a, b) => a + b, 0), 208);
+  const Q = newQ();
+  assert.strictEqual(Q.senate_total, 266);
+  assert.ok(Q.senate.pp > Q.senate.psoe && Q.senate.pp > 133, JSON.stringify(Q.senate));
+});
+
+test('European Parliament: 2014 result, then a national D\'Hondt vote in May 2019', () => {
+  const Q = newQ();
+  assert.strictEqual(Q.ep_total, 54);
+  assert.strictEqual(Q.rep_ep, 14);
+  Q.year = 2019; Q.month = 5; G.europeanElection(Q); G.recalculate(Q);
+  assert.strictEqual(Q.ep_total, 54);
+  assert.strictEqual(Q.ep_election_due, 1);
+  assert.deepStrictEqual(G.dhondtSeats({ a: 60, b: 30, c: 10 }, 10), { a: 6, b: 3, c: 1 });
+});

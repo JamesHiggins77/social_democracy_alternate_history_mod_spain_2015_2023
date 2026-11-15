@@ -70,6 +70,20 @@ Style: **[+ style_word +]**
 
 Fed. Committee: **[+ committee_word +]**
 
+= Representation
+
+[? if exiled = 1 : [+ my_party_cap +] ?][? if exiled = 0 : The PSOE ?] holds:
+
+Congress of Deputies: **[+ rep_congress +] / 350**
+
+Senate: **[+ rep_senate +] / [+ senate_total +]**
+
+European Parliament: **[+ rep_ep +] / [+ ep_total +]**
+
+Regional parliaments: **[+ rep_regional +] / [+ rep_regional_total +]**
+
+Regional presidencies: **[+ rep_presidencies +] / [+ rep_regions +]** (in government in [+ rep_in_regional_govt +])
+
 = Relations
 
 {!<div id="sp-side-relations"></div>!}

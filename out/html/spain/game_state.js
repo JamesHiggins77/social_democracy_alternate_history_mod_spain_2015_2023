@@ -316,6 +316,7 @@
     Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
+    representation(Q);
     Object.keys(SISTER_LEADERS).forEach(function (p) { Q['sister_' + p] = sisterLeader(Q, p).name; });
     checkLeadership(Q);
     // flags for conditional world events
@@ -908,6 +909,116 @@
     return f;
   }
 
+  // ------------------------------------------------------------------
+  // Representation beyond Congress: the Senate, the European Parliament
+  // and the regions.
+  // ------------------------------------------------------------------
+  // Senate: 208 elected by limited vote (4 per mainland province: the
+  // first party usually takes 3, the second 1; islands and Ceuta and
+  // Melilla by their own rules) plus 58 appointed by the regional
+  // parliaments in proportion to their groups.
+  var SENATE_ISLANDS = { 'Baleares': [4, 1], 'Las Palmas': [4, 1], 'SC de Tenerife': [5, 1], 'Ceuta': [2, 0], 'Melilla': [2, 0] };
+  var SENATE_APPOINTED = { 'Andalucía': 9, 'Aragón': 2, 'Asturias': 2, 'Baleares': 2, 'Canarias': 3, 'Cantabria': 1,
+    'Castilla y León': 3, 'Castilla-La Mancha': 3, 'Cataluña': 8, 'Comunidad Valenciana': 6, 'Extremadura': 2,
+    'Galicia': 3, 'Madrid': 7, 'Región de Murcia': 2, 'Navarra': 1, 'País Vasco': 3, 'La Rioja': 1 };
+
+  function senateElected(ballots) {
+    var out = {};
+    Object.keys(ballots).forEach(function (prov) {
+      var lists = ballots[prov].lists.map(function (l) {
+        return Array.isArray(l) ? { id: l[0], votes: l[2] } : l;
+      }).sort(function (a, b) { return b.votes - a.votes; });
+      var split = SENATE_ISLANDS[prov] || [3, 1];
+      if (lists[0]) { out[lists[0].id] = (out[lists[0].id] || 0) + split[0]; }
+      if (lists[1] && split[1]) { out[lists[1].id] = (out[lists[1].id] || 0) + split[1]; }
+    });
+    return out;
+  }
+
+  function dhondtSeats(votes, n) {
+    var out = {};
+    var ids = Object.keys(votes).filter(function (k) { return votes[k] > 0; });
+    for (var i = 0; i < n; i++) {
+      var best = null, bestQ = -1;
+      ids.forEach(function (id) {
+        var q = votes[id] / ((out[id] || 0) + 1);
+        if (q > bestQ) { bestQ = q; best = id; }
+      });
+      if (best) { out[best] = (out[best] || 0) + 1; }
+    }
+    return out;
+  }
+
+  function senateAppointed(Q) {
+    var out = {};
+    Object.keys(SENATE_APPOINTED).forEach(function (r) {
+      var reg = Q.regions && Q.regions[r];
+      if (!reg) { return; }
+      var seats = {};
+      Object.keys(reg.seats).forEach(function (id) {
+        // joint lists count for their main party
+        var k = id === 'jxsi' ? 'junts' : id;
+        seats[k] = (seats[k] || 0) + reg.seats[id];
+      });
+      var got = dhondtSeats(seats, SENATE_APPOINTED[r]);
+      Object.keys(got).forEach(function (id) { out[id] = (out[id] || 0) + got[id]; });
+    });
+    return out;
+  }
+
+  // European Parliament: one national constituency, D'Hondt, no threshold.
+  // 54 seats from 2014, 59 after Brexit (February 2020).
+  var EP_2014 = { pp: 16, psoe: 14, iu: 6, up: 5, upyd: 4, junts: 2, pnv: 1, erc: 2, cs: 2, bildu: 1, compromis: 1 };
+
+  function europeanElection(Q) {
+    var shares = JSON.parse(JSON.stringify(Q.true_poll || {}));
+    Q.ep_shares = shares;
+    Q.ep_prev = Q.ep_seats;
+    Q.ep_seats = dhondtSeats(shares, Q.year * 100 + Q.month >= 202002 ? 59 : 54);
+    Q.ep_held = Q.year;
+    Q.ep_election_due = 1;
+  }
+
+  function representation(Q) {
+    var me = Q.player_party || 'psoe';
+    if (!Q.senate_elected) {
+      Q.senate_elected = senateElected(DATA.elections['2011'].provinces);
+    }
+    var appointed = senateAppointed(Q);
+    var senate = {};
+    [Q.senate_elected, appointed].forEach(function (o) {
+      Object.keys(o).forEach(function (k) { senate[k] = (senate[k] || 0) + o[k]; });
+    });
+    Q.senate = senate;
+    Q.senate_total = Object.keys(senate).reduce(function (a, k) { return a + senate[k]; }, 0);
+    Q.rep_congress = Q.congress[me] || 0;
+    Q.rep_senate = senate[me] || 0;
+    Q.ep_seats = Q.ep_seats || EP_2014;
+    if (Q.year * 100 + Q.month >= 202002 && Q.ep_shares && !Q.ep_brexit) {
+      Q.ep_seats = dhondtSeats(Q.ep_shares, 59);
+      Q.ep_brexit = 1;
+    }
+    Q.ep_total = Object.keys(Q.ep_seats).reduce(function (a, k) { return a + Q.ep_seats[k]; }, 0);
+    Q.rep_ep = Q.ep_seats[me] || 0;
+    var regSeats = 0, regTotal = 0, pres = 0, inGov = 0, nReg = 0;
+    Object.keys(Q.regions || {}).forEach(function (r) {
+      var reg = Q.regions[r];
+      nReg += 1;
+      Object.keys(reg.seats).forEach(function (id) {
+        regTotal += reg.seats[id];
+        if (id === me) { regSeats += reg.seats[id]; }
+      });
+      var g = reg.government || {};
+      if (g.party === me) { pres += 1; }
+      if ((g.cabinet || []).indexOf(me) !== -1) { inGov += 1; }
+    });
+    Q.rep_regional = regSeats;
+    Q.rep_regional_total = regTotal;
+    Q.rep_presidencies = pres;
+    Q.rep_in_regional_govt = inGov;
+    Q.rep_regions = nReg;
+  }
+
   // Card helpers ------------------------------------------------------
   // Shift a party's support by class and refresh the polls.
   // Sánchez's own party splits the left rather than growing it: its gains
@@ -1214,6 +1325,9 @@
       }
     });
     Q.regional_elections_due = due;
+    if (Q.year === 2019 && Q.month === 5 && Q.ep_held !== 2019) {
+      europeanElection(Q);
+    }
     Q.has_regional_elections = due.length > 0 ? 1 : 0;
 
     // the legislature's four years run out: an election two months later
@@ -1519,6 +1633,7 @@
     Q.map_kind = 'general';
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
+    Q.senate_elected = senateElected(r.ballots);
     // the result itself replaces that month's poll; then a new polling
     // error for the next cycle
     Q.poll = r.voteShares;
@@ -2208,23 +2323,40 @@
     }
     var regions = Object.keys(Q.regions).sort();
     var selected = root.spSelectedRegion && Q.regions[root.spSelectedRegion] ? root.spSelectedRegion : '';
+    var mode = root.spRegionMapMode || 'presidency';
+    var voxOn = Q.year >= 2018 || Q.vox_breakthrough;
+    var modes = ['presidency', 'psoe', 'pp', 'up', 'cs'].concat(voxOn ? ['vox'] : []).concat(['iu', 'regionalist']);
+    if (modes.indexOf(mode) === -1) {
+      mode = 'presidency';
+    }
     var rows = regions.map(function (r) {
       var reg = Q.regions[r];
       var g = reg.government;
-      return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
+      return '<tr class="sp-reg-row' + (r === selected ? ' sp-reg-selected' : '') + '" data-reg="' + r +
+        '" tabindex="0"><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
         UI.partyColor(g.party) + '"></span>' + surname(g.president) + '</td><td class="sp-num">' +
         reg.nextElection.slice(0, 4) + '</td></tr>';
     });
     var options = '<option value="">Choose a community…</option>' + regions.map(function (r) {
       return '<option value="' + r + '"' + (r === selected ? ' selected' : '') + '>' + r + '</option>';
     }).join('');
-    out.innerHTML = '<select id="' + id + '-select" class="sp-select">' + options + '</select>' +
+    var modeOptions = modes.map(function (m) {
+      return '<option value="' + m + '"' + (m === mode ? ' selected' : '') + '>' +
+        (m === 'presidency' ? 'Who holds each presidency' : 'Where the ' + UI.BLOC_NAMES[m] + ' governs') + '</option>';
+    }).join('');
+    out.innerHTML = '<select id="' + id + '-mode" class="sp-select" aria-label="Map view">' + modeOptions + '</select>' +
+      '<div id="' + id + '-map"></div>' +
+      '<select id="' + id + '-select" class="sp-select" aria-label="Community">' + options + '</select>' +
       '<div id="' + id + '-detail"></div>' +
       '<table class="sp-results sp-compact"><thead><tr><th>Region</th>' +
       '<th>President</th><th class="sp-num">Vote</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
     var select = el(id + '-select');
     var show = function (r) {
       root.spSelectedRegion = r;
+      select.value = r;
+      Array.prototype.forEach.call(out.querySelectorAll('.sp-reg-row'), function (tr) {
+        tr.className = 'sp-reg-row' + (tr.getAttribute('data-reg') === r ? ' sp-reg-selected' : '');
+      });
       var detail = el(id + '-detail');
       if (!r) {
         detail.innerHTML = '';
@@ -2243,8 +2375,32 @@
         UI.resultsTable(reg.seats, null, { prevSeats: reg.prevSeats, compact: true });
       UI.drawHemicycle('#' + id + '-hemi', reg.seats);
     };
+    var drawMap = function () {
+      UI.drawRegionMap(el(id + '-map'), Q.regions, mode, { onSelect: function (r) { show(r); } });
+    };
+    el(id + '-mode').onchange = function () {
+      mode = el(id + '-mode').value;
+      root.spRegionMapMode = mode;
+      drawMap();
+    };
     select.onchange = function () { show(select.value); };
+    Array.prototype.forEach.call(out.querySelectorAll('.sp-reg-row'), function (tr) {
+      var pick = function () {
+        show(tr.getAttribute('data-reg'));
+        select.scrollIntoView({ block: 'nearest' });
+      };
+      tr.onclick = pick;
+      tr.onkeydown = function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); } };
+    });
+    drawMap();
     show(selected);
+  }
+
+  function renderEuropean(Q, id) {
+    var out = el(id);
+    if (out && Q.ep_seats) {
+      out.innerHTML = UI.resultsTable(Q.ep_seats, Q.ep_shares, { prevSeats: Q.ep_prev });
+    }
   }
 
   function renderMap(Q, id) {
@@ -2277,7 +2433,7 @@
     if (!out) {
       return;
     }
-    out.innerHTML = (Q.last_regional_results || []).map(function (res) {
+    var html = (Q.last_regional_results || []).map(function (res) {
       var note = res.psoeLost ? ' The PSOE loses the presidency.'
         : (res.psoeWon ? ' The PSOE takes the presidency.' : '');
       return '<h4>' + res.region + '</h4>' +
@@ -2287,6 +2443,9 @@
           ? ', with support from ' + res.government.support.map(UI.partyName).join(' and ') : '') +
         '). ' + (res.government.type || '') + '.' + note + '</p>';
     }).join('');
+    out.innerHTML = html + '<div id="' + id + '-presidencies"></div>';
+    UI.drawRegionMap(el(id + '-presidencies'), Q.regions, 'presidency',
+      { title: 'Who holds each presidency now' });
   }
 
   function renderFactions(Q, id) {
@@ -2346,6 +2505,10 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    senateElected: senateElected,
+    dhondtSeats: dhondtSeats,
+    europeanElection: europeanElection,
+    renderEuropean: renderEuropean,
     renderVote: renderVote,
     renderCongress: renderCongress,
     renderPolls: renderPolls,
