@@ -27,13 +27,21 @@ Morale: **[+ morale_word +]**
 
 Unity: **[+ unity_word +]**
 
-Party funds: **[+ funds_display +]** (+[+ funds_income +]/mo)[? if in_debt = 1 : , in debt ?]
-
-[? if psoe_in_government = 1 : Deficit: **[+ deficit_text +]%** of GDP, debt [+ debt +]% ?]
+Party funds: **[+ funds_display +]** ([+ funds_income_text +]/mo)[? if in_debt = 1 : , in debt ?]
 
 [? if investiture_clock > 0 : Dissolution in [+ investiture_clock +] wk. ?]
 
 [? if election_year > 0 : Election: [+ election_month : month +] [+ election_year +] ?]
+
+= Economy & society
+
+Economy: **[+ economy_word +]** (growth [+ growth_text +]%, unemployment [+ unemployment_text +]%)
+
+Deficit: **[+ deficit_text +]%** of GDP, debt [+ debt +]%
+
+Society: **[+ cohesion_word +]**
+
+Stability: **[+ chaos_word +]**
 
 = Congress
 

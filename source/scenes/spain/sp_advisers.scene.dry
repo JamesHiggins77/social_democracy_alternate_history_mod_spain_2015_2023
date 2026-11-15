@@ -208,7 +208,7 @@ title: Tighten spending
 subtitle: Lowers the deficit and pleases Brussels; the unions object.
 choose-if: advisor_action_timer = 0
 unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
-on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.fiscal_adj -= 0.3; Q.trade_unionists_dissent += 5; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); } !}
+on-arrival: {! Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; Q.fiscal_adj -= 0.3; Q.trade_unionists_dissent += 5; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.econ(Q, -0.1, 0.05); window.SpainGame.social(Q, -1); } !}
 
 A spending freeze in every ministry but pensions.
 

@@ -75,6 +75,10 @@
       up = relation(Q, 'up', 35) >= 60 ? 'abstain' : 'no';
     }
     var independence = (!Q.red_lines && Q.referendum_offer && !Q.pact_cs) ? 'abstain' : 'no';
+    // ERC settles for less than a referendum: a dialogue table with a
+    // left-wing coalition is enough for its abstention (January 2020)
+    var ercDeal = !Q.red_lines && Q.pact_up && !Q.pact_cs &&
+      ((Q.cat_dialogue || 0) >= 1 || relation(Q, 'erc', 25) >= 50) ? 'abstain' : independence;
     return vetoes(Q, {
       psoe: 'yes',
       pp: 'no', vox: 'no', upn: 'no',
@@ -82,11 +86,11 @@
       up: up,
       iu: Q.pact_up ? 'yes' : (relation(Q, 'iu', 40) >= 55 && !Q.pact_cs ? 'abstain' : 'no'),
       mp: Q.pact_up ? 'yes' : byRelation(Q, 'mp', 55, 35),
-      erc: independence,
+      erc: ercDeal,
       junts: independence,
       cup: 'no',
       pnv: byRelation(Q, 'pnv', 65, 45),
-      bildu: (Q.pact_up && !Q.pact_cs && relation(Q, 'bildu', 10) >= 40) ? 'abstain' : 'no',
+      bildu: (Q.pact_up && !Q.pact_cs && relation(Q, 'bildu', 10) >= 30) ? 'abstain' : 'no',
       cc: Q.pact_cs ? 'yes' : byRelation(Q, 'cc', 65, 45),
       nc: byRelation(Q, 'nc', 55, 35),
       bng: byRelation(Q, 'bng', 60, 40),

@@ -304,8 +304,12 @@ test('international relations are clamped, worded, and set Brussels deficit tole
   assert.strictEqual(Q.deficit_tolerance, 3.5);
   G.intl(Q, 'eu', 30);
   G.recalculate(Q);
-  assert.strictEqual(Q.intl_eu, 90);
+  // diminishing returns: +30 from 60 adds 13
+  assert.strictEqual(Q.intl_eu, 73);
   assert.strictEqual(Q.deficit_tolerance, 4.2);
+  G.intl(Q, 'eu', 30);
+  G.recalculate(Q);
+  assert.ok(Q.intl_eu < 85, `${Q.intl_eu}`);
   G.intl(Q, 'eu', -200);
   G.recalculate(Q);
   assert.strictEqual(Q.intl_eu, 0);
@@ -415,4 +419,39 @@ test('a Sánchez party splits the left vote rather than adding to it', () => {
   assert.ok(Q.true_poll.ps > ps);
   assert.ok(left(Q) <= mid + 0.01, `campaign: ${mid} -> ${left(Q)}`);
   assert.ok(before >= left(Q));
+});
+
+test('chaos rises under an acting government and feeds Vox after 2016', () => {
+  const calm = newQ(); const messy = newQ();
+  [calm, messy].forEach(q => { q.year = 2019; q.month = 1; q.vm.partyFactor = {}; G.recalculate(q); });
+  messy.government_status = 'acting'; messy.repeat_elections = 2; messy.catalan_crisis = 1;
+  G.recalculate(messy);
+  for (let i = 0; i < 6; i++) { G.monthlyWorld(calm); G.monthlyWorld(messy); G.recalculate(calm); G.recalculate(messy); }
+  assert.ok(messy.chaos > calm.chaos + 15, `${messy.chaos} vs ${calm.chaos}`);
+  assert.ok(messy.true_poll.vox > calm.true_poll.vox, `${messy.true_poll.vox} vs ${calm.true_poll.vox}`);
+});
+
+test('policy shocks move growth and unemployment, which fade', () => {
+  const Q = newQ(); Q.year = 2018; G.recalculate(Q);
+  const u0 = Q.unemployment;
+  G.econ(Q, -1, 1); G.recalculate(Q);
+  assert.ok(Q.unemployment > u0 + 0.9);
+  for (let i = 0; i < 24; i++) G.monthlyWorld(Q);
+  assert.ok(Q.unemployment < u0 + 1.2 && Q.growth_adj > -0.2);
+});
+
+test('relations gain less the warmer they are', () => {
+  const Q = newQ();
+  Q.intl.eu = 90; G.intl(Q, 'eu', 10);
+  assert.ok(Q.intl.eu < 92);
+  Q.intl.eu = 30; G.intl(Q, 'eu', 10);
+  assert.ok(Q.intl.eu > 37);
+});
+
+test('party income is lower and dues change it', () => {
+  const Q = newQ(); Q.year = 2019; G.recalculate(Q);
+  const base = G.fundsIncome(Q);
+  assert.ok(base < 0.6, `${base}`);
+  Q.dues_level = 2;
+  assert.ok(G.fundsIncome(Q) > base + 0.25);
 });

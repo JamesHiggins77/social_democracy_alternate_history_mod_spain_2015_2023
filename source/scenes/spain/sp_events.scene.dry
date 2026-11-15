@@ -296,6 +296,7 @@ Q.leadership_exception_open = 0;
 if (Q.primary_won) {
     Q.sanchez_leader = 1; Q.sanchez_authority = 70; Q.sanchismo += 20; Q.member_morale += 10;
     Q.federal_committee_balance = 60;
+    Q.red_lines = 0;
 }
 !}
 
@@ -1027,3 +1028,27 @@ on-arrival: {! Q.pp_asked = Q.formation_round || 1; Q.sanchez_nominated = 1; Q.s
 = The King nominates you
 
 The PSOE is the largest party in Congress. After his consultations, the King proposes you as candidate for President of the Government. The right will vote against; everything depends on the deals you can strike. (Use the "Seek investiture" card when you are ready.)
+
+@king_second_round
+title: The King's second round
+new-page: true
+tags: sp_event
+view-if: acting = 1 and investiture_votes >= 1 and investiture_clock > 0 and sanchez_nominated = 0 and sanchez_leader = 1 and election_year = 0 and king_second_asked < formation_round
+on-arrival: {! Q.king_second_asked = Q.formation_round || 1; !}
+
+= The King's second round
+
+[+ right_leader +] has lost the vote in Congress. The two-month clock is running. The King calls a new round of consultations and asks whether you can find the votes.
+
+- @second_accept: Accept the nomination and seek a majority
+- @second_refuse: Decline: let the clock run out
+
+@second_accept
+on-arrival: sanchez_nominated = 1; sanchez_authority += 3
+
+You are the candidate. (Use the "Seek investiture" card when your partners are ready.)
+
+@second_refuse
+on-arrival: sanchez_authority -= 2
+
+The clock keeps running towards a new election.

@@ -270,3 +270,95 @@ subtitle: Popular with workers; liberals and the moderate middle class will run.
 on-arrival: {! Q.progressives_dissent -= 8; Q.trade_unionists_dissent -= 4; Q.modernisers_dissent += 8; Q.institutionalists_dissent += 6; Q.rel_up += 6; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 3); window.SpainGame.target(Q, 'psoe', 'unemployed', 2); window.SpainGame.position(Q, 3, 0); window.SpainGame.recalculate(Q); } !}
 
 Bankia, rescued with public money, could stay public. The electricity companies' profits could fund lower bills. The left cheers; the IBEX-35, Ciudadanos and the business press warn of "Venezuela".
+
+@dues
+title: Party dues
+new-page: true
+is-card: true
+tags: sp_party
+view-if: dues_timer <= 0 and sanchez_leader = 1
+on-arrival: dues_timer = 6
+
+= Party dues
+
+The treasurer presents the accounts. Members pay [? if dues_level = 0 : the standard dues ?][? if dues_level > 0 : more than the standard dues ?][? if dues_level < 0 : less than the standard dues ?]. Income this month: [+ funds_income +] after running costs, which rise every year.
+
+- @dues_raise: Raise the dues
+- @dues_cut: Cut the dues
+- @root: Leave them as they are
+
+@dues_raise
+choose-if: dues_level < 2
+unavailable-subtitle: Dues are already at their highest.
+on-arrival: {! Q.month_actions += 1; Q.dues_level += 1; Q.member_morale -= 5; Q.sanchismo -= 2; Q.trade_unionists_dissent += 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.6, pp: 0.2, cs: 0.2}, {workers: 0.5, pensioners: 0.4, students: 0.4, unemployed: 0.4}); } !}
+
+More money for Ferraz, and fewer members. Some of those who leave stop voting for the party too.
+
+@dues_cut
+choose-if: dues_level > -2
+unavailable-subtitle: Dues are already at their lowest.
+on-arrival: {! Q.month_actions += 1; Q.dues_level -= 1; Q.member_morale += 4; Q.sanchismo += 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 0.3, students: 0.3, unemployed: 0.3}); } !}
+
+Membership grows, especially among the young and the unemployed. The party's accounts get tighter.
+
+@intl_network
+title: Socialist International and Progressive Alliance
+new-page: true
+is-card: true
+tags: sp_party
+view-if: intl_net_timer <= 0 and sanchez_leader = 1
+on-arrival: intl_net_timer = 4
+
+= Socialist International and Progressive Alliance
+
+The PSOE belongs to both international families of the centre-left. Party money spent there builds friendships with sister parties, and the chance to learn from what worked for them.
+
+- @net_host: Host a Progressive Alliance conference in Madrid
+- @net_portugal: Learn from the Portuguese Socialists: governing with the radical left
+- @net_denmark: Learn from the Danish Social Democrats: migration and the welfare state
+- @net_labour: Learn from British Labour: a mass campaign machine
+- @net_nordic: Learn from the Swedish Social Democrats: building a welfare consensus
+- @net_spd: Learn from the German SPD: surviving a grand coalition
+- @root: Not now
+
+@net_host
+choose-if: funds >= 1.5
+unavailable-subtitle: Needs 1.5 in party funds.
+on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', 4); window.SpainGame.intl(Q, 'us', 2); window.SpainGame.intl(Q, 'maghreb', 2); } !}
+
+Delegations from forty parties fill a Madrid conference centre. You are photographed with prime ministers and future prime ministers.
+
+@net_portugal
+choose-if: funds >= 0.5 and learned_portugal = 0
+unavailable-subtitle: [? if learned_portugal = 1 : Already learned. ?][? if learned_portugal = 0 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.learned_portugal = 1; Q.rel_up += 6; Q.up_talks += 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 4); } !}
+
+Costa's people explain how they wrote separate agreements with each partner, and kept them in writing. Talks with Podemos get easier.
+
+@net_denmark
+choose-if: funds >= 0.5 and migration_learned = 0
+unavailable-subtitle: [? if migration_learned = 1 : Already learned. ?][? if migration_learned = 0 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.migration_learned = 1; Q.progressives_dissent += 6; if (window.SpainGame) { window.SpainGame.position(Q, 0, -0.5); } !}
+
+A firmer line on borders, paired with a strong welfare state. Vox gains less from migration from now on; your progressives think it is a concession to the right.
+
+@net_labour
+choose-if: funds >= 0.5 and campaign_skill < 0.3
+unavailable-subtitle: [? if campaign_skill >= 0.3 : Nothing more to learn. ?][? if campaign_skill < 0.3 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.campaign_skill += 0.1; Q.member_morale += 2; !}
+
+Door-knocking apps, small-donor networks, volunteers trained by the thousand. Your campaigns win a little more from now on.
+
+@net_nordic
+choose-if: funds >= 0.5 and welfare_learned = 0
+unavailable-subtitle: [? if welfare_learned = 1 : Already learned. ?][? if welfare_learned = 0 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.welfare_learned = 1; Q.rel_up += 2; Q.trade_unionists_dissent -= 3; !}
+
+Universal services, negotiated with unions and employers. The model raises Spain's social cohesion whenever you can apply it.
+
+@net_spd
+choose-if: funds >= 0.5 and learned_spd = 0
+unavailable-subtitle: [? if learned_spd = 1 : Already learned. ?][? if learned_spd = 0 : Needs 0.5 in party funds. ?]
+on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; Q.learned_spd = 1; Q.regional_leaders_dissent -= 5; Q.institutionalists_dissent -= 4; Q.progressives_dissent += 3; Q.rel_pp += 4; !}
+
+The SPD's lesson: a grand coalition keeps the State running and slowly eats the junior partner. The barons like the first half.

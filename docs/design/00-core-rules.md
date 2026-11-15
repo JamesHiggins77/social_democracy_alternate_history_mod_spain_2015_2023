@@ -237,7 +237,7 @@ Values are shown as words, never numbers: authority (Non-existent, Very low ≤9
 
 ### 7.3 Finances
 
-- **Party funds** (abstract units): start at 6, earn 0.5 + PSOE seats/200 a month (dues and public subsidy). A general election campaign costs 4, a round of regional campaigns 1, and big-hall rallies, the branch tour, digital campaigns and member consultations cost 1 each. The *Party finances* card raises funds (donors, micro-donations, or a bank loan repaid from income). Debt lowers morale and authority each month.
+- **Party funds** (abstract units): start at 6, earn income and pay rising running costs each month (see §7.9). A general election campaign costs 4 (rising each year), a round of regional campaigns 1, and big-hall rallies, the branch tour, digital campaigns and member consultations cost 1 each. The *Party finances* card raises funds (donors, micro-donations, or a bank loan repaid from income). Debt lowers morale and authority each month.
 - **Government finances** (shown while the PSOE governs): deficit and debt follow the real path for each year (2015–2023, including the 2020 pandemic) plus the player's policy adjustments (`fiscal_adj`), which also accumulate into debt. Above 3.5% of GDP, Brussels writes.
 
 ### 7.4 Decisions move votes
@@ -283,6 +283,24 @@ After joining or founding a party, card and event effects aimed at the PSOE appl
 PP succession: pressure builds when the PP loses power (3), is not the largest party after an election (2), loses 10+ seats or fails to form a government (1). A PP leader in office is safe; otherwise the chance of being forced out is 25% at 1, 60% at 2, certain at 3. Successors by period, weighted by the right's mood (a strong Vox favours a hard-liner, a strong Cs a moderate): Sáenz de Santamaría (moderate), Casado (hard), Cospedal (establishment) to 2018–19; Feijóo (moderate) from 2019; Ayuso (hard) from 2021. Hard-liners pull Vox voters back and lose centrists, warm PP–Vox relations and chill the PNV; moderates do the opposite.
 
 Advisers (pinned, sharing one action timer): Antonio Hernando (parliament), the Secretary of Organisation (César Luena to 2016, José Luis Ábalos from 2017: federations, finances, discipline), Adriana Lastra (Podemos channel, members, equality), Iván Redondo from 2017 (private polling without the published error, narrative, the centre) and, in government, María Jesús Montero (spending, regional financing, budget partners).
+
+### 7.9 Chaos, the economy and society
+
+**Chaos** (0–100, shown as Stability: Calm, Restless, Turbulent, Chaotic, In turmoil) is recalculated monthly from: unemployment above 13% and negative growth; an acting government (10, plus 2 a month up to 15) and repeat elections (6 each); migration (a background level by year, highest in 2018 and 2020–21, plus event tension: the Aquarius, Ceuta, the Canary route, Ukraine); the Catalan crisis (15) and its aftermath (the 2019 sentence adds tension that fades); PP corruption while the PP governs; the pandemic (March 2020 to June 2021); and low social cohesion. It is smoothed (70% last month, 30% new).
+
+From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos every month: Vox takes from the PP, Cs and (a little) the PSOE, at 30% strength until it breaks through (2018, or its first regional seats) and slowing as it nears 25%; learning the Danish model cuts its migration-driven gains by a fifth. When chaos falls below 20, Vox's protest voters drift back to the PP. Vox's first regional seats trigger a breakthrough event with a further jump.
+
+**Ciudadanos**: its losses no longer recover from 2016. As the junior partner of a PP government it is absorbed (mostly by the PP), and from 2019, once Vox polls 5% or more, the right consolidates at its expense. **Podemos** loses 0.8% of its support a month from 2017 to internal strife, plus the Vistalegre II (2017) and Galapagar chalet (2018) events.
+
+**Economy**: unemployment and growth follow the real figures by year (24.4% and +1.4% in 2014 to 12.2% and +2.5% in 2023, with the 2020 pandemic recession) plus adjustments from any government's decisions (minimum wage, labour reform, taxes, budgets, the pandemic response, the recovery fund, the Iberian exception, tariffs, Ukraine). Growth shocks fade within a year; unemployment follows growth (Okun) and fades slowly. A long acting government and high chaos slow growth. Unemployment above its historical level costs the governing party votes. PP governments trim the deficit each January.
+
+**Society**: social cohesion (Fractured, Tense, Strained, Stable, Cohesive) moves a tenth of the way each month towards a target set by unemployment, chaos and accumulated social policy (minimum wage, pensions, labour rights, memory, "only yes means yes", reception of migrants; PP governments subtract a little each year, PP–Vox governments more). Low cohesion adds to chaos.
+
+**Investiture**: ERC abstains on a Sánchez investiture backed by a Podemos coalition if the red lines are gone and there is a dialogue table (or relations of 50+), as in January 2020; Bildu abstains from relations of 30. Winning a primary lifts the 2016 red lines. After the right's candidate loses a vote, the King offers Sánchez the nomination.
+
+**Party money**: income is 0.2 + seats/350 a month plus 0.15 per dues level; running costs are 0.05 + 0.04 per year since 2014; a general election costs 4 + 0.4 per year since 2015. The Party dues card raises dues (money, but members and some voters leave) or cuts them (members and goodwill, less money). The Socialist International and Progressive Alliance card spends money on hosting a conference (relations abroad) or learning from sister parties: Portugal (talks with Podemos), Denmark (Vox gains less from migration; progressives object), British Labour (campaign gains +10% each, up to +30%), Sweden (higher cohesion), the SPD (calmer barons, warmer PP).
+
+**Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 3% a month back towards 55 without attention.
 
 ### 7.5 Election results
 

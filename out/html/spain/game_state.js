@@ -48,6 +48,18 @@
   function yearValue(table, year) {
     return table[Math.max(2015, Math.min(2023, year))];
   }
+  // Unemployment (EPA annual average, %) and real GDP growth (INE, %).
+  var UNEMP_BY_YEAR = { 2014: 24.4, 2015: 22.1, 2016: 19.6, 2017: 17.2, 2018: 15.3, 2019: 14.1,
+                        2020: 15.5, 2021: 14.8, 2022: 12.9, 2023: 12.2 };
+  var GROWTH_BY_YEAR = { 2014: 1.4, 2015: 3.8, 2016: 3.0, 2017: 3.0, 2018: 2.3, 2019: 2.0,
+                         2020: -11.2, 2021: 6.4, 2022: 5.8, 2023: 2.5 };
+  // Background migration pressure by year (arrivals by sea: 2018 peak on the
+  // Strait, 2020-21 Canaries route), on the chaos scale.
+  var MIGRATION_BY_YEAR = { 2014: 1, 2015: 2, 2016: 2, 2017: 4, 2018: 8, 2019: 4, 2020: 6, 2021: 8,
+                            2022: 3, 2023: 5 };
+  function yearOf(table, year) {
+    return table[Math.max(2014, Math.min(2023, year))];
+  }
 
   var cachedBase = null;
   function base() {
@@ -84,7 +96,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'foreign', 'pes', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'foreign', 'pes', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -175,6 +187,16 @@
 
     // Party finances: an abstract fund, earned monthly and spent on campaigns.
     Q.funds = 6;
+    Q.dues_level = 0;           // -2..+2: party dues below or above the norm
+    Q.campaign_skill = 0;       // learned from sister parties (Labour etc.)
+    // Economy and society: historical path plus adjustments by any government
+    Q.growth_adj = 0;
+    Q.unemp_adj = 0;
+    Q.social_policy = 0;        // accumulated social policy (welfare, rights)
+    Q.cohesion = 42;            // social cohesion 0-100 (2014: deep crisis)
+    Q.migration = 0;            // migration tension from events (decays)
+    Q.cat_tension = 0;          // tension after the Catalan crisis (decays)
+    Q.chaos = 25;
     // Government finances: policy adjustment to the deficit (points of GDP)
     // and its cumulative effect on debt.
     Q.fiscal_adj = 0;
@@ -253,16 +275,18 @@
     Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;
     var and = Q.regions && Q.regions['Andalucía'] && Q.regions['Andalucía'].government;
     Q.regions_andalucia_psoe = (and && and.party === 'psoe') ? 1 : 0;
-    Q.funds_income = Math.round((0.5 + (Q.congress[Q.player_party || 'psoe'] || 0) / 200) * 10) / 10;
+    Q.funds_income = Math.round((fundsIncome(Q) - fundsUpkeep(Q)) * 100) / 100;
+    Q.funds_income_text = (Q.funds_income >= 0 ? '+' : '') + Q.funds_income.toFixed(2);
     Q.funds_display = Math.floor(Q.funds);
     Q.in_debt = Q.funds < 0 ? 1 : 0;
     Q.deficit = Math.round((yearValue(DEFICIT_BY_YEAR, Q.year) + (Q.fiscal_adj || 0)) * 10) / 10;
     Q.debt = Math.round(yearValue(DEBT_BY_YEAR, Q.year) + (Q.debt_adj || 0));
     Q.deficit_text = Q.deficit.toFixed(1);
+    deriveWorld(Q);
     Q.intl = Q.intl || { eu: 60, south: 60, maghreb: 50, us: 55, nato: 55, un: 55 };
     Object.keys(Q.intl).forEach(function (k) {
-      Q.intl[k] = clamp(Math.round(Q.intl[k]), 0, 100);
-      Q['intl_' + k] = Q.intl[k];
+      Q.intl[k] = clamp(Q.intl[k], 0, 100);
+      Q['intl_' + k] = Math.round(Q.intl[k]);
       Q['intl_' + k + '_word'] = UI.word('relation', Q.intl[k]);
     });
     // Brussels tolerates a little more deficit from a trusted government
@@ -396,7 +420,7 @@
       if (v > 0) {
         v *= (1 - Q.dissent);
         if (isPsoe) {
-          v *= GAIN_SCALE * fatigueFactor(Q) * (Q.psoe_in_government ? GOVERNING_GAIN : 1);
+          v *= GAIN_SCALE * fatigueFactor(Q) * (Q.psoe_in_government ? GOVERNING_GAIN : 1) * (1 + (Q.campaign_skill || 0));
           gained += v;
         }
       } else if (isPsoe && Q.psoe_in_government) {
@@ -444,9 +468,145 @@
   }
 
   // Change Spain's relation with an international partner.
+  // Relations improve with diminishing returns: the warmer they already
+  // are, the less a gesture adds. Losses apply in full.
   function intl(Q, key, delta) {
     Q.intl = Q.intl || {};
-    Q.intl[key] = clamp((Q.intl[key] === undefined ? 50 : Q.intl[key]) + delta, 0, 100);
+    var cur = Q.intl[key] === undefined ? 50 : Q.intl[key];
+    if (delta > 0) {
+      delta *= Math.max(0.15, (100 - cur) / 90);
+    }
+    Q.intl[key] = clamp(cur + delta, 0, 100);
+  }
+
+  // Economic effect of a policy or event: growth in points this year,
+  // unemployment in points (structural, slow to fade).
+  function econ(Q, growth, unemp) {
+    Q.growth_adj = (Q.growth_adj || 0) + (growth || 0);
+    Q.unemp_adj = (Q.unemp_adj || 0) + (unemp || 0);
+  }
+
+  // Social policy: welfare and rights raise cohesion, cuts and conflict lower it.
+  function social(Q, delta) {
+    Q.social_policy = clamp((Q.social_policy || 0) + delta, -20, 20);
+  }
+
+  function migration(Q, delta) {
+    Q.migration = clamp((Q.migration || 0) + delta, 0, 40);
+  }
+
+  // Monthly economy, society and chaos. Chaos (0-100) gathers economic
+  // pain, endless government formation, migration tension, the Catalan
+  // conflict, corruption and the pandemic. From 2016 it feeds Vox and, to a
+  // lesser extent, Podemos.
+  function monthlyWorld(Q) {
+    var t = Q.year * 12 + Q.month;
+    // the economy: growth shocks fade within a year; unemployment follows
+    // growth (Okun) and its own adjustments fade slowly
+    Q.unemp_adj = (Q.unemp_adj || 0) - 0.04 * (Q.growth_adj || 0);
+    Q.growth_adj = (Q.growth_adj || 0) * 0.88;
+    Q.unemp_adj *= 0.985;
+    if (Q.acting && (Q.formation_months || 0) > 6) {
+      Q.growth_adj -= 0.03;
+    }
+    if ((Q.chaos || 0) > 40) {
+      Q.growth_adj -= 0.01 * (Q.chaos - 40) / 10;
+    }
+    // governments of the right govern too: the PP trims the deficit and
+    // society notices
+    if (!Q.acting && Q.pm_party === 'pp' && Q.month === 1) {
+      Q.fiscal_adj = (Q.fiscal_adj || 0) - 0.1;
+      social(Q, (Q.govt_parties || []).indexOf('vox') !== -1 ? -4 : -2);
+    }
+    Q.migration = (Q.migration || 0) * 0.96;
+    Q.cat_tension = (Q.cat_tension || 0) * 0.95;
+    Q.social_policy = (Q.social_policy || 0) * 0.995;
+    deriveWorld(Q);
+    // social cohesion moves a tenth of the way to its target each month
+    var target = 70 - 1.2 * (Q.unemployment - 10) - 0.3 * (Q.chaos || 0) + 1.5 * (Q.social_policy || 0) +
+      (Q.welfare_learned ? 4 : 0);
+    Q.cohesion = clamp((Q.cohesion || 42) + (target - (Q.cohesion || 42)) * 0.1, 0, 100);
+    // chaos
+    var pandemic = (t >= 2020 * 12 + 3 && t <= 2021 * 12 + 6) ? 12 : 0;
+    var raw = Math.max(0, Q.unemployment - 13) * 1.5 + Math.max(0, -Q.growth) * 2 +
+      (Q.acting ? 10 + Math.min(15, 2 * (Q.formation_months || 0)) : 0) + 6 * (Q.repeat_elections || 0) +
+      yearOf(MIGRATION_BY_YEAR, Q.year) + (Q.migration || 0) +
+      (Q.catalan_crisis ? 15 : 0) + (Q.cat_tension || 0) +
+      (Q.pm_party === 'pp' ? 3 * (Q.pp_scandal || 0) : 0) + pandemic +
+      Math.max(0, 50 - Q.cohesion) * 0.5;
+    Q.chaos = clamp(0.7 * (Q.chaos || 25) + 0.3 * raw, 0, 100);
+    if (Q.acting) {
+      Q.formation_months = (Q.formation_months || 0) + 1;
+    } else {
+      Q.formation_months = 0;
+    }
+    if (Q.year * 100 + Q.month < 201601) {
+      return;  // 2014-15 follows the real polls (history_path_data.js)
+    }
+    var c = Q.chaos / 100;
+    // Vox feeds on chaos, fully once it has broken through (from 2018)
+    var voxReady = Q.year >= 2018 || Q.vox_breakthrough ? 1 : 0.3;
+    var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
+    // Vox's growth slows as it approaches its ceiling
+    var vox = 0.8 * c * voxReady * (Q.migration_learned ? 0.8 : 1) * Math.max(0, 1 - voxNow / 25);
+    transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
+                              professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
+    transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
+                              students: vox * 0.25, unemployed: vox * 0.3 });
+    transfer(Q, 'psoe', 'vox', { workers: vox * 0.2, pensioners: vox * 0.15, unemployed: vox * 0.2 });
+    // Podemos too, to a smaller extent
+    var up = 0.3 * c;
+    transfer(Q, 'psoe', 'up', { students: up, unemployed: up, workers: up * 0.8, professionals: up * 0.5 });
+    transfer(Q, 'cs', 'up', { students: up * 0.4, professionals: up * 0.3 });
+    // Ciudadanos: the junior partner of a PP government is absorbed, and
+    // once Vox exists the right consolidates at Cs's expense
+    var all = function (x) {
+      return { workers: x, professionals: x, pensioners: x, self_employed: x,
+               unemployed: x, students: x, homemakers: x };
+    };
+    if (!Q.acting && (Q.govt_parties || []).indexOf('cs') !== -1 && Q.pm_party !== 'cs') {
+      transfer(Q, 'cs', { pp: 0.6, vox: 0.25, psoe: 0.15 }, all(0.25));
+    }
+    var voxPoll = (Q.true_poll && Q.true_poll.vox) || 0;
+    if (Q.year >= 2019 && voxPoll >= 5) {
+      transfer(Q, 'cs', { pp: 0.5, vox: 0.5 }, all(0.012 * voxPoll));
+    }
+    // Podemos's internal strife slowly erodes it from 2017
+    if (Q.year >= 2017) {
+      transfer(Q, 'up', { psoe: 0.6, iu: 0.15, mp: 0.25 }, share(Q, 'up', 0.008));
+    }
+    // when things calm down, Vox's protest voters drift back to the PP
+    if (Q.chaos < 20 && voxPoll > 3) {
+      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (20 - Q.chaos) / 10));
+    }
+    // the economy judges the government: unemployment above its
+    // historical level costs the governing party
+    var gov = Q.pm_party;
+    if (!Q.acting && gov && Q.unemp_adj > 0.5 && Q.vm.classSupport.workers[gov] !== undefined) {
+      var to = gov === 'pp' ? { psoe: 0.5, vox: 0.3, cs: 0.2 } : { pp: 0.5, vox: 0.3, up: 0.2 };
+      transfer(Q, gov, to, all(0.04 * Q.unemp_adj));
+    }
+  }
+
+  // A fraction of a party's support in every class (for proportional moves).
+  function share(Q, party, frac) {
+    var out = {};
+    Object.keys(Q.vm.classSupport).forEach(function (c) {
+      out[c] = (Q.vm.classSupport[c][party] || 0) * frac;
+    });
+    return out;
+  }
+
+  function deriveWorld(Q) {
+    Q.unemployment = Math.round((yearOf(UNEMP_BY_YEAR, Q.year) + (Q.unemp_adj || 0)) * 10) / 10;
+    Q.growth = Math.round((yearOf(GROWTH_BY_YEAR, Q.year) + (Q.growth_adj || 0)) * 10) / 10;
+    Q.unemployment_text = Q.unemployment.toFixed(1);
+    Q.growth_text = (Q.growth > 0 ? '+' : '') + Q.growth.toFixed(1);
+    var co = Math.round(Q.cohesion || 0);
+    Q.cohesion_word = co < 25 ? 'Fractured' : (co < 40 ? 'Tense' : (co < 55 ? 'Strained' : (co < 70 ? 'Stable' : 'Cohesive')));
+    var ch = Math.round(Q.chaos || 0);
+    Q.chaos_word = ch < 20 ? 'Calm' : (ch < 35 ? 'Restless' : (ch < 50 ? 'Turbulent' : (ch < 65 ? 'Chaotic' : 'In turmoil')));
+    Q.economy_word = Q.growth < 0 ? 'Recession' : (Q.unemployment >= 20 ? 'Depressed' : (Q.unemployment >= 15 ? 'Recovering' : (Q.growth >= 2.5 ? 'Booming' : 'Steady')));
   }
 
   // Change a relation between two other parties (clamped 0-100).
@@ -469,6 +629,16 @@
     } else if (Q.pm_party === 'pp' && !Q.acting) {
       transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all);
     }
+  }
+
+  // Party money: public subsidy by seats plus members' dues; running costs
+  // (staff, offices, debt service on campaigns) rise year by year.
+  function fundsIncome(Q) {
+    return 0.2 + (Q.congress[Q.player_party || 'psoe'] || 0) / 350 + 0.15 * (Q.dues_level || 0);
+  }
+
+  function fundsUpkeep(Q) {
+    return 0.05 + 0.04 * Math.max(0, Q.year - 2014);
   }
 
   // Card helpers ------------------------------------------------------
@@ -703,6 +873,10 @@
       ['psoe', 'pp', 'cs'].forEach(function (p) {
         var cur = Q.vm.classSupport[c][p];
         var rate = cur > initial[c][p] ? 0.03 : 0.01;
+        // Ciudadanos's losses are permanent once its bubble bursts
+        if (p === 'cs' && cur < initial[c][p] && Q.year >= 2016) {
+          rate = 0;
+        }
         Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * rate;
       });
       // a new party without roots loses support unless it keeps campaigning
@@ -713,13 +887,18 @@
     Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
     positionDrift(Q);
     incumbencyWear(Q);
+    monthlyWorld(Q);
+    // foreign relations drift back towards a neutral 55 without attention
+    Object.keys(Q.intl || {}).forEach(function (k) {
+      Q.intl[k] += (55 - Q.intl[k]) * 0.03;
+    });
 
     Object.keys(Q.target_uses || {}).forEach(function (k) {
       Q.target_uses[k] = Math.max(0, Q.target_uses[k] - 0.15);
     });
 
     // party finances: dues and the public subsidy, scaled by seats
-    Q.funds += 0.5 + (Q.congress[Q.player_party || 'psoe'] || 0) / 200;
+    Q.funds += fundsIncome(Q) - fundsUpkeep(Q);
     if (Q.loan_months > 0) {
       Q.funds -= 0.4;
       Q.loan_months -= 1;
@@ -1061,7 +1240,7 @@
     Q.congress = r.totals;
     Q.vote_shares = r.voteShares;
     Q.elections_held = (Q.elections_held || 0) + 1;
-    Q.funds -= 4;
+    Q.funds -= 4 + 0.4 * Math.max(0, Q.year - 2015);
     Q.map_winners = provinceWinners(r.ballots);
     Q.map_shares = districtShares(r.ballots, 5);
     Q.map_kind = 'general';
@@ -1257,6 +1436,11 @@
       if (region === 'Cataluña' && Q.cat_crisis_stage === 3) {
         Q.cat_election_held = 1;
       }
+      if ((r.totals.vox || 0) > 0 && !Q.vox_breakthrough && Q.year >= 2017) {
+        Q.vox_breakthrough = 1;
+        Q.vox_breakthrough_due = 1;
+        Q.vox_breakthrough_region = region;
+      }
       if (gov.cabinet.indexOf('vox') !== -1) {
         Q.pp_vox_regional_coalitions = (Q.pp_vox_regional_coalitions || 0) + 1;
       }
@@ -1374,6 +1558,7 @@
       Q.institutionalists_dissent -= 8;
       Q.lead_stage = 0;
       Q.backbench = 0;
+      Q.red_lines = 0;
       Q.psoe_leader = 'Pedro Sánchez';
     } else {
       oust(Q, false);
@@ -1893,6 +2078,11 @@
     transfer: function (Q, from, to, changes) { return transfer(Q, me(Q, from), meTo(Q, to), changes); },
     partyRel: partyRel,
     intl: intl,
+    econ: econ,
+    social: social,
+    migration: migration,
+    monthlyWorld: monthlyWorld,
+    fundsIncome: fundsIncome,
     formationBlame: formationBlame,
     position: position,
     trueVote: trueVote,

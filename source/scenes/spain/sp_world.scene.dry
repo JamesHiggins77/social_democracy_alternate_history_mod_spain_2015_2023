@@ -77,17 +77,17 @@ The United Kingdom votes to leave the European Union. Three hundred thousand Spa
 - @brexit_people: Make it about people: protect citizens on both sides
 
 @brexit_eu
-on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 6); window.SpainGame.target(Q, 'psoe', 'middle', 1); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 6); window.SpainGame.target(Q, 'psoe', 'middle', 1); } if (window.SpainGame) { window.SpainGame.econ(Q, -0.1, 0); } !}
 
 Brussels appreciates a reliable partner.
 
 @brexit_gibraltar
-on-arrival: {! Q.rel_pp += 3; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.5); } !}
+on-arrival: {! Q.rel_pp += 3; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.5); } if (window.SpainGame) { window.SpainGame.econ(Q, -0.1, 0); } !}
 
 A patriotic note that plays well in Andalusia and badly in Brussels.
 
 @brexit_people
-on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.target(Q, 'psoe', 'young', 1); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.target(Q, 'psoe', 'young', 1); } if (window.SpainGame) { window.SpainGame.econ(Q, -0.1, 0); } !}
 
 Thousands of young Spaniards working in Britain take note.
 
@@ -97,7 +97,7 @@ new-page: true
 tags: sp_event
 view-if: barcelona_attack_seen = 0 and ((year = 2017 and month >= 8) or year >= 2018)
 max-visits: 1
-on-arrival: {! Q.barcelona_attack_seen = 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.intl(Q, 'maghreb', -3); } !}
+on-arrival: {! Q.barcelona_attack_seen = 1; if (window.SpainGame) { window.SpainGame.migration(Q, 3); window.SpainGame.intl(Q, 'eu', 3); window.SpainGame.intl(Q, 'maghreb', -3); } !}
 
 = Las Ramblas
 
@@ -139,7 +139,7 @@ A court in Navarre convicts five men of "sexual abuse" rather than rape for the 
 - @respect_courts: Respect the courts' decision
 
 @only_yes
-on-arrival: {! Q.progressives_dissent -= 5; Q.only_yes_law = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 3); window.SpainGame.position(Q, 0, 1.5); } !}
+on-arrival: {! Q.progressives_dissent -= 5; Q.only_yes_law = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 3); window.SpainGame.position(Q, 0, 1.5); } if (window.SpainGame) { window.SpainGame.social(Q, 1.5); } !}
 
 The feminist movement has its demand, and the PSOE has made it its own. Drafting such a law well will be harder than promising it.
 
@@ -149,7 +149,7 @@ on-arrival: {! Q.institutionalists_dissent -= 3; if (window.SpainGame) { window.
 Serious and slow. The marchers wanted more.
 
 @respect_courts
-on-arrival: {! Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); window.SpainGame.position(Q, 0, -0.5); } !}
+on-arrival: {! Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); window.SpainGame.position(Q, 0, -0.5); } if (window.SpainGame) { window.SpainGame.social(Q, -1); } !}
 
 Institutionally correct, politically deaf. Young women notice.
 
@@ -201,7 +201,7 @@ Italy's new interior minister, Matteo Salvini, closes Italian ports to the rescu
 - @aquarius_no: Refuse: Spain cannot become Europe's only open door
 
 @aquarius_valencia
-on-arrival: {! Q.progressives_dissent -= 6; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 6); window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', -4); window.SpainGame.position(Q, 0, 1.2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.8, self_employed: 0.8, workers: 0.5}); } !}
+on-arrival: {! Q.progressives_dissent -= 6; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', 6); window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', -4); window.SpainGame.position(Q, 0, 1.2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.8, self_employed: 0.8, workers: 0.5}); } if (window.SpainGame) { window.SpainGame.migration(Q, 6);window.SpainGame.social(Q, 1); } !}
 
 The *Aquarius* docks in Valencia to a welcome from volunteers and the world's cameras. Salvini mocks you; Vox finds a cause.
 
@@ -211,7 +211,7 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 3); window
 Brussels convenes a summit. The ship waits another week.
 
 @aquarius_no
-on-arrival: {! Q.progressives_dissent += 10; Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', -6); window.SpainGame.intl(Q, 'south', 3); window.SpainGame.position(Q, 0, -1); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); } !}
+on-arrival: {! Q.progressives_dissent += 10; Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'un', -6); window.SpainGame.intl(Q, 'south', 3); window.SpainGame.position(Q, 0, -1); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, professionals: 1}); } if (window.SpainGame) { window.SpainGame.migration(Q, -2);window.SpainGame.social(Q, -1); } !}
 
 Salvini praises Spain. Your own members do not.
 
@@ -252,7 +252,7 @@ new-page: true
 tags: sp_event
 view-if: tariffs_seen = 0 and ((year = 2019 and month >= 10) or year >= 2020)
 max-visits: 1
-on-arrival: {! Q.tariffs_seen = 1; Q.tariff_hit = (Q.intl && Q.intl.us < 45) ? 2 : 1; if (window.SpainGame) { window.SpainGame.target(Q, Q.psoe_in_government ? 'psoe' : 'pp', 'rural', -2 * Q.tariff_hit); } !}
+on-arrival: {! Q.tariffs_seen = 1; Q.tariff_hit = (Q.intl && Q.intl.us < 45) ? 2 : 1; if (window.SpainGame) { window.SpainGame.econ(Q, -0.1 * Q.tariff_hit, 0.05 * Q.tariff_hit); window.SpainGame.target(Q, Q.psoe_in_government ? 'psoe' : 'pp', 'rural', -2 * Q.tariff_hit); } !}
 
 = Trump's tariffs
 
@@ -314,7 +314,7 @@ new-page: true
 tags: sp_event
 view-if: cat_sentence_seen = 0 and cat_crisis_seen = 1 and ((year = 2019 and month >= 10) or year >= 2020)
 max-visits: 1
-on-arrival: {! Q.cat_sentence_seen = 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {self_employed: 2, pensioners: 1.5, workers: 1.5, homemakers: 1, professionals: 1}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.partyRel(Q, 'cs', 'erc', -5); } !}
+on-arrival: {! Q.cat_sentence_seen = 1; Q.cat_tension = (Q.cat_tension || 0) + 15; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {self_employed: 2, pensioners: 1.5, workers: 1.5, homemakers: 1, professionals: 1}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.partyRel(Q, 'cs', 'erc', -5); } !}
 
 = The sentence
 
@@ -381,17 +381,17 @@ A new coronavirus is filling the hospitals of Madrid and Barcelona. On 14 March 
 - @covid_economy: [? if psoe_in_government = 1 : Protect the economy: lighter, shorter measures ?][? if psoe_in_government = 0 : Oppose the extensions: the government is improvising ?]
 
 @covid_strict
-on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.5; Q.sanchez_authority += 6; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1}); window.SpainGame.campaign(Q, 'vox', {self_employed: 2, professionals: 0.5}); window.SpainGame.intl(Q, 'eu', 3); } } else { Q.rel_pp += 5; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } } !}
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.5; Q.sanchez_authority += 6; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1}); window.SpainGame.campaign(Q, 'vox', {self_employed: 2, professionals: 0.5}); window.SpainGame.intl(Q, 'eu', 3); } } else { Q.rel_pp += 5; Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } } if (window.SpainGame) { if (Q.psoe_in_government) { window.SpainGame.econ(Q, -1.5, 1.0);window.SpainGame.social(Q, 1); } } !}
 
 [? if psoe_in_government = 1 : The curve flattens. The furlough scheme (ERTE) protects millions of jobs. Shopkeepers and the self-employed are furious, and Vox drives through Madrid in caravans of honking cars. ?][? if psoe_in_government = 0 : Responsible opposition. The government thanks you; your critics say you have become the PP's crutch. ?]
 
 @covid_regions
-on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; Q.regional_leaders_dissent -= 10; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 0.5}); window.SpainGame.regionalMod(Q, 'Madrid', 'pp', 1.04); } } else { Q.regional_leaders_dissent -= 6; Q.rel_pp += 2; } !}
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; Q.regional_leaders_dissent -= 10; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 0.5}); window.SpainGame.regionalMod(Q, 'Madrid', 'pp', 1.04); } } else { Q.regional_leaders_dissent -= 6; Q.rel_pp += 2; } if (window.SpainGame) { if (Q.psoe_in_government) { window.SpainGame.econ(Q, -1.0, 0.7); } } !}
 
 [? if psoe_in_government = 1 : The regions take charge, and seventeen different sets of rules confuse everyone. Madrid's president keeps her bars open and becomes a national figure. ?][? if psoe_in_government = 0 : The barons who govern regions are grateful. ?]
 
 @covid_economy
-on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, up: 0.3, cs: 0.2}, {pensioners: 3, homemakers: 2, professionals: 1.5}); window.SpainGame.intl(Q, 'eu', -3); } } else { Q.rel_pp -= 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, pp: 0.5}, {pensioners: 1.5, homemakers: 1}); } } !}
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, up: 0.3, cs: 0.2}, {pensioners: 3, homemakers: 2, professionals: 1.5}); window.SpainGame.intl(Q, 'eu', -3); } } else { Q.rel_pp -= 8; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, pp: 0.5}, {pensioners: 1.5, homemakers: 1}); } } if (window.SpainGame) { if (Q.psoe_in_government) { window.SpainGame.econ(Q, 0.8, -0.3);window.SpainGame.social(Q, -3); } } !}
 
 [? if psoe_in_government = 1 : The second wave is worse. The death toll rises, and the anger with it. ?][? if psoe_in_government = 0 : In the middle of a pandemic, opposing the measures looks irresponsible to most voters. ?]
 
@@ -412,17 +412,17 @@ For the first time, the EU will borrow together: €750 billion for recovery, mu
 - @fund_social: Put it into health, care and jobs
 
 @fund_green
-on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj -= 0.3 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.target(Q, 'psoe', 'young', 1 + Q.recovery_size); } !}
+on-arrival: {! if (Q.psoe_in_government) { Q.fiscal_adj -= 0.3 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.target(Q, 'psoe', 'young', 1 + Q.recovery_size); } if (window.SpainGame) { window.SpainGame.econ(Q, 0.4 * Q.recovery_size, -0.2 * Q.recovery_size); } !}
 
 Brussels approves the plan quickly. Solar farms and charging points start to appear.
 
 @fund_regions
-on-arrival: {! Q.regional_leaders_dissent -= 10; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 1 + Q.recovery_size); } !}
+on-arrival: {! Q.regional_leaders_dissent -= 10; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 1 + Q.recovery_size); } if (window.SpainGame) { window.SpainGame.econ(Q, 0.3 * Q.recovery_size, -0.2 * Q.recovery_size); } !}
 
 The regional presidents, of every party, are happy for once.
 
 @fund_social
-on-arrival: {! Q.trade_unionists_dissent -= 5; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'working', 1 + Q.recovery_size); } !}
+on-arrival: {! Q.trade_unionists_dissent -= 5; if (Q.psoe_in_government) { Q.fiscal_adj -= 0.2 * Q.recovery_size; } if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -2); window.SpainGame.target(Q, 'psoe', 'working', 1 + Q.recovery_size); } if (window.SpainGame) { window.SpainGame.econ(Q, 0.3 * Q.recovery_size, -0.4 * Q.recovery_size);window.SpainGame.social(Q, 2); } !}
 
 Popular at home; Brussels insists on more reforms in return.
 
@@ -494,7 +494,7 @@ new-page: true
 tags: sp_event
 view-if: ceuta_seen = 0 and ((year = 2021 and month >= 5) or year >= 2022)
 max-visits: 1
-on-arrival: {! Q.ceuta_seen = 1; Q.ceuta_severe = (Q.intl && Q.intl.maghreb < 45) ? 1 : 0; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {pensioners: 1 + Q.ceuta_severe, self_employed: 1 + Q.ceuta_severe, workers: 0.5 + Q.ceuta_severe}); } !}
+on-arrival: {! Q.ceuta_seen = 1; Q.ceuta_severe = (Q.intl && Q.intl.maghreb < 45) ? 1 : 0; if (window.SpainGame) { window.SpainGame.migration(Q, 8 + 6 * Q.ceuta_severe); window.SpainGame.campaign(Q, 'vox', {pensioners: 1 + Q.ceuta_severe, self_employed: 1 + Q.ceuta_severe, workers: 0.5 + Q.ceuta_severe}); } !}
 
 = Ceuta
 
@@ -505,12 +505,12 @@ Angry that Spain admitted the Polisario leader Brahim Ghali to a Spanish hospita
 - @ceuta_children: Protect the unaccompanied children first
 
 @ceuta_army
-on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', -8); window.SpainGame.intl(Q, 'eu', 5); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.8); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', -8); window.SpainGame.intl(Q, 'eu', 5); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.position(Q, 0, -0.8); } if (window.SpainGame) { window.SpainGame.migration(Q, -2); } !}
 
 Firm, and seen to be firm. Brussels declares Ceuta's border Europe's border.
 
 @ceuta_rabat
-on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 6); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.5, self_employed: 0.5}); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 6); window.SpainGame.campaign(Q, 'vox', {pensioners: 0.5, self_employed: 0.5}); } if (window.SpainGame) { window.SpainGame.migration(Q, -3); } !}
 
 The crisis ends, the questions about what Spain conceded do not.
 
@@ -535,12 +535,12 @@ The independence leaders have served more than three years. ERC, on whose votes 
 - @pardon_no: Refuse: the sentences stand
 
 @pardon_yes
-on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 20; Q.rel_junts += 10; Q.regional_leaders_dissent += 15; Q.rel_pp -= 10; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, vox: 0.3, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 0.97); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); window.SpainGame.position(Q, 0, 1.5); } !}
+on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 20; Q.rel_junts += 10; Q.regional_leaders_dissent += 15; Q.rel_pp -= 10; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, vox: 0.3, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 0.97); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); window.SpainGame.position(Q, 0, 1.5); } if (window.SpainGame) { Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 8); } !}
 
 The streets of Catalonia go quiet. The rest of Spain argues about it for a year.
 
 @pardon_no
-on-arrival: {! Q.rel_erc -= 20; Q.regional_leaders_dissent -= 8; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } if (Q.depends_on_catalans) { Q.depends_on_catalans = 0; Q.lost_majority = 1; } !}
+on-arrival: {! Q.rel_erc -= 20; Q.regional_leaders_dissent -= 8; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); } if (Q.depends_on_catalans) { Q.depends_on_catalans = 0; Q.lost_majority = 1; } if (window.SpainGame) { Q.cat_tension = (Q.cat_tension || 0) + 5; } !}
 
 [? if lost_majority = 1 : ERC withdraws its support. Your government no longer has a majority. ?][? if lost_majority = 0 : The PP has nothing to campaign on. ERC has everything. ?]
 
@@ -575,7 +575,7 @@ new-page: true
 tags: sp_event
 view-if: ukraine_seen = 0 and ((year = 2022 and month >= 2) or year >= 2023)
 max-visits: 1
-on-arrival: {! Q.ukraine_seen = 1; if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; } !}
+on-arrival: {! Q.ukraine_seen = 1; if (Q.psoe_in_government) { Q.fiscal_adj += 0.3; } if (window.SpainGame) { window.SpainGame.econ(Q, -0.8, 0.2); window.SpainGame.migration(Q, 3); } !}
 
 = War in Ukraine
 
@@ -616,7 +616,7 @@ Morocco offers to end the crisis if Spain backs its plan for autonomy for Wester
 - @sahara_neutral: Keep Spain's neutrality
 
 @sahara_morocco
-on-arrival: {! Q.rel_up -= 10; Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 10); window.SpainGame.intl(Q, 'un', -5); } Q.fiscal_adj += 0.1; !}
+on-arrival: {! Q.rel_up -= 10; Q.progressives_dissent += 8; if (window.SpainGame) { window.SpainGame.intl(Q, 'maghreb', 10); window.SpainGame.intl(Q, 'un', -5); } Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.migration(Q, -4); } !}
 
 Rabat reopens the borders and cooperates on migration. Algeria freezes its friendship treaty and raises gas prices. Every party in Congress, including your partners, votes to condemn the decision.
 
@@ -656,7 +656,7 @@ new-page: true
 tags: sp_event
 view-if: energy_seen = 0 and ukraine_seen = 1 and psoe_in_government = 1 and ((year = 2022 and month >= 4) or year >= 2023)
 max-visits: 1
-on-arrival: {! Q.energy_seen = 1; Q.iberian_ok = (Q.intl && Q.intl.south >= 55 && Q.intl.eu >= 50) ? 1 : 0; if (Q.iberian_ok) { Q.fiscal_adj -= 0.1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.intl(Q, 'south', 4); } } else { if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.6, vox: 0.4}, {workers: 1, pensioners: 1, self_employed: 1}); } } !}
+on-arrival: {! Q.energy_seen = 1; Q.iberian_ok = (Q.intl && Q.intl.south >= 55 && Q.intl.eu >= 50) ? 1 : 0; if (Q.iberian_ok) { Q.fiscal_adj -= 0.1; if (window.SpainGame) { window.SpainGame.econ(Q, 0.3, -0.1); window.SpainGame.target(Q, 'psoe', 'working', 2); window.SpainGame.target(Q, 'psoe', 'pensioners', 1.5); window.SpainGame.intl(Q, 'south', 4); } } else { if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.6, vox: 0.4}, {workers: 1, pensioners: 1, self_employed: 1}); } } !}
 
 = The Iberian exception
 
@@ -685,3 +685,114 @@ on-arrival: {! Q.eu_presidency_seen = 1; if (window.SpainGame) { window.SpainGam
 = The EU presidency
 
 For six months Spain holds the presidency of the Council of the European Union, chairing the negotiations on migration, artificial intelligence and fiscal rules. [? if psoe_in_government = 1 : You chair the summits, and the photographs help at home. ?][? if psoe_in_government = 0 : The government chairs the summits; the PSOE watches. ?]
+
+@vox_breakthrough
+title: Vox breaks through
+new-page: true
+tags: sp_event
+view-if: vox_breakthrough_due = 1
+on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 0.8, self_employed: 1.2, workers: 0.6, professionals: 0.6, homemakers: 0.6}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 0.8, workers: 0.6, professionals: 0.6, students: 0.4}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
+
+= Vox breaks through
+
+For the first time since 1982, a party of the hard right wins seats in a Spanish parliament: Vox enters the assembly of [+ vox_breakthrough_region +]. The PP and Ciudadanos immediately start talking about governing with its votes. Every channel invites Santiago Abascal.
+
+- @vox_alarm: Sound the alarm: "an antifascist front"
+- @vox_cordon: Demand that the PP and Cs build a cordon sanitaire
+- @vox_issues: Answer the anger behind the vote: jobs, rural Spain, housing
+
+@vox_alarm
+on-arrival: {! Q.progressives_dissent -= 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.campaignRaw(Q, 'vox', {pensioners: 0.3, self_employed: 0.3}); } !}
+
+Your voters mobilise. So do his.
+
+@vox_cordon
+on-arrival: {! Q.rel_cs -= 4; Q.rel_pp -= 4; if (window.SpainGame) { window.SpainGame.partyRel(Q, 'cs', 'vox', -8); window.SpainGame.target(Q, 'psoe', 'middle', 1); } !}
+
+Ciudadanos refuses to sign anything, then refuses to sit with Vox at the same table, then takes its votes.
+
+@vox_issues
+on-arrival: {! Q.trade_unionists_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'rural', 1.5); window.SpainGame.social(Q, 1); } !}
+
+Less noise, more substance. The effect is slower, and lasts longer.
+
+@vistalegre_two
+title: Vistalegre II
+new-page: true
+tags: sp_event
+view-if: vistalegre_two_seen = 0 and ((year = 2017 and month >= 2) or year >= 2018) and up_running = 1
+max-visits: 1
+on-arrival: {! Q.vistalegre_two_seen = 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', {psoe: 0.7, iu: 0.1, cs: 0.2}, {professionals: 1, students: 0.8, workers: 0.6, unemployed: 0.5}); } !}
+
+= Vistalegre II
+
+Podemos's second congress becomes a public duel between Pablo Iglesias and Íñigo Errejón: a party of the street against a party that wants to govern. Iglesias wins easily, and Errejón's allies are purged. Some of Podemos's more moderate voters start looking elsewhere.
+
+- @vista_door: Open the door to disappointed Podemos voters
+- @vista_silent: Say nothing about another party's congress
+
+@vista_door
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', {professionals: 0.6, students: 0.5}); } Q.rel_up -= 4; !}
+
+"The PSOE is the useful vote for change." Some of them listen.
+
+@vista_silent
+on-arrival: rel_up += 2
+
+Podemos notices your discretion.
+
+@chalet
+title: The chalet in Galapagar
+new-page: true
+tags: sp_event
+view-if: chalet_seen = 0 and ((year = 2018 and month >= 5) or year >= 2019) and up_running = 1
+max-visits: 1
+on-arrival: {! Q.chalet_seen = 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', {psoe: 0.6, iu: 0.2, mp: 0.2}, {workers: 0.8, unemployed: 0.8, students: 0.6, pensioners: 0.3}); } !}
+
+= The chalet in Galapagar
+
+Pablo Iglesias and Irene Montero buy a €600,000 house with a pool in the Madrid hills. The man who mocked politicians for living in villas puts his leadership to a vote of the members, and survives it. The damage to Podemos's image does not go away.
+
+- @chalet_mock: Let your people mock it
+- @chalet_above: Stay above it
+
+@chalet_mock
+on-arrival: {! Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 1); } !}
+
+The jokes write themselves. Podemos will remember who told them.
+
+@chalet_above
+on-arrival: rel_up += 3
+
+"Where people live is their own business."
+
+@canaries
+title: The Canary route
+new-page: true
+tags: sp_event
+view-if: canaries_seen = 0 and ((year = 2020 and month >= 10) or year >= 2021)
+max-visits: 1
+on-arrival: {! Q.canaries_seen = 1; if (window.SpainGame) { window.SpainGame.migration(Q, 10); } !}
+
+= The Canary route
+
+More than twenty thousand people reach the Canary Islands in small boats this year, eight times more than last. Thousands sleep on the dock at Arguineguín. [? if psoe_in_government = 1 : The islands' government demands that you transfer migrants to the mainland. ?][? if psoe_in_government = 0 : The government is overwhelmed; Vox holds a rally on the dock. ?]
+
+- @can_transfer: Share them out across Spain and invest in reception
+- @can_return: Speed up returns to Morocco and Senegal
+- @can_europe: Ask the EU for a common response
+
+@can_transfer
+on-arrival: {! Q.rel_cc += 6; if (window.SpainGame) { window.SpainGame.social(Q, 1); window.SpainGame.intl(Q, 'un', 3); window.SpainGame.migration(Q, 3); window.SpainGame.position(Q, 0, 0.5); } if (Q.psoe_in_government) { Q.fiscal_adj += 0.05; } !}
+
+Humane, and visible: the camps in each region become local news.
+
+@can_return
+on-arrival: {! Q.progressives_dissent += 5; if (window.SpainGame) { window.SpainGame.migration(Q, -5); window.SpainGame.intl(Q, 'maghreb', 3); window.SpainGame.position(Q, 0, -0.6); } !}
+
+Arrivals slow. Human rights groups and your own left are unhappy.
+
+@can_europe
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 2); } !}
+
+Brussels promises a pact on migration, eventually.

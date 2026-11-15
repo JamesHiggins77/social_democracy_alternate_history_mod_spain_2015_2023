@@ -74,3 +74,17 @@ test('a PSOE government can depend on the independence parties', () => {
   const st = P.stancesForSanchez({ pact_up: 1, rel_pnv: 70, rel_bildu: 45, referendum_offer: 1, red_lines: 0, rel_cc: 50 });
   assert.ok(P.dependsOnIndependentists(seats, st));
 });
+
+test('January 2020: PSOE–Podemos invested with ERC and Bildu abstaining for a dialogue table', () => {
+  const seats = { psoe: 120, pp: 89, vox: 52, up: 35, erc: 13, cs: 10, junts: 8, pnv: 6, bildu: 5, mp: 3,
+                  cup: 2, cc: 2, upn: 2, bng: 1, prc: 1, te: 1 };
+  const Q = { pact_up: 1, cat_dialogue: 1, rel_erc: 45, rel_pnv: 70, rel_bildu: 35, rel_bng: 60, rel_te: 55,
+              rel_mp: 60, rel_cc: 50, rel_prc: 30, red_lines: 0 };
+  const v = P.investiture(seats, 'sanchez', Q);
+  assert.strictEqual(v.detail.erc, 'abstain');
+  assert.strictEqual(v.detail.bildu, 'abstain');
+  assert.strictEqual(v.firstBallot, false);
+  assert.ok(v.secondBallot, `${v.yes} yes vs ${v.no} no`);
+  // with the 2016 red lines still in force, ERC votes no and it fails
+  assert.ok(!P.investiture(seats, 'sanchez', Object.assign({}, Q, { red_lines: 1 })).passes);
+});
