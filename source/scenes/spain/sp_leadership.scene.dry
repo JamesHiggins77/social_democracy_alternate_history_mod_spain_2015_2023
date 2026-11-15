@@ -107,17 +107,26 @@ on-arrival: {! window.SpainGame.oust(Q, false); !}
 
 You do not stand. [+ psoe_leader +] becomes Secretary-General unopposed.
 
+@career_over
+title: The end of the road
+new-page: true
+tags: sp_event
+view-if: no_way_back = 1
+go-to: game_over
+
 @exile
 title: After Ferraz
 new-page: true
 tags: sp_event
-view-if: exile_pending = 1
+view-if: exile_pending = 1 and no_way_back = 0
 
 = After Ferraz
 
-[? if expelled = 1 : You have been expelled from the PSOE. ?][? if expelled = 0 : You are no longer Secretary-General. ?] Your phone keeps ringing anyway. Some calls are offers.
+[? if expelled = 1 : You have been expelled from the PSOE. ?][? if expelled = 0 : You are no longer Secretary-General. ?] What comes next depends on who still wants you.
 
-[? if can_join_cs = 1 : Albert Rivera's people suggest that a moderate social democrat would be welcome in Ciudadanos. ?][? if can_join_up = 1 : Podemos sounds you out about joining a broad progressive front. ?] Your own followers want you to start again under a new name. Your pollsters think a party of your own could start at around [+ new_party_prospect +]%; your personal following and an anti-establishment profile are what it would run on. Every vote it wins would come out of the PSOE or Podemos, splitting the left in every province, and many voters would see it as a vanity project.
+[? if can_join_cs = 1 : Ciudadanos's leadership calls: a moderate who stood firm against independence, and a friend of the party, would be welcome. ?][? if can_join_up = 1 : Podemos calls: a radical, progressive, anti-establishment Sánchez could lead a broad front of the left. ?][? if can_found = 1 : Your followers are ready to start again under your own name: your pollsters think a Pedro Sánchez List could start at around [+ new_party_prospect +]%, though every vote it wins would come out of the PSOE or Podemos. ?]
+
+[? if can_join_cs = 0 : Ciudadanos will not have you: it takes near-perfect relations (90+), a moderate economic line and a hard line against independence. ?] [? if can_join_up = 0 : Podemos will not have you: it takes near-perfect relations (90+), a progressive social line, a radical economic line and a populist style. ?] [? if can_found = 0 : There is no Sánchez movement to build a party on: that needs a dominant personal following. ?]
 
 - @join_cs: Join Ciudadanos
 - @join_up: Join Podemos
@@ -126,20 +135,19 @@ view-if: exile_pending = 1
 - @retire: Retire from politics
 
 @join_cs
-choose-if: can_join_cs = 1
-unavailable-subtitle: Ciudadanos only wants a proven moderate (a centrist economic line) with good relations with them.
+view-if: can_join_cs = 1
 on-arrival: {! window.SpainGame.joinParty(Q, 'cs'); Q.month_actions += 1; !}
 
 You sign up with Ciudadanos at a packed press conference. The PSOE calls it treason; Rivera calls it the birth of a great centre. You will have to earn your place in a party that is not yours.
 
 @join_up
-choose-if: can_join_up = 1
-unavailable-subtitle: Podemos only wants a proven progressive (a left or progressive line) with good relations with them.
+view-if: can_join_up = 1
 on-arrival: {! window.SpainGame.joinParty(Q, 'up'); Q.month_actions += 1; !}
 
 You join Podemos's lists as an independent. The left calls it the end of the PSOE's monopoly; the PSOE calls it the end of Pedro Sánchez.
 
 @new_party
+view-if: can_found = 1
 on-arrival: {! window.SpainGame.joinParty(Q, 'ps', 'Pedro Sánchez List'); Q.month_actions += 1; !}
 go-to: founded
 
@@ -151,8 +159,7 @@ title: The founding
 [+ new_party_name +] is launched in a sports hall in Madrid. [? if populism >= 5 : Your anti-establishment message, "neither the apparatus nor the IBEX", fills it. ?][? if populism < 5 : The hall is respectable rather than full; you are known as a man of the apparatus you are now running against. ?] The first polls give it [+ player_poll +]%.
 
 @backbench
-choose-if: expelled = 0
-unavailable-subtitle: You have been expelled from the party.
+view-if: expelled = 0
 on-arrival: backbench = 1; backbench_since = time
 
 You take a seat at the back of the PSOE group. The new leadership watches you as closely as the PP does. If they stumble, the members may remember you.

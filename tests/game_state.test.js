@@ -415,12 +415,32 @@ test('a new party takes votes in proportion to following and populism', () => {
   assert.ok(strong.true_poll.ps > before);
 });
 
-test('joining Ciudadanos needs a moderate line and good relations', () => {
+test('joining Ciudadanos needs 90+ relations, a moderate line and a hard line on independence', () => {
   const Q = newQ();
-  Q.econ_left = 3; Q.rel_cs = 70; Q.true_poll.cs = 12; G.recalculate(Q);
+  Q.true_poll.cs = 12; Q.econ_left = 0; Q.rel_cs = 85; Q.cat_hard_line = 2; G.recalculate(Q);
   assert.strictEqual(Q.can_join_cs, 0);
-  Q.econ_left = 0; Q.true_poll.cs = 12; G.recalculate(Q);
+  Q.rel_cs = 92; Q.true_poll.cs = 12; G.recalculate(Q);
   assert.strictEqual(Q.can_join_cs, 1);
+  Q.referendum_offer = 1; Q.true_poll.cs = 12; G.recalculate(Q);
+  assert.strictEqual(Q.can_join_cs, 0);
+});
+
+test('joining Podemos needs 90+ relations and a progressive, radical, populist Sánchez', () => {
+  const Q = newQ();
+  Q.true_poll.up = 15; Q.rel_up = 95; Q.social_prog = 4; Q.econ_left = 7; Q.populism = 6; G.recalculate(Q);
+  assert.strictEqual(Q.can_join_up, 0);
+  Q.populism = 9; Q.true_poll.up = 15; G.recalculate(Q);
+  assert.strictEqual(Q.can_join_up, 1);
+});
+
+test('no following, no party, expelled: the game ends', () => {
+  const Q = newQ(); Q.year = 2019;
+  Q.sanchismo = 50; G.oust(Q, true); G.recalculate(Q);
+  assert.strictEqual(Q.can_found, 0);
+  assert.ok(/career is over/.test(G.lossReason(Q)));
+  const R = newQ(); R.year = 2019; R.sanchismo = 85; G.oust(R, true); G.recalculate(R);
+  assert.strictEqual(R.can_found, 1);
+  assert.strictEqual(G.lossReason(R), '');
 });
 
 test('without Sánchez, formation runs automatically with his party\'s line', () => {

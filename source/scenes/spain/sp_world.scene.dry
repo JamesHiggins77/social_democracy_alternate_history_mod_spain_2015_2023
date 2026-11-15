@@ -335,7 +335,7 @@ on-arrival: {! Q.cat_dialogue += 1; Q.rel_erc += 3; !}
 Both camps think you are talking to the other one.
 
 @sentence_pardons
-on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 10; Q.regional_leaders_dissent += 15; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.4, vox: 0.4, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.position(Q, 0, 2); } !}
+on-arrival: {! Q.pardons_granted = 1; Q.cat_dialogue += 2; Q.rel_erc += 10; Q.regional_leaders_dissent += 15; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.4, vox: 0.4, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.position(Q, 0, 2); } !}
 
 The word "pardon" dominates the next election campaign. Not in your favour.
 
@@ -535,7 +535,7 @@ The independence leaders have served more than three years. ERC, on whose votes 
 - @pardon_no: Refuse: the sentences stand
 
 @pardon_yes
-on-arrival: {! Q.cat_dialogue += 2; Q.rel_erc += 20; Q.rel_junts += 10; Q.regional_leaders_dissent += 15; Q.rel_pp -= 10; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, vox: 0.3, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 0.97); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); window.SpainGame.position(Q, 0, 1.5); } if (window.SpainGame) { Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 8); } !}
+on-arrival: {! Q.pardons_granted = 1; Q.cat_dialogue += 2; Q.rel_erc += 20; Q.rel_junts += 10; Q.regional_leaders_dissent += 15; Q.rel_pp -= 10; Q.rel_cs -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {pp: 0.5, vox: 0.3, cs: 0.2}, {pensioners: 2, homemakers: 1.5, self_employed: 1.5}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 0.97); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.06); window.SpainGame.position(Q, 0, 1.5); } if (window.SpainGame) { Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 8); } !}
 
 The streets of Catalonia go quiet. The rest of Spain argues about it for a year.
 

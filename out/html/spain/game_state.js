@@ -251,10 +251,23 @@
     Q.player_seats = Q.congress[Q.player_party] || 0;
     Q.player_is_right_cand = (Q.exiled && Q.player_leads && Q.right_candidate === Q.player_party) ? 1 : 0;
     Q.player_poll = Math.round(((Q.true_poll && Q.true_poll[Q.player_party]) || 0) * 10) / 10;
-    Q.is_moderate = (Q.econ_left || 0) <= 1 ? 1 : 0;
-    Q.is_progressive = ((Q.econ_left || 0) >= 3 || (Q.social_prog || 0) >= 3) ? 1 : 0;
-    Q.can_join_cs = (Q.is_moderate && Q.rel_cs >= 55 && Q.true_poll && Q.true_poll.cs >= 3) ? 1 : 0;
-    Q.can_join_up = (Q.is_progressive && Q.rel_up >= 55 && Q.true_poll && Q.true_poll.up >= 3) ? 1 : 0;
+    // Invitations into another party are rare: near-perfect relations and
+    // close political alignment. Ciudadanos wants an economic moderate who
+    // has been a hardliner against independence; Podemos a social
+    // progressive, economic radical and populist.
+    var e = Q.econ_left || 0, so = Q.social_prog || 0;
+    Q.anti_indep_score = 2 * (Q.cat_hard_line || 0) + (Q.red_lines ? 2 : 0) - 2 * (Q.cat_dialogue || 0) -
+      (Q.referendum_offer ? 4 : 0) - (Q.pardons_granted ? 4 : 0);
+    Q.is_anti_indep = Q.anti_indep_score >= 4 ? 1 : 0;
+    Q.is_moderate = (e >= -3 && e <= 1) ? 1 : 0;
+    Q.is_progressive = so >= 3 ? 1 : 0;
+    Q.is_radical = e >= 6 ? 1 : 0;
+    Q.is_populist = (Q.populism || 0) >= 8 ? 1 : 0;
+    Q.can_join_cs = (Q.rel_cs >= 90 && Q.is_moderate && Q.is_anti_indep && Q.true_poll && Q.true_poll.cs >= 3) ? 1 : 0;
+    Q.can_join_up = (Q.rel_up >= 90 && Q.is_progressive && Q.is_radical && Q.is_populist &&
+      Q.true_poll && Q.true_poll.up >= 3) ? 1 : 0;
+    // a party of his own needs a personality cult
+    Q.can_found = (Q.sanchismo || 0) >= 80 ? 1 : 0;
     var nps = newPartyStrength(Q);
     // rough vote share a new party would poll (fitted to the vote model)
     Q.new_party_prospect = Math.round(0.6 * nps + 0.035 * nps * nps);
@@ -1789,6 +1802,7 @@
     // out of the leadership with no primary pending: decide what next
     Q.exile_pending = (!Q.sanchez_leader && !Q.leadership_exception_open && !Q.exiled &&
       !Q.backbench && !Q.retired) ? 1 : 0;
+    Q.no_way_back = (Q.exile_pending && Q.expelled && !Q.can_join_cs && !Q.can_join_up && !Q.can_found) ? 1 : 0;
   }
 
   function challengerName(Q) {
@@ -2077,6 +2091,9 @@
     }
     if (Q.retired) {
       return 'Pedro Sánchez retires from politics.';
+    }
+    if (Q.no_way_back) {
+      return 'Expelled from the PSOE, with no party willing to take him and no following of his own, Pedro Sánchez\'s political career is over.';
     }
     return '';
   }
