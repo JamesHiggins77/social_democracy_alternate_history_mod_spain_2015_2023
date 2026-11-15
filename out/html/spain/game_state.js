@@ -323,7 +323,10 @@
     Q.congress_text = congressText(Q.congress);
     representation(Q);
     cabinetFlags(Q);
-    Object.keys(SISTER_LEADERS).forEach(function (p) { Q['sister_' + p] = sisterLeader(Q, p).name; });
+    Object.keys(SISTER_LEADERS).forEach(function (p) {
+      Q['sister_' + p] = sisterLeader(Q, p).name;
+      Q['hint_' + p] = lessonHint(Q, p);
+    });
     checkLeadership(Q);
     // flags for conditional world events
     var mad = Q.regions && Q.regions['Madrid'];
@@ -800,6 +803,36 @@
     sweden: [[202110, 'lofven', 'Stefan Löfven'], [999999, 'andersson', 'Magdalena Andersson']],
     us: [[201701, 'obama', 'Barack Obama'], [202003, 'sanders', 'the Sanders movement'], [999999, 'biden', 'Joe Biden']]
   };
+
+  // One-line hints of what each lesson does, shown under the options.
+  var LESSON_HINTS = {
+    'labour:miliband': 'Working-class appeal, a little campaign skill; nudges you left',
+    'labour:harman': 'Working-class appeal, a little campaign skill; nudges you left',
+    'labour:corbyn': 'Young voters, members and progressives up; pensioners, middle class and barons put off',
+    'labour:starmer': 'Middle class and modernisers up; progressives angry, some young voters lost to Podemos',
+    'portugal:seguro': 'Very little to learn',
+    'portugal:costa_opp': 'Better relations with Podemos',
+    'portugal:costa_gov': 'Much easier talks with Podemos; warmer southern Europe',
+    'portugal:costa_maj': 'Win over Podemos voters; relations with Podemos sour',
+    'denmark:thorning': 'Warmer Ciudadanos; nudges you to the centre; progressives uneasy',
+    'denmark:frederiksen': 'Vox gains less from migration; progressives object; socially more conservative',
+    'germany:gabriel': 'Calmer barons, warmer PP; members uneasy',
+    'germany:schulz': 'A burst of member enthusiasm and working-class support; authority dips',
+    'germany:nahles': 'Progressives reassured; PP relations cool',
+    'germany:scholz': 'Authority and middle-class appeal',
+    'sweden:lofven': 'Higher social cohesion; union goodwill',
+    'sweden:andersson': 'Some cohesion, warmer NATO; progressives uneasy',
+    'us:obama': 'Campaign skill; warmer United States',
+    'us:sanders': 'Young voters and small donors; nudges you left; barons uneasy',
+    'us:biden': 'Working and middle class, union goodwill; warmer United States'
+  };
+
+  function lessonHint(Q, party) {
+    var L = sisterLeader(Q, party);
+    var key = party + ':' + L.id;
+    var n = (Q.learn_counts || {})[key] || 0;
+    return (LESSON_HINTS[key] || '') + (n ? ' (studied ' + n + '×: next lesson ' + Math.round(100 / (1 + n)) + '% as strong)' : '');
+  }
 
   function sisterLeader(Q, party) {
     var k = Q.year * 100 + Q.month;

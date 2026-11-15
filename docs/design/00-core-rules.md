@@ -310,7 +310,7 @@ Denmark — Thorning-Schmidt (to 2015): governing with liberals, warmer Cs; Fred
 Germany — Gabriel (to 2017): grand-coalition stability, warmer PP, members uneasy; Schulz (2017–18): a short burst of enthusiasm, then doubt; Nahles and successors (2018–21): "never prop up the right"; Scholz (2021–): calm competence, middle-class appeal.
 Sweden — Löfven (to 2021): the negotiated welfare model raises cohesion; Andersson (2021–): welfare plus a NATO turn.
 US Democrats — Obama (to 2017): data-driven campaigning; the Sanders movement (2017–20): small donors and the young, a drift left; Biden (2020–): union and middle-class pitch.
-Campaign skill (from Labour and Obama) adds up to +30% to campaign gains.
+Campaign skill (from Labour and Obama) adds up to +30% to campaign gains. Each option shows a one-line hint of what the current leadership teaches and, if studied before, how strong the next lesson will be.
 
 **Foreign relations** improve with diminishing returns (a gesture adds less the warmer relations already are) and drift 2% a month back towards 55 without attention.
 

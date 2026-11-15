@@ -323,6 +323,7 @@ The PSOE belongs to both international families of the centre-left. Party money 
 - @root: Not now
 
 @net_host
+subtitle: Better relations with the EU, southern Europe, the US and the Maghreb; a little authority
 choose-if: funds >= 1.5
 unavailable-subtitle: Needs 1.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', 4); window.SpainGame.intl(Q, 'us', 2); window.SpainGame.intl(Q, 'maghreb', 2); } !}
@@ -330,36 +331,42 @@ on-arrival: {! Q.month_actions += 1; Q.funds -= 1.5; Q.sanchez_authority += 2; i
 Delegations from forty parties fill a Madrid conference centre. You are photographed with prime ministers and future prime ministers.
 
 @net_labour
+subtitle: [+ hint_labour +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'labour'); } !}
 go-to: lesson
 
 @net_portugal
+subtitle: [+ hint_portugal +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'portugal'); } !}
 go-to: lesson
 
 @net_denmark
+subtitle: [+ hint_denmark +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'denmark'); } !}
 go-to: lesson
 
 @net_germany
+subtitle: [+ hint_germany +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'germany'); } !}
 go-to: lesson
 
 @net_sweden
+subtitle: [+ hint_sweden +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'sweden'); } !}
 go-to: lesson
 
 @net_us
+subtitle: [+ hint_us +]
 choose-if: funds >= 0.5
 unavailable-subtitle: Needs 0.5 in party funds.
 on-arrival: {! Q.month_actions += 1; Q.funds -= 0.5; if (window.SpainGame) { window.SpainGame.learnFrom(Q, 'us'); } !}
