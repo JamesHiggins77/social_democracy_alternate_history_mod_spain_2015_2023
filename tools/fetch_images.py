@@ -10,6 +10,7 @@ Usage: python3 tools/fetch_images.py
 import json
 import re
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -22,17 +23,29 @@ WIDTHS = {"bg_": 1280, "deck_": 500, "portrait_": 330, "event_": 960}
 
 def rows():
     for line in (ROOT / "docs" / "assets.md").read_text(encoding="utf-8").splitlines():
-        m = re.match(r"\| `(img/spain/[^`]+)` \|[^|]+\| \[([^\]]+)\]\([^)]+\) \|[^|]+\| ([^|]+) \|", line)
+        m = re.match(r"\| `(img/spain/[^`]+)` \|[^|]+\| \[([^\]]+)\]\(\S+\) \|[^|]+\| ([^|]+) \|", line)
         if m:
             yield m.group(1), "File:" + m.group(2), m.group(3).strip()
 
 
-def get(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120).read()
+def get(url, tries=6):
+    """Fetch politely: on HTTP 429, wait and retry with growing delays."""
+    for attempt in range(tries):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120).read()
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or attempt == tries - 1:
+                raise
+            time.sleep(60 * (attempt + 1))
 
 
 def main():
-    for path, title, licence in rows():
+    listed = list(rows())
+    print(f"{len(listed)} images listed in docs/assets.md")
+    for path, title, licence in listed:
+        if (ROOT / "out" / "html" / path).exists():
+            print(f"have {path}")
+            continue
         width = next(w for p, w in WIDTHS.items() if Path(path).name.startswith(p))
         assert width in STANDARD_WIDTHS
         q = urllib.parse.urlencode({
@@ -50,7 +63,7 @@ def main():
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(get(info.get("thumburl") or info["url"]))
         print(f"OK   {path} ({target.stat().st_size // 1024} KiB, {found})")
-        time.sleep(5)
+        time.sleep(30)
 
 
 if __name__ == "__main__":

@@ -25,43 +25,63 @@
   // instead of amplifying their 2015 micro-vote.
   var ESTABLISHED = { psoe: true, pp: true, cs: true, up: true, iu: true };
 
-  // PROVISIONAL class model - see docs/design/00-core-rules.md.
-  var CLASSES = ['workers', 'professionals', 'self_employed', 'pensioners',
-                 'young', 'unemployed', 'rural'];
+  // Classes follow the CIS's socio-economic condition (+ inactive) variable.
+  // Shares: CIS study 3126, post-electoral survey of the 2015 general
+  // election (Jan-Mar 2016), "Condición socioeconómica del INE (+inactivos)",
+  // excluding the 1.6% "no clasificables":
+  //   professionals = directors and professionals 4.1 + technicians and
+  //                   middle managers 10.9
+  //   self_employed = small business owners 3.9 + farmers 0.9
+  //   workers       = office and service employees 4.9 + skilled 5.8 +
+  //                   unskilled 10.8 manual workers
+  //   pensioners 27.4, unemployed 18.2, students 4.5,
+  //   homemakers (unpaid domestic work) 7.0
+  var CLASSES = ['professionals', 'self_employed', 'workers', 'pensioners',
+                 'unemployed', 'students', 'homemakers'];
   var CLASS_SHARE_2015 = {
-    workers: 27, professionals: 15, self_employed: 9, pensioners: 25,
-    young: 10, unemployed: 10, rural: 4
+    professionals: 15.0, self_employed: 4.8, workers: 21.5, pensioners: 27.4,
+    unemployed: 18.2, students: 4.5, homemakers: 7.0
   };
+  // Support by class (PROVISIONAL until calibrated on CIS microdata - see
+  // docs/design/00-core-rules.md §4.1). Patterns follow the CIS reports on
+  // the 2015 election: the PSOE strongest among manual workers and
+  // pensioners, the PP among the self-employed, pensioners and homemakers,
+  // Podemos U-shaped (workers and unemployed, but also professionals and
+  // students), Ciudadanos among professionals and the salaried middle class.
+  // Values only shape how support moves; the regional layer calibrates the
+  // starting result exactly whatever they are.
   var CLASS_SUPPORT_2015 = {
-    workers:       { psoe: 26, pp: 22, cs: 13, up: 24, iu: 4, vox: 0.3, mp: 0, pacma: 1.0, upyd: 0.6 },
-    professionals: { psoe: 15, pp: 22, cs: 24, up: 24, iu: 5, vox: 0.3, mp: 0, pacma: 1.0, upyd: 1.2 },
+    professionals: { psoe: 16, pp: 22, cs: 24, up: 26, iu: 5, vox: 0.3, mp: 0, pacma: 1.0, upyd: 1.2 },
     self_employed: { psoe: 13, pp: 40, cs: 22, up: 12, iu: 2, vox: 0.6, mp: 0, pacma: 0.6, upyd: 0.8 },
-    pensioners:    { psoe: 34, pp: 46, cs: 8,  up: 6,  iu: 2, vox: 0.2, mp: 0, pacma: 0.2, upyd: 0.4 },
-    young:         { psoe: 12, pp: 14, cs: 20, up: 38, iu: 6, vox: 0.3, mp: 0, pacma: 2.5, upyd: 0.6 },
-    unemployed:    { psoe: 28, pp: 18, cs: 10, up: 28, iu: 5, vox: 0.3, mp: 0, pacma: 1.0, upyd: 0.4 },
-    rural:         { psoe: 32, pp: 48, cs: 8,  up: 6,  iu: 2, vox: 0.3, mp: 0, pacma: 0.3, upyd: 0.3 }
+    workers:       { psoe: 28, pp: 20, cs: 12, up: 24, iu: 4, vox: 0.3, mp: 0, pacma: 1.0, upyd: 0.5 },
+    pensioners:    { psoe: 34, pp: 46, cs: 7,  up: 6,  iu: 2, vox: 0.2, mp: 0, pacma: 0.2, upyd: 0.4 },
+    unemployed:    { psoe: 27, pp: 17, cs: 10, up: 29, iu: 5, vox: 0.3, mp: 0, pacma: 1.0, upyd: 0.4 },
+    students:      { psoe: 11, pp: 13, cs: 21, up: 38, iu: 7, vox: 0.3, mp: 0, pacma: 3.0, upyd: 0.6 },
+    homemakers:    { psoe: 30, pp: 45, cs: 9,  up: 8,  iu: 2, vox: 0.2, mp: 0, pacma: 0.3, upyd: 0.3 }
   };
   // Regional deviations from the national class mix (multiplier, default 1).
+  // PROVISIONAL: to be replaced by the class mix per community in the CIS
+  // microdata.
   var CLASS_MIX_FACTORS = {
-    'Andalucía': { unemployed: 1.5, rural: 1.6, professionals: 0.8, pensioners: 0.9 },
-    'Aragón': { rural: 1.3, pensioners: 1.1 },
-    'Asturias': { pensioners: 1.35, workers: 1.05, young: 0.8, rural: 0.8 },
+    'Andalucía': { unemployed: 1.4, homemakers: 1.2, professionals: 0.85, self_employed: 1.1 },
+    'Aragón': { pensioners: 1.1, self_employed: 1.15 },
+    'Asturias': { pensioners: 1.35, workers: 1.05, students: 0.8 },
     'Baleares': { self_employed: 1.3, pensioners: 0.8, unemployed: 0.9 },
     'Canarias': { unemployed: 1.4, pensioners: 0.8 },
     'Cantabria': { pensioners: 1.1 },
-    'Castilla-La Mancha': { rural: 1.7, unemployed: 1.2, professionals: 0.75 },
-    'Castilla y León': { pensioners: 1.3, rural: 1.8, young: 0.8, professionals: 0.85 },
-    'Cataluña': { professionals: 1.2, workers: 1.05, unemployed: 0.85, rural: 0.6 },
-    'Ceuta': { unemployed: 1.6, young: 1.3, pensioners: 0.7 },
+    'Castilla-La Mancha': { self_employed: 1.3, unemployed: 1.15, homemakers: 1.2, professionals: 0.8 },
+    'Castilla y León': { pensioners: 1.3, self_employed: 1.3, students: 0.85, professionals: 0.9 },
+    'Cataluña': { professionals: 1.2, workers: 1.1, unemployed: 0.85, homemakers: 0.8 },
+    'Ceuta': { unemployed: 1.6, students: 1.2, pensioners: 0.7 },
     'Comunidad Valenciana': { self_employed: 1.1, unemployed: 1.05 },
-    'Extremadura': { rural: 2.0, unemployed: 1.4, pensioners: 1.1, professionals: 0.7 },
-    'Galicia': { pensioners: 1.3, rural: 1.6, young: 0.85 },
-    'La Rioja': { rural: 1.3 },
-    'Madrid': { professionals: 1.5, young: 1.1, rural: 0.2, pensioners: 0.85, unemployed: 0.8 },
-    'Melilla': { unemployed: 1.6, young: 1.3, pensioners: 0.7 },
+    'Extremadura': { unemployed: 1.4, self_employed: 1.4, homemakers: 1.2, professionals: 0.75 },
+    'Galicia': { pensioners: 1.3, self_employed: 1.3, students: 0.85 },
+    'La Rioja': { self_employed: 1.2 },
+    'Madrid': { professionals: 1.5, students: 1.2, unemployed: 0.8, homemakers: 0.8, self_employed: 0.8 },
+    'Melilla': { unemployed: 1.6, students: 1.2, pensioners: 0.7 },
     'Navarra': { workers: 1.1, professionals: 1.1, unemployed: 0.7 },
-    'País Vasco': { workers: 1.1, professionals: 1.15, pensioners: 1.1, unemployed: 0.7, rural: 0.6 },
-    'Región de Murcia': { rural: 1.3, self_employed: 1.1, young: 1.1 }
+    'País Vasco': { workers: 1.1, professionals: 1.15, pensioners: 1.1, unemployed: 0.7 },
+    'Región de Murcia': { self_employed: 1.2, unemployed: 1.1, students: 1.1 }
   };
   // Latent regional receptiveness for parties without a meaningful 2015
   // base (multiplier on their class-driven growth). Vox's reflects the

@@ -1,4 +1,5 @@
 title: Next month
+set-bg: img/spain/bg_congreso_hemiciclo.jpg
 is-hand: true
 on-arrival: {!
 if (Q.advisor_action_timer <= 0) {
@@ -21,6 +22,7 @@ max-cards: 3
 
 @deck_politics
 title: Negotiations and media
+card-image: img/spain/deck_congreso_fachada.jpg
 is-deck: true
 
 - #sp_politics

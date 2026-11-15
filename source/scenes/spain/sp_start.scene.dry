@@ -1,5 +1,6 @@
 title: The morning after
 new-page: true
+set-bg: img/spain/bg_congreso_hemiciclo.jpg
 on-arrival: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.newGame(Q, 0);

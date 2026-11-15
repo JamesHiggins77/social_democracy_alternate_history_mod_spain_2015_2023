@@ -87,7 +87,19 @@ Implemented and tested in `out/html/spain/`.
 
 ### 4.1 Vote model: classes with a regional layer
 
-1. **Classes (national) (provisional):** workers, professionals, self-employed, pensioners, young/precarious, unemployed, rural. Each class has support points for the statewide parties (PSOE, PP, Cs, Podemos space, IU, Vox, Más País/Compromís, PACMA, UPyD). Cards add and subtract points, as in the original.
+1. **Classes (national):** the CIS's socio-economic groups, with shares taken from CIS Study 3126 (post-election survey of the 2015 election, January–March 2016):
+
+   | Class | CIS groups | Share |
+   |---|---|---:|
+   | Professionals | directors and professionals; technicians and middle managers | 15.0% |
+   | Self-employed | small business owners; farmers | 4.8% |
+   | Workers | office and service employees; skilled and unskilled manual workers | 21.5% |
+   | Pensioners | retired and pensioners | 27.4% |
+   | Unemployed | unemployed | 18.2% |
+   | Students | students | 4.5% |
+   | Homemakers | unpaid domestic work | 7.0% |
+
+   Each class has support points for the statewide parties (PSOE, PP, Cs, Podemos space, IU, Vox, Más País/Compromís, PACMA, UPyD). Cards add and subtract points, as in the original. **The support values are provisional**: the published CIS reports give only the pattern (PSOE strongest among manual workers and pensioners; PP among the self-employed, pensioners and homemakers; Podemos U-shaped; Ciudadanos among professionals). The exact class × party table, the class mix in each community and a **gender split** (support by class and sex) will be calculated from the CIS microdata (`tools/build_class_model.py`, to be written once the files are available). Rural voters are modelled through the regional layer, not as a class.
 2. **Regions:** 19 regional units (17 communities plus Ceuta and Melilla), each with:
    - its own class mix (provisional);
    - a multiplier per statewide party (`regionalMod`), for regional events;
@@ -200,6 +212,6 @@ From player discussion of the Weimar game:
 
 ## 10. Open questions
 
-1. The class list and support values (§4.1) are first-pass. Do you want different classes, for example a religious-conservative dimension?
+1. CIS microdata (studies 3126, 3145, 3248, 3269 and 3420) are needed to calibrate classes, regional class mixes and the gender split.
 2. Should Ceuta and Melilla's assemblies be simulated, or only their Congress seats?
 3. Senate: a simple ledger, or full elections (208 elected senators, limited-vote system)?

@@ -59,7 +59,7 @@ A prime-time interview on La Sexta. What is the message?
 - @easy_discard
 
 @change
-on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {workers: 2, young: 3, unemployed: 2}); window.SpainGame.updatePolls(Q); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {workers: 2, students: 3, unemployed: 2}); window.SpainGame.updatePolls(Q); } !}
 on-departure: progressives_dissent -= 3; member_morale += 3
 
 Young and working voters respond. Your most cautious barons wince at the word "change".
@@ -71,7 +71,7 @@ on-departure: institutionalists_dissent -= 3; modernisers_dissent -= 2
 Older and middle-class voters hear a party of government. Some members hear a party afraid of its own shadow.
 
 @attack_podemos
-on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {pensioners: 3, rural: 2, young: -2}); window.SpainGame.updatePolls(Q); } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.shiftSupport(Q, 'psoe', {pensioners: 3, homemakers: 2, students: -2}); window.SpainGame.updatePolls(Q); } !}
 on-departure: rel_up -= 10; regional_leaders_dissent -= 4; progressives_dissent += 4
 
 The barons enjoy it. Iglesias replies within the hour.

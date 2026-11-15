@@ -125,7 +125,7 @@
         s.notStanding.iu = true;
         s.classSupport.pensioners.pp += 6;
         s.classSupport.self_employed.pp += 5;
-        s.classSupport.rural.pp += 4;
+        s.classSupport.homemakers.pp += 4;
       }
     },
     'vox_breakthrough': {
@@ -133,7 +133,7 @@
       date: [2019, 11],
       apply: function (s) {
         VoteModel.CLASSES.forEach(function (c) {
-          s.classSupport[c].vox += ({ self_employed: 22, rural: 20, pensioners: 10 })[c] || 14;
+          s.classSupport[c].vox += ({ self_employed: 22, homemakers: 12, pensioners: 10 })[c] || 14;
           s.classSupport[c].cs *= 0.45;
           s.classSupport[c].up += s.classSupport[c].iu * 0.6;
           s.classSupport[c].iu = 0;
