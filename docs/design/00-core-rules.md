@@ -7,7 +7,7 @@ This document covers the rules every chapter and card depends on. Chapter docume
 ## 1. Shape of the game
 
 - **Player:** Pedro Sánchez, not the PSOE. Sánchez's personal authority and the party's institutional strength are separate quantities.
-- **Span:** 20 November 2015, one month before the general election, to the end of 2023. The game opens with the 2011 Congress and Rajoy's majority government; the 20 December election is run live by the vote model, so the player's pre-campaign line and campaign cards shape the result and their position for coalition talks.
+- **Span:** 13 July 2014, the day Pedro Sánchez wins the PSOE primary with the backing of Susana Díaz and the regional leaders, to the end of 2023. The game opens with the 2011 Congress, Rajoy's absolute majority and the regional governments of July 2014. The 2015 regional elections and the 20 December 2015 general election are played live.
 - **Structure:** month-by-month, as in the Weimar original: draw and play cards, consult advisers, then resolve the month. Scheduled and conditional events happen between turns. Major procedures (investitures, motions of no confidence, Federal Committees, primaries) interrupt the loop as multi-stage sequences.
 - **History:** historical dates are *opportunities with preconditions*, not commands. If the conditions that produced an event are absent, it does not happen or happens differently.
 - **Distribution:** a standalone fork with its own site. The Weimar campaign is removed from the build; it stays in git history for reference.
@@ -195,6 +195,12 @@ One central routine (the Spanish `post_event`), as in the original. Cards change
 7. Route to any due events; otherwise return to the desk.
 
 Card types follow the Chapter I doc §11.4: **action cards**, **event cards**, **pinned adviser and actor cards** and **crisis sequences**.
+
+### 6.4 The historical currents of 2014–15
+
+The rise and fall of Podemos and Ciudadanos, the PP's erosion and the collapse of IU and UPyD come from a fitted path (`tools/build_history_path.js`, `history_path_data.js`): monthly national factors per party, fitted so that the polls the player sees match the real 2014–15 poll averages and the true vote is those polls minus the December 2015 polling error. The path ends at the real December 2015 result. The player's actions push on top of it; regional elections up to December 2015 use the real result as baseline and the swing against the path at the same date, so an untouched game reproduces the real March, May and September 2015 regional results and governments.
+
+Events explain the currents and let the player respond: the abortion law's withdrawal (Sept 2014), the black cards and Púnica (Oct 2014), Podemos at Vistalegre (Oct 2014), the 9N consultation (Nov 2014), Díaz's snap Andalusian election (Jan 2015 call), Ciudadanos going national (Feb 2015), the mayors of change (June 2015), Syriza's surrender (July 2015), Mas's plebiscitary election (Aug 2015 call) and Rajoy dissolving the Cortes at the end of the legislature (Oct 2015), with the PSOE's campaign line.
 
 ### 7.0 Weekly turns during government formation
 

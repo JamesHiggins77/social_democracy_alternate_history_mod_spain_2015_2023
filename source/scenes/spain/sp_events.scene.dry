@@ -557,3 +557,335 @@ The banks protest; the Commission accepts the plan.
 on-arrival: {! Q.sanchez_authority -= 4; Q.institutionalists_dissent += 6; Q.fiscal_adj += 0.1; if (window.SpainGame) { window.SpainGame.recalculate(Q); } !}
 
 The risk premium rises a few points. The Commission keeps writing.
+
+@gallardon
+title: The abortion law falls
+new-page: true
+tags: sp_event
+view-if: gallardon_seen = 0 and ((year = 2014 and month >= 9) or year >= 2015) and pp_governs = 1
+max-visits: 1
+on-arrival: gallardon_seen = 1
+
+= The abortion law falls
+
+Facing protests across the country and divisions in his own party, Rajoy withdraws the justice minister's law restricting abortion. Alberto Ruiz-Gallardón resigns.
+
+- @women_victory: Celebrate it as a victory for women's mobilisation
+- @repeal: Promise to restore the 2010 law in full, including for 16- and 17-year-olds
+- @move_on: Move on: this was the PP's own mess
+
+@women_victory
+on-arrival: {! Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2.5); window.SpainGame.recalculate(Q); } !}
+
+The feminist organisations that led the protests welcome the PSOE's support.
+
+@repeal
+on-arrival: {! Q.progressives_dissent -= 5; Q.institutionalists_dissent += 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 2); window.SpainGame.target(Q, 'psoe', 'young', 1.5); window.SpainGame.target(Q, 'psoe', 'pensioners', -1); window.SpainGame.recalculate(Q); } !}
+
+A clear commitment. The bishops' conference condemns it.
+
+@move_on
+on-arrival: institutionalists_dissent -= 2
+
+The PP's divisions speak for themselves.
+
+@black_cards
+title: The black cards and Púnica
+new-page: true
+tags: sp_event
+view-if: black_cards_seen = 0 and ((year = 2014 and month >= 10) or year >= 2015)
+max-visits: 1
+on-arrival: {! Q.black_cards_seen = 1; Q.pp_scandal = (Q.pp_scandal || 0) + 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'pp', {pensioners: -1, professionals: -1.5, self_employed: -1}); } !}
+
+= The black cards and Púnica
+
+Two scandals in one month. The board of Caja Madrid, the savings bank rescued with public money, spent millions on undeclared "black" credit cards: the users include PP figures, but also PSOE and IU representatives and union leaders. Days later, Operation Púnica arrests dozens of mayors and officials, most of them from the PP, for kickbacks on public contracts.
+
+Disgust with "the caste" of the old parties has never been higher.
+
+- @expel: Expel every PSOE member who used a black card, immediately
+- @anticorruption: Propose a state pact against corruption
+- @attack_pp: Focus on the PP: it is their system
+
+@expel
+on-arrival: {! Q.sanchez_authority += 5; Q.institutionalists_dissent += 5; Q.trade_unionists_dissent += 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 1.5); window.SpainGame.target(Q, 'psoe', 'young', 1); window.SpainGame.recalculate(Q); } !}
+
+You act within hours. Some veterans think you threw old comrades to the wolves; the voters think you did the obvious thing.
+
+@anticorruption
+on-arrival: {! Q.rel_cs += 4; Q.rel_pp -= 2; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 1); window.SpainGame.recalculate(Q); } !}
+
+A serious proposal. Rajoy ignores it; the new parties call it too little, too late.
+
+@attack_pp
+on-arrival: {! Q.rel_pp -= 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1, workers: 0.5}); } !}
+
+The PSOE's own cardholders are still on the front pages. Podemos says "PP and PSOE, the same thing".
+
+@vistalegre_podemos
+title: Podemos at Vistalegre
+new-page: true
+tags: sp_event
+view-if: podemos_assembly_seen = 0 and ((year = 2014 and month >= 10) or year >= 2015)
+max-visits: 1
+on-arrival: podemos_assembly_seen = 1
+
+= Podemos at Vistalegre
+
+Seven thousand people fill the Vistalegre arena for Podemos's founding assembly. Pablo Iglesias wins control of the party and sets one goal: to "storm the heavens" and govern Spain. Within weeks, some polls put Podemos first.
+
+How does the PSOE answer?
+
+- @compete_left: Compete for the same voters: a bold programme for the young and the precarious
+- @populists: Call it what it is: populism with simple answers
+- @own_ground: Ignore Podemos and talk about governing
+
+@compete_left
+on-arrival: {! Q.progressives_dissent -= 4; Q.rel_up -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2.5); window.SpainGame.target(Q, 'psoe', 'unemployed', 2); window.SpainGame.recalculate(Q); } !}
+
+You will not leave the indignant generation to Iglesias. Some of them listen.
+
+@populists
+on-arrival: {! Q.rel_up -= 12; Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1.5, unemployed: 1}); } !}
+
+Older voters nod. Younger ones hear the establishment defending itself.
+
+@own_ground
+on-arrival: institutionalists_dissent -= 2; modernisers_dissent += 2
+
+You keep your distance. Podemos keeps growing.
+
+@nine_n
+title: The 9N consultation
+new-page: true
+tags: sp_event
+view-if: nine_n_seen = 0 and ((year = 2014 and month >= 11) or year >= 2015)
+max-visits: 1
+on-arrival: {! Q.nine_n_seen = 1; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'cs', 1.15); window.SpainGame.recalculate(Q); } !}
+
+= The 9N consultation
+
+Despite the Constitutional Court, Artur Mas's government holds a "participatory process" on independence. 2.3 million Catalans vote, 80% of them for independence; most of those who oppose it stay at home. In Catalonia, Ciudadanos becomes the loudest voice against the process.
+
+- @federal_answer: Answer with the federal reform of the Constitution
+- @legal_answer: Back legal action against the consultation
+- @psc_space: Let the PSC find its own space
+
+@federal_answer
+on-arrival: federal_proposal = 1; rel_pnv += 3; regional_leaders_dissent += 3; cat_dialogue += 1
+
+The Granada Declaration becomes your answer: a federal Spain. Few in Catalonia are listening any more.
+
+@legal_answer
+on-arrival: {! Q.rel_pp += 3; Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 0.97); window.SpainGame.recalculate(Q); } !}
+
+The barons approve. The PSC loses more members to the independence camp.
+
+@psc_space
+on-arrival: {! Q.sanchez_authority -= 1; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.02); window.SpainGame.recalculate(Q); } !}
+
+Miquel Iceta's PSC treads its own careful line.
+
+@diaz_snap
+title: Díaz calls an election
+new-page: true
+tags: sp_event
+view-if: diaz_snap_seen = 0 and year = 2015 and month >= 1 and regions_andalucia_psoe = 1
+max-visits: 1
+on-arrival: {!
+Q.diaz_snap_seen = 1;
+if (Q.regions && Q.regions['Andalucía']) {
+    Q.regions['Andalucía'].nextElection = '2015-03-22';
+    Q.regions['Andalucía'].lastWasSnap = true;
+}
+!}
+
+= Díaz calls an election
+
+Susana Díaz breaks her coalition with Izquierda Unida and calls an Andalusian election for 22 March, a year early. She wants her own mandate before Podemos grows any further, and before the general election. Everyone in Ferraz understands the other reason: a big win would make her the strongest person in the PSOE.
+
+- @campaign_with_diaz: Campaign at her side across Andalusia
+- @distance_diaz: Let her run her own campaign
+
+@campaign_with_diaz
+on-arrival: {! Q.funds -= 1; Q.diaz_relation += 6; Q.regional_leaders_dissent -= 5; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Andalucía', 'psoe', 1.03); window.SpainGame.recalculate(Q); } !}
+
+The two of you share stages from Almería to Huelva. If she wins, you can share the credit; she will not forget that you came.
+
+@distance_diaz
+on-arrival: diaz_relation -= 6; sanchismo += 2
+
+She runs as the face of the Andalusian PSOE, not of yours. The result will be hers alone.
+
+@rivera_national
+title: Ciudadanos goes national
+new-page: true
+tags: sp_event
+view-if: rivera_seen = 0 and year = 2015 and month >= 2
+max-visits: 1
+on-arrival: rivera_seen = 1
+
+= Ciudadanos goes national
+
+Albert Rivera, until now known for opposing Catalan independence, takes Ciudadanos across Spain. Young, telegenic and free of corruption cases, he offers "sensible change": regeneration without Podemos's revolution. Disillusioned PP voters, and some of yours, are listening.
+
+- @spare_part: Call Ciudadanos the PP's spare part
+- @court_centre: Compete for the centre: clean institutions and economic credibility
+- @ignore_cs: Ignore them: the real fight is with Podemos and the PP
+
+@spare_part
+on-arrival: {! Q.rel_cs -= 10; Q.progressives_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 1); window.SpainGame.recalculate(Q); } !}
+
+The label sticks, among your own voters at least.
+
+@court_centre
+on-arrival: {! Q.rel_cs += 3; Q.modernisers_dissent -= 3; Q.progressives_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 2.5); window.SpainGame.recalculate(Q); } !}
+
+You hold on to more of the professional middle class than the polls expected.
+
+@ignore_cs
+on-arrival: institutionalists_dissent -= 1
+
+Ciudadanos keeps rising, mostly at the PP's expense, and some at yours.
+
+@mayors_of_change
+title: The mayors of change
+new-page: true
+tags: sp_event
+view-if: mayors_seen = 0 and ((year = 2015 and month >= 6) or year >= 2016)
+max-visits: 1
+on-arrival: mayors_seen = 1
+
+= The mayors of change
+
+The municipal elections redraw the map of Spanish cities. Citizen platforms backed by Podemos come close in Madrid, with the former judge Manuela Carmena, and win Barcelona, with the housing activist Ada Colau. In both, they can only govern with the PSOE's votes. Elsewhere, PSOE mayors need Podemos.
+
+- @back_mayors: Back the platforms in Madrid and Barcelona, and ask for their votes elsewhere
+- @own_candidates: Insist on PSOE mayors wherever possible
+- @let_pp: Abstain and let the most-voted lists govern
+
+@back_mayors
+on-arrival: {! Q.rel_up += 10; Q.rel_cs -= 4; Q.progressives_dissent -= 6; Q.regional_leaders_dissent += 4; Q.mayors_of_change = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 1); window.SpainGame.recalculate(Q); } !}
+
+Carmena and Colau take office with socialist votes, and the PSOE wins dozens of city halls and regional governments with Podemos's support in return.
+
+@own_candidates
+on-arrival: rel_up -= 6; institutionalists_dissent -= 3; progressives_dissent += 3
+
+Tough negotiations, city by city. Some deals fail, and the PP keeps a few cities it had lost.
+
+@let_pp
+on-arrival: {! Q.rel_up -= 12; Q.rel_pp += 4; Q.member_morale -= 8; Q.progressives_dissent += 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 2, workers: 1.5, unemployed: 1.5}); } !}
+
+The PP keeps Madrid. Your members cannot believe it, and many of your voters decide Podemos is the only real alternative.
+
+@syriza
+title: Syriza gives way
+new-page: true
+tags: sp_event
+view-if: syriza_seen = 0 and ((year = 2015 and month >= 7) or year >= 2016)
+max-visits: 1
+on-arrival: syriza_seen = 1
+
+= Syriza gives way
+
+A week after the Greeks voted "no" to the bailout terms in a referendum, Alexis Tsipras signs a third bailout harsher than the one they rejected. Podemos had made Syriza its model. Its promise that austerity could simply be refused looks much less convincing.
+
+- @realism: Make the case for realistic change within Europe
+- @solidarity: Express solidarity with Greece, and blame Merkel's austerity
+- @say_nothing: Say nothing
+
+@realism
+on-arrival: {! Q.rel_up -= 4; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, professionals: 1, pensioners: 0.5}); } !}
+
+"Change is possible, but it has to be real." Some of the voters who left for Podemos start to come back.
+
+@solidarity
+on-arrival: {! Q.rel_up += 4; Q.progressives_dissent -= 3; Q.modernisers_dissent += 2; !}
+
+The left of the party approves. It does little for the PSOE's credibility as a government in waiting.
+
+@say_nothing
+on-arrival: institutionalists_dissent -= 1
+
+Podemos's troubles are its own.
+
+@mas_plebiscite
+title: Mas calls a "plebiscitary" election
+new-page: true
+tags: sp_event
+view-if: mas_seen = 0 and year = 2015 and month >= 8 and catalonia_independentist = 1
+max-visits: 1
+on-arrival: {!
+Q.mas_seen = 1;
+if (Q.regions && Q.regions['Cataluña']) {
+    Q.regions['Cataluña'].nextElection = '2015-09-27';
+    Q.regions['Cataluña'].lastWasSnap = true;
+}
+!}
+
+= Mas calls a "plebiscitary" election
+
+Artur Mas calls Catalan elections for 27 September and declares them a plebiscite on independence. His Convergència and its rival ERC will run on a single list, Junts pel Sí. If it wins a majority, they promise to start the road to independence.
+
+- @psc_federal: The PSC campaigns for a federal Spain and a negotiated reform
+- @unionist_front: Join a common front of the parties against independence
+- @psc_alone: Leave the campaign to the PSC
+
+@psc_federal
+on-arrival: {! Q.cat_dialogue += 1; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.03); window.SpainGame.recalculate(Q); } !}
+
+Iceta's dancing becomes the image of the campaign. The PSC holds its ground better than feared.
+
+@unionist_front
+on-arrival: {! Q.rel_cs += 4; Q.rel_pp += 2; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Cataluña', 'cs', 1.05); window.SpainGame.recalculate(Q); } !}
+
+The front against independence has a leader, and it is Inés Arrimadas of Ciudadanos, not the PSC.
+
+@psc_alone
+on-arrival: sanchez_authority -= 1
+
+The PSC fights alone.
+
+@dissolution_2015
+title: Rajoy dissolves the Cortes
+new-page: true
+tags: sp_event
+view-if: legislature_expired = 1 and elections_held = 0 and campaign_line = 0
+on-arrival: dissolution_2015_seen = 1
+
+= Rajoy dissolves the Cortes
+
+Mariano Rajoy has run his legislature to the end. He signs the dissolution of the Cortes and calls the general election for [+ election_month : month +] [+ election_year +], the last possible date.
+
+He goes to the country on the economy: Spain is growing again, and unemployment is falling, if from 26% to 21%. Against him: four years of austerity and cuts to health and education; the labour reform; Bárcenas's accounts and the Gürtel trials; the black cards and Púnica; the 2012 bank bailout. The PP still leads the polls, but a long way below the 44.6% that gave it its majority. The majority itself is gone: the question is who will govern without one.
+
+Four parties can now win more than 10%. What line does the PSOE take into the campaign?
+
+- @change: Change: no deals with Rajoy, a government of progress
+- @governing: A governing party: serious, moderate, ready from day one
+- @vs_podemos: The only real alternative: Podemos is a risk Spain cannot take
+
+@change
+on-arrival: {!
+Q.campaign_line = 1; Q.rel_pp -= 8; Q.rel_up += 6; Q.member_morale += 5; Q.progressives_dissent -= 5;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.recalculate(Q); }
+!}
+
+You promise that the PSOE will never make Rajoy Prime Minister. It energises the members and closes a door you may later want open.
+
+@governing
+on-arrival: {!
+Q.campaign_line = 2; Q.rel_cs += 6; Q.rel_pnv += 3; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 4;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, professionals: 1, self_employed: 0.5}); window.SpainGame.recalculate(Q); }
+!}
+
+The barons approve. Older and middle-class voters hear a party of government; younger ones hear the past.
+
+@vs_podemos
+on-arrival: {!
+Q.campaign_line = 3; Q.rel_up -= 12; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 5;
+if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1.5, students: -1}); window.SpainGame.recalculate(Q); }
+!}
+
+Your attacks on Iglesias hold the PSOE's older voters. Podemos will remember them when the talking starts.

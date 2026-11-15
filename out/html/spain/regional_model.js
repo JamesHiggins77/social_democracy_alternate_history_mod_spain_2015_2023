@@ -13,12 +13,37 @@
   var VoteModel = isNode ? require('./vote_model.js') : root.SpainVoteModel;
   var Rules = isNode ? require('./regional_rules.js') : root.SpainRegionalRules;
 
-  var GAME_START = '2015-12-20';
+  // Real regional results are used as baselines up to the end of the real
+  // historical path (the December 2015 general election); the game diverges
+  // after that.
+  var HISTORY_END = '2015-12-20';
   var SMOOTHING = 0.02;
   // Regional lists standing for several general-election parties at once.
   var ALIASES = { jxsi: ['erc', 'junts'] };
 
-  // Who governs each community when the game starts (December 2015).
+  // Who governs each community on 13 July 2014, when the game starts.
+  var GOVERNMENTS_2014 = {
+    'Andalucía': { type: 'Coalition majority', president: 'Susana Díaz', party: 'psoe', cabinet: ['psoe', 'iu'], support: [] },
+    'Aragón': { type: 'Coalition majority', president: 'Luisa Fernanda Rudi', party: 'pp', cabinet: ['pp', 'par'], support: [] },
+    'Asturias': { type: 'Minority with external support', president: 'Javier Fernández', party: 'psoe', cabinet: ['psoe'], support: ['iu'] },
+    'Baleares': { type: 'Majority', president: 'José Ramón Bauzá', party: 'pp', cabinet: ['pp'], support: [] },
+    'Canarias': { type: 'Coalition majority', president: 'Paulino Rivero', party: 'cc', cabinet: ['cc', 'psoe'], support: [] },
+    'Cantabria': { type: 'Majority', president: 'Ignacio Diego', party: 'pp', cabinet: ['pp'], support: [] },
+    'Castilla-La Mancha': { type: 'Majority', president: 'María Dolores de Cospedal', party: 'pp', cabinet: ['pp'], support: [] },
+    'Castilla y León': { type: 'Majority', president: 'Juan Vicente Herrera', party: 'pp', cabinet: ['pp'], support: [] },
+    'Cataluña': { type: 'Minority with external support', president: 'Artur Mas', party: 'junts', cabinet: ['junts'], support: ['erc'] },
+    'Comunidad Valenciana': { type: 'Majority', president: 'Alberto Fabra', party: 'pp', cabinet: ['pp'], support: [] },
+    'Extremadura': { type: 'Minority with external support', president: 'José Antonio Monago', party: 'pp', cabinet: ['pp'], support: ['iu'] },
+    'Galicia': { type: 'Majority', president: 'Alberto Núñez Feijóo', party: 'pp', cabinet: ['pp'], support: [] },
+    'La Rioja': { type: 'Majority', president: 'Pedro Sanz', party: 'pp', cabinet: ['pp'], support: [] },
+    'Madrid': { type: 'Majority', president: 'Ignacio González', party: 'pp', cabinet: ['pp'], support: [] },
+    'Región de Murcia': { type: 'Majority', president: 'Alberto Garre', party: 'pp', cabinet: ['pp'], support: [] },
+    'Navarra': { type: 'Minority', president: 'Yolanda Barcina', party: 'upn', cabinet: ['upn'], support: [] },
+    'País Vasco': { type: 'Minority', president: 'Iñigo Urkullu', party: 'pnv', cabinet: ['pnv'], support: [] }
+  };
+
+  // Who governs each community after the real 2015 regional elections
+  // (December 2015). Used when a 2015 election produces the real winner.
   var GOVERNMENTS_2015 = {
     'Andalucía': { type: 'Minority with external support', president: 'Susana Díaz', party: 'psoe', cabinet: ['psoe'], support: ['cs'] },
     'Aragón': { type: 'Minority coalition with external support', president: 'Javier Lambán', party: 'psoe', cabinet: ['psoe', 'cha'], support: ['up', 'iu'] },
@@ -52,11 +77,12 @@
   }
 
   // Starting composition of every regional parliament.
-  function startingParliaments(regionalData) {
+  function startingParliaments(regionalData, asOf) {
+    asOf = asOf || HISTORY_END;
     var out = {};
     Object.keys(regionalData.regions).forEach(function (r) {
       var els = regionalData.regions[r];
-      var d = baselineDate(els, GAME_START);
+      var d = baselineDate(els, asOf);
       var votes = {};
       var total = 0;
       Object.keys(els[d].districts).forEach(function (dn) {
@@ -72,7 +98,7 @@
         lastElection: d,
         lastWasSnap: false,
         seats: JSON.parse(JSON.stringify(els[d].seats)),
-        government: GOVERNMENTS_2015[r],
+        government: JSON.parse(JSON.stringify((asOf < '2015-01-01' ? GOVERNMENTS_2014 : GOVERNMENTS_2015)[r])),
         nextElection: Rules.nextRegularElection(r, d, false)
       };
     });
@@ -95,11 +121,20 @@
   }
 
   // Ballots for a regional election in `region` on `date`.
-  function regionalBallots(state, base, regionalData, region, asOf) {
+  // Ballots for a regional election in `region` on `date`. The baseline is
+  // the last real regional result on or before the date (up to the end of
+  // the historical path). The swing applied to it is the difference between
+  // the game's vote in the community and the vote the unchanged historical
+  // path gives on the same date - so national support moves regional votes,
+  // and an untouched game reproduces the real 2014-15 results.
+  function regionalBallots(state, base, regionalData, region, date) {
     var els = regionalData.regions[region];
-    var baseline = els[baselineDate(els, asOf || GAME_START)];
+    var cutoff = date && date < HISTORY_END ? date : HISTORY_END;
+    var baseline = els[baselineDate(els, cutoff)];
     var now = normalise(VoteModel.regionalShares(state, base)[region]);
-    var then = base.regionShares[region];
+    var neutral = VoteModel.initialState();
+    neutral.partyFactor = (state.partyFactor && date && date <= HISTORY_END) ? state.partyFactor : {};
+    var then = normalise(VoteModel.regionalShares(neutral, base)[region]);
     var tMod = (state.territorialMod && state.territorialMod[region]) || {};
     var ballots = {};
     Object.keys(baseline.districts).forEach(function (dName) {
@@ -148,12 +183,14 @@
   }
 
   function runRegionalElection(state, base, regionalData, region, date) {
-    var ballots = regionalBallots(state, base, regionalData, region);
+    var ballots = regionalBallots(state, base, regionalData, region, date);
     return Rules.electRegion(region, ballots, date, regionalData.regions[region]);
   }
 
   var api = {
     GOVERNMENTS_2015: GOVERNMENTS_2015,
+    GOVERNMENTS_2014: GOVERNMENTS_2014,
+    HISTORY_END: HISTORY_END,
     startingParliaments: startingParliaments,
     regionalBallots: regionalBallots,
     runRegionalElection: runRegionalElection

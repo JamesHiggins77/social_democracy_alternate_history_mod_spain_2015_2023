@@ -17,6 +17,15 @@
   var DATA = lib('SPAIN_ELECTION_DATA', 'election_data.js');
   var POLL_HISTORY = lib('SPAIN_POLL_HISTORY', 'poll_history_data.js');
   var POLL_ERRORS = lib('SPAIN_POLL_ERRORS', 'poll_error_data.js');
+  var HISTORY_PATH = lib('SPAIN_HISTORY_PATH', 'history_path_data.js');
+  var GAME_START = '2014-07';
+
+  // The historical currents of July 2014 - November 2015 (rise and fall of
+  // Podemos and Ciudadanos, the PP's erosion): national factors per party.
+  function applyHistoryPath(Q) {
+    var key = Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month;
+    Q.vm.partyFactor = (HISTORY_PATH && HISTORY_PATH[key]) ? JSON.parse(JSON.stringify(HISTORY_PATH[key])) : {};
+  }
   var REGIONAL = lib('SPAIN_REGIONAL_DATA', 'regional_data.js');
 
   var FACTIONS = ['institutionalists', 'regional_leaders', 'progressives', 'modernisers', 'trade_unionists'];
@@ -53,7 +62,7 @@
   }
 
   // ------------------------------------------------------------------
-  // New game: 20 November 2015, one month before the general election.
+  // New game: 13 July 2014, the day Pedro Sánchez wins the PSOE primary.
   // Congress and government are those elected in November 2011.
   // ------------------------------------------------------------------
   function officialShares(key) {
@@ -70,8 +79,8 @@
     Q.spain = 1;
     Q.difficulty = difficulty || 0;
     Q.time = 1;
-    Q.year = 2015;
-    Q.month = 11;
+    Q.year = 2014;
+    Q.month = 7;
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
@@ -92,10 +101,12 @@
     // monthly poll of polls recorded during the game (history before
     // December 2015 comes from real polling, poll_history_data.js)
     Q.poll_history = [];
+    Q.game_start = GAME_START;
     Q.vm = VoteModel.initialState();
+    applyHistoryPath(Q);
     drawPollError(Q, '2015');
     Q.poll_noise = {};
-    Q.regions = RegionalModel.startingParliaments(REGIONAL);
+    Q.regions = RegionalModel.startingParliaments(REGIONAL, '2014-07-13');
 
     // Government: Rajoy's majority, with the election called for December
     Q.pm = 'Mariano Rajoy';
@@ -109,8 +120,8 @@
     Q.week = 1;                 // week of the month during government formation
     Q.formation_weeks = 0;      // weeks since the last general election
     Q.investiture_votes = 0;
-    Q.election_year = 2015;     // scheduled general election, 0 = none
-    Q.election_month = 12;
+    Q.election_year = 0;        // scheduled general election, 0 = none
+    Q.election_month = 0;       // (the 2011 legislature expires in late 2015)
     Q.sanchez_nominated = 0;
     Q.rajoy_declined = 0;
     Q.psoe_stance_pp = 'no';
@@ -122,15 +133,17 @@
     // Sánchez and the PSOE
     Q.sanchez_leader = 1;
     Q.leadership_exception_open = 0;
-    Q.sanchez_authority = 66;
-    Q.member_morale = 60;
-    Q.federal_committee_balance = 48;
-    Q.sanchismo = 30;
-    Q.institutionalists_strength = 25; Q.institutionalists_dissent = 20;
-    Q.regional_leaders_strength = 30; Q.regional_leaders_dissent = 30;
-    Q.progressives_strength = 15; Q.progressives_dissent = 10;
-    Q.modernisers_strength = 20; Q.modernisers_dissent = 5;
-    Q.trade_unionists_strength = 10; Q.trade_unionists_dissent = 10;
+    // won the primary with 48.7%, carried by Susana Díaz and the federations
+    Q.sanchez_authority = 62;
+    Q.member_morale = 62;
+    Q.federal_committee_balance = 62;
+    Q.sanchismo = 22;
+    Q.diaz_relation = 70;
+    Q.institutionalists_strength = 25; Q.institutionalists_dissent = 15;
+    Q.regional_leaders_strength = 32; Q.regional_leaders_dissent = 8;
+    Q.progressives_strength = 15; Q.progressives_dissent = 18;
+    Q.modernisers_strength = 18; Q.modernisers_dissent = 5;
+    Q.trade_unionists_strength = 10; Q.trade_unionists_dissent = 12;
 
     // Relations with other parties (0-100)
     Q.rel_pp = 20; Q.rel_cs = 45; Q.rel_up = 35; Q.rel_iu = 40; Q.rel_erc = 25;
@@ -150,6 +163,7 @@
     Q.debt_adj = 0;
 
     updatePolls(Q);
+    recordPoll(Q);
     recalculate(Q);
   }
 
@@ -178,10 +192,13 @@
     Q.weekly = formationMode(Q);
     Q.pp_governs = (Q.pm_party === 'pp' && !Q.acting) ? 1 : 0;
     Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
+    Q.pp_majority = (Q.congress.pp || 0) >= 176 ? 1 : 0;
     Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
     var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
     Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;
+    var and = Q.regions && Q.regions['Andalucía'] && Q.regions['Andalucía'].government;
+    Q.regions_andalucia_psoe = (and && and.party === 'psoe') ? 1 : 0;
     Q.funds_income = Math.round((0.5 + (Q.congress.psoe || 0) / 200) * 10) / 10;
     Q.funds_display = Math.floor(Q.funds);
     Q.in_debt = Q.funds < 0 ? 1 : 0;
@@ -216,18 +233,33 @@
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
   }
 
+  // Typical vote share of each party across the measured elections, used to
+  // turn an error in points into a relative error.
+  function typicalShare(p) {
+    var vals = [];
+    Object.keys((POLL_ERRORS && POLL_ERRORS.elections) || {}).forEach(function (k) {
+      var r = POLL_ERRORS.elections[k].result[p];
+      if (r) { vals.push(r); }
+    });
+    return vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) / vals.length : 10;
+  }
+
+  // Errors are relative (a party polled 30% above its true vote stays 30%
+  // above it whatever its size).
   function drawPollError(Q, historicalKey) {
-    var err = {};
+    var rel = {};
     var hist = historicalKey && POLL_ERRORS && POLL_ERRORS.elections[historicalKey];
     POLLED_PARTIES.forEach(function (p) {
       if (hist) {
-        err[p] = hist.errors[p] || 0;
+        var res = hist.result[p];
+        rel[p] = res && hist.errors[p] !== undefined ? hist.errors[p] / res : 0;
       } else {
         var stats = (POLL_ERRORS && POLL_ERRORS.parties[p]) || { bias: 0, sd: 1 };
-        err[p] = Math.round((stats.bias + stats.sd * gaussian()) * 10) / 10;
+        rel[p] = (stats.bias + stats.sd * gaussian()) / typicalShare(p);
       }
+      rel[p] = Math.max(-0.6, Math.min(0.6, Math.round(rel[p] * 1000) / 1000));
     });
-    Q.poll_error = err;
+    Q.poll_error = rel;
   }
 
   function drawPollNoise(Q) {
@@ -247,22 +279,16 @@
     Q.true_poll = truth.voteShares;
     var err = Q.poll_error || {};
     var noise = Q.poll_noise || {};
-    // scale each polled party nationally so its share moves by its error
+    // the error scales each polled party's national support (the same
+    // mechanism as the historical path, so the two compose cleanly)
     var polled = JSON.parse(JSON.stringify(Q.vm));
-    var factors = {};
+    polled.partyFactor = polled.partyFactor || {};
     POLLED_PARTIES.forEach(function (p) {
       var share = truth.voteShares[p] || 0;
-      var e = (err[p] || 0) + (noise[p] || 0);
-      if (share > 0.5 && e) {
-        factors[p] = Math.max(0.2, (share + e) / share);
+      if (share > 0.5) {
+        var f = Math.max(0.2, 1 + (err[p] || 0) + (noise[p] || 0) / share);
+        polled.partyFactor[p] = (polled.partyFactor[p] === undefined ? 1 : polled.partyFactor[p]) * f;
       }
-    });
-    Object.keys(base().regionShares).forEach(function (r) {
-      polled.regionalMod[r] = polled.regionalMod[r] || {};
-      Object.keys(factors).forEach(function (p) {
-        var cur = polled.regionalMod[r][p] === undefined ? 1 : polled.regionalMod[r][p];
-        polled.regionalMod[r][p] = cur * factors[p];
-      });
     });
     var r = VoteModel.runGeneralElection(polled, base(), DATA, Q.year, Q.month);
     Q.poll = r.voteShares;
@@ -451,6 +477,7 @@
     Q.time += 1;
     Q.week = 1;
     Q.month_actions = 0;
+    applyHistoryPath(Q);
     if (!fromWeekly) {
       (Q.timers || []).forEach(function (t) {
         if (Q[t + '_timer'] > 0) {
@@ -557,7 +584,9 @@
 
   // Real history up to November 2015, then the game's own record.
   function pollSeries(Q) {
-    return (POLL_HISTORY || []).concat(Q.poll_history || []);
+    var start = Q.game_start || GAME_START;
+    return (POLL_HISTORY || []).filter(function (r) { return r.date < start; })
+      .concat(Q.poll_history || []);
   }
 
   function electionDates(Q) {
@@ -751,7 +780,7 @@
   // Forms a regional government: the leading party, cabinet partners and
   // supporting parties needed to reach a majority, and the type of
   // government. `ppVoxRelation` decides whether Vox enters PP cabinets.
-  function regionalGovernment(seats, previous, ppVoxRelation) {
+  function regionalGovernment(seats, previous, ppVoxRelation, year) {
     var total = 0;
     Object.keys(seats).forEach(function (id) { total += seats[id]; });
     var majority = Math.floor(total / 2) + 1;
@@ -785,7 +814,12 @@
     var cabinet = [party];
     var support = [];
     var count = seats[party] || 0;
-    var willing = (COALITION_PARTNERS[party] || []).slice();
+    // Ciudadanos stayed out of regional cabinets until 2019, Podemos until 2017
+    var willing = (COALITION_PARTNERS[party] || []).filter(function (id) {
+      if (id === 'cs' && year && year < 2019) { return false; }
+      if (id === 'up' && year && year < 2017) { return false; }
+      return true;
+    });
     if (party === 'pp' && (ppVoxRelation || 50) >= 60) {
       willing.push('vox');
     }
@@ -823,14 +857,18 @@
     (Q.regional_elections_due || []).forEach(function (region) {
       var reg = Q.regions[region];
       var date = reg.nextElection;
-      var ballots = RegionalModel.regionalBallots(Q.vm, base(), REGIONAL, region);
+      var ballots = RegionalModel.regionalBallots(Q.vm, base(), REGIONAL, region, date);
       var r = lib('SpainRegionalRules', 'regional_rules.js').electRegion(region, ballots, date,
         REGIONAL.regions[region]);
       var flat = {};
       Object.keys(ballots).forEach(function (d) { flat[d] = { lists: ballots[d].lists }; });
       var shares = VoteModel.nationalShares(flat);
       var before = reg.government;
-      var gov = regionalGovernment(r.totals, before, Q.pp_vox_relation);
+      var gov = regionalGovernment(r.totals, before, Q.pp_vox_relation, Q.year);
+      var real = RegionalModel.GOVERNMENTS_2015[region];
+      if (date <= RegionalModel.HISTORY_END && real && real.party === gov.party) {
+        gov = JSON.parse(JSON.stringify(real));
+      }
       var psoeLost = before.party === 'psoe' && gov.party !== 'psoe';
       var psoeWon = before.party !== 'psoe' && gov.party === 'psoe';
       if (psoeLost) {
@@ -1126,6 +1164,7 @@
     transfer: transfer,
     trueVote: trueVote,
     drawPollError: drawPollError,
+    typicalShare: typicalShare,
     target: target,
     TARGETS: TARGETS,
     regionalMod: regionalMod,

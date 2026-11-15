@@ -9,27 +9,55 @@ function newQ() {
   return Q;
 }
 
-test('new game starts in November 2015 with the 2011 Congress and an election due', () => {
+// Advance month by month, holding regional and general elections as they
+// fall due, until the given condition holds.
+function advanceUntil(Q, done) {
+  for (let i = 0; i < 200 && !done(Q); i++) {
+    G.endOfMonth(Q);
+    if (Q.has_regional_elections) G.runDueRegionalElections(Q);
+  }
+}
+
+// From July 2014 to the morning after the December 2015 election.
+function toDecember2015(Q) {
+  advanceUntil(Q, q => q.general_election_due === 1);
+  G.runGeneralElection(Q);
+  G.recalculate(Q);
+}
+
+test('new game starts in July 2014 with the 2011 Congress and the polls of the time', () => {
   const Q = newQ();
-  assert.strictEqual(Q.year, 2015);
-  assert.strictEqual(Q.month, 11);
+  assert.strictEqual(Q.year, 2014);
+  assert.strictEqual(Q.month, 7);
   assert.strictEqual(Q.congress.pp, 186);
   assert.strictEqual(Q.pm, 'Mariano Rajoy');
   assert.strictEqual(Q.acting, 0);
-  assert.strictEqual(Object.keys(Q.regions).length, 17);
-  // the true vote is the real December 2015 result when nothing changes...
-  assert.ok(Math.abs(Q.true_poll.cs - 14.0) < 0.2);
-  // ...but the polls carry the real 2015 polling error: Ciudadanos
-  // overestimated, Podemos underestimated, as in November 2015
-  assert.ok(Q.poll.cs > 17.5, `polled Cs ${Q.poll.cs}`);
-  assert.ok(Q.poll.up < 18.5, `polled Podemos ${Q.poll.up}`);
+  assert.strictEqual(Q.election_year, 0);
+  assert.strictEqual(Q.regions['Madrid'].government.president, 'Ignacio González');
+  assert.deepStrictEqual(Q.regions['Andalucía'].government.cabinet, ['psoe', 'iu']);
+  // the polls the player sees track the real July 2014 polls
+  assert.ok(Math.abs(Q.poll.pp - 31.1) < 1.5, `PP ${Q.poll.pp}`);
+  assert.ok(Math.abs(Q.poll.up - 18.4) < 1.5, `Podemos ${Q.poll.up}`);
+  assert.ok(Q.poll.cs < 5, `Cs ${Q.poll.cs}`);
+});
+
+test('the untouched historical path: Podemos peaks, Cs rises, the PP calls the election', () => {
+  const Q = newQ();
+  advanceUntil(Q, q => q.year === 2014 && q.month === 12);
+  assert.ok(Q.poll.up > 24, `Podemos Dec 2014 ${Q.poll.up}`);
+  advanceUntil(Q, q => q.year === 2015 && q.month === 10);
+  assert.ok(Q.poll.cs > 14, `Cs Oct 2015 ${Q.poll.cs}`);
+  assert.strictEqual(Q.election_year, 2015);
+  assert.strictEqual(Q.election_month, 12);
+  // the May 2015 regional elections reproduced reality
+  assert.deepStrictEqual(Q.regions['Madrid'].seats, { pp: 48, psoe: 37, up: 27, cs: 17 });
+  assert.strictEqual(Q.regions['Madrid'].government.president, 'Cristina Cifuentes');
+  assert.strictEqual(Q.regions['Comunidad Valenciana'].government.president, 'Ximo Puig');
 });
 
 test('the December 2015 election reproduces the real Congress and records changes', () => {
   const Q = newQ();
-  G.endOfMonth(Q);
-  assert.strictEqual(Q.general_election_due, 1);
-  G.runGeneralElection(Q);
+  toDecember2015(Q);
   assert.deepStrictEqual(Q.congress,
     { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, bildu: 2, iu: 2, cc: 1 });
   assert.strictEqual(Q.prev_congress.psoe, 110);
@@ -57,13 +85,15 @@ test('a failed investiture starts the clock; dissolution leads to a repeat elect
 
 test('regional elections fall due in May 2019 and change governments', () => {
   const Q = newQ();
-  while (!(Q.year === 2019 && Q.month === 5)) G.endOfMonth(Q);
+  advanceUntil(Q, q => q.year === 2019 && q.month === 4);
+  G.endOfMonth(Q);
   assert.ok(Q.regional_elections_due.length >= 12, Q.regional_elections_due.join(','));
   const results = G.runDueRegionalElections(Q);
   assert.ok(results.length >= 12);
   assert.strictEqual(Q.regions['Madrid'].nextElection, '2023-05-28');
-  // Andalusia (own calendar) voted in March 2019 in this timeline
-  assert.ok(Q.regions['Andalucía'].lastElection >= '2019-03');
+  // Andalusia keeps its own calendar: without Díaz's snap election it votes
+  // at the end of its 2012 term
+  assert.strictEqual(Q.regions['Andalucía'].lastElection, '2016-03-25');
 });
 
 test('a PP leader is invested if the PSOE abstains', () => {
@@ -84,8 +114,7 @@ test('regional government follows the blocs', () => {
 
 test('repeat elections bring PP-Cs cooperation and pressure on Sánchez', () => {
   const Q = newQ();
-  G.endOfMonth(Q);
-  G.runGeneralElection(Q); // December 2015
+  toDecember2015(Q);
   const authority = Q.sanchez_authority;
   G.runGeneralElection(Q); // repeat election with no government formed
   assert.strictEqual(Q.repeat_elections, 1);
@@ -127,8 +156,7 @@ test('government deficit follows the year and policy adjustments', () => {
 
 test('province winners feed the results map', () => {
   const Q = newQ();
-  G.endOfMonth(Q);
-  G.runGeneralElection(Q);
+  toDecember2015(Q);
   assert.strictEqual(Object.keys(Q.map_winners).length, 52);
   assert.strictEqual(Q.map_winners['Sevilla'], 'psoe');
   assert.strictEqual(Q.map_winners['Barcelona'], 'up');
@@ -137,8 +165,7 @@ test('province winners feed the results map', () => {
 
 test('abstaining for Rajoy moves left-wing voters to Podemos', () => {
   const Q = newQ();
-  G.endOfMonth(Q);
-  G.runGeneralElection(Q);
+  toDecember2015(Q);
   const before = { psoe: Q.true_poll.psoe, up: Q.true_poll.up };
   G.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 5, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
   assert.ok(Q.true_poll.psoe < before.psoe - 2, `${before.psoe} -> ${Q.true_poll.psoe}`);
@@ -167,20 +194,18 @@ test('demographic targeting moves the right voters, with diminishing returns', (
 
 test('after an election the polls get a new error drawn from history', () => {
   const Q = newQ();
-  G.endOfMonth(Q);
-  G.runGeneralElection(Q);
+  toDecember2015(Q);
   assert.ok(Q.last_poll_miss.cs > 3, `Cs miss ${Q.last_poll_miss.cs}`);
   // repeated draws centre on the historical bias: PSOE underestimated
   let sum = 0;
   for (let i = 0; i < 400; i++) { G.drawPollError(Q, null); sum += Q.poll_error.psoe; }
-  assert.ok(sum / 400 < -0.8 && sum / 400 > -1.9, `mean PSOE error ${sum / 400}`);
+  // relative error: about -1.3 points on a typical 25% share
+  assert.ok(sum / 400 < -0.025 && sum / 400 > -0.085, `mean PSOE relative error ${sum / 400}`);
 });
 
 test('government formation runs in weeks; four weeks close the month', () => {
   const Q = newQ();
-  G.endOfMonth(Q);           // December 2015
-  G.runGeneralElection(Q);
-  G.recalculate(Q);
+  toDecember2015(Q);
   assert.strictEqual(Q.weekly, 1);
   Q.negotiations_timer = 1; Q.rally_timer = 2;
   G.endOfWeek(Q);

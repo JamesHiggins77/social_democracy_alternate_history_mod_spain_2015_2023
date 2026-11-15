@@ -217,7 +217,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 
 A motion of no confidence must name an alternative Prime Minister, you, and needs an absolute majority: 176 yes votes. If it passes, you take office the next day, without an election. If it fails, it strengthens the government.
 
-Hernando's count of a motion tabled today:
+[? if pp_majority = 1 : The PP holds an absolute majority on its own: no motion can pass. Tabling one would be a gesture, not a threat. ?]Hernando's count of a motion tabled today:
 
 {!<div id="sp-censure-count"></div>!}
 

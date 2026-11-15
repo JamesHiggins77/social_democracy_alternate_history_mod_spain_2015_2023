@@ -1,4 +1,4 @@
-title: One month to go
+title: The new Secretary-General
 new-page: true
 set-bg: img/spain/bg_congreso_hemiciclo.jpg
 on-arrival: {!
@@ -7,38 +7,31 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 }
 !}
 
-= 20 November 2015 — One month to go
+= 13 July 2014 — The new Secretary-General
 
-Mariano Rajoy has called the general election for 20 December. In 2011 his People's Party won an absolute majority, 186 seats, while the PSOE fell to 110, its worst result at the time. Four years of austerity, unemployment above 20% and a stream of corruption cases later, two new parties are reaching for the PSOE's voters: Podemos on the left and Ciudadanos in the centre.
+For the first time, the PSOE's members have chosen their leader directly. You, **Pedro Sánchez**, a 42-year-old economist and Madrid deputy little known outside the party, have won with 48.7% of the vote, ahead of Eduardo Madina (36.2%) and José Antonio Pérez Tapias (15.1%).
 
-You are **Pedro Sánchez**, Secretary-General of the PSOE since the 2014 primary. This is your first general election as candidate. The polls put you in a three-way fight for second place.
+You did not win alone. Susana Díaz, President of Andalusia and the most powerful figure in the party, chose not to stand and put the Andalusian federation, the largest in the PSOE, behind you. Most of the regional leaders followed. They expect a leader who will listen to them.
 
-The campaign line you choose now shapes not only the vote but how the other parties will see you when the counting is done.
+The country you inherit is raw. Unemployment is above 24%. Mariano Rajoy governs with an absolute majority won in 2011, and has spent it on austerity and a labour reform the unions call the hardest in democracy. Corruption cases surround the PP. In May's European elections the two big parties together fell below 50% for the first time, and a new party called Podemos, founded in January, won 8% and five seats.
 
-- @change: Change: no deals with Rajoy, a government of progress
-- @governing: A governing party: serious, moderate, ready from day one
-- @vs_podemos: The only real alternative: Podemos is a risk Spain cannot take
+The general election is due by the end of 2015. At the Extraordinary Congress in two weeks you must say what your PSOE stands for.
 
-@change
-on-arrival: {!
-Q.campaign_line = 1; Q.rel_pp -= 8; Q.rel_up += 6; Q.member_morale += 5; Q.progressives_dissent -= 5;
-if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.recalculate(Q); }
-!}
+- @renewal: A new PSOE: renewal, clean politics, a younger face
+- @left_turn: Back to the left: tax the rich, repeal the labour reform
+- @unity: A party of government: unity with the federations and the old guard
 
-You promise that the PSOE will never make Rajoy Prime Minister. It energises the members and closes a door you may later want open.
+@renewal
+on-arrival: {! Q.opening = 1; Q.modernisers_dissent -= 5; Q.modernisers_strength += 3; Q.institutionalists_dissent += 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'young', 2); window.SpainGame.target(Q, 'psoe', 'middle', 1.5); window.SpainGame.recalculate(Q); } !}
 
-@governing
-on-arrival: {!
-Q.campaign_line = 2; Q.rel_cs += 6; Q.rel_pnv += 3; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 4;
-if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5, professionals: 1, self_employed: 0.5}); window.SpainGame.recalculate(Q); }
-!}
+You fill the new executive with people under 45 and promise primaries, transparency and an end to the old ways. Commentators call it "the new PSOE". The old guard calls it inexperience.
 
-The barons approve. Older and middle-class voters hear a party of government; younger ones hear the past.
+@left_turn
+on-arrival: {! Q.opening = 2; Q.progressives_dissent -= 8; Q.trade_unionists_dissent -= 6; Q.regional_leaders_dissent += 5; Q.institutionalists_dissent += 4; Q.rel_up += 5; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 2.5); window.SpainGame.recalculate(Q); } !}
 
-@vs_podemos
-on-arrival: {!
-Q.campaign_line = 3; Q.rel_up -= 12; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 5;
-if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, homemakers: 1.5, students: -1}); window.SpainGame.recalculate(Q); }
-!}
+You promise to repeal the labour reform and to reform the Constitution's article 135, the austerity amendment your own party voted for in 2011. The left of the party is surprised and pleased. Díaz's people are surprised.
 
-Your attacks on Iglesias hold the PSOE's older voters. Podemos will remember them when the talking starts.
+@unity
+on-arrival: {! Q.opening = 3; Q.regional_leaders_dissent -= 5; Q.institutionalists_dissent -= 6; Q.diaz_relation += 8; Q.sanchismo -= 3; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'pensioners', 2); window.SpainGame.recalculate(Q); } !}
+
+The barons get the posts they asked for. The party is calm; the voters notice little difference.

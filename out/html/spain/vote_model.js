@@ -109,14 +109,21 @@
     return { shares: shares, candidacyVotes: total, blankRatio: blank / total };
   }
 
-  function normalisedSupport(support) {
+  // factor: optional national multiplier per party (the historical path of
+  // 2014-15, see history_path_data.js).
+  function normalisedSupport(support, factor) {
+    factor = factor || {};
     var n = {};
     CLASSES.forEach(function (c) {
       var sum = 0;
-      STATEWIDE.forEach(function (p) { sum += Math.max(0, support[c][p] || 0); });
+      var v = {};
+      STATEWIDE.forEach(function (p) {
+        v[p] = Math.max(0, support[c][p] || 0) * (factor[p] === undefined ? 1 : factor[p]);
+        sum += v[p];
+      });
       n[c] = {};
       STATEWIDE.forEach(function (p) {
-        n[c][p] = sum > 0 ? Math.max(0, support[c][p] || 0) / sum : 0;
+        n[c][p] = sum > 0 ? v[p] / sum : 0;
       });
     });
     return n;
@@ -136,7 +143,7 @@
 
   // Class-weighted support W[region][party] for statewide parties.
   function classWeights(state, regions) {
-    var norm = normalisedSupport(state.classSupport);
+    var norm = normalisedSupport(state.classSupport, state.partyFactor);
     var W = {};
     regions.forEach(function (r) {
       var mix = regionClassMix(state.classShare, r);
@@ -231,7 +238,9 @@
       // lists that did not stand in 2015: {province: {party: share}}
       newLists: {},
       // statewide parties not standing (e.g. IU after joining Unidos Podemos)
-      notStanding: {}
+      notStanding: {},
+      // national multiplier per party for the historical path of 2014-15
+      partyFactor: {}
     };
   }
 
