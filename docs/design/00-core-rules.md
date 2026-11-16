@@ -379,7 +379,7 @@ Each PSOE faction shows its leader in the Politics tab (hover card and Wikipedia
 
 **Historical anchors.** An acting PP Prime Minister who still leads the largest party is not forced out (Rajoy through 2016). The Gürtel sentence (May 2018) offers a motion of no confidence on the spot.
 
-**Economy.** Policy effects are stronger and last longer (unemployment effects fade by about half over eight years); a governing PSOE's economic line moves growth and cohesion each year. Only unemployment more than a point above its historical level costs the governing party votes.
+**Economy.** Policy effects are stronger and last longer (unemployment effects fade by about half over eight years); a governing PSOE's economic line moves growth and cohesion each year. Only unemployment more than a point above its historical level costs the governing party votes. Incumbency wear is gentle (0.1 points per class a month for a PSOE government, 0.15 for a PP one), and a new PSOE government gains a little visibility in its first year.
 
 ### 7.5 Election results
 

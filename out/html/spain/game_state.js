@@ -895,12 +895,19 @@
     if (Q.year < 2016) {
       return;
     }
-    var all = { workers: 0.25, professionals: 0.25, pensioners: 0.2, self_employed: 0.25,
-                unemployed: 0.3, students: 0.25, homemakers: 0.2 };
+    var all = function (x) {
+      return { workers: x, professionals: x, pensioners: 0.8 * x, self_employed: x,
+               unemployed: 1.2 * x, students: x, homemakers: 0.8 * x };
+    };
+    Q.govt_months = Q.acting ? 0 : (Q.govt_months || 0) + 1;
     if (Q.psoe_in_government && !Q.acting) {
-      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all);
+      // the first year in office gives visibility; wear sets in slowly
+      if (Q.govt_months <= 12) {
+        shiftSupport(Q, 'psoe', all(0.12));
+      }
+      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.1));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
-      transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all);
+      transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15));
     }
   }
 
