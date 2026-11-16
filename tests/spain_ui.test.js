@@ -103,3 +103,11 @@ test('Spanish Wikipedia is the fallback where there is no English page', () => {
   assert.ok(/Spanish Wikipedia/.test(E.cardHtml('Pepe Álvarez', true)));
   assert.strictEqual(E.lookup('Nadia Calviño').party, 'nonpartisan');
 });
+
+test('regional control: a party without seats is shown as absent, not in opposition', () => {
+  const U = require('../out/html/spain/spain_ui.js');
+  const gal = { party: 'pp', cabinet: ['pp'], support: [] };
+  assert.strictEqual(U.regionControl(gal, { pp: 41, psoe: 14, bng: 7, up: 13 }, 'psoe'), 'none');
+  assert.strictEqual(U.regionControl(gal, { pp: 41, psoe: 14, bng: 7, up: 13 }, 'vox'), 'absent');
+  assert.strictEqual(U.regionControl(gal, { pp: 41, psoe: 14, bng: 7, up: 13 }, 'cs'), 'absent');
+});

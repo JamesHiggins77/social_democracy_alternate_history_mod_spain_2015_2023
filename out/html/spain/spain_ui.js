@@ -324,10 +324,10 @@
     iu: ['iu', 'x:I-E'],
     regionalist: null   // every party that is not statewide
   };
-  var CONTROL_RANK = { majority: 4, president: 3, junior: 2, supply: 1, none: 0 };
+  var CONTROL_RANK = { majority: 4, president: 3, junior: 2, supply: 1, none: 0, absent: -1 };
   var CONTROL_LABEL = { majority: 'Majority government', president: 'Holds the presidency',
                         junior: 'Junior coalition partner', supply: 'Supports the government',
-                        none: 'In opposition' };
+                        none: 'In opposition', absent: 'No seats' };
 
   function inBloc(bloc, id) {
     if (bloc === 'regionalist') {
@@ -355,6 +355,12 @@
     });
     (gov.cabinet || []).forEach(function (id) { if (id !== gov.party) { consider(id, 'junior'); } });
     (gov.support || []).forEach(function (id) { consider(id, 'supply'); });
+    if (best === 'none') {
+      var hasSeats = Object.keys(seats || {}).some(function (id) { return inBloc(bloc, id) && seats[id] > 0; });
+      if (!hasSeats) {
+        return 'absent';
+      }
+    }
     return best;
   }
 
@@ -373,7 +379,7 @@
   function controlColor(bloc, status) {
     var base = BLOC_COLOR[bloc] || partyColor(bloc);
     return { majority: mix(base, '#000000', 0.35), president: base, junior: mix(base, '#ffffff', 0.45),
-             supply: mix(base, '#ffffff', 0.72), none: '#f2f0ec' }[status];
+             supply: mix(base, '#ffffff', 0.72), none: '#f2f0ec', absent: 'url(#sp-hatch)' }[status];
   }
 
   // regions: {name: {government, seats}}; mode: 'presidency' or a bloc id.
@@ -410,13 +416,17 @@
           escapeHtml(shortName(id)) + '</span>';
       }).join(' ');
     } else {
-      legend = ['majority', 'president', 'junior', 'supply', 'none'].map(function (st) {
-        return '<span class="sp-legend"><span class="sp-swatch" style="background:' + controlColor(mode, st) +
+      legend = ['majority', 'president', 'junior', 'supply', 'none', 'absent'].map(function (st) {
+        var bg = st === 'absent' ? 'repeating-linear-gradient(45deg, #e9e6e1 0 2px, #a9a49c 2px 4px)' : controlColor(mode, st);
+        return '<span class="sp-legend"><span class="sp-swatch" style="background:' + bg +
           ';border:1px solid #bbb"></span>' + CONTROL_LABEL[st] + '</span>';
       }).join(' ');
     }
     container.innerHTML = (opts.title ? '<h4>' + escapeHtml(opts.title) + '</h4>' : '') +
       '<div class="sp-map-wrap"><svg class="sp-map" viewBox="0 0 ' + map.width + ' ' + map.height + '">' +
+      '<defs><pattern id="sp-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+      '<rect width="6" height="6" fill="#e9e6e1"></rect><line x1="0" y1="0" x2="0" y2="6" stroke="#a9a49c" stroke-width="2.2"></line>' +
+      '</pattern></defs>' +
       paths.join('') + inset + '</svg><div class="sp-map-tip"></div></div>' +
       '<p class="sp-map-legend">' + legend + '</p>';
     var tip = container.querySelector('.sp-map-tip');
