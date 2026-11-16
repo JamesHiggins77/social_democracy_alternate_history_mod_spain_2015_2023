@@ -563,7 +563,10 @@
         // elsewhere it links to Wikipedia in a new tab
         var inLink = false;
         for (var a = node.parentNode; a && a !== rootEl.parentNode; a = a.parentNode) {
-          if (a.nodeName === 'A') { inLink = true; break; }
+          // inside a link, or anywhere in a list of choices (subtitles,
+          // unavailable options): the game handles clicks there itself
+          if (a.nodeName === 'A' || (a.classList && (a.classList.contains('choices') || a.classList.contains('hand') ||
+              a.classList.contains('decks') || a.classList.contains('pinned-cards')))) { inLink = true; break; }
         }
         var span = doc.createElement(info.wiki && !inLink ? 'a' : 'span');
         span.className = 'sp-ent' + (info.kind === 'topic' ? ' sp-topic' : '');
