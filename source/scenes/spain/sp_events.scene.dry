@@ -1192,7 +1192,7 @@ Each spend costs 1 in party funds. Big communities elect more deputies; close pr
 - @fcr_galicia: Galicia
 - @fcr_castilla_y_leon: Castilla y León
 - @fcr_pais_vasco: País Vasco
-- @fcr_castilla-la_mancha: Castilla-La Mancha
+- @fcr_castilla_la_mancha: Castilla-La Mancha
 - @fcr_canarias: Canarias
 - @fcr_region_de_murcia: Región de Murcia
 - @fcr_aragon: Aragón
@@ -1249,7 +1249,7 @@ unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'País Vasco'); } !}
 go-to: final_campaign
 
-@fcr_castilla-la_mancha
+@fcr_castilla_la_mancha
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'region', 'Castilla-La Mancha'); } !}
