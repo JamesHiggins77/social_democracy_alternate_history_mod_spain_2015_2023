@@ -313,7 +313,7 @@ tags: sp_event
 view-if: leadership_exception_open = 1 and ((year = 2017 and month >= 5) or year >= 2018)
 max-visits: 1
 on-arrival: {!
-Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0;
+if (window.SpainGame) { window.SpainGame.comebackPrimary(Q); } else { Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0; }
 Q.leadership_exception_open = 0;
 if (Q.primary_won) {
     Q.sanchez_leader = 1; Q.sanchez_authority = 70; Q.sanchismo += 20; Q.member_morale += 10;
@@ -324,7 +324,11 @@ if (Q.primary_won) {
 
 = The primary
 
-[? if primary_won = 1 : The members vote, and they vote for you. Against the barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. ?][? if primary_won = 0 : The members vote, and they do not vote for you. ?]
+Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. You have spent months touring the local branches in your own car.
+
+The members vote. Pedro Sánchez **[+ primary_sanchez +]%**, Susana Díaz **[+ primary_diaz +]%**, Patxi López **[+ primary_lopez +]%**.
+
+[? if primary_won = 1 : Against the barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. The people who removed you spent months running the party; now they must work for you. ?][? if primary_won = 0 : The members choose Susana Díaz. Your comeback is over, for now. ?]
 
 @deadlock_vote
 title: The King forces a vote

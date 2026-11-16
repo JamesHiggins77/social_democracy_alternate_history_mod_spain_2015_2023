@@ -298,15 +298,21 @@ new-page: true
 tags: sp_event
 view-if: coup_due = 1 and sanchez_leader = 1
 
-= The barons move
+= The rebellion
 
-It happens on a Wednesday afternoon. Seventeen members of the Federal Executive resign at once to force the Executive to dissolve. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional leaders: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
+It happens on a Wednesday afternoon. The critics' aim is to stop your primaries and your congress before they can happen. Seventeen members of the Federal Executive resign at once to force the Executive to dissolve. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional leaders: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
 
 [? if loyalist_posts >= 4 : Your own people hold enough posts in Ferraz and in the federations to put up a fight. ?][? if loyalist_posts < 4 : You have few loyalists in the party's structures; the apparatus belongs to them. ?]
 
-- @coup_fight: Fight it out in the Federal Committee
+- @coup_refuse: Refuse to recognise the resignations: the Executive continues "in functions"
+- @coup_fight: Go straight to the Federal Committee and fight it out
 - @coup_members: Appeal over their heads: call a primary of the members now
 - @coup_resign: Resign rather than split the party
+
+@coup_refuse
+on-arrival: {! Q.two_authorities = 1; Q.sanchismo += 3; Q.plot += 3; !}
+
+César Luena, your Secretary of Organisation, tells the press that you remain the legitimate Secretary-General: resignations do not remove a leader elected by the members. The country now watches a party with two leaderships.
 
 @coup_fight
 on-arrival: {! window.SpainGame.baronsCoup(Q, 'fight'); Q.lead_confronted = 1; !}
@@ -332,4 +338,173 @@ on-arrival: {! Q.gestora_seen_round = Q.formation_round || 1; !}
 
 = The caretaker committee abstains
 
-The caretaker committee led by [+ psoe_leader +] meets the Federal Committee and votes to abstain in [+ right_leader +]'s investiture "so that Spain has a government". Fifteen socialist deputies say they will vote no anyway. Your supporters fill the street outside Ferraz with chants of "No es no" ("No means no").
+The caretaker committee led by [+ psoe_leader +] takes the question to the Federal Committee: should the PSOE abstain and let [+ right_leader +] govern? [+ psoe_leader +] insists that abstaining is not the same as supporting the PP. The Committee votes for abstention by a clear margin[? if year = 2016 : , 139 to 96 ?]. The Catalan socialists announce they will not follow the instruction. Your supporters fill the street outside Ferraz chanting "No es no" ("No means no"), and you call on the members to rebuild a party that does not prop up the right.
+
+@vara_breaks_ranks
+title: A baron breaks ranks
+new-page: true
+tags: sp_event
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 40 and coup_due = 0 and vara_round < formation_round and elections_held >= 1
+on-arrival: {! Q.vara_round = Q.formation_round || 1; !}
+
+= A baron breaks ranks
+
+Guillermo Fernández Vara, President of Extremadura, says in public what the barons have been saying in private: another general election would be bad for Spain and worse for the PSOE, and the party cannot keep up an unconditional no. He asks for a Federal Committee to discuss it.
+
+- @vara_debate: Agree to a Federal Committee debate on the strategy
+- @vara_dismiss: Dismiss him: the members gave you the mandate
+- @vara_alternative: Ask the Committee for authority to explore an alternative government
+
+@vara_debate
+on-arrival: {! Q.plot -= 5; Q.federal_committee_balance += 3; Q.sanchez_authority -= 2; !}
+
+The debate is scheduled. It buys time, and the barons note that you blinked.
+
+@vara_dismiss
+on-arrival: {! Q.plot += 8; Q.sanchismo += 2; Q.member_morale += 2; !}
+
+Your supporters cheer. The barons start coordinating.
+
+@vara_alternative
+on-arrival: {! Q.plot += 5; Q.alt_gov_bid = 1; Q.rel_up += 3; Q.up_talks += 0.5; if (window.SpainGame) { window.SpainGame.position(Q, 0.3, 0); } !}
+
+You want a mandate to talk to Podemos and, perhaps, Ciudadanos. The critics say any government that depends on Podemos and the Catalan independence parties is no government at all.
+
+@page_attacks
+title: García-Page attacks
+new-page: true
+tags: sp_event
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and coup_due = 0 and page_round < formation_round and vara_round >= formation_round
+on-arrival: {! Q.page_round = Q.formation_round || 1; !}
+
+= García-Page attacks
+
+Emiliano García-Page, President of Castilla-La Mancha, accuses you of treating dissenting colleagues unfairly and demands a Federal Congress. The two camps are organising around rival strategies: yours, of rejecting the right and exploring an alternative; theirs, of letting the right govern to end the deadlock.
+
+- @page_primaries: Call primaries and a Federal Congress now: let the members decide
+- @page_abide: Promise to abide by whatever the Federal Committee decides
+- @page_ignore: Ignore him
+
+@page_primaries
+on-arrival: {! Q.primaries_called = 1; Q.plot += 12; Q.sanchismo += 4; Q.populism += 1; !}
+
+You announce primaries within a month, followed by a Federal Congress. It is a direct appeal to the members before the deadlock can be resolved without you, and the barons see it as a declaration of war. They start discussing mass resignations from the Executive to stop it.
+
+@page_abide
+on-arrival: {! Q.plot -= 10; Q.sanchez_authority -= 8; Q.federal_committee_balance += 4; Q.psoe_stance_pp = 'abstain'; !}
+
+You defuse the rebellion by handing the decision to the Federal Committee, which everyone knows will choose abstention. Your members ask what you are for.
+
+@page_ignore
+on-arrival: plot += 4
+
+The critics take your silence as weakness.
+
+@felipe_speaks
+title: Felipe González speaks
+new-page: true
+tags: sp_event
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and felipe_round < formation_round and year <= 2019
+on-arrival: {! Q.felipe_round = Q.formation_round || 1; !}
+
+= Felipe González speaks
+
+On morning radio, Felipe González, the PSOE's most famous former prime minister, says he feels "cheated": you told him privately, he says, that you would abstain to let Rajoy govern. The old guard rallies behind him.
+
+- @felipe_deny: Deny it flatly, on air, the same morning
+- @felipe_silence: Say nothing: you will not fight Felipe in public
+
+@felipe_deny
+on-arrival: {! Q.plot += 6; Q.sanchismo += 3; Q.institutionalists_dissent += 6; !}
+
+Your members love it. The old guard will not forgive it.
+
+@felipe_silence
+on-arrival: {! Q.plot += 3; Q.sanchez_authority -= 3; !}
+
+His version becomes the story.
+
+@two_authorities_event
+title: Two authorities
+new-page: true
+tags: sp_event
+view-if: two_authorities = 1 and sanchez_leader = 1
+on-arrival: {! Q.two_authorities = 0; !}
+
+= Two authorities
+
+The party now has two leaderships. Your remaining Executive says it continues in functions; Verónica Pérez says it has ceased to exist and that she is "the only authority" until a caretaker committee takes over. Susana Díaz offers herself as the person who can bring the party together, and rejects a congress "designed around one man". Both sides call the Federal Committee for Saturday morning at Ferraz.
+
+- @auth_condition: Announce that you will resign if the Committee votes for abstention
+- @auth_rules: Fight on procedure: dispute Verónica Pérez's authority over the Committee
+- @auth_compromise: Offer a compromise: a congress later, in exchange for no abstention now
+
+@auth_condition
+on-arrival: {! Q.fc_bonus = 6; Q.sanchismo += 3; !}
+go-to: federal_committee_day
+
+@auth_rules
+on-arrival: {! Q.fc_bonus = 3; Q.institutionalists_dissent += 5; !}
+go-to: federal_committee_day
+
+@auth_compromise
+on-arrival: {! Q.fc_bonus = 8; Q.sanchez_authority -= 5; Q.plot -= 5; !}
+go-to: federal_committee_day
+
+@federal_committee_day
+title: The Federal Committee
+new-page: true
+
+= Saturday: the Federal Committee
+
+At nine in the morning you slip into Ferraz past the waiting press. More than 250 members of the Federal Committee crowd the hall; the meeting starts an hour and a half late, after arguments over who chairs it. Before eleven-thirty the critics refuse to recognise your seventeen remaining Executive members' right to vote. At a quarter to one Verónica Pérez's Mesa takes its seats. A hundred and fifty members ask to speak.
+
+By three in the afternoon you propose yet another Committee meeting. Javier Lambán answers that you are no longer Secretary-General. By six your supporters set up a ballot box to vote on an extraordinary congress; the critics call it illegal.
+
+- @fc_ballot: Insist on the ballot box: a secret vote
+- @fc_hands: Accept a public vote by show of hands
+
+@fc_ballot
+on-arrival: {! window.SpainGame.federalCommitteeVote(Q, (Q.fc_bonus || 0) - 2); !}
+go-to: fc_result
+
+@fc_hands
+on-arrival: {! window.SpainGame.federalCommitteeVote(Q, (Q.fc_bonus || 0) + 1); !}
+go-to: fc_result
+
+@fc_result
+title: The vote
+
+= The vote
+
+[? if coup_survived = 1 : Shortly after eight in the evening the vote is counted: [+ fc_for +] for the extraordinary congress, [+ fc_against +] against. You have won. The critics walk out into the night; Verónica Pérez's Mesa dissolves itself. The barons will need years to try again. ?][? if coup_survived = 0 : Shortly after eight in the evening the vote is counted: [+ fc_against +] against the extraordinary congress, [+ fc_for +] for. Ten minutes later you announce your resignation as Secretary-General. At nine you face the press. The Committee appoints a caretaker committee under [+ psoe_leader +] to run the party until a new congress. ?]
+
+@seat_choice
+title: The second vote
+new-page: true
+tags: sp_event
+view-if: gestora_invested = 1 and seat_choice_done = 0 and sanchez_leader = 0 and exiled = 0
+on-arrival: seat_choice_done = 1
+
+= The second vote
+
+The caretaker committee has won the Federal Committee vote to abstain. In the first investiture vote the socialists vote no; in the second, they are to abstain and let [+ pm +] govern. [+ psoe_rebels +] socialist deputies, including all the Catalan socialists, say they will vote no anyway. On the morning of the vote, you have to decide what you will do with your own seat.
+
+- @seat_resign: Give up your seat rather than abstain
+- @seat_rebel: Keep your seat and vote no with the rebels
+- @seat_abstain: Abstain with the group
+
+@seat_resign
+on-arrival: {! Q.sanchismo += 10; Q.member_morale += 4; Q.populism += 1; Q.seat_resigned = 1; !}
+
+You resign as a deputy, saying you cannot vote for what you promised you would never allow. You walk out of Congress with nothing but the members' sympathy, which is everything you need for a comeback.
+
+@seat_rebel
+on-arrival: {! Q.sanchismo += 6; Q.institutionalists_dissent += 6; Q.expelled_risk = 1; !}
+
+You vote no with the rebels. The caretaker committee opens disciplinary proceedings against all of you.
+
+@seat_abstain
+on-arrival: {! Q.sanchismo -= 12; Q.member_morale -= 6; Q.institutionalists_dissent -= 4; !}
+
+You abstain with the group. The members who were chanting your name outside Ferraz feel betrayed.

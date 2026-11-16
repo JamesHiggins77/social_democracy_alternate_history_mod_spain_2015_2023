@@ -704,21 +704,54 @@
     return Q.loyalist_ok;
   }
 
+  // The barons' strength in a showdown: the plot, their own weight, Díaz's
+  // enmity, a left-wing course and, in a deadlock with a weak PSOE, the
+  // argument that Spain needs a government.
+  function coupAttack(Q) {
+    return 0.6 * (Q.plot || 0) + 0.5 * (Q.regional_leaders_strength || 30) +
+      (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) + 2 * leftDrift(Q) +
+      (Q.acting && (Q.congress.psoe || 0) < 100 ? 10 : 0);
+  }
+
+  // Sánchez's strength: the Committee's balance, his loyalists in key posts,
+  // the members' morale.
+  function coupDefence(Q) {
+    return 0.8 * (Q.federal_committee_balance || 50) + 4 * (Q.loyalist_posts || 0) + (Q.member_morale || 50) / 5;
+  }
+
+  // The extraordinary Federal Committee: about 240 delegates vote on
+  // Sánchez's extraordinary congress. bonus: procedural moves (+) or
+  // concessions (-). Sets fc_for / fc_against; ousts him if he loses.
+  function federalCommitteeVote(Q, bonus) {
+    var attack = coupAttack(Q);
+    var defence = coupDefence(Q) + (bonus || 0) + 12 * (Math.random() - 0.5);
+    var total = 239;
+    Q.fc_for = Math.round(total * defence / (defence + attack));
+    Q.fc_against = total - Q.fc_for;
+    Q.coup_survived = Q.fc_for > Q.fc_against ? 1 : 0;
+    Q.coup_cooldown = Q.time + 6;
+    if (Q.coup_survived) {
+      Q.plot = 10; Q.sanchez_authority += 12; Q.regional_leaders_dissent -= 10; Q.sanchismo += 6;
+    } else {
+      oust(Q, false);
+    }
+    recalculate(Q);
+    return Q.coup_survived;
+  }
+
   // The barons move: the Federal Executive resigns en masse. defend:
   // 'fight' (in the Federal Committee), 'members' (a snap primary) or
   // 'resign'. Returns 1 if Sánchez survives.
   function baronsCoup(Q, defend) {
     Q.coup_cooldown = Q.time + 6;
-    var attack = 0.6 * Q.plot + 0.5 * (Q.regional_leaders_strength || 30) + (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) +
-      2 * leftDrift(Q);
+    var attack = coupAttack(Q);
     if (defend === 'resign') {
       oust(Q, false);
       Q.coup_survived = 0;
     } else if (defend === 'members') {
       Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2);
     } else {
-      var defence = (Q.federal_committee_balance || 50) + 4 * (Q.loyalist_posts || 0) + (Q.member_morale || 50) / 5 +
-        16 * (Math.random() - 0.5);
+      var defence = coupDefence(Q) + 16 * (Math.random() - 0.5);
       Q.coup_survived = defence >= attack ? 1 : 0;
       if (!Q.coup_survived) {
         oust(Q, false);
@@ -2160,6 +2193,19 @@
 
   // A PSOE leadership election (primary). bonus: + for calling it oneself.
   // Returns 1 if Sánchez wins.
+  // The comeback primary of May 2017: Sánchez against Susana Díaz (or the
+  // barons' candidate) and Patxi López. Returns 1 if Sánchez wins.
+  function comebackPrimary(Q) {
+    var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
+    var s = clamp(45 + (x - 60) * 0.5 + 6 * (Math.random() - 0.5), 15, 75);
+    var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
+    Q.primary_sanchez = Math.round(s * 10) / 10;
+    Q.primary_lopez = Math.round(lopez * 10) / 10;
+    Q.primary_diaz = Math.round((100 - s - lopez) * 10) / 10;
+    Q.primary_won = Q.primary_sanchez > Q.primary_diaz ? 1 : 0;
+    return Q.primary_won;
+  }
+
   function leadershipElection(Q, bonus) {
     var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) +
       (bonus || 0) + 6 * gaussian();
@@ -2577,6 +2623,12 @@
         if (tried[i] === 'up') { Q.psoe_backs_iglesias = 'external'; }
         formGovernment(Q, tried[i]);
         Q.auto_formed = 1;
+        if (Q.psoe_interim && (tried[i] === 'pp' || tried[i] === 'cs')) {
+          // the caretaker PSOE abstained: the group splits, as in October 2016
+          Q.gestora_invested = 1;
+          Q.psoe_rebels = Math.max(5, Math.round((Q.congress.psoe || 85) * (0.08 + (Q.sanchismo || 20) / 600)));
+          Q.psoe_abstainers = (Q.congress.psoe || 0) - Q.psoe_rebels;
+        }
         recalculate(Q);
         return tried[i];
       }
@@ -2901,8 +2953,10 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    comebackPrimary: comebackPrimary,
     placeLoyalists: placeLoyalists,
     baronsCoup: baronsCoup,
+    federalCommitteeVote: federalCommitteeVote,
     allocateCabinet: allocateCabinet,
     renderCabinet: renderCabinet,
     MINISTRIES: MINISTRIES,
