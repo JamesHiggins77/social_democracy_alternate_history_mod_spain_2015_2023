@@ -60,7 +60,7 @@
     [['José Luis Rodríguez Zapatero', 'Zapatero'], 'psoe', 'Prime Minister 2004–11', 'Progressives'],
     [['Miquel Iceta', 'Iceta'], 'psoe', 'Leader of the PSC', 'Catalan socialists, federalist'],
     [['Salvador Illa', 'Illa'], 'psoe', 'PSC; Minister of Health', 'Catalan socialists'],
-    [['Nadia Calviño', 'Calviño'], 'psoe', 'Minister of Economic Affairs', 'Modernisers: the government\'s technocratic wing (independent)'],
+    [['Nadia Calviño', 'Calviño'], 'nonpartisan', 'Minister of Economic Affairs (independent, in the PSOE\'s share of the cabinet)', 'Modernisers: the government\'s technocratic wing'],
     [['Josep Borrell', 'Borrell'], 'psoe', 'Minister of Foreign Affairs', 'Federalist, pro-European'],
     [['Fernando Grande-Marlaska', 'Grande-Marlaska'], 'psoe', 'Minister of the Interior', 'Independent judge'],
     [['Margarita Robles'], 'psoe', 'Minister of Defence', 'Independent judge, institutionalist'],
@@ -203,7 +203,9 @@
     'Javier Fernández': 'Javier Fernández (Spanish politician)', 'Ignacio González': 'Ignacio González (politician)',
     'Pablo Iglesias': 'Pablo Iglesias Turrión', 'Mohammed VI': 'Mohammed VI of Morocco',
     'Fernando Clavijo': 'Fernando Clavijo (politician)', 'Volodymyr Zelensky': 'Volodymyr Zelenskyy',
-    'Teresa Rodríguez': null, 'Pepe Álvarez': null
+    // no English page: Spanish Wikipedia instead ("es:" prefix)
+    'Teresa Rodríguez': 'es:Teresa Rodríguez', 'Pepe Álvarez': 'es:Pepe Álvarez', 'Nacho Álvarez': 'es:Nacho Álvarez',
+    'Verónica Pérez': 'es:Verónica Pérez Fernández'
   };
   var PARTY_WIKI = {
     psoe: "Spanish Socialist Workers' Party", pp: "People's Party (Spain)", up: 'Podemos (Spanish political party)',
@@ -257,7 +259,9 @@
     [['Mossos'], "Mossos d'Esquadra", 'The Catalan police'],
     [['Vistalegre II'], '2016–2017 Podemos state party assembly', 'Podemos\'s second congress, 2017'],
     [['motion of no confidence'], 'Motion of no confidence', 'Art. 113: a vote to replace the Prime Minister'],
-    [['European Union'], 'European Union', 'The EU']
+    [['European Union'], 'European Union', 'The EU'],
+    [['labour reform'], 'es:Reforma laboral española de 2012', 'The PP\'s 2012 labour-market reform'],
+    [['only yes means yes', 'only yes'], 'es:Ley Orgánica de Garantía Integral de la Libertad Sexual', 'The 2022 sexual-consent law']
   ];
 
   // party names as they appear in the text
@@ -588,8 +592,11 @@
     });
   }
 
+  // "es:Title" links to Spanish Wikipedia (used where no English page exists)
   function wikiUrl(title) {
-    return 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title.replace(/ /g, '_')).replace(/%2C/g, ',');
+    var lang = /^es:/.test(title) ? 'es' : 'en';
+    var t = title.replace(/^es:/, '');
+    return 'https://' + lang + '.wikipedia.org/wiki/' + encodeURIComponent(t.replace(/ /g, '_')).replace(/%2C/g, ',');
   }
 
   function cardHtml(key, linked) {
@@ -597,9 +604,10 @@
     if (!info) {
       return '';
     }
-    var more = linked && info.wiki ? '<div class="sp-ent-more">Click to open on Wikipedia ↗</div>' : '';
+    var more = linked && info.wiki ? '<div class="sp-ent-more">Click to open on ' + (/^es:/.test(info.wiki) ? 'Spanish ' : '') +
+      'Wikipedia ↗</div>' : '';
     if (info.kind === 'topic') {
-      return '<div><strong>' + info.wiki + '</strong></div><div class="sp-ent-wing">' + info.note + '</div>' + more;
+      return '<div><strong>' + info.wiki.replace(/^es:/, '') + '</strong></div><div class="sp-ent-wing">' + info.note + '</div>' + more;
     }
     var pi = partyInfo(info.party);
     var badge = '<span class="sp-ent-logo" style="background:' + pi.color + '">' + pi.short + '</span>';

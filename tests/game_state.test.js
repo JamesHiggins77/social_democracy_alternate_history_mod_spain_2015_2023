@@ -648,7 +648,11 @@ test('faction leaders follow the date and the situation', () => {
   assert.strictEqual(G.factionLeader(Q, 'trade_unionists'), 'Cándido Méndez');
   Q.year = 2019; Q.month = 9;
   assert.strictEqual(G.factionLeader(Q, 'institutionalists'), 'Carmen Calvo');
-  assert.strictEqual(G.factionLeader(Q, 'modernisers'), 'Nadia Calviño');
+  // not in government: no Calviño
+  assert.strictEqual(G.factionLeader(Q, 'modernisers'), 'Patxi López');
+  Q.congress = Object.assign({}, Q.congress, { psoe: 140 });
+  G.formGovernment(Q, 'sanchez'); G.recalculate(Q);
+  assert.strictEqual(G.factionLeader(Q, 'modernisers'), 'Nadia Calviño (independent)');
   // Díaz loses Andalusia: García-Page leads the barons
   Q.regions['Andalucía'].government = { party: 'pp', president: 'Juanma Moreno', cabinet: ['pp', 'cs'], support: ['vox'] };
   assert.strictEqual(G.factionLeader(Q, 'regional_leaders'), 'Emiliano García-Page');

@@ -95,3 +95,11 @@ test('majority arrangements: 2019 left bloc passes on the second ballot; parties
   assert.ok(!all.some(a => a.yesIds.includes('mp') || a.yesIds.includes('upn')));
   assert.ok(/Paths to a majority/.test(U.arrangementsHtml(dec2015)));
 });
+
+test('Spanish Wikipedia is the fallback where there is no English page', () => {
+  const E = require('../out/html/spain/entities.js');
+  assert.ok(/^https:\/\/es\.wikipedia\.org\/wiki\/Pepe_%C3%81lvarez$/.test(E.wikiUrl(E.lookup('Pepe Álvarez').wiki)));
+  assert.ok(/^https:\/\/en\.wikipedia\.org\//.test(E.wikiUrl(E.lookup('Susana Díaz').wiki)));
+  assert.ok(/Spanish Wikipedia/.test(E.cardHtml('Pepe Álvarez', true)));
+  assert.strictEqual(E.lookup('Nadia Calviño').party, 'nonpartisan');
+});

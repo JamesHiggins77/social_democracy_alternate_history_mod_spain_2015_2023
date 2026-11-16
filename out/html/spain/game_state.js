@@ -2428,7 +2428,7 @@
   };
   // ministers by party (historical where the party held the post)
   var MINISTER_NAMES = {
-    psoe: { pm: 'Pedro Sánchez', deputy: 'Carmen Calvo', finance: 'María Jesús Montero', economy: 'Nadia Calviño',
+    psoe: { pm: 'Pedro Sánchez', deputy: 'Carmen Calvo', finance: 'María Jesús Montero', economy: 'Nadia Calviño (independent)',
             foreign: 'Josep Borrell', interior: 'Fernando Grande-Marlaska', defence: 'Margarita Robles',
             justice: 'Dolores Delgado', labour: 'Magdalena Valerio', social_rights: 'José Luis Escrivá',
             health: 'Salvador Illa', education: 'Isabel Celaá', territorial: 'Meritxell Batet', ecology: 'Teresa Ribera',
@@ -2912,7 +2912,12 @@
         return k < 201706 ? 'José Antonio Pérez Tapias' : 'José Luis Rodríguez Zapatero';
       case 'modernisers':
         if (k < 201709) { return 'Eduardo Madina'; }
-        return k < 201806 ? 'Patxi López' : 'Nadia Calviño';
+        // Calviño, an independent, only once a PSOE government has made her a minister
+        var eco = Q.cabinet && Q.cabinet.economy;
+        if (k >= 201806 && !Q.acting && eco && /^Nadia Calviño/.test(eco.name || '') && Q.psoe_in_government) {
+          return 'Nadia Calviño (independent)';
+        }
+        return 'Patxi López';
       case 'trade_unionists':
         return k < 201603 ? 'Cándido Méndez' : 'Pepe Álvarez';
     }
