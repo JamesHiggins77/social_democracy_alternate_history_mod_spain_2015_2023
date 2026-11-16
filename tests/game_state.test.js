@@ -607,3 +607,36 @@ test('US Democrats split into leadership and progressives after Obama; Italy and
   Q.year = 2017; assert.strictEqual(G.sisterLeader(Q, 'greece').id, 'gennimata');
   assert.strictEqual(G.sisterLeader(Q, 'italy').id, 'renzi');
 });
+
+test('bad results arm the barons; loyalists and a lost coup; the caretaker abstains', () => {
+  const Q = newQ();
+  Q.year = 2016; Q.month = 6; G.recalculate(Q);
+  const before = Q.plot || 0;
+  Q.prev_test = 1;
+  // a collapse in seats raises the plot
+  Q.congress = Object.assign({}, Q.congress, { psoe: 110 });
+  Q.vm.partyFactor = {};
+  G.transferRaw(Q, 'psoe', 'up', { workers: 8, pensioners: 8, professionals: 8, students: 8, unemployed: 8, homemakers: 8 });
+  G.runGeneralElection(Q);
+  assert.ok(Q.plot > before + 20, `plot ${Q.plot}`);
+  // loyalists lower it
+  const p1 = Q.plot;
+  G.placeLoyalists(Q, 'executive');
+  assert.ok(Q.plot < p1 && Q.loyalist_posts >= 2);
+  // a lost coup leaves a caretaker committee, which abstains for the PP
+  Q.plot = 90; Q.federal_committee_balance = 20; Q.loyalist_posts = 0; Q.member_morale = 10;
+  let survived = 1;
+  for (let i = 0; i < 20 && survived; i++) { Q.sanchez_leader = 1; Q.plot = 90; survived = G.baronsCoup(Q, 'fight'); }
+  assert.strictEqual(Q.sanchez_leader, 0);
+  assert.strictEqual(Q.psoe_interim, 1);
+  Q.gestora_abstains = 1;
+  assert.strictEqual(G.aiStances(Q, 'pp').psoe, 'abstain');
+});
+
+test('a left-wing course makes the barons plot faster', () => {
+  const centre = newQ(); const left = newQ();
+  [centre, left].forEach(q => { q.year = 2017; q.month = 6; q.plot = 20; q.econ_left = 0; q.social_prog = 1; });
+  left.econ_left = 8; left.social_prog = 6; left.pact_up = 1; left.referendum_offer = 1;
+  for (let i = 0; i < 6; i++) { G.monthlyWorld(centre); G.monthlyWorld(left); }
+  assert.ok(left.plot > centre.plot + 15, `${left.plot} vs ${centre.plot}`);
+});

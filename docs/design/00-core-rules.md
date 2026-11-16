@@ -348,6 +348,16 @@ A single-party government takes every post. In a coalition, the junior partner g
 
 Government cards need the matching ministry: the budget and tax reform need Finance; the minimum wage and labour reform need Labour; pensions need Social Rights; historical memory needs Justice or the deputy premiership; foreign tours need Foreign Affairs; a reshuffle needs the premiership. María Jesús Montero is an adviser only while the party holds Finance. The Government deck appears whenever the player's party is in government, including as a junior partner.
 
+### 7.13 The barons' plot
+
+A plot score (0–100, shown in the Politics tab as Quiet, Murmurs, Organising or Imminent) measures how close the regional barons and the Federal Executive are to moving against Sánchez. It rises with bad results (1.5 per seat lost at a general election, +15 under 100 seats, +25 under 90; +8 for each regional presidency lost), with a losing streak (1.5 a month while the PSOE has under 100 seats and is out of government), a hostile Federal Committee, a divided party, weak polls and Susana Díaz's enmity (to 2018), and above all with a left-wing course: economic radicalism, a Podemos pact, a referendum offer and concessions to the independence parties. Loyalists in key posts lower it each month; it decays slowly.
+
+At 60 the barons move: the Federal Executive resigns en masse and Verónica Pérez, President of the Federal Committee, declares herself the party's only authority, backed by Susana Díaz, García-Page, Lambán and Fernández Vara. Sánchez can fight it out in the Federal Committee (Federal Committee balance, loyalists and morale against the plot, the barons' strength and his left-wing course), appeal to the members in a snap primary, or resign. Surviving resets the plot and strengthens him.
+
+The *Placing your people* card (Party deck) puts sanchistas in power: the Federal Executive (safe; angers the institutionalists), the regional federations (a gamble: success breaks the barons' hold, failure strengthens them), the parliamentary group, and, with a members' mandate, new statutes letting only the members elect and remove the leader. Repeats give diminishing returns.
+
+If Sánchez is ousted, a caretaker committee (Javier Fernández to 2018) runs the PSOE for eight months before an elected leader takes over. While no government has been formed, it abstains to let the PP govern in four cases out of five, as in October 2016.
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.

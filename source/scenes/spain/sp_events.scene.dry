@@ -283,11 +283,7 @@ Q.committee_won = (Q.federal_committee_balance + Q.member_morale / 5 >= 55) ? 1 
 if (Q.committee_won) {
     Q.sanchez_authority += 10; Q.regional_leaders_dissent -= 10; Q.federal_committee_balance += 5;
 } else {
-    Q.sanchez_leader = 0;
-    if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.6, cs: 0.4}, {students: 2, workers: 2, professionals: 1}); }
-    if (Q.in_leadership_window) {
-        Q.leadership_exception_open = 1;
-    }
+    if (window.SpainGame) { window.SpainGame.oust(Q, false); window.SpainGame.transfer(Q, 'psoe', {up: 0.6, cs: 0.4}, {students: 1, workers: 1}); }
 }
 !}
 go-to: fight_won if committee_won = 1; ousted if committee_won = 0
@@ -300,7 +296,7 @@ title: You survive
 After a day of shouting in the corridors of Ferraz, the vote goes your way. Your critics will wait for another chance.
 
 @members
-on-arrival: populism += 1; sanchez_leader = 0; leadership_exception_open = 1 if in_leadership_window = 1
+on-arrival: {! Q.populism += 1; if (window.SpainGame) { window.SpainGame.oust(Q, false); } !}
 go-to: ousted
 
 @ousted
@@ -960,9 +956,7 @@ new-page: true
 tags: sp_event
 view-if: ruinous_debt = 1 and sanchez_leader = 1 and federal_committee_balance < 55
 on-arrival: {!
-Q.sanchez_leader = 0;
-if (Q.in_leadership_window) { Q.leadership_exception_open = 1; }
-if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.5, cs: 0.5}, {students: 1, workers: 1, professionals: 1}); }
+if (window.SpainGame) { window.SpainGame.oust(Q, false); }
 !}
 
 = Removed over the finances

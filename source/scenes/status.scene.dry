@@ -67,6 +67,8 @@ Social line: **[+ social_word +]**
 
 Sanchismo: **[+ sanchismo_word +]**
 
+[? if sanchez_leader = 1 : Barons' plotting: **[+ plot_word +]**; loyalists in key posts: **[+ loyalist_posts_text +]** ?]
+
 Style: **[+ style_word +]**
 
 Fed. Committee: **[+ committee_word +]**

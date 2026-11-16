@@ -96,7 +96,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'foreign', 'pes', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'foreign', 'pes', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -648,8 +648,92 @@
   // pain, endless government formation, migration tension, the Catalan
   // conflict, corruption and the pandemic. From 2016 it feeds Vox and, to a
   // lesser extent, Podemos.
+  // Monthly drift of the barons' plot: a hostile Federal Committee, a
+  // divided party, weak polls and Díaz's enmity feed it; loyalists in
+  // the party's posts starve it.
+  function plotDrift(Q) {
+    if (!Q.sanchez_leader) {
+      return;
+    }
+    var poll = (Q.true_poll && Q.true_poll.psoe) || 22;
+    var d = 0.4 * (50 - (Q.federal_committee_balance || 50)) / 10 + ((Q.dissent_percent || 20) - 25) / 8 +
+      (poll < 20 ? 1.5 : (poll < 23 ? 0.5 : -0.5)) + ((Q.diaz_relation || 50) < 40 && Q.year <= 2018 ? 1 : 0) -
+      0.5 * (Q.loyalist_posts || 0) + leftDrift(Q) +
+      // a losing streak: under 100 seats and out of government
+      ((Q.congress.psoe || 0) < 100 && !Q.psoe_in_government && Q.elections_held >= 1 ? 1.5 : 0);
+    Q.plot = clamp((Q.plot || 0) * 0.98 + d, 0, 100);
+  }
+
+  // A left-wing course alarms the Executive and above all the barons:
+  // economic radicalism counts most, then deals with Podemos and
+  // concessions to the independence parties.
+  function leftDrift(Q) {
+    var e = Q.econ_left || 0, so = Q.social_prog || 0;
+    return Math.max(0, e - 2) * 0.7 + Math.max(0, so - 3) * 0.3 + (Q.pact_up ? 1 : 0) +
+      (Q.referendum_offer ? 1.5 : 0) + ((Q.cat_dialogue || 0) >= 2 ? 1 : 0);
+  }
+
+  // Sánchez's attempt to put his own people in the party's posts.
+  // where: 'executive', 'federations', 'group', 'statutes'
+  function placeLoyalists(Q, where) {
+    Q.loyalist_uses = Q.loyalist_uses || {};
+    var n = Q.loyalist_uses[where] || 0;
+    Q.loyalist_uses[where] = n + 1;
+    var f = 1 / (1 + n);
+    Q.loyalist_ok = 1;
+    if (where === 'executive') {
+      Q.loyalist_posts = (Q.loyalist_posts || 0) + 2 * f; Q.federal_committee_balance += 5 * f;
+      Q.institutionalists_dissent += 5; Q.plot -= 8 * f;
+    } else if (where === 'federations') {
+      var chance = 0.25 + (Q.sanchismo || 0) / 120 + (Q.member_morale || 0) / 300 - (Q.regional_leaders_strength || 30) / 150;
+      Q.loyalist_ok = Math.random() < chance ? 1 : 0;
+      if (Q.loyalist_ok) {
+        Q.loyalist_posts = (Q.loyalist_posts || 0) + 3 * f; Q.regional_leaders_strength -= 3 * f;
+        Q.regional_leaders_dissent += 8; Q.plot -= 12 * f; Q.federal_committee_balance += 6 * f;
+      } else {
+        Q.regional_leaders_dissent += 10; Q.plot += 10; Q.sanchez_authority -= 4;
+      }
+    } else if (where === 'group') {
+      Q.loyalist_posts = (Q.loyalist_posts || 0) + 1 * f; Q.institutionalists_dissent += 4; Q.plot -= 4 * f;
+    } else if (where === 'statutes') {
+      Q.loyalist_posts = (Q.loyalist_posts || 0) + 2 * f; Q.member_morale += 3; Q.plot -= 12 * f;
+      Q.federal_committee_balance += 6 * f; Q.regional_leaders_dissent += 5; Q.statutes_reformed = 1;
+    }
+    Q.loyalist_posts = Math.min(10, Q.loyalist_posts || 0);
+    recalculate(Q);
+    return Q.loyalist_ok;
+  }
+
+  // The barons move: the Federal Executive resigns en masse. defend:
+  // 'fight' (in the Federal Committee), 'members' (a snap primary) or
+  // 'resign'. Returns 1 if Sánchez survives.
+  function baronsCoup(Q, defend) {
+    Q.coup_cooldown = Q.time + 6;
+    var attack = 0.6 * Q.plot + 0.5 * (Q.regional_leaders_strength || 30) + (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) +
+      2 * leftDrift(Q);
+    if (defend === 'resign') {
+      oust(Q, false);
+      Q.coup_survived = 0;
+    } else if (defend === 'members') {
+      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2);
+    } else {
+      var defence = (Q.federal_committee_balance || 50) + 4 * (Q.loyalist_posts || 0) + (Q.member_morale || 50) / 5 +
+        16 * (Math.random() - 0.5);
+      Q.coup_survived = defence >= attack ? 1 : 0;
+      if (!Q.coup_survived) {
+        oust(Q, false);
+      }
+    }
+    if (Q.coup_survived) {
+      Q.plot = 10; Q.sanchez_authority += 10; Q.regional_leaders_dissent -= 8; Q.sanchismo += 5;
+    }
+    recalculate(Q);
+    return Q.coup_survived;
+  }
+
   function monthlyWorld(Q) {
     var t = Q.year * 12 + Q.month;
+    plotDrift(Q);
     // the economy: growth shocks fade within a year; unemployment follows
     // growth (Okun) and its own adjustments fade slowly
     Q.unemp_adj = (Q.unemp_adj || 0) - 0.04 * (Q.growth_adj || 0);
@@ -1810,6 +1894,13 @@
       Q.loss_reason = verdict.reason;
     }
     var swing = (r.totals.psoe || 0) - (old.psoe || 0);
+    // bad results arm the barons
+    if (Q.sanchez_leader) {
+      if (swing < 0) { Q.plot = (Q.plot || 0) + 1.5 * -swing; }
+      var ps = r.totals.psoe || 0;
+      Q.plot = (Q.plot || 0) + (ps < 90 ? 25 : (ps < 100 ? 15 : 0));
+      if (swing > 0) { Q.plot = Math.max(0, (Q.plot || 0) - swing); }
+    }
     Q.sanchez_authority += swing / 2;
     Q.member_morale += swing / 2;
     var ppLoss = (old.pp || 0) - (r.totals.pp || 0);
@@ -1941,6 +2032,7 @@
       var psoeLost = before.party === 'psoe' && gov.party !== 'psoe';
       var psoeWon = before.party !== 'psoe' && gov.party === 'psoe';
       if (psoeLost) {
+        Q.plot = (Q.plot || 0) + 8;
         Q.regional_leaders_strength -= 3;
         Q.sanchez_authority -= 3;
       }
@@ -2014,6 +2106,16 @@
     // the 2016-17 window in which an ouster can be reversed by a primary
     var k = dateKey(Q.year, Q.month);
     Q.in_leadership_window = (k >= 201606 && k <= 201703) ? 1 : 0;
+    // the barons' plot: pressure to overthrow Sánchez (0-100)
+    Q.plot = clamp(Q.plot || 0, 0, 100);
+    Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
+    Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
+    Q.coup_due = (Q.sanchez_leader && Q.plot >= 60 && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    // a caretaker committee hands over to an elected leader after eight months
+    if (!Q.sanchez_leader && Q.psoe_interim && Q.time - (Q.interim_since || Q.time) >= 8) {
+      Q.psoe_interim = 0;
+      Q.psoe_leader = Q.psoe_next_leader || challengerName(Q);
+    }
     // the leadership crisis: rumours, then talk of a leadership election,
     // then a forced one
     if (Q.sanchez_leader) {
@@ -2088,7 +2190,14 @@
   function oust(Q, expelled) {
     Q.sanchez_leader = 0;
     Q.lead_stage = 0;
-    Q.psoe_leader = Q.challenger || challengerName(Q);
+    Q.plot = 0;
+    Q.psoe_next_leader = Q.challenger || challengerName(Q);
+    // a caretaker committee runs the party until a primary; with no
+    // government formed, it is likely to let the PP govern
+    Q.psoe_interim = 1;
+    Q.interim_since = Q.time;
+    Q.psoe_leader = Q.year <= 2018 ? 'Javier Fernández' : 'a caretaker committee';
+    Q.gestora_abstains = Math.random() < 0.8 ? 1 : 0;
     if (expelled) {
       Q.expelled = 1;
     }
@@ -2391,7 +2500,8 @@
     if (Q.exiled && pl === 'up' && Q.player_line_left === 'coalition') { H.pact_up = 1; }
     if (Q.exiled && pl === 'cs' && Q.player_line_right === 'coalition') { H.pact_pp_cs = 1; }
     // without Sánchez the PSOE abstains for the right after a repeat election
-    H.psoe_stance_pp = (Q.repeat_elections || 0) >= 1 || (Q.formation_weeks || 0) >= 10 ? 'abstain' : 'no';
+    H.psoe_stance_pp = ((Q.psoe_interim && Q.gestora_abstains) || (Q.repeat_elections || 0) >= 1 ||
+      (Q.formation_weeks || 0) >= 10) ? 'abstain' : 'no';
     H.red_lines = 1;
     var st = candidate === 'sanchez' ? Parliament.stancesForSanchez(H)
       : (candidate === 'up' ? Parliament.stancesForUP(H)
@@ -2442,7 +2552,8 @@
   }
 
   function autoFormation(Q) {
-    if (Q.sanchez_leader || !Q.acting || Q.election_year || (Q.formation_weeks || 0) < 3 || Q.elections_held < 1) {
+    if (Q.sanchez_leader || !Q.acting || Q.election_year || (Q.formation_weeks || 0) < (Q.psoe_interim ? 1 : 3) ||
+        Q.elections_held < 1) {
       return null;
     }
     if (Q.exiled && Q.player_party !== 'psoe' && !Q.player_line_set) {
@@ -2790,6 +2901,8 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    placeLoyalists: placeLoyalists,
+    baronsCoup: baronsCoup,
     allocateCabinet: allocateCabinet,
     renderCabinet: renderCabinet,
     MINISTRIES: MINISTRIES,

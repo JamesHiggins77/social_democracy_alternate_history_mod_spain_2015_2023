@@ -291,3 +291,45 @@ The corruption files are reopened on every talk show.
 on-arrival: institutionalists_dissent -= 1
 
 You let the new leader make the first mistakes.
+
+@barons_coup
+title: The barons move
+new-page: true
+tags: sp_event
+view-if: coup_due = 1 and sanchez_leader = 1
+
+= The barons move
+
+It happens on a Wednesday afternoon. Seventeen members of the Federal Executive resign at once to force the Executive to dissolve. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional leaders: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
+
+[? if loyalist_posts >= 4 : Your own people hold enough posts in Ferraz and in the federations to put up a fight. ?][? if loyalist_posts < 4 : You have few loyalists in the party's structures; the apparatus belongs to them. ?]
+
+- @coup_fight: Fight it out in the Federal Committee
+- @coup_members: Appeal over their heads: call a primary of the members now
+- @coup_resign: Resign rather than split the party
+
+@coup_fight
+on-arrival: {! window.SpainGame.baronsCoup(Q, 'fight'); Q.lead_confronted = 1; !}
+
+[? if coup_survived = 1 : After eleven hours of shouting behind closed doors, the vote goes your way. The plotters retreat to their federations, humiliated, and the party knows who is in charge. ?][? if coup_survived = 0 : After eleven hours behind closed doors, you lose the vote. You resign as Secretary-General. A caretaker committee under [+ psoe_leader +] takes over Ferraz. [? if acting = 1 : [? if gestora_abstains = 1 : Its first decision will be to let the PP govern. ?] ?] ?]
+
+@coup_members
+on-arrival: {! window.SpainGame.baronsCoup(Q, 'members'); Q.populism += 1; !}
+
+[? if coup_survived = 1 : The members answer you, not the barons. With a fresh mandate, the plot collapses. ?][? if coup_survived = 0 : The members do not save you. A caretaker committee under [+ psoe_leader +] takes over. ?]
+
+@coup_resign
+on-arrival: {! window.SpainGame.baronsCoup(Q, 'resign'); !}
+
+You resign to avoid a split. A caretaker committee under [+ psoe_leader +] takes over Ferraz. [? if acting = 1 : [? if gestora_abstains = 1 : Its first decision will be to let the PP govern. ?] ?]
+
+@gestora_abstains
+title: The caretaker committee abstains
+new-page: true
+tags: sp_event
+view-if: psoe_interim = 1 and gestora_abstains = 1 and acting = 1 and election_year = 0 and gestora_seen_round < formation_round
+on-arrival: {! Q.gestora_seen_round = Q.formation_round || 1; !}
+
+= The caretaker committee abstains
+
+The caretaker committee led by [+ psoe_leader +] meets the Federal Committee and votes to abstain in [+ right_leader +]'s investiture "so that Spain has a government". Fifteen socialist deputies say they will vote no anyway. Your supporters fill the street outside Ferraz with chants of "No es no" ("No means no").

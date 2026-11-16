@@ -40,6 +40,7 @@
     [['Emiliano García-Page', 'García-Page'], 'psoe', 'President of Castilla-La Mancha', 'Regional Leaders, centrist and hostile to deals with nationalists'],
     [['Javier Fernández'], 'psoe', 'President of Asturias; caretaker leader in 2016', 'Regional Leaders, institutionalist'],
     [['Eduardo Madina', 'Madina'], 'psoe', 'Basque deputy', 'Modernisers'],
+    [['Verónica Pérez'], 'psoe', 'President of the PSOE Federal Committee', 'Regional Leaders (susanismo), Andalusian'],
     [['Patxi López'], 'psoe', 'Former Lehendakari', 'Institutionalists'],
     [['Antonio Hernando', 'Hernando'], 'psoe', 'Spokesperson of the parliamentary group', 'Institutionalists'],
     [['César Luena', 'Luena'], 'psoe', 'Secretary of Organisation (2014–16)', 'Sanchismo'],

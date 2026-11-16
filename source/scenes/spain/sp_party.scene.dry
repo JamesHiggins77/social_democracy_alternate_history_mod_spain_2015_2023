@@ -410,3 +410,46 @@ title: The lesson
 [+ learn_text +]
 
 [? if learn_times > 1 : Your delegation has studied this leadership [+ learn_times +] times; the lessons are only [+ learn_factor +]% as strong as the first time. ?]
+
+@appointments
+title: Placing your people
+new-page: true
+is-card: true
+tags: sp_party
+view-if: sanchez_leader = 1 and appoint_timer <= 0
+on-arrival: appoint_timer = 4
+
+= Placing your people
+
+The plotters are only as strong as the posts they hold. Your Secretary of Organisation brings a list of positions that could go to people loyal to you. Barons' plotting: **[+ plot_word +]**. Loyalists in key posts: [+ loyalist_posts_text +].
+
+- @app_exec: Fill the Federal Executive with sanchistas
+- @app_fed: Back loyalist candidates against the barons in the regional federations
+- @app_group: Replace the parliamentary group's leadership
+- @app_statutes: Rewrite the statutes: members, not the Federal Committee, choose and remove the leader
+- @root: Not now
+
+@app_exec
+subtitle: Calms the plot and secures the Executive; angers the institutionalists
+on-arrival: {! Q.month_actions += 1; window.SpainGame.placeLoyalists(Q, 'executive'); !}
+
+Ábalos, Lastra and your inner circle take the Executive's key portfolios. The old guard calls it a purge.
+
+@app_fed
+subtitle: A gamble: success breaks the barons' hold, failure makes them stronger
+on-arrival: {! Q.month_actions += 1; window.SpainGame.placeLoyalists(Q, 'federations'); !}
+
+[? if loyalist_ok = 1 : Your candidates win the federation primaries in several regions. The barons' network has holes in it now. ?][? if loyalist_ok = 0 : The barons' candidates win, and they know who tried to unseat them. ?]
+
+@app_group
+subtitle: A loyal parliamentary group; the institutionalists grumble
+on-arrival: {! Q.month_actions += 1; window.SpainGame.placeLoyalists(Q, 'group'); !}
+
+A new spokesperson and a new whip. The deputies will vote as you tell them.
+
+@app_statutes
+view-if: primary_won = 1 or sanchismo >= 60
+subtitle: Needs a members' mandate; makes the leader much harder to remove
+on-arrival: {! Q.month_actions += 1; window.SpainGame.placeLoyalists(Q, 'statutes'); !}
+
+A federal congress approves new statutes: the members elect and remove the Secretary-General, and the Federal Committee can no longer topple the leader on its own.
