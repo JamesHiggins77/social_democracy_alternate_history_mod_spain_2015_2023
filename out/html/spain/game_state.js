@@ -2896,6 +2896,29 @@
       { title: 'Who holds each presidency now' });
   }
 
+  // Who leads each PSOE faction, by date and by the game's situation.
+  function factionLeader(Q, f) {
+    var k = Q.year * 100 + Q.month;
+    var andalucia = Q.regions && Q.regions['Andalucía'] && Q.regions['Andalucía'].government;
+    var diazGoverns = andalucia && andalucia.party === 'psoe' && /Díaz/.test(andalucia.president || 'Susana Díaz');
+    var diazLeadsParty = !Q.sanchez_leader && Q.psoe_leader === 'Susana Díaz';
+    switch (f) {
+      case 'regional_leaders':
+        return diazGoverns && !diazLeadsParty ? 'Susana Díaz' : 'Emiliano García-Page';
+      case 'institutionalists':
+        if (k < 201610) { return 'Alfredo Pérez Rubalcaba'; }
+        return k < 201907 ? 'Javier Fernández' : 'Carmen Calvo';
+      case 'progressives':
+        return k < 201706 ? 'José Antonio Pérez Tapias' : 'José Luis Rodríguez Zapatero';
+      case 'modernisers':
+        if (k < 201709) { return 'Eduardo Madina'; }
+        return k < 201806 ? 'Patxi López' : 'Nadia Calviño';
+      case 'trade_unionists':
+        return k < 201603 ? 'Cándido Méndez' : 'Pepe Álvarez';
+    }
+    return '';
+  }
+
   function renderFactions(Q, id) {
     var out = el(id);
     if (!out) {
@@ -2906,7 +2929,8 @@
       progressives: 'Progressives', modernisers: 'Modernisers', trade_unionists: 'Unionists'
     };
     var rows = FACTIONS.map(function (f) {
-      return '<tr><td>' + short[f] + '</td><td>' + UI.word('strength', Q[f + '_strength']) +
+      return '<tr><td>' + short[f] + '<br><span class="sp-faction-leader">' + factionLeader(Q, f) + '</span></td><td>' +
+        UI.word('strength', Q[f + '_strength']) +
         '</td><td>' + UI.word('dissent', Q[f + '_dissent']) + '</td></tr>';
     });
     out.innerHTML = '<table class="sp-results sp-compact"><thead><tr><th>Faction</th><th>Weight</th>' +
@@ -2953,6 +2977,7 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    factionLeader: factionLeader,
     comebackPrimary: comebackPrimary,
     placeLoyalists: placeLoyalists,
     baronsCoup: baronsCoup,

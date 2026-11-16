@@ -640,3 +640,16 @@ test('a left-wing course makes the barons plot faster', () => {
   for (let i = 0; i < 6; i++) { G.monthlyWorld(centre); G.monthlyWorld(left); }
   assert.ok(left.plot > centre.plot + 15, `${left.plot} vs ${centre.plot}`);
 });
+
+test('faction leaders follow the date and the situation', () => {
+  const Q = newQ();
+  assert.strictEqual(G.factionLeader(Q, 'regional_leaders'), 'Susana Díaz');
+  assert.strictEqual(G.factionLeader(Q, 'institutionalists'), 'Alfredo Pérez Rubalcaba');
+  assert.strictEqual(G.factionLeader(Q, 'trade_unionists'), 'Cándido Méndez');
+  Q.year = 2019; Q.month = 9;
+  assert.strictEqual(G.factionLeader(Q, 'institutionalists'), 'Carmen Calvo');
+  assert.strictEqual(G.factionLeader(Q, 'modernisers'), 'Nadia Calviño');
+  // Díaz loses Andalusia: García-Page leads the barons
+  Q.regions['Andalucía'].government = { party: 'pp', president: 'Juanma Moreno', cabinet: ['pp', 'cs'], support: ['vox'] };
+  assert.strictEqual(G.factionLeader(Q, 'regional_leaders'), 'Emiliano García-Page');
+});

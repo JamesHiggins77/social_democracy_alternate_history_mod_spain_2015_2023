@@ -40,8 +40,11 @@
     [['Emiliano García-Page', 'García-Page'], 'psoe', 'President of Castilla-La Mancha', 'Regional Leaders, centrist and hostile to deals with nationalists'],
     [['Javier Fernández'], 'psoe', 'President of Asturias; caretaker leader in 2016', 'Regional Leaders, institutionalist'],
     [['Eduardo Madina', 'Madina'], 'psoe', 'Basque deputy', 'Modernisers'],
+    [['José Antonio Pérez Tapias', 'Pérez Tapias'], 'psoe', 'Leader of Izquierda Socialista; 2014 primary candidate', 'Progressives (the party\'s left current)'],
+    [['Cándido Méndez'], 'psoe', 'Secretary-General of the UGT union (to 2016)', 'Trade unionists'],
+    [['Pepe Álvarez'], 'psoe', 'Secretary-General of the UGT union (from 2016)', 'Trade unionists'],
     [['Verónica Pérez'], 'psoe', 'President of the PSOE Federal Committee', 'Regional Leaders (susanismo), Andalusian'],
-    [['Patxi López'], 'psoe', 'Former Lehendakari', 'Institutionalists'],
+    [['Patxi López'], 'psoe', 'Former Lehendakari; 2017 primary candidate', 'Between the camps; moderniser'],
     [['Antonio Hernando', 'Hernando'], 'psoe', 'Spokesperson of the parliamentary group', 'Institutionalists'],
     [['César Luena', 'Luena'], 'psoe', 'Secretary of Organisation (2014–16)', 'Sanchismo'],
     [['José Luis Ábalos', 'Ábalos'], 'psoe', 'Secretary of Organisation (from 2017)', 'Sanchismo'],
@@ -57,7 +60,7 @@
     [['José Luis Rodríguez Zapatero', 'Zapatero'], 'psoe', 'Prime Minister 2004–11', 'Progressives'],
     [['Miquel Iceta', 'Iceta'], 'psoe', 'Leader of the PSC', 'Catalan socialists, federalist'],
     [['Salvador Illa', 'Illa'], 'psoe', 'PSC; Minister of Health', 'Catalan socialists'],
-    [['Nadia Calviño', 'Calviño'], 'psoe', 'Minister of Economic Affairs', 'Independent technocrat (EU Commission)'],
+    [['Nadia Calviño', 'Calviño'], 'psoe', 'Minister of Economic Affairs', 'Modernisers: the government\'s technocratic wing (independent)'],
     [['Josep Borrell', 'Borrell'], 'psoe', 'Minister of Foreign Affairs', 'Federalist, pro-European'],
     [['Fernando Grande-Marlaska', 'Grande-Marlaska'], 'psoe', 'Minister of the Interior', 'Independent judge'],
     [['Margarita Robles'], 'psoe', 'Minister of Defence', 'Independent judge, institutionalist'],
@@ -200,7 +203,7 @@
     'Javier Fernández': 'Javier Fernández (Spanish politician)', 'Ignacio González': 'Ignacio González (politician)',
     'Pablo Iglesias': 'Pablo Iglesias Turrión', 'Mohammed VI': 'Mohammed VI of Morocco',
     'Fernando Clavijo': 'Fernando Clavijo (politician)', 'Volodymyr Zelensky': 'Volodymyr Zelenskyy',
-    'Teresa Rodríguez': null
+    'Teresa Rodríguez': null, 'Pepe Álvarez': null
   };
   var PARTY_WIKI = {
     psoe: "Spanish Socialist Workers' Party", pp: "People's Party (Spain)", up: 'Podemos (Spanish political party)',

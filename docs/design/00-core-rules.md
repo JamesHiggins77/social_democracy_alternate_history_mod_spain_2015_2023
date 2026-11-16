@@ -362,6 +362,15 @@ After an ouster, the caretaker committee's abstention splits the group: a number
 
 If Sánchez is ousted, a caretaker committee (Javier Fernández to 2018) runs the PSOE for eight months before an elected leader takes over. While no government has been formed, it abstains to let the PP govern in four cases out of five, as in October 2016.
 
+### 7.14 Faction leaders
+
+Each PSOE faction shows its leader in the Politics tab (hover card and Wikipedia link where there is a page):
+- Regional Leaders: Susana Díaz while she governs Andalusia and is not herself PSOE leader; otherwise Emiliano García-Page, the most outspoken critical baron.
+- Institutionalists: Alfredo Pérez Rubalcaba until the 2016 crisis; Javier Fernández, the caretaker, until he leaves the Asturian presidency in mid-2019; then Carmen Calvo.
+- Progressives: José Antonio Pérez Tapias (Izquierda Socialista) until mid-2017; then José Luis Rodríguez Zapatero, champion of left-wing alliances.
+- Modernisers: Eduardo Madina until he leaves politics in September 2017; Patxi López until mid-2018; then Nadia Calviño, the government's technocratic wing.
+- Trade Unionists: the UGT's leaders, Cándido Méndez until March 2016, then Pepe Álvarez.
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
