@@ -1636,6 +1636,9 @@
   // legislature. Returns the tally.
   function holdInvestiture(Q, candidate) {
     var v = projectedVote(Q, candidate);
+    if (Q.government_status !== 'acting') {
+      return v;   // there is a government: no investiture to hold
+    }
     Q.investiture_votes += 1;
     if (Q.investiture_clock < 0) {
       Q.investiture_clock = 8;
@@ -1684,6 +1687,7 @@
   function formGovernment(Q, candidate) {
     var ppHadPower = Q.pm_party === 'pp';
     Q.government_status = 'formed';
+    Q.sanchez_nominated = 0;
     Q.repeat_elections = 0;
     Q.fatigue = 0;
     Q.investiture_clock = -1;

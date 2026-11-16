@@ -696,3 +696,14 @@ test('a PSOE-led deadlock also breaks: the left abstains rather than force a thi
   assert.ok(G.lastChanceInvestiture(Q));
   assert.strictEqual(Q.pm, 'Pedro Sánchez');
 });
+
+test('no investiture against a sitting government: forming one clears the nomination', () => {
+  const Q = newQ();
+  Q.government_status = 'acting'; Q.sanchez_nominated = 1; Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'abstain';
+  G.formGovernment(Q, 'pp'); G.recalculate(Q);
+  assert.strictEqual(Q.sanchez_nominated, 0);
+  G.holdInvestiture(Q, 'sanchez');
+  assert.strictEqual(Q.investiture_clock, -1);
+  assert.strictEqual(Q.pm_party, 'pp');
+});
