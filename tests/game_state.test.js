@@ -487,9 +487,12 @@ test('policy shocks move growth and unemployment, which fade', () => {
   const Q = newQ(); Q.year = 2018; G.recalculate(Q);
   const u0 = Q.unemployment;
   G.econ(Q, -1, 1); G.recalculate(Q);
-  assert.ok(Q.unemployment > u0 + 0.9);
-  for (let i = 0; i < 24; i++) G.monthlyWorld(Q);
-  assert.ok(Q.unemployment < u0 + 1.2 && Q.growth_adj > -0.2);
+  assert.ok(Q.unemployment > u0 + 1.7);
+  let peak = 0;
+  for (let i = 0; i < 24; i++) { G.monthlyWorld(Q); peak = Math.max(peak, Q.unemp_adj); }
+  // growth recovers within two years; unemployment lingers but stops rising
+  assert.ok(Q.growth_adj > -0.3, `growth ${Q.growth_adj}`);
+  assert.ok(Q.unemp_adj > 1.5 && Q.unemp_adj <= peak + 1e-9, `unemp ${Q.unemp_adj} peak ${peak}`);
 });
 
 test('relations gain less the warmer they are', () => {

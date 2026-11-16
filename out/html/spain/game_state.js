@@ -631,8 +631,8 @@
   // Economic effect of a policy or event: growth in points this year,
   // unemployment in points (structural, slow to fade).
   function econ(Q, growth, unemp) {
-    Q.growth_adj = (Q.growth_adj || 0) + (growth || 0);
-    Q.unemp_adj = (Q.unemp_adj || 0) + (unemp || 0);
+    Q.growth_adj = (Q.growth_adj || 0) + 1.6 * (growth || 0);
+    Q.unemp_adj = (Q.unemp_adj || 0) + 1.8 * (unemp || 0);
   }
 
   // Social policy: welfare and rights raise cohesion, cuts and conflict lower it.
@@ -770,8 +770,8 @@
     // the economy: growth shocks fade within a year; unemployment follows
     // growth (Okun) and its own adjustments fade slowly
     Q.unemp_adj = (Q.unemp_adj || 0) - 0.04 * (Q.growth_adj || 0);
-    Q.growth_adj = (Q.growth_adj || 0) * 0.88;
-    Q.unemp_adj *= 0.985;
+    Q.growth_adj = (Q.growth_adj || 0) * 0.92;
+    Q.unemp_adj *= 0.994;
     if (Q.acting && (Q.formation_months || 0) > 6) {
       Q.growth_adj -= 0.03;
     }
@@ -780,6 +780,13 @@
     }
     // governments of the right govern too: the PP trims the deficit and
     // society notices
+    // a governing PSOE's economic line: a more left course costs a little
+    // growth and confidence but builds social cohesion; a centrist one helps growth
+    if (!Q.acting && Q.psoe_in_government && Q.sanchez_leader && Q.month === 1) {
+      var e = Q.econ_left || 0;
+      econ(Q, e >= 5 ? -0.25 : (e <= 1 ? 0.2 : 0), e >= 5 ? 0.15 : (e <= 1 ? -0.1 : 0));
+      social(Q, e >= 5 ? 2 : (e >= 3 ? 1 : 0));
+    }
     if (!Q.acting && Q.pm_party === 'pp' && Q.month === 1) {
       Q.fiscal_adj = (Q.fiscal_adj || 0) - 0.1;
       social(Q, (Q.govt_parties || []).indexOf('vox') !== -1 ? -4 : -2);
