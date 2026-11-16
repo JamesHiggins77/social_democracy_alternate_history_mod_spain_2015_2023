@@ -68,6 +68,7 @@ test('the December 2015 election reproduces the real Congress and records change
 
 test('a failed investiture starts the clock; dissolution leads to a repeat election', () => {
   const Q = newQ();
+  Q.government_status = 'acting';
   Q.pact_cs = 1;
   const v = G.holdInvestiture(Q, 'sanchez');
   assert.strictEqual(v.passes, false);
@@ -317,7 +318,7 @@ test('who is blamed for a repeat election', () => {
 test('a PP investiture with Cs ministers forms a PP-Cs coalition', () => {
   const Q = newQ();
   Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
-  Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'abstain';
+  Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'abstain'; Q.government_status = 'acting';
   G.holdInvestiture(Q, 'pp');
   assert.strictEqual(Q.government_type, 'PP–Ciudadanos coalition government');
 });
