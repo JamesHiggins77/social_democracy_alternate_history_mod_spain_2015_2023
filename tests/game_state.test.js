@@ -687,3 +687,12 @@ test('after a repeat election there is no third election: the eve-of-dissolution
   const R = newQ(); R.government_status = 'acting'; R.fatigue = 0; G.recalculate(R);
   assert.ok(!G.lastChanceInvestiture(R));
 });
+
+test('a PSOE-led deadlock also breaks: the left abstains rather than force a third election', () => {
+  const Q = newQ();
+  Q.year = 2020; Q.month = 6; Q.government_status = 'acting'; Q.fatigue = 1;
+  Q.congress = { psoe: 101, pp: 75, vox: 52, up: 45, cs: 37, erc: 12, junts: 10, pnv: 6, bildu: 5, iu: 5, cc: 2 };
+  Q.rel_up = 20; G.recalculate(Q);
+  assert.ok(G.lastChanceInvestiture(Q));
+  assert.strictEqual(Q.pm, 'Pedro Sánchez');
+});

@@ -164,8 +164,10 @@
     return {
       psoe: 'yes', pp: 'no', vox: 'no', upn: 'no',
       cs: relation(Q, 'cs', 45) >= 75 ? 'yes' : 'no',
-      up: relation(Q, 'up', 35) >= 30 ? 'yes' : 'abstain',
-      iu: relation(Q, 'iu', 40) >= 30 ? 'yes' : 'abstain',
+      // a convicted government: Podemos and IU vote to remove it whatever
+      // they think of the PSOE (June 2018)
+      up: relation(Q, 'up', 35) >= 30 || scandal >= 3 ? 'yes' : 'abstain',
+      iu: relation(Q, 'iu', 40) >= 30 || scandal >= 3 ? 'yes' : 'abstain',
       mp: 'yes',
       erc: outWithRajoy('erc', 50),
       junts: outWithRajoy('junts', 55),

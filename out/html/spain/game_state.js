@@ -2555,7 +2555,13 @@
     }
     var cand = (Q.congress.psoe || 0) > (Q.congress.pp || 0) ? 'sanchez' : (Q.right_candidate || 'pp');
     Q.formation_weeks = Math.max(Q.formation_weeks || 0, 6);
-    var v = Parliament.investiture(Q.congress, cand, Q);
+    var st = cand === 'sanchez' ? Parliament.stancesForSanchez(Q)
+      : (cand === 'cs' ? Parliament.stancesForCs(Q) : Parliament.stancesForPP(Q));
+    if (cand === 'sanchez') {
+      // the left will not hand the right a third election
+      ['up', 'iu', 'mp', 'erc', 'bildu', 'bng', 'compromis'].forEach(function (p) { if (st[p] === 'no') { st[p] = 'abstain'; } });
+    }
+    var v = Parliament.count(Q.congress, st);
     if (v.passes) {
       Q.investiture_votes += 1;
       formGovernment(Q, cand);
