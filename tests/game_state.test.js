@@ -674,3 +674,16 @@ test('the barons rebel at most once per game', () => {
   assert.strictEqual(Q.coup_due, 0);
   assert.strictEqual(Q.revolt_possible, 0);
 });
+
+test('after a repeat election there is no third election: the eve-of-dissolution vote passes', () => {
+  const Q = newQ();
+  Q.year = 2016; Q.month = 9; Q.government_status = 'acting'; Q.fatigue = 1;
+  Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'no'; G.recalculate(Q);
+  assert.ok(G.lastChanceInvestiture(Q));
+  assert.strictEqual(Q.pm_party, 'pp');
+  assert.strictEqual(Q.acting, 0);
+  // without a previous repeat, no rescue
+  const R = newQ(); R.government_status = 'acting'; R.fatigue = 0; G.recalculate(R);
+  assert.ok(!G.lastChanceInvestiture(R));
+});

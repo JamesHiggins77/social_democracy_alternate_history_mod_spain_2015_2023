@@ -1438,6 +1438,7 @@
       Q.investiture_clock -= 1;
       if (Q.investiture_clock === 0) {
         Q.dissolution_due = 1;
+        lastChanceInvestiture(Q);
       }
     }
     if (Q.week >= 4) {
@@ -1526,6 +1527,7 @@
       Q.investiture_clock = Math.max(0, Q.investiture_clock - 4);
       if (Q.investiture_clock === 0) {
         Q.dissolution_due = 1;
+        lastChanceInvestiture(Q);
       }
     }
 
@@ -2544,6 +2546,33 @@
       '<table class="sp-results sp-compact sp-cabinet"><tbody>' + rows + '</tbody></table>';
   }
 
+  // After a repeat election, Spain does not vote a third time in a row: on
+  // the eve of dissolution the largest party's candidate faces one last
+  // vote and the second-largest abstains (as the PSOE did in October 2016).
+  function lastChanceInvestiture(Q) {
+    if (!Q.acting || (Q.fatigue || 0) < 1) {
+      return false;
+    }
+    var cand = (Q.congress.psoe || 0) > (Q.congress.pp || 0) ? 'sanchez' : (Q.right_candidate || 'pp');
+    Q.formation_weeks = Math.max(Q.formation_weeks || 0, 6);
+    var v = Parliament.investiture(Q.congress, cand, Q);
+    if (v.passes) {
+      Q.investiture_votes += 1;
+      formGovernment(Q, cand);
+      Q.dissolution_due = 0;
+      Q.deadlock_broken = 1;
+      Q.deadlock_by = cand === 'sanchez' ? 'the PP' : 'the PSOE';
+      if (cand !== 'sanchez' && Q.sanchez_leader) {
+        // the PSOE's deputies abstained: the party pays for it
+        transfer(Q, 'psoe', { up: 0.8, iu: 0.2 }, { workers: 2, students: 2, unemployed: 1.5, professionals: 1 });
+        Q.member_morale -= 8; Q.progressives_dissent += 10; Q.sanchez_authority -= 6;
+      }
+      recalculate(Q);
+      return true;
+    }
+    return false;
+  }
+
   // When Sánchez is not leading the PSOE, governments form without him:
   // each week of formation the largest bloc's candidate tries, with the
   // PSOE voting by its new leadership's line and Sánchez's party voting by
@@ -2993,6 +3022,7 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    lastChanceInvestiture: lastChanceInvestiture,
     factionLeader: factionLeader,
     comebackPrimary: comebackPrimary,
     placeLoyalists: placeLoyalists,

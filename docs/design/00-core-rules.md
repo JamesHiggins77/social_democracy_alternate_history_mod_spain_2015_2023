@@ -373,7 +373,7 @@ Each PSOE faction shows its leader in the Politics tab (hover card and Wikipedia
 
 ### 7.15 Ending deadlocks, one rebellion
 
-**Deadlock fatigue.** Spain never voted three times in a row: after one repeat election (2016, November 2019) a government formed. After a repeat election, Ciudadanos and the small regional parties (PNV, CC, PRC, Teruel Existe, NC) abstain rather than block the largest party's candidate. If six weeks of talks then pass without a deal, the second-largest of PP and PSOE abstains: the PP for a PSOE-led Congress, the PSOE's deputies for a PP-led one (as in October 2016). After a second repeat it happens at once.
+**Deadlock fatigue.** Spain never voted three times in a row: after one repeat election (2016, November 2019) a government formed. After a repeat election, Ciudadanos and the small regional parties (PNV, CC, PRC, Teruel Existe, NC) abstain rather than block the largest party's candidate. If six weeks of talks then pass without a deal, the second-largest of PP and PSOE abstains: the PP for a PSOE-led Congress, the PSOE's deputies for a PP-led one (as in October 2016). On the eve of a second dissolution the largest party's candidate always gets one last vote with that abstention, so Spain never votes three times in a row.
 
 **One rebellion per game.** The barons' coup (or the older Federal Committee revolt) and its warnings (Fernández Vara, García-Page, Felipe González) happen at most once in a game. Challenges driven by low authority (rumours, a challenger, a forced primary) are separate.
 

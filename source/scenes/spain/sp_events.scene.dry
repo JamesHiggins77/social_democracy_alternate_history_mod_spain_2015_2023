@@ -1356,3 +1356,14 @@ unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'psoe'); } !}
 go-to: final_campaign
 
+
+@deadlock_broken
+title: No third election
+new-page: true
+tags: sp_event
+view-if: deadlock_broken = 1
+on-arrival: deadlock_broken = 0
+
+= No third election
+
+On the eve of a second dissolution, with the country facing a third election in a row, [+ deadlock_by +] gives in: its deputies abstain in one last investiture vote. [+ pm +] is invested: [+ government_type +]. [? if sanchez_pm = 0 : [? if sanchez_leader = 1 : The PSOE's members feel betrayed by their own deputies, and Podemos opens its doors to every disappointed socialist. ?] ?][? if sanchez_pm = 1 : The PP calls it a sacrifice for Spain. You call it the voters' verdict. ?]
