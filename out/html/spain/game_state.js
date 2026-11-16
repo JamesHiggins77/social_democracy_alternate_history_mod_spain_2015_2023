@@ -855,9 +855,9 @@
     // the economy judges the government: unemployment above its
     // historical level costs the governing party
     var gov = Q.pm_party;
-    if (!Q.acting && gov && Q.unemp_adj > 0.5 && Q.vm.classSupport.workers[gov] !== undefined) {
+    if (!Q.acting && gov && Q.unemp_adj > 1 && Q.vm.classSupport.workers[gov] !== undefined) {
       var to = gov === 'pp' ? { psoe: 0.5, vox: 0.3, cs: 0.2 } : { pp: 0.5, vox: 0.3, up: 0.2 };
-      transfer(Q, gov, to, all(0.04 * Q.unemp_adj));
+      transfer(Q, gov, to, all(0.025 * (Q.unemp_adj - 1)));
     }
   }
 

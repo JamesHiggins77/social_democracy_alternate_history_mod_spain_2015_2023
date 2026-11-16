@@ -89,7 +89,7 @@
     }
     var st = vetoes(Q, {
       psoe: 'yes',
-      pp: psoeFirst && fatigue >= 2 ? 'abstain' : 'no', vox: 'no', upn: 'no',
+      pp: psoeFirst && (fatigue >= 2 || (fatigue >= 1 && (Q.formation_weeks || 0) >= 6)) ? 'abstain' : 'no', vox: 'no', upn: 'no',
       cs: cs,
       up: up,
       iu: Q.pact_up ? 'yes' : (relation(Q, 'iu', 40) >= 55 && !Q.pact_cs ? 'abstain' : 'no'),
@@ -116,7 +116,7 @@
   // How each group votes on Mariano Rajoy's (or another PP leader's)
   // investiture. Q.psoe_stance_pp: 'no' or 'abstain', the player's choice.
   function stancesForPP(Q) {
-    var ppFirst = !Q.psoe_largest && (Q.fatigue || 0) >= 2;
+    var ppFirst = !Q.psoe_largest && ((Q.fatigue || 0) >= 2 || ((Q.fatigue || 0) >= 1 && (Q.formation_weeks || 0) >= 6));
     return vetoes(Q, {
       pp: 'yes', vox: between(Q, 'pp', 'vox') >= 30 ? 'yes' : 'abstain', upn: 'yes',
       psoe: ppFirst ? 'abstain' : (Q.psoe_stance_pp || 'no'),

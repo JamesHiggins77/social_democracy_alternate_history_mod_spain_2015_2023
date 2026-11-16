@@ -98,6 +98,8 @@ test('deadlock fatigue: after repeat elections the largest party is let through'
   assert.ok(two.passes, `${two.yes} vs ${two.no}`);
   // and the other way round: a PP-led Congress after two repeats, the PSOE's deputies abstain
   const ppSeats = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
-  assert.ok(!P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 1 }).passes);
+  assert.ok(!P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 1, formation_weeks: 2 }).passes);
+  // after one repeat and six weeks without a deal, the deadlock breaks
+  assert.ok(P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 1, formation_weeks: 6 }).passes);
   assert.ok(P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 2 }).passes);
 });

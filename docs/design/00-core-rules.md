@@ -371,6 +371,16 @@ Each PSOE faction shows its leader in the Politics tab (hover card and Wikipedia
 - Modernisers: Eduardo Madina until he leaves politics in September 2017; then Patxi López — except while a PSOE government has made Nadia Calviño its Economy minister (from mid-2018), when she leads the government's technocratic wing, shown in grey as an independent.
 - Trade Unionists: the UGT's leaders, Cándido Méndez until March 2016, then Pepe Álvarez.
 
+### 7.15 Ending deadlocks, one rebellion
+
+**Deadlock fatigue.** Spain never voted three times in a row: after one repeat election (2016, November 2019) a government formed. After a repeat election, Ciudadanos and the small regional parties (PNV, CC, PRC, Teruel Existe, NC) abstain rather than block the largest party's candidate. If six weeks of talks then pass without a deal, the second-largest of PP and PSOE abstains: the PP for a PSOE-led Congress, the PSOE's deputies for a PP-led one (as in October 2016). After a second repeat it happens at once.
+
+**One rebellion per game.** The barons' coup (or the older Federal Committee revolt) and its warnings (Fernández Vara, García-Page, Felipe González) happen at most once in a game. Challenges driven by low authority (rumours, a challenger, a forced primary) are separate.
+
+**Historical anchors.** An acting PP Prime Minister who still leads the largest party is not forced out (Rajoy through 2016). The Gürtel sentence (May 2018) offers a motion of no confidence on the spot.
+
+**Economy.** Policy effects are stronger and last longer (unemployment effects fade by about half over eight years); a governing PSOE's economic line moves growth and cohesion each year. Only unemployment more than a point above its historical level costs the governing party votes.
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
