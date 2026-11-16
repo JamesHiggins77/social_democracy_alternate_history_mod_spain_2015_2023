@@ -74,14 +74,22 @@
     } else {
       up = relation(Q, 'up', 35) >= 60 ? 'abstain' : 'no';
     }
+    // deadlock fatigue: after a repeat election the pressure to let the
+    // largest party govern grows (Q.fatigue = repeat elections in a row,
+    // Q.psoe_largest = the PSOE leads Congress)
+    var fatigue = Q.fatigue || 0;
+    var psoeFirst = !!Q.psoe_largest;
     var independence = (!Q.red_lines && Q.referendum_offer && !Q.pact_cs) ? 'abstain' : 'no';
     // ERC settles for less than a referendum: a dialogue table with a
     // left-wing coalition is enough for its abstention (January 2020)
     var ercDeal = !Q.red_lines && Q.pact_up && !Q.pact_cs &&
       ((Q.cat_dialogue || 0) >= 1 || relation(Q, 'erc', 25) >= 50) ? 'abstain' : independence;
-    return vetoes(Q, {
+    if (psoeFirst && fatigue >= 1 && cs === 'no' && !Q.pact_up) {
+      cs = 'abstain';   // Ciudadanos would rather not force another election
+    }
+    var st = vetoes(Q, {
       psoe: 'yes',
-      pp: 'no', vox: 'no', upn: 'no',
+      pp: psoeFirst && fatigue >= 2 ? 'abstain' : 'no', vox: 'no', upn: 'no',
       cs: cs,
       up: up,
       iu: Q.pact_up ? 'yes' : (relation(Q, 'iu', 40) >= 55 && !Q.pact_cs ? 'abstain' : 'no'),
@@ -98,14 +106,20 @@
       te: byRelation(Q, 'te', 50, 30),
       geroa: byRelation(Q, 'geroa', 50, 30)
     });
+    if (psoeFirst && fatigue >= 1) {
+      // the small regional parties back the largest party's candidate
+      ['pnv', 'cc', 'prc', 'te', 'nc'].forEach(function (p) { if (st[p] === 'no') { st[p] = 'abstain'; } });
+    }
+    return st;
   }
 
   // How each group votes on Mariano Rajoy's (or another PP leader's)
   // investiture. Q.psoe_stance_pp: 'no' or 'abstain', the player's choice.
   function stancesForPP(Q) {
+    var ppFirst = !Q.psoe_largest && (Q.fatigue || 0) >= 2;
     return vetoes(Q, {
       pp: 'yes', vox: between(Q, 'pp', 'vox') >= 30 ? 'yes' : 'abstain', upn: 'yes',
-      psoe: Q.psoe_stance_pp || 'no',
+      psoe: ppFirst ? 'abstain' : (Q.psoe_stance_pp || 'no'),
       cs: Q.pact_cs ? 'no' : (Q.pact_pp_cs ? 'yes' : 'abstain'),
       cc: between(Q, 'cc', 'pp') >= 50 ? 'yes' : 'abstain',
       up: 'no', iu: 'no', mp: 'no', erc: 'no', junts: 'no', cup: 'no', bildu: 'no',

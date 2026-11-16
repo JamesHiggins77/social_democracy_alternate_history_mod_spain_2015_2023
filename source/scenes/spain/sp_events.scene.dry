@@ -267,8 +267,8 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 title: Revolt in the Federal Committee
 new-page: true
 tags: sp_event
-view-if: revolt_possible = 1 and sanchez_leader = 1 and revolt_round < formation_round
-on-arrival: {! Q.revolt_round = Q.formation_round || 1; !}
+view-if: revolt_possible = 1 and sanchez_leader = 1 and rebellion_used = 0
+on-arrival: {! Q.rebellion_used = 1; !}
 
 = Revolt in the Federal Committee
 
@@ -394,7 +394,21 @@ if (window.SpainGame) {
 
 = The Gürtel sentence
 
-The National Court rules that the People's Party profited from the Gürtel corruption network, and finds that the PP ran a parallel accounting system for years. [? if pp_governs = 1 : Rajoy is Prime Minister of a government whose party has just been convicted as a beneficiary of corruption. Every opposition party is asking the same question: who will table a motion of no confidence? ?][? if pp_governs = 0 : The PP, out of government, takes the blow in the polls. ?]
+The National Court rules that the People's Party profited from the Gürtel corruption network, and finds that the PP ran a parallel accounting system for years. [? if pp_governs = 1 : [+ pm +] is Prime Minister of a government whose party has just been convicted as a beneficiary of corruption. Every opposition party is asking the same question: who will table a motion of no confidence? ?][? if pp_governs = 0 : The PP, out of government, takes the blow in the polls. ?]
+
+- @gurtel_censure: Table a motion of no confidence now, with yourself as the alternative
+- @gurtel_wait: Wait: demand that the government call an election
+
+@gurtel_censure
+view-if: pp_governs = 1 and sanchez_leader = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.holdCensure(Q); } if (Q.censure_passed) { Q.sanchez_authority += 15; Q.member_morale += 10; Q.sanchismo += 10; Q.plot = 0; } else { Q.sanchez_authority -= 5; } !}
+
+[? if censure_passed = 1 : [+ inv_yes +] deputies vote yes: Podemos, the PNV, ERC, PDeCAT, Bildu and the small parties join the PSOE. For the first time in Spanish democracy a motion of no confidence succeeds. Pedro Sánchez is Prime Minister. ?][? if censure_passed = 0 : The motion gets [+ inv_yes +] votes, short of 176. The government survives, wounded. ?]
+
+@gurtel_wait
+on-arrival: sanchez_authority -= 2
+
+You demand an election. The government ignores you; Podemos says you lacked courage.
 
 @cat_referendum_law
 title: The referendum laws

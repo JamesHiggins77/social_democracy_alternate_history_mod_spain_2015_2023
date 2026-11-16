@@ -296,7 +296,8 @@ You let the new leader make the first mistakes.
 title: The barons move
 new-page: true
 tags: sp_event
-view-if: coup_due = 1 and sanchez_leader = 1
+view-if: coup_due = 1 and sanchez_leader = 1 and rebellion_used = 0
+on-arrival: rebellion_used = 1
 
 = The rebellion
 
@@ -344,8 +345,8 @@ The caretaker committee led by [+ psoe_leader +] takes the question to the Feder
 title: A baron breaks ranks
 new-page: true
 tags: sp_event
-view-if: sanchez_leader = 1 and acting = 1 and plot >= 40 and coup_due = 0 and vara_round < formation_round and elections_held >= 1
-on-arrival: {! Q.vara_round = Q.formation_round || 1; !}
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 40 and coup_due = 0 and vara_seen = 0 and rebellion_used = 0 and elections_held >= 1
+on-arrival: {! Q.vara_seen = 1; !}
 
 = A baron breaks ranks
 
@@ -374,8 +375,8 @@ You want a mandate to talk to Podemos and, perhaps, Ciudadanos. The critics say 
 title: García-Page attacks
 new-page: true
 tags: sp_event
-view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and coup_due = 0 and page_round < formation_round and vara_round >= formation_round
-on-arrival: {! Q.page_round = Q.formation_round || 1; !}
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and coup_due = 0 and page_seen = 0 and vara_seen = 1 and rebellion_used = 0
+on-arrival: {! Q.page_seen = 1; !}
 
 = García-Page attacks
 
@@ -404,8 +405,8 @@ The critics take your silence as weakness.
 title: Felipe González speaks
 new-page: true
 tags: sp_event
-view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and felipe_round < formation_round and year <= 2019
-on-arrival: {! Q.felipe_round = Q.formation_round || 1; !}
+view-if: sanchez_leader = 1 and acting = 1 and plot >= 50 and felipe_seen = 0 and rebellion_used = 0 and year <= 2019
+on-arrival: {! Q.felipe_seen = 1; !}
 
 = Felipe González speaks
 

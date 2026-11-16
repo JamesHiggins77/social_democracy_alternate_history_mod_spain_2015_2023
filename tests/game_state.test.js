@@ -657,3 +657,17 @@ test('faction leaders follow the date and the situation', () => {
   Q.regions['Andalucía'].government = { party: 'pp', president: 'Juanma Moreno', cabinet: ['pp', 'cs'], support: ['vox'] };
   assert.strictEqual(G.factionLeader(Q, 'regional_leaders'), 'Emiliano García-Page');
 });
+
+test('an acting PP Prime Minister leading the largest party is not forced out', () => {
+  const Q = newQ();
+  Q.government_status = 'acting'; Q.pm_party = 'pp';
+  Q.congress = { pp: 123, psoe: 90, up: 69, cs: 40, erc: 9, junts: 8, pnv: 6, iu: 2, bildu: 2, cc: 1 };
+  for (let i = 0; i < 20; i++) G.ppSetback(Q, 1);
+  assert.ok(!Q.pp_leader_falls_due);
+});
+
+test('the barons rebel at most once per game', () => {
+  const Q = newQ(); Q.plot = 90; Q.rebellion_used = 1; G.recalculate(Q);
+  assert.strictEqual(Q.coup_due, 0);
+  assert.strictEqual(Q.revolt_possible, 0);
+});

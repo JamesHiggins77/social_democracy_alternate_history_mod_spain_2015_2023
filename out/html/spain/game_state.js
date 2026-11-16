@@ -1676,6 +1676,7 @@
     var ppHadPower = Q.pm_party === 'pp';
     Q.government_status = 'formed';
     Q.repeat_elections = 0;
+    Q.fatigue = 0;
     Q.investiture_clock = -1;
     Q.dissolution_due = 0;
     Q.depends_on_catalans = 0;
@@ -1913,6 +1914,7 @@
     // Repeat elections: the right regroups and the party blames the leader.
     var wasActing = statusBefore === 'acting';
     Q.repeat_elections = wasActing ? (Q.repeat_elections || 0) + 1 : 0;
+    Q.fatigue = Q.repeat_elections;
     var repeat = Q.repeat_elections;
     if (repeat >= 1) {
       Q.pact_pp_cs = 1;
@@ -2133,7 +2135,7 @@
   // ------------------------------------------------------------------
   function checkLeadership(Q) {
     // A revolt becomes possible when the party is divided and Sánchez weak.
-    Q.revolt_possible = ((Q.dissent_percent >= 40 && Q.sanchez_authority <= 35 &&
+    Q.revolt_possible = !Q.rebellion_used && ((Q.dissent_percent >= 40 && Q.sanchez_authority <= 35 &&
       Q.federal_committee_balance < 50) ||
       (Q.funds <= -5 && Q.sanchez_authority <= 45 && Q.federal_committee_balance < 50)) ? 1 : 0;
     // the 2016-17 window in which an ouster can be reversed by a primary
@@ -2143,7 +2145,7 @@
     Q.plot = clamp(Q.plot || 0, 0, 100);
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
     Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
-    Q.coup_due = (Q.sanchez_leader && Q.plot >= 60 && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= 60 && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
     // a caretaker committee hands over to an elected leader after eight months
     if (!Q.sanchez_leader && Q.psoe_interim && Q.time - (Q.interim_since || Q.time) >= 8) {
       Q.psoe_interim = 0;
@@ -2324,8 +2326,10 @@
       return;
     }
     Q.pp_pressure = (Q.pp_pressure || 0) + weight;
-    // a PP leader in office (not acting) is safe
-    if (Q.pm_party === 'pp' && Q.government_status === 'formed') {
+    // a PP leader in office, or acting Prime Minister at the head of the
+    // largest party (Rajoy in 2016), is safe
+    var ppLargest = (Q.congress.pp || 0) >= Math.max(Q.congress.psoe || 0, Q.congress.cs || 0, Q.congress.up || 0);
+    if (Q.pm_party === 'pp' && (Q.government_status === 'formed' || ppLargest)) {
       return;
     }
     var chance = Q.pp_pressure >= 3 ? 1 : (Q.pp_pressure === 2 ? 0.6 : 0.25);

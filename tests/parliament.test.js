@@ -88,3 +88,16 @@ test('January 2020: PSOE–Podemos invested with ERC and Bildu abstaining for a 
   // with the 2016 red lines still in force, ERC votes no and it fails
   assert.ok(!P.investiture(seats, 'sanchez', Object.assign({}, Q, { red_lines: 1 })).passes);
 });
+
+test('deadlock fatigue: after repeat elections the largest party is let through', () => {
+  const seats = { psoe: 100, pp: 67, up: 51, vox: 47, cs: 44, erc: 11, junts: 10, pnv: 7, iu: 6, bildu: 5, cc: 2 };
+  const base = { pact_up: 1, cat_dialogue: 1, rel_erc: 50, rel_pnv: 70, rel_bildu: 35, red_lines: 0, psoe_largest: 1 };
+  assert.ok(!P.investiture(seats, 'sanchez', Object.assign({}, base, { fatigue: 0 })).passes);
+  const two = P.investiture(seats, 'sanchez', Object.assign({}, base, { fatigue: 2 }));
+  assert.strictEqual(two.detail.pp, 'abstain');
+  assert.ok(two.passes, `${two.yes} vs ${two.no}`);
+  // and the other way round: a PP-led Congress after two repeats, the PSOE's deputies abstain
+  const ppSeats = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  assert.ok(!P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 1 }).passes);
+  assert.ok(P.investiture(ppSeats, 'pp', { psoe_stance_pp: 'no', pact_pp_cs: 1, psoe_largest: 0, fatigue: 2 }).passes);
+});
