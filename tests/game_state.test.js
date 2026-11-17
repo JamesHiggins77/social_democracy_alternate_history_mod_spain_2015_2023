@@ -283,9 +283,10 @@ test('governing wears the PSOE down and losses hurt more in government', () => {
   const Q = newQ();
   Q.year = 2018;
   Q.psoe_in_government = 1; Q.government_status = 'formed'; Q.pm_party = 'psoe';
-  const w = Q.vm.classSupport.workers.psoe;
-  G.endOfMonth(Q);
-  assert.ok(Q.vm.classSupport.workers.psoe < w);
+  Q.govt_months = 13;   // past the first year's visibility
+  const O = newQ(); O.year = 2018;   // the same month in opposition
+  G.endOfMonth(Q); G.endOfMonth(O);
+  assert.ok(Q.vm.classSupport.workers.psoe < O.vm.classSupport.workers.psoe);
   const before = Q.vm.classSupport.students.psoe;
   G.campaign(Q, 'psoe', { students: -2 });
   assert.ok(before - Q.vm.classSupport.students.psoe > 2.9);
@@ -319,8 +320,25 @@ test('a PP investiture with Cs ministers forms a PP-Cs coalition', () => {
   const Q = newQ();
   Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
   Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'abstain'; Q.government_status = 'acting';
+  // by default Cs supports from outside, as in 2016
   G.holdInvestiture(Q, 'pp');
-  assert.strictEqual(Q.government_type, 'PP–Ciudadanos coalition government');
+  assert.strictEqual(Q.government_type, 'PP minority government with Ciudadanos support');
+  // with warm PP–Cs relations it joins the cabinet
+  const R = newQ();
+  R.congress = Object.assign({}, Q.congress);
+  R.pact_pp_cs = 1; R.psoe_stance_pp = 'abstain'; R.government_status = 'acting'; R.party_rel = { 'cs-pp': 70 };
+  G.holdInvestiture(R, 'pp');
+  assert.strictEqual(R.government_type, 'PP–Ciudadanos coalition government');
+});
+
+test('Ciudadanos is blamed when it could have let the PSOE govern by abstaining (2019)', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.month = 6; Q.government_status = 'acting'; Q.rel_cs = 30;
+  Q.congress = { psoe: 123, pp: 66, cs: 57, up: 42, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4, cc: 2, prc: 1, upn: 2, mp: 1 };
+  const cs = Q.vm.classSupport.professionals.cs;
+  G.dissolve(Q);
+  assert.strictEqual(Q.formation_blame, 'cs');
+  assert.ok(Q.vm.classSupport.professionals.cs < cs - 3);
 });
 
 test('moving the PSOE to the right sends left voters to Podemos', () => {

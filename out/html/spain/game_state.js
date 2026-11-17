@@ -831,17 +831,18 @@
     }
     var c = Q.chaos / 100;
     // Vox feeds on chaos, fully once it has broken through (from 2018)
-    var voxReady = Q.year >= 2018 || Q.vox_breakthrough ? 1 : 0.3;
+    var voxReady = Q.year >= 2018 || Q.vox_breakthrough || Q.cat_crisis_seen ? 1 : 0.3;
     var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
     // Vox's growth slows as it approaches its ceiling
-    var vox = 0.45 * c * voxReady * (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0)) * Math.max(0, 1 - voxNow / 16);
+    var vox = 0.7 * c * voxReady * (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0)) * Math.max(0, 1 - voxNow / 16);
     transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
                               professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
     transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
                               students: vox * 0.25, unemployed: vox * 0.3 });
     transfer(Q, 'psoe', 'vox', { workers: vox * 0.2, pensioners: vox * 0.15, unemployed: vox * 0.2 });
     // Podemos too, to a smaller extent
-    var up = 0.3 * c;
+    // after 2016 Podemos is in decline: chaos feeds it far less
+    var up = 0.3 * c * (Q.year >= 2017 ? 0.3 : 1);
     transfer(Q, 'psoe', 'up', { students: up, unemployed: up, workers: up * 0.8, professionals: up * 0.5 });
     transfer(Q, 'cs', 'up', { students: up * 0.4, professionals: up * 0.3 });
     // Ciudadanos: the junior partner of a PP government is absorbed, and
@@ -852,6 +853,13 @@
     };
     if (!Q.acting && (Q.govt_parties || []).indexOf('cs') !== -1 && Q.pm_party !== 'cs') {
       transfer(Q, 'cs', { pp: 0.7, vox: 0.15, psoe: 0.15 }, all(0.25));
+    } else if (!Q.acting && Q.cs_supports_pp && Q.pm_party === 'pp') {
+      transfer(Q, 'cs', { pp: 0.7, vox: 0.3 }, all(0.04));   // propping up the PP costs a little
+    }
+    // the Catalan crisis: anti-independence voters rally to Ciudadanos
+    if (Q.catalan_crisis) {
+      transfer(Q, 'pp', 'cs', { professionals: 0.4, self_employed: 0.3, pensioners: 0.2, workers: 0.25, students: 0.3 });
+      transfer(Q, 'psoe', 'cs', { professionals: 0.12, workers: 0.08 });
     }
     var voxPoll = (Q.true_poll && Q.true_poll.vox) || 0;
     if (Q.year >= 2019 && voxPoll >= 5) {
@@ -859,11 +867,11 @@
     }
     // Podemos's internal strife slowly erodes it from 2017
     if (Q.year >= 2017) {
-      transfer(Q, 'up', { psoe: 0.6, iu: 0.15, mp: 0.25 }, share(Q, 'up', 0.008));
+      transfer(Q, 'up', { psoe: 0.6, iu: 0.15, mp: 0.25 }, share(Q, 'up', 0.011));
     }
     // when things calm down, Vox's protest voters drift back to the PP
-    if (Q.chaos < 30 && voxPoll > 3) {
-      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (30 - Q.chaos) / 10));
+    if (Q.chaos < 20 && voxPoll > 3) {
+      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (20 - Q.chaos) / 10));
     }
     // the economy judges the government: unemployment above its
     // historical level costs the governing party
@@ -916,7 +924,8 @@
     if (Q.psoe_in_government && !Q.acting) {
       // the first year in office gives visibility; wear sets in slowly
       if (Q.govt_months <= 12) {
-        shiftSupport(Q, 'psoe', all(0.12));
+        transfer(Q, 'up', 'psoe', all(0.1));
+        transfer(Q, 'cs', 'psoe', all(0.05));
       }
       transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.1));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
@@ -1400,6 +1409,14 @@
     if (Q.censure_passed) {
       formGovernment(Q, 'sanchez');
       Q.government_type = 'PSOE government after a motion of no confidence';
+      // the new Prime Minister's bounce (June 2018): left voters come home
+      transfer(Q, 'up', { psoe: 1 }, { workers: 2, students: 2, unemployed: 2, professionals: 1.5, pensioners: 1, homemakers: 1 });
+      transfer(Q, 'cs', { psoe: 1 }, { professionals: 0.8, workers: 0.5 });
+      if ((Q.pp_scandal || 0) >= 3) {
+        // a party thrown out of government for corruption: its voters scatter
+        transfer(Q, 'pp', { cs: 0.4, vox: 0.4, psoe: 0.2 },
+          { pensioners: 2, professionals: 2.5, self_employed: 2.5, workers: 1.5, homemakers: 2, students: 1.5, unemployed: 1.5 });
+      }
     }
     recalculate(Q);
     return v;
@@ -1490,7 +1507,13 @@
     // campaign effects fade towards the underlying level: gains fade at 3%
     // of the gap a month, losses recover at only 1% - voters remember
     // grievances longer than favours
-    var initial = VoteModel.initialState().classSupport;
+    // The level that campaign effects fade towards is itself carried slowly
+    // by lasting shifts (Podemos voters coming home, the PP's collapse), so
+    // a quick bounce fades while a sustained change becomes structural.
+    if (!Q.vm.baseline) {
+      Q.vm.baseline = VoteModel.initialState().classSupport;
+    }
+    var initial = Q.vm.baseline;
     Object.keys(Q.vm.classSupport).forEach(function (c) {
       ['psoe', 'pp', 'cs'].forEach(function (p) {
         var cur = Q.vm.classSupport[c][p];
@@ -1500,6 +1523,7 @@
           rate = 0;
         }
         Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * rate;
+        initial[c][p] += (Q.vm.classSupport[c][p] - initial[c][p]) * 0.04;
       });
       // a new party without roots loses support unless it keeps campaigning
       if (Q.vm.classSupport[c].ps) {
@@ -1764,7 +1788,10 @@
       Q.psoe_in_government = 0;
       var cs = Q.congress.cs || 0;
       var vox = Q.congress.vox || 0;
-      if ((Q.pact_pp_cs || (Q.player_party === 'cs' && Q.player_line_right === 'coalition')) && cs >= 20) {
+      var csJoins = (Q.player_party === 'cs' && Q.player_line_right === 'coalition') ||
+        (Q.pact_pp_cs && Parliament.between(Q, 'cs', 'pp') >= 65);
+      Q.cs_supports_pp = Q.pact_pp_cs && !csJoins ? 1 : 0;
+      if (csJoins && cs >= 20) {
         Q.govt_parties = ['pp', 'cs'];
         Q.government_type = 'PP–Ciudadanos coalition government';
       } else if (vox >= 15 && (Q.pp_vox_relation || 50) >= 60 && (Q.congress.pp || 0) + cs < 176) {
@@ -1772,7 +1799,8 @@
         Q.government_type = 'PP–Vox coalition government';
       } else {
         Q.govt_parties = ['pp'];
-        Q.government_type = (Q.congress.pp || 0) >= 176 ? 'PP majority government' : 'PP minority government';
+        Q.government_type = (Q.congress.pp || 0) >= 176 ? 'PP majority government'
+          : (Q.cs_supports_pp && cs >= 20 ? 'PP minority government with Ciudadanos support' : 'PP minority government');
       }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
@@ -1824,10 +1852,23 @@
                unemployed: x, students: x, homemakers: x };
     };
     Q.formation_blame = formationBlame(Q);
+    // Ciudadanos could have let the PSOE govern just by abstaining, and
+    // refused (Rivera, 2019): its voters punish it hard, and the blame is its
+    var seats = Q.congress;
+    var leftYes = ['psoe', 'up', 'iu', 'mp', 'compromis', 'pnv', 'cc', 'prc', 'te', 'bng', 'nc', 'geroa']
+      .reduce(function (n, p) { return n + (seats[p] || 0); }, 0);
+    var csSeats = seats.cs || 0;
+    var restNo = 350 - leftYes - csSeats;
+    Q.cs_blocked = (!Q.pact_cs && Q.year >= 2018 && (Q.rel_cs || 45) < 50 && csSeats >= 15 &&
+      leftYes > restNo && leftYes <= restNo + csSeats) ? 1 : 0;
+    if (Q.cs_blocked) {
+      transfer(Q, 'cs', { pp: 0.45, vox: 0.3, psoe: 0.25 }, all(4));
+      Q.formation_blame = 'cs';
+    }
     if (Q.formation_blame === 'psoe') {
       transfer(Q, 'psoe', { up: 0.4, cs: 0.3, pp: 0.3 }, all(1.8));
       Q.sanchez_authority -= 6;
-    } else {
+    } else if (Q.formation_blame !== 'cs') {
       var right = Q.right_candidate || 'pp';
       var hasVox = (Q.true_poll && Q.true_poll.vox >= 1) || (Q.congress.vox || 0) > 0;
       var to = right === 'pp' ? (hasVox ? { psoe: 0.45, cs: 0.35, vox: 0.2 } : { psoe: 0.55, cs: 0.45 })

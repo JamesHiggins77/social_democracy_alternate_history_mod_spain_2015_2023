@@ -315,7 +315,7 @@ new-page: true
 tags: sp_event
 view-if: cat_sentence_seen = 0 and cat_crisis_seen = 1 and ((year = 2019 and month >= 10) or year >= 2020)
 max-visits: 1
-on-arrival: {! Q.cat_sentence_seen = 1; Q.cat_tension = (Q.cat_tension || 0) + 15; if (window.SpainGame) { window.SpainGame.campaign(Q, 'vox', {self_employed: 2, pensioners: 1.5, workers: 1.5, homemakers: 1, professionals: 1}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.partyRel(Q, 'cs', 'erc', -5); } !}
+on-arrival: {! Q.cat_sentence_seen = 1; Q.cat_tension = (Q.cat_tension || 0) + 15; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {self_employed: 2, pensioners: 1.5, workers: 1, homemakers: 1, professionals: 1}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1.5, professionals: 1.2, students: 1, pensioners: 0.8}); window.SpainGame.territorial(Q, 'Cataluña', 'erc', 1.05); window.SpainGame.partyRel(Q, 'cs', 'erc', -5); } !}
 
 = The sentence
 
@@ -693,7 +693,7 @@ title: Vox breaks through
 new-page: true
 tags: sp_event
 view-if: vox_breakthrough_due = 1
-on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 0.8, self_employed: 1.2, workers: 0.6, professionals: 0.6, homemakers: 0.6}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 0.8, workers: 0.6, professionals: 0.6, students: 0.4}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
+on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 2, self_employed: 3, workers: 1.5, professionals: 1.5, homemakers: 1.5, unemployed: 1}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1, professionals: 1, students: 0.8}); window.SpainGame.transferRaw(Q, 'psoe', 'vox', {workers: 0.5, unemployed: 0.5}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
 
 = Vox breaks through
 

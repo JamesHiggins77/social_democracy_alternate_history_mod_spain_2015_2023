@@ -381,6 +381,19 @@ Each PSOE faction shows its leader in the Politics tab (hover card and Wikipedia
 
 **Economy.** Policy effects are stronger and last longer (unemployment effects fade by about half over eight years); a governing PSOE's economic line moves growth and cohesion each year. Only unemployment more than a point above its historical level costs the governing party votes. Incumbency wear is gentle (0.1 points per class a month for a PSOE government, 0.15 for a PP one), and a new PSOE government gains a little visibility in its first year.
 
+### 7.16 Calibration against the real 2015–2023 path
+
+A replay script plays Sánchez's real decisions with the game's own effects (the 2016 caretaker abstention, the Gürtel censure, the Aquarius, pensions, the minimum wage, Franco's exhumation, the coalition, the lockdown, the pardons, the labour-reform agreement) and compares each general election with the real one. The changes that brought it close:
+- **Lasting shifts stick.** Campaign effects fade towards a level that itself follows sustained changes (4% a month), so Podemos voters returning to the PSOE or the PP's collapse persist, while a quick bounce still fades.
+- **Ciudadanos backs a PP government from outside** (as in 2016) unless PP–Cs relations are warm (65+), which spares it the junior partner's slow absorption; propping the PP up still costs it a little. The Catalan crisis rallies anti-independence voters to Cs.
+- **The censure.** A successful motion of no confidence brings the new Prime Minister's bounce (Podemos and Cs voters come to the PSOE), and if it follows a corruption conviction the PP's voters scatter to Cs, Vox and the PSOE.
+- **Podemos declines** faster from 2017 (1.1% of its vote a month), and chaos feeds it only a third as much after 2016.
+- **Vox** grows faster once the Catalan crisis has happened, its Andalusian breakthrough and the 2019 sentence take more PP and Cs voters, and its voters drift back to the PP only when things are calm (chaos under 20).
+- **Ciudadanos's 2019 collapse.** If, from 2018, Cs could have let the PSOE govern just by abstaining and refused (relations below 50), the repeat election is blamed on it and it loses heavily, mostly to the PP and Vox.
+- **Government.** A new PSOE government draws some Podemos and Cs voters in its first year; wear is gentle afterwards.
+
+Result of the replay (game seats, real in brackets): April 2019 PSOE 107 (123), PP 95 (66), Podemos 46 (42), Cs 55 (57), Vox 10 (24); November 2019 PSOE 121 (120), PP 105 (89), Podemos 44 (35), Cs 16 (10), Vox 25 (52); July 2023 PSOE 108 (121), PP 139 (137), Podemos/Sumar 24 (31), Cs 2 (0), Vox 32 (33). A radical economic line on the same path gives the PSOE 100, 100 and 88 seats instead, with higher unemployment and a stronger Cs. Vox in 2019 is still on the low side.
+
 ### 7.5 Election results
 
 Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
