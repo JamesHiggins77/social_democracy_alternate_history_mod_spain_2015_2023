@@ -78,7 +78,7 @@ What will the PSOE do?
 - @abstain: Abstain and let a PP government be formed
 - @limited: Negotiate a limited agreement in exchange for abstention
 - @other_candidate: Demand a different PP candidate
-- @grand: Offer the PP a grand coalition, so it does not need Vox
+- @grand: Offer the PP a grand coalition
 
 @against
 on-arrival: {! Q.psoe_stance_pp = "no"; Q.member_morale += 4; Q.rel_pp -= 6; Q.sanchez_authority += 2; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); } !}
@@ -94,6 +94,7 @@ go-to: pp_decides
 
 @grand
 view-if: grand_possible = 1 and right_is_cs = 0
+subtitle: Stable government and a veto on Vox; the PSOE's left and the unions revolt, Podemos and Vox both gain, and keep gaining while it lasts
 on-arrival: {! if (window.SpainGame) { window.SpainGame.grandCoalitionOffer(Q); } !}
 go-to: grand_yes if grand_accepted = 1; grand_no if grand_accepted = 0
 
@@ -102,7 +103,7 @@ title: A grand coalition
 
 = A grand coalition
 
-[+ pp_leader +] accepts. For the first time, the PP and the PSOE will govern together: [+ pp_leader +] as Prime Minister, Pedro Sánchez as Deputy Prime Minister, the PSOE with a share of the ministries and a veto on Vox. The barons and the institutions are relieved. Your progressives call it a betrayal, the unions are furious, and Podemos opens its doors to every disappointed socialist.
+[+ pp_leader +] accepts. For the first time, the PP and the PSOE will govern together: [+ pp_leader +] as Prime Minister, Pedro Sánchez as Deputy Prime Minister, the PSOE with a share of the ministries and a veto on Vox. The barons and the institutions are relieved. Your progressives call it a betrayal, the UGT and CCOO are furious, and Podemos opens its doors to every disappointed socialist. On the right, Santiago Abascal calls it "the PSOE-PP" and says only Vox is left to oppose the left; the PP's hard-liners start to listen.
 
 @grand_no
 title: The PP says no

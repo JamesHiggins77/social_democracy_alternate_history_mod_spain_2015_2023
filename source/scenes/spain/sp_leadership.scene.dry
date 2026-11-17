@@ -177,14 +177,14 @@ view-if: comeback_ready = 1 and backbench = 1 and election_year = 0
 
 = The members remember
 
-The PSOE under [+ psoe_leader +] is sinking in the polls. Members are signing a petition for a new primary, and many of them want you on the ballot.
+[? if comeback_forced = 1 : Your network has collected the signatures: the PSOE must hold an extraordinary leadership election. ?][? if comeback_forced = 0 : The PSOE under [+ psoe_leader +] is sinking in the polls. Members are signing a petition for a new primary, and many of them want you on the ballot. ?] Your campaign: network **[+ network_word +]**, barons won over [+ baron_allies +], war chest [+ war_chest +].
 
 - @comeback_run: Run in the primary
 - @comeback_wait: Not yet
 - @comeback_leave: Leave the PSOE for good
 
 @comeback_run
-on-arrival: {! var b = Q.backbench_since; window.SpainGame.leadershipElection(Q, 4); if (!Q.primary_won) { Q.backbench = 1; Q.backbench_since = b; Q.comeback_next = Q.time + 24; } !}
+on-arrival: {! var b = Q.backbench_since; Q.comeback_forced = 0; window.SpainGame.leadershipElection(Q, 4 + window.SpainGame.comebackBonus(Q)); if (!Q.primary_won) { Q.backbench = 1; Q.backbench_since = b; Q.comeback_next = Q.time + 24; Q.network = Math.round((Q.network || 0) * 0.6); } !}
 
 [? if primary_won = 1 : Pedro Sánchez is Secretary-General of the PSOE again. The barons who threw you out will have to work with you. ?][? if primary_won = 0 : [+ psoe_leader +] holds on. The members were tempted, not convinced. ?]
 

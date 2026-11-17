@@ -149,8 +149,8 @@ title: Keep a low profile
 new-page: true
 is-card: true
 tags: sp_exile
-view-if: sanchez_leader = 0
-on-arrival: month_actions += 1
+view-if: sanchez_leader = 0 and low_profile_timer <= 0
+on-arrival: month_actions += 1; low_profile_timer = 3
 
 = Keep a low profile
 
@@ -165,6 +165,445 @@ on-arrival: sanchismo -= 1
 Out of sight is, a little, out of mind.
 
 @low_calls
-on-arrival: sanchismo += 2
+on-arrival: {! Q.sanchismo += 1; Q.network = (Q.network || 0) + 1; !}
 
 Your network holds together.
+
+@bb_interview
+title: Break your silence
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_interview_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_interview_timer = 4; !}
+
+= Break your silence
+
+A prime-time interviewer wants your first full account of how you were forced out. Everything you say will be replayed for months.
+
+- @iv_story: Tell the whole story: the banks, the media and the barons who wanted you gone
+- @iv_measured: Be measured: explain your reasons, blame nobody by name
+- @iv_decline: Decline: a former leader should not wash the party's linen in public
+
+@iv_story
+subtitle: Your followers grow fast; the new leadership and the party's image suffer
+on-arrival: {! Q.sanchismo += 9; Q.populism += 1; Q.network = (Q.network || 0) + 6; Q.rel_leadership = (Q.rel_leadership || 40) - 12; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', { up: 0.7, cs: 0.3 }, { workers: 0.4, students: 0.5, professionals: 0.3 }); } !}
+
+The interview is a sensation. Millions watch you name the powers that wanted you out. Your phone fills with offers to volunteer; Ferraz accuses you of damaging the party, and the polls show a divided PSOE losing voters.
+
+@iv_measured
+subtitle: A steadier rise; little damage
+on-arrival: {! Q.sanchismo += 4; Q.network = (Q.network || 0) + 2; Q.rel_leadership = (Q.rel_leadership || 40) - 2; !}
+
+You come across as serious and wounded. Fewer headlines, fewer enemies.
+
+@iv_decline
+subtitle: Keeps the peace with the leadership; your followers wonder where you are
+on-arrival: {! Q.sanchismo -= 2; Q.rel_leadership = (Q.rel_leadership || 40) + 5; !}
+
+Silence earns you some respect in Ferraz, and some impatience among your own people.
+
+@bb_team
+title: Build your team
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_team_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_team_timer = 3; !}
+
+= Build your team
+
+José Luis Ábalos, Adriana Lastra and Santos Cerdán are ready to organise your supporters, province by province. An organised faction is powerful, and visible.
+
+- @team_full: A full campaign machine in every federation
+- @team_quiet: A discreet network of trusted organisers
+- @team_wait: Not yet: don't give Ferraz an excuse
+
+@team_full
+subtitle: Costs 2 from your war chest; a strong network, but the leadership sees a rival party inside the party
+choose-if: war_chest >= 2
+unavailable-subtitle: Needs 2 in your war chest.
+on-arrival: {! Q.war_chest -= 2; Q.network = (Q.network || 0) + 14; Q.rel_leadership = (Q.rel_leadership || 40) - 8; Q.expulsion_risk = (Q.expulsion_risk || 0) + 1; !}
+
+Offices, phone banks, coordinators in fifty provinces. Ferraz talks about "a party within the party".
+
+@team_quiet
+subtitle: Slower, but it doesn't provoke anyone
+on-arrival: {! Q.network = (Q.network || 0) + 6; !}
+
+A few trusted people in each federation, meeting in bars and kitchens.
+
+@team_wait
+on-arrival: {! Q.rel_leadership = (Q.rel_leadership || 40) + 2; !}
+
+You keep your powder dry.
+
+@bb_money
+title: The war chest
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_money_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_money_timer = 3; !}
+
+= The war chest
+
+A comeback campaign needs money the party will not give you.
+
+- @money_small: Small donations from members and supporters
+- @money_big: A dinner with wealthy donors who liked your fight with the barons
+- @money_own: Fund it yourself, and take a consulting job to pay for it
+
+@money_small
+subtitle: A little money; your movement grows with it
+on-arrival: {! Q.war_chest = (Q.war_chest || 0) + 1 + (Q.network || 0) / 40; Q.network = (Q.network || 0) + 2; !}
+
+Ten, twenty, fifty euros at a time. Every donor is also a volunteer.
+
+@money_big
+subtitle: More money; it makes you look like the establishment you are running against
+on-arrival: {! Q.war_chest = (Q.war_chest || 0) + 3; Q.populism -= 1; Q.sanchismo -= 3; !}
+
+The money is real. So is the photograph of you at the dinner, which ends up in the press.
+
+@money_own
+subtitle: Some money; you disappear from the scene for a while
+on-arrival: {! Q.war_chest = (Q.war_chest || 0) + 2; Q.sanchismo -= 4; Q.network = Math.max(0, (Q.network || 0) - 3); !}
+
+The private sector pays well. Your supporters see less of you.
+
+@bb_vote
+title: A vote in Congress
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and seat_resigned = 0 and bb_vote_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_vote_timer = 4; Q.bb_vote_pp = Q.pm_party === 'pp' ? 1 : 0; !}
+
+= A vote in Congress
+
+[? if bb_vote_pp = 1 : The leadership has negotiated the PP government's budget ceiling in exchange for a few concessions, and orders the group to abstain. ?][? if bb_vote_pp = 0 : The leadership orders the group to back a deal you think betrays the members. ?] Some deputies are looking at you to see what you will do.
+
+- @vote_follow: Vote with the group
+- @vote_rebel: Break the whip and vote no
+- @vote_absent: Be absent for the vote
+
+@vote_follow
+subtitle: Peace with the leadership; your followers are disappointed
+on-arrival: {! Q.rel_leadership = (Q.rel_leadership || 40) + 8; Q.sanchismo -= 4; Q.member_morale -= 1; !}
+
+You vote with the group. The leadership notes your discipline; your supporters note it too.
+
+@vote_rebel
+subtitle: Your followers cheer; a disciplinary file and a risk of expulsion
+on-arrival: {! Q.sanchismo += 6; Q.member_morale += 2; Q.populism += 1; Q.rel_leadership = (Q.rel_leadership || 40) - 12; Q.expulsion_risk = (Q.expulsion_risk || 0) + 2; Q.bb_expelled_now = (Q.expulsion_risk >= 4 && Math.random() < 0.35) ? 1 : 0; if (Q.bb_expelled_now) { Q.expelled = 1; Q.backbench = 0; } !}
+
+[? if bb_expelled_now = 1 : The Ethics Committee expels you from the PSOE for repeated indiscipline. ?][? if bb_expelled_now = 0 : The group fines you. The members cheer you. ?]
+
+@vote_absent
+subtitle: Avoids a fight; nobody is impressed
+on-arrival: {! Q.sanchismo -= 1; !}
+
+You are "detained elsewhere". Both sides notice.
+
+@bb_baron
+title: Court a baron
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_baron_timer <= 0 and baron_allies < 3
+on-arrival: {! Q.month_actions += 1; Q.bb_baron_timer = 4; !}
+
+= Court a baron
+
+Most regional leaders backed your removal, but not all of them are happy with the new leadership. Ximo Puig, Francina Armengol and the Basque socialists might be persuaded, for a price.
+
+- @baron_federal: Promise them a federal party with real autonomy for the federations
+- @baron_posts: Promise their people posts in your future Executive
+- @baron_none: No deals with the apparatus: the members are enough
+
+@baron_federal
+subtitle: Wins an ally; a promise the federations will hold you to
+on-arrival: {! Q.baron_allies = (Q.baron_allies || 0) + 1; Q.federal_promise = (Q.federal_promise || 0) + 1; Q.populism -= 0.5; !}
+
+A baron agrees to stay neutral, and to let it be known. The federations will remember what you promised.
+
+@baron_posts
+subtitle: Wins an ally; fewer posts for your own people later
+on-arrival: {! Q.baron_allies = (Q.baron_allies || 0) + 1; Q.network = Math.max(0, (Q.network || 0) - 4); Q.populism -= 1; !}
+
+A deal. Your organisers grumble that the posts were theirs.
+
+@baron_none
+subtitle: Your purest followers love it; the apparatus stays united against you
+on-arrival: {! Q.sanchismo += 4; Q.populism += 1; !}
+
+"Me against the apparatus" is a good story. It is also a lonely one.
+
+@bb_programme
+title: The programme for the comeback
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_programme_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_programme_timer = 6; !}
+
+= The programme for the comeback
+
+Your campaign needs ideas, not only grievances. What will the PSOE be if you return?
+
+- @prog_left: "We are the left": a clear break with the right and no more abstentions
+- @prog_plural: A plurinational Spain: dialogue with Catalonia
+- @prog_centre: A party of government for the great majority
+
+@prog_left
+subtitle: The members love it; you will govern from further left
+on-arrival: {! Q.member_morale += 5; Q.network = (Q.network || 0) + 5; Q.sanchismo += 3; if (window.SpainGame) { window.SpainGame.position(Q, 1, 0.3); } !}
+
+The slogan becomes a chant at every rally.
+
+@prog_plural
+subtitle: The Catalan socialists rally to you; the barons and Spanish nationalists are horrified
+on-arrival: {! Q.baron_allies = (Q.baron_allies || 0) + 0.5; Q.network = (Q.network || 0) + 3; Q.regional_leaders_dissent += 6; if (window.SpainGame) { window.SpainGame.position(Q, 0, 1); window.SpainGame.regionalMod(Q, 'Cataluña', 'psoe', 1.02); } !}
+
+The PSC is with you. Susana Díaz calls it "a betrayal of Spain".
+
+@prog_centre
+subtitle: Reassures the barons; your most militant followers are lukewarm
+on-arrival: {! Q.rel_leadership = (Q.rel_leadership || 40) + 4; Q.baron_allies = (Q.baron_allies || 0) + 0.5; Q.sanchismo -= 2; if (window.SpainGame) { window.SpainGame.position(Q, -0.5, 0); } !}
+
+Responsible, and a little dull.
+
+@bb_social
+title: The online army
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_social_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_social_timer = 3; !}
+
+= The online army
+
+Thousands of supporters want to campaign for you on social media. They are enthusiastic, and not always careful.
+
+- @social_unleash: Let them loose
+- @social_disciplined: Organise them, with clear rules
+- @social_ignore: Stay out of it
+
+@social_unleash
+subtitle: Big reach; a real risk of an embarrassing scandal
+on-arrival: {! Q.network = (Q.network || 0) + 8; Q.populism += 1; Q.social_scandal = Math.random() < 0.3 ? 1 : 0; if (Q.social_scandal) { Q.sanchismo -= 6; Q.rel_leadership = (Q.rel_leadership || 40) - 6; } else { Q.sanchismo += 3; } !}
+
+[? if social_scandal = 1 : One of your most followed supporters is caught insulting the party's women leaders. The press asks whether this is your campaign. ?][? if social_scandal = 0 : #ConPedro trends for a week. ?]
+
+@social_disciplined
+subtitle: Smaller reach, no risk
+on-arrival: {! Q.network = (Q.network || 0) + 4; !}
+
+Fewer messages, all on message.
+
+@social_ignore
+on-arrival: {! Q.sanchismo -= 1; !}
+
+The army fights on without you.
+
+@bb_debate
+title: The battle of ideas
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_debate_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_debate_timer = 4; !}
+
+= The battle of ideas
+
+[+ psoe_leader +] gives a major speech defending the party's line. The press waits for your reply.
+
+- @debate_attack: Go after the leadership directly
+- @debate_ideas: Answer with ideas, not names
+- @debate_praise: Praise the effort, and stay loyal
+
+@debate_attack
+subtitle: More followers; the party looks divided and loses voters
+on-arrival: {! Q.sanchismo += 6; Q.rel_leadership = (Q.rel_leadership || 40) - 10; Q.populism += 0.5; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', { up: 0.6, cs: 0.2, pp: 0.2 }, { workers: 0.4, students: 0.4, pensioners: 0.3 }); } !}
+
+The exchange dominates the week. The PSOE drops in the polls; you rise in the members' eyes.
+
+@debate_ideas
+subtitle: A modest gain; no damage
+on-arrival: {! Q.sanchismo += 3; Q.network = (Q.network || 0) + 2; !}
+
+You win the argument without starting a war.
+
+@debate_praise
+subtitle: Peace with the leadership; your movement loses steam
+on-arrival: {! Q.rel_leadership = (Q.rel_leadership || 40) + 8; Q.sanchismo -= 3; Q.network = Math.max(0, (Q.network || 0) - 2); !}
+
+Ferraz is pleasantly surprised. Some of your organisers are not.
+
+@bb_intl
+title: Friends abroad
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and bb_intl_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.bb_intl_timer = 6; !}
+
+= Friends abroad
+
+You are still a known figure among Europe's social democrats. A visible friendship abroad makes you look like a future prime minister.
+
+- @intl_costa: Visit António Costa in Lisbon: the left can govern together
+- @intl_pes: Speak at the European socialists' congress
+- @intl_stay: Stay home: the members vote, not Brussels
+
+@intl_costa
+subtitle: A credible left-wing alternative; the barons are wary
+on-arrival: {! Q.sanchismo += 3; Q.rel_up += 4; Q.network = (Q.network || 0) + 2; Q.regional_leaders_dissent += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'south', 2); } !}
+
+The photograph in Lisbon says what you want to say.
+
+@intl_pes
+subtitle: Looks like a statesman; little effect on the members
+on-arrival: {! Q.sanchismo += 1; Q.rel_leadership = (Q.rel_leadership || 40) + 2; Q.baron_allies = (Q.baron_allies || 0) + 0.25; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 2); } !}
+
+Applause from the delegates, polite interest at home.
+
+@intl_stay
+on-arrival: {! Q.network = (Q.network || 0) + 1; !}
+
+Another weekend in another local branch.
+
+@bb_signatures
+title: Force a primary
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: sanchez_leader = 0 and exiled = 0 and backbench = 1 and network >= 30 and comeback_ready = 0
+on-arrival: {! Q.month_actions += 1; !}
+
+= Force a primary
+
+Your network is strong enough to collect the members' signatures that force an extraordinary leadership election. Strike now, or keep building?
+
+- @sig_now: Collect the signatures and force the primary now
+- @sig_wait: Wait and keep building
+
+@sig_now
+subtitle: The sooner the better, if your network is strong enough; failing sets you back two years
+on-arrival: {! Q.comeback_ready = 1; Q.comeback_forced = 1; Q.comeback_next = 0; Q.backbench_since = Math.min(Q.backbench_since || Q.time, Q.time - 12); !}
+
+The signatures pour in. The leadership has no choice but to call the vote.
+
+@sig_wait
+on-arrival: {! Q.network = (Q.network || 0) + 2; !}
+
+Patience: every month the network grows.
+
+@ex_rally
+title: On the road for [+ my_party +]
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and ex_rally_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.ex_rally_timer = 3; !}
+
+= On the road for [+ my_party +]
+
+Your name still fills a hall. Where should it be spent?
+
+- @rally_south: The socialist heartlands of Andalusia and Extremadura
+- @rally_cities: The big cities, Madrid, Barcelona, Valencia
+- @rally_tv: A national television tour instead
+
+@rally_south
+subtitle: Costs 1 in party funds; wins older PSOE voters and makes the PSOE an enemy
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! Q.funds -= 1; Q.rel_psoe = (Q.rel_psoe || 20) - 5; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', Q.player_party, { pensioners: 1, workers: 0.8, homemakers: 0.8 }); } !}
+
+The plazas are full of people who voted for you in 2015. The PSOE's barons notice whose.
+
+@rally_cities
+subtitle: Costs 1 in party funds; young and professional voters, mostly from the other new parties
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, Q.player_party === 'cs' ? 'up' : 'cs', Q.player_party, { students: 0.8, professionals: 0.8 }); window.SpainGame.campaignRaw(Q, Q.player_party, { students: 0.4, professionals: 0.4 }); } !}
+
+Packed halls and good photographs. Whether the young vote is another matter.
+
+@rally_tv
+subtitle: Free, but the effect fades fast and your opponents get to answer
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaignRaw(Q, Q.player_party, { pensioners: 0.5, homemakers: 0.5, workers: 0.3 }); } Q.sanchismo += 1; !}
+
+Three channels, five interviews, one gaffe.
+
+@ex_line
+title: What [+ my_party +] stands for
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and ex_line_timer <= 0
+on-arrival: {! Q.month_actions += 1; Q.ex_line_timer = 6; !}
+
+= What [+ my_party +] stands for
+
+[? if player_is_ps = 1 : A new party has to say what it is for, not only who leads it. ?][? if player_is_ps = 0 : Your new colleagues want to know whether you have joined their project or brought your own. ?]
+
+- @line_party: Adopt the party's line in full
+- @line_own: Push your own agenda: social democracy, Europe and dialogue
+- @line_populist: Run against "the old parties", all of them
+
+@line_party
+subtitle: The party trusts you; your own followers drift away
+on-arrival: {! Q.sanchismo -= 4; Q.party_trust = (Q.party_trust || 0) + 10; if (Q.player_is_cs) { Q.rel_cs = (Q.rel_cs || 50) + 6; } if (Q.player_is_up) { Q.rel_up = (Q.rel_up || 50) + 6; } !}
+
+You become a loyal soldier of [+ my_party +].
+
+@line_own
+subtitle: Keeps your followers; your hosts think you are building a faction
+on-arrival: {! Q.sanchismo += 3; Q.party_trust = (Q.party_trust || 0) - 8; if (Q.player_is_cs) { Q.rel_cs = (Q.rel_cs || 50) - 6; } if (Q.player_is_up) { Q.rel_up = (Q.rel_up || 50) - 6; } if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', Q.player_party, { professionals: 0.4, workers: 0.4 }); } !}
+
+Some PSOE voters follow the man they knew. Your new party's founders follow you with their eyes.
+
+@line_populist
+subtitle: Energises the angry; moderates and the establishment recoil
+on-arrival: {! Q.populism += 2; Q.sanchismo += 4; if (window.SpainGame) { window.SpainGame.campaignRaw(Q, Q.player_party, { unemployed: 0.8, students: 0.6, workers: 0.4 }); window.SpainGame.transferRaw(Q, Q.player_party, 'pp', { professionals: 0.5, self_employed: 0.5 }); } !}
+
+"Neither the IBEX nor the apparatus." It plays well in the street and badly in the boardrooms.
+
+@ex_scandal
+title: The past comes calling
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: exiled = 1 and ex_scandal_timer <= 0 and time >= ex_scandal_after
+on-arrival: {! Q.month_actions += 1; Q.ex_scandal_timer = 9; !}
+
+= The past comes calling
+
+A newspaper close to your old party publishes details of your doctoral thesis and of expenses from your years as Secretary-General. Ferraz says nothing, which says a lot.
+
+- @past_fight: Sue, and go on the attack
+- @past_explain: Publish everything and explain
+- @past_ignore: Ignore it
+
+@past_fight
+subtitle: Costs 1 in party funds; your base rallies, the story runs for weeks
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! Q.funds -= 1; Q.sanchismo += 3; Q.populism += 1; Q.rel_psoe = (Q.rel_psoe || 20) - 4; !}
+
+"A campaign of lies." Your supporters believe you; the story stays on the front pages.
+
+@past_explain
+subtitle: Costs you a little now; it ends the story
+on-arrival: {! Q.sanchismo -= 2; if (window.SpainGame) { window.SpainGame.transferRaw(Q, Q.player_party, { pp: 0.3, cs: 0.3, psoe: 0.4 }, { professionals: 0.3, pensioners: 0.3 }); } !}
+
+Everything online by the evening. A dull week, then nothing.
+
+@past_ignore
+subtitle: A gamble: it may die, or it may grow
+on-arrival: {! Q.past_grew = Math.random() < 0.5 ? 1 : 0; if (Q.past_grew) { Q.sanchismo -= 6; if (window.SpainGame) { window.SpainGame.transferRaw(Q, Q.player_party, { pp: 0.3, cs: 0.3, psoe: 0.4 }, { professionals: 0.8, pensioners: 0.8, homemakers: 0.6 }); } } !}
+
+[? if past_grew = 1 : It grows. By the end of the month there are three more stories and a call for a parliamentary inquiry. ?][? if past_grew = 0 : The story dies on its own. ?]

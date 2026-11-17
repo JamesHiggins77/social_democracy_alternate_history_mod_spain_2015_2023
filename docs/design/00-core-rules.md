@@ -417,3 +417,25 @@ From player discussion of the Weimar game:
 1. CIS microdata (studies 3126, 3145, 3248, 3269 and 3420) are needed to calibrate classes, regional class mixes and the gender split.
 2. Should Ceuta and Melilla's assemblies be simulated, or only their Congress seats?
 3. Senate: a simple ledger, or full elections (208 elected senators, limited-vote system)?
+
+### 7.17 The road back and the grand coalition
+
+**Backbench campaign.** Out of the leadership, Sánchez builds a comeback with three resources, shown in the sidebar:
+
+| Resource | Raised by | Effect |
+|---|---|---|
+| Network (0–100) | Team, online army, interviews, programme, tours | Up to +12 points in the comeback primary |
+| Barons won over (0–3) | Court a baron (federal promises or posts) | +2.5 points each |
+| War chest | Small donors, wealthy donors, private work | Up to +4 points |
+| Relations with the leadership (0–100) | Loyal votes, praise, silence | Below 40, the apparatus mobilises: up to −4 points |
+
+- Backbench cards, each on its own timer: Break your silence, Build your team, The war chest, A vote in Congress, Court a baron, The programme for the comeback, The online army, The battle of ideas, Friends abroad.
+- Most choices trade the members against the leadership: attacks and rebellions grow Sánchez's following, but cost the PSOE voters (to Podemos and Cs) and raise an expulsion risk. Repeated whip-breaking can get him expelled, which sends him to the exile choice.
+- Force a primary: with a network of 30+, he can collect the members' signatures and trigger the comeback primary early. Losing it costs 40% of the network and two years.
+- Keep a low profile now has a three-month timer, so it can no longer be played every month.
+
+**Exile cards** for the Pedro Sánchez List, Cs or Podemos: On the road (heartlands, cities, or television), What the party stands for (the party's line, his own, or anti-establishment), and The past comes calling (a scandal from six months after leaving, which can be fought, explained, or ignored as a gamble).
+
+**Grand coalition.** A PP–PSOE grand coalition is possible whenever the two have 176 seats and the PP accepts.
+- At formation: PSOE voters go to Podemos (and IU and Más País), and PP voters go to Vox (and Cs); progressives and unions revolt.
+- While it lasts, every month: further PSOE→Podemos and PP→Vox transfers, and union and progressive dissent rises.

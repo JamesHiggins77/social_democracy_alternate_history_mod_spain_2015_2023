@@ -17,7 +17,7 @@ PM: [+ pm +][? if acting = 1 : (acting) ?]
 
 [? if exiled = 0 : [? if psoe_in_government = 1 : PSOE in government ?][? if psoe_in_government = 0 : PSOE in opposition ?] ?][? if exiled = 1 : Sánchez's party: **[+ my_party +]**[? if player_leads = 1 : (leader) ?], [+ player_seats +] seats, [+ player_poll +]% ?]
 
-[? if backbench = 1 : Sánchez sits on the PSOE backbenches. ?][? if sanchez_leader = 0 : PSOE leader: [+ psoe_leader +] ?]
+[? if backbench = 1 : Sánchez sits on the PSOE backbenches. Comeback: network **[+ network_word +]**, relations with the leadership **[+ leadership_word +]**, primary edge [+ comeback_bonus +]. ?][? if sanchez_leader = 0 : PSOE leader: [+ psoe_leader +] ?]
 
 PP leader: [+ pp_leader +]
 

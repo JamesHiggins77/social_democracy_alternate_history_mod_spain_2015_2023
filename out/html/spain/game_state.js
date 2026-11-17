@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'foreign', 'pes', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -780,6 +780,7 @@
   function monthlyWorld(Q) {
     var t = Q.year * 12 + Q.month;
     plotDrift(Q);
+    grandCoalitionWear(Q);
     // the economy: growth shocks fade within a year; unemployment follows
     // growth (Okun) and its own adjustments fade slowly
     Q.unemp_adj = (Q.unemp_adj || 0) - 0.04 * (Q.growth_adj || 0);
@@ -2248,9 +2249,15 @@
     if (Q.backbench && Q.backbench_since === undefined) {
       Q.backbench_since = Q.time;
     }
-    Q.comeback_ready = (Q.backbench && Q.time - (Q.backbench_since || Q.time) >= 12 &&
+    Q.comeback_ready = (Q.backbench && (Q.comeback_forced || (Q.time - (Q.backbench_since || Q.time) >= 12 &&
       Q.time >= (Q.comeback_next || 0) &&
-      ((Q.psoe_ai_swing || 0) < 0 || ((Q.true_poll && Q.true_poll.psoe) || 0) < 22)) ? 1 : 0;
+      ((Q.psoe_ai_swing || 0) < 0 || ((Q.true_poll && Q.true_poll.psoe) || 0) < 22)))) ? 1 : 0;
+    Q.network = clamp(Q.network || 0, 0, 100);
+    Q.war_chest = Math.max(0, Q.war_chest || 0);
+    Q.rel_leadership = clamp(Q.rel_leadership === undefined ? 40 : Q.rel_leadership, 0, 100);
+    Q.network_word = Q.network < 15 ? 'A handful of loyalists' : (Q.network < 35 ? 'Organising' : (Q.network < 60 ? 'A real network' : 'A movement'));
+    Q.leadership_word = UI.word('relation', Q.rel_leadership);
+    Q.comeback_bonus = Math.round(comebackBonus(Q));
     // out of the leadership with no primary pending: decide what next
     Q.exile_pending = (!Q.sanchez_leader && !Q.leadership_exception_open && !Q.exiled &&
       !Q.backbench && !Q.retired) ? 1 : 0;
@@ -2271,9 +2278,16 @@
   // Returns 1 if Sánchez wins.
   // The comeback primary of May 2017: Sánchez against Susana Díaz (or the
   // barons' candidate) and Patxi López. Returns 1 if Sánchez wins.
+  // The comeback campaign's resources: the organised network, the barons
+  // won over and the war chest; a hostile leadership mobilises against him.
+  function comebackBonus(Q) {
+    return Math.min(12, (Q.network || 0) / 7) + 2.5 * Math.min(3, Q.baron_allies || 0) + Math.min(4, (Q.war_chest || 0) / 2) -
+      Math.max(0, (40 - (Q.rel_leadership === undefined ? 40 : Q.rel_leadership)) / 10);
+  }
+
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
-    var s = clamp(45 + (x - 60) * 0.5 + 6 * (Math.random() - 0.5), 15, 75);
+    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) + 6 * (Math.random() - 0.5), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
     Q.primary_sanchez = Math.round(s * 10) / 10;
     Q.primary_lopez = Math.round(lopez * 10) / 10;
@@ -2347,7 +2361,7 @@
   // Sánchez leaves for another party (or founds one).
   function joinParty(Q, party, name) {
     var old = Q.player_party;
-    Q.exiled = 1;
+    Q.exiled = 1; Q.ex_scandal_after = Q.time + 6;
     Q.backbench = 0;
     Q.player_party = party;
     Q.player_leads = party === 'ps' ? 1 : 0;
@@ -2684,6 +2698,17 @@
     return st;
   }
 
+  // A sitting grand coalition keeps bleeding at both ends: the PSOE's left
+  // and the unions to Podemos, the PP's radical right to Vox.
+  function grandCoalitionWear(Q) {
+    if (!Q.grand_coalition || Q.acting) { return; }
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, all(0.12));
+    transfer(Q, 'pp', { vox: 0.9, cs: 0.1 }, all(0.12));
+    Q.progressives_dissent += 1.5; Q.trade_unionists_dissent += 1.5;
+    Q.member_morale -= 0.5;
+  }
+
   // Will the PP accept a grand coalition with the PSOE instead of Vox?
   // Easier with a moderate PP leader, warm PSOE–PP relations and cold
   // PP–Vox relations; harder with a hard-liner.
@@ -2699,6 +2724,9 @@
       formGovernment(Q, 'grand');
       // the PSOE's left-wing voters and members do not forgive it
       transfer(Q, 'psoe', { up: 0.8, iu: 0.1, mp: 0.1 }, { workers: 4, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
+      // the PP's hard right sees a pact with the socialists as treason
+      transfer(Q, 'pp', { vox: 0.85, cs: 0.15 }, { self_employed: 5, pensioners: 2.5, homemakers: 3, professionals: 2, workers: 1.5 });
+      Q.rel_vox = (Q.rel_vox || 0) - 10;
       Q.progressives_dissent += 25; Q.trade_unionists_dissent += 12; Q.member_morale -= 18; Q.sanchismo -= 8;
       Q.regional_leaders_dissent -= 10; Q.institutionalists_dissent -= 8; Q.rel_pp += 15; Q.rel_up -= 25;
       recalculate(Q);
@@ -3094,6 +3122,8 @@
     campaignRaw: campaign,
     aiStances: aiStances,
     leaderOf: leaderOf,
+    comebackBonus: comebackBonus,
+    grandCoalitionWear: grandCoalitionWear,
     lastChanceInvestiture: lastChanceInvestiture,
     factionLeader: factionLeader,
     comebackPrimary: comebackPrimary,

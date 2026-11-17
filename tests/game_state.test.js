@@ -743,3 +743,29 @@ test('a new game wipes everything left by the previous one', () => {
   // the same set of values as a game started from nothing
   assert.deepStrictEqual(Object.keys(Q).sort(), Object.keys(fresh).sort());
 });
+
+test('a grand coalition feeds Podemos and Vox, at formation and while it lasts', () => {
+  const R = newQ();
+  R.congress = { pp: 140, vox: 50, psoe: 100, up: 30, cs: 10, erc: 10, junts: 10 };
+  R.rel_pp = 90; R.pp_style_moderate = 1;
+  G.recalculate(R);
+  const before = Object.assign({}, R.true_poll);
+  assert.strictEqual(G.grandCoalitionOffer(R), 1);
+  const after = Object.assign({}, R.true_poll);
+  assert.ok(after.up > before.up, 'Podemos gains');
+  assert.ok(after.vox > before.vox, 'Vox gains');
+  assert.ok(after.psoe < before.psoe && after.pp < before.pp);
+  const dissent = R.trade_unionists_dissent;
+  G.grandCoalitionWear(R); G.recalculate(R);
+  assert.ok(R.true_poll.vox > after.vox && R.true_poll.up > after.up);
+  assert.ok(R.trade_unionists_dissent > dissent);
+});
+
+test('the comeback campaign: network, barons and money raise the primary edge; a hostile leadership lowers it', () => {
+  const Q = newQ();
+  const base = G.comebackBonus(Q);
+  Q.network = 70; Q.baron_allies = 2; Q.war_chest = 6;
+  assert.ok(G.comebackBonus(Q) > base + 15);
+  Q.rel_leadership = 0;
+  assert.ok(G.comebackBonus(Q) < base + 16);
+});
