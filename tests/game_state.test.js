@@ -708,3 +708,20 @@ test('no investiture against a sitting government: forming one clears the nomina
   assert.strictEqual(Q.investiture_clock, -1);
   assert.strictEqual(Q.pm_party, 'pp');
 });
+
+test('a new game wipes everything left by the previous one', () => {
+  const Q = newQ();
+  Q.rebellion_used = 1; Q.gurtel_seen = 1; Q.plot = 90; Q.exiled = 1; Q.player_party = 'ps';
+  Q.learn_counts = { 'labour:corbyn': 3 }; Q.pact_up = 1; Q.loss_reason = 'old game over'; Q.year = 2023;
+  G.newGame(Q, 0);
+  const fresh = newQ();
+  assert.strictEqual(Q.rebellion_used, undefined);
+  assert.strictEqual(Q.gurtel_seen, undefined);
+  assert.strictEqual(Q.loss_reason, undefined);
+  assert.strictEqual(Q.exiled, 0);
+  assert.strictEqual(Q.player_party, 'psoe');
+  assert.strictEqual(Q.learn_counts, undefined);
+  assert.strictEqual(Q.year, 2014);
+  // the same set of values as a game started from nothing
+  assert.deepStrictEqual(Object.keys(Q).sort(), Object.keys(fresh).sort());
+});

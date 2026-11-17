@@ -86,7 +86,20 @@
     return VoteModel.nationalShares(ballots);
   }
 
+  // Wipe every value left by a previous game (event flags, pacts, plots,
+  // lessons, exile...) and the page-level view settings, so a new
+  // campaign starts exactly like the first one.
+  function resetGame(Q) {
+    Object.keys(Q).forEach(function (k) { delete Q[k]; });
+    if (root.document) {
+      root.spSelectedRegion = '';
+      root.spRegionMapMode = 'presidency';
+    }
+    UI.setPartyName('ps', 'Pedro Sánchez List', 'PSL');
+  }
+
   function newGame(Q, difficulty) {
+    resetGame(Q);
     Q.started = 1;
     Q.spain = 1;
     Q.difficulty = difficulty || 0;
@@ -3014,6 +3027,7 @@
   var api = {
     FACTIONS: FACTIONS,
     newGame: newGame,
+    resetGame: resetGame,
     recalculate: recalculate,
     updatePolls: updatePolls,
     shiftSupport: shiftSupport,
