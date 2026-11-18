@@ -23,6 +23,8 @@ PP leader: [+ pp_leader +]
 
 [? if sanchez_leader = 1 : Authority: **[+ authority_word +]** ?]
 
+PSOE membership: **[+ membership_word +]**[? if members_lost >= 2 : (left-wing members lost to Podemos) ?]
+
 Morale: **[+ morale_word +]**
 
 Unity: **[+ unity_word +]**

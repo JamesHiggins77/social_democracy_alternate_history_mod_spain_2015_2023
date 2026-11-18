@@ -941,3 +941,12 @@ test('a PP government before Sánchez has renewed his mandate sets off the criti
   const R = newQ(); R.mandate_renewed = 1; R.plot = 10; R.congress = Q.congress; G.formGovernment(R, 'pp');
   assert.ok(R.plot < 60);
 });
+
+test('a strong Podemos drains left-wing members from the PSOE and blunts Sánchez in leadership contests', () => {
+  const Q = newQ(); Q.true_poll = Object.assign({}, Q.true_poll, { up: 22 });
+  for (let i = 0; i < 36; i++) G.membersDrift(Q);
+  assert.ok(Q.members_lost > 7 && Q.membership_word !== 'Left-leaning');
+  const R = newQ(); R.true_poll = Object.assign({}, R.true_poll, { up: 8 });
+  for (let i = 0; i < 36; i++) G.membersDrift(R);
+  assert.ok(R.members_lost < 1);
+});

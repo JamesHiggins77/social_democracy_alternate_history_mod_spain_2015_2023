@@ -809,6 +809,7 @@
     var t = Q.year * 12 + Q.month;
     plotDrift(Q);
     grandCoalitionWear(Q);
+    membersDrift(Q);
     // the economy: growth shocks fade within a year; unemployment follows
     // growth (Okun) and its own adjustments fade slowly
     Q.unemp_adj = (Q.unemp_adj || 0) - 0.04 * (Q.growth_adj || 0);
@@ -2510,7 +2511,7 @@
   // runs on his left instead. Díaz always runs.
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
-    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) - (Q.three_losses ? 8 : 0) + 6 * (Math.random() - 0.5), 15, 75);
+    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) - (Q.three_losses ? 8 : 0) - ((Q.members_lost || 0) - 6.5) + 6 * (Math.random() - 0.5), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
     var tapias = 0;
     Q.primary_moderniser = Q.lopez_decided ? 1 : 0;
@@ -2689,7 +2690,7 @@
   }
 
   function leadershipElection(Q, bonus) {
-    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) - (Q.three_losses ? 10 : 0) +
+    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
       (bonus || 0) + 6 * gaussian();
     Q.primary_score = Math.round(score);
     var won = score >= 38 ? 1 : 0;
@@ -3102,6 +3103,17 @@
       }
     }
     return st;
+  }
+
+  // Left-wing members leave for Podemos when it is strong, leaving a more
+  // moderate PSOE membership: Sánchez's members-against-the-apparatus edge
+  // in leadership contests shrinks. They drift back slowly as Podemos fades
+  // (and faster when it splits: Más País).
+  function membersDrift(Q) {
+    var up = (Q.true_poll && Q.true_poll.up) || 12;
+    var target = clamp((up - 10) * 0.8, 0, 12);
+    Q.members_lost = (Q.members_lost || 0) + (target - (Q.members_lost || 0)) * 0.04;
+    Q.membership_word = Q.members_lost < 4 ? 'Left-leaning' : (Q.members_lost < 8 ? 'Mixed' : 'Moderate-leaning');
   }
 
   // A sitting grand coalition keeps bleeding at both ends: the PSOE's left
@@ -3553,6 +3565,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderPrimary: renderPrimary,

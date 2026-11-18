@@ -284,11 +284,11 @@ new-page: true
 tags: sp_event
 view-if: mas_pais_seen = 0 and ((year = 2019 and month >= 9) or year >= 2020) and up_running = 1
 max-visits: 1
-on-arrival: {! Q.mas_pais_seen = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'mp', {students: 3, professionals: 2.5, workers: 1, unemployed: 1}); window.SpainGame.partyRel(Q, 'up', 'erc', -2); } !}
+on-arrival: {! Q.mas_pais_seen = 1; Q.members_lost = Math.max(0, (Q.members_lost || 0) - 3); if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'mp', {students: 3, professionals: 2.5, workers: 1, unemployed: 1}); window.SpainGame.partyRel(Q, 'up', 'erc', -2); } !}
 
 = Errejón goes his own way
 
-Íñigo Errejón, Podemos's co-founder and its most moderate strategist, breaks with Pablo Iglesias and launches Más País, allied with Compromís in Valencia. The space to the PSOE's left is now split in two.
+Íñigo Errejón, Podemos's co-founder and its most moderate strategist, breaks with Pablo Iglesias and launches Más País. Some socialists who had left for Podemos rejoin the PSOE rather than choose between them, allied with Compromís in Valencia. The space to the PSOE's left is now split in two.
 
 - @errejon_welcome: Welcome a partner who wants to govern
 - @errejon_ignore: Ignore it: it is Podemos's problem

@@ -518,3 +518,10 @@ After an October 2016 ouster, the window runs as an event chain:
 - **PSOE "no" that changes nothing.** When the right has the votes without the PSOE, the result text says the PSOE voted no but couldn't block, instead of describing an abstention.
 - **A PP government before a renewed mandate.** If a PP government forms (alone or with Cs) while Sánchez leads but has never won a leadership election in the game, the barons' plot rises to 82, once.
 - **Three defeats.** Three general elections within 36 months in which the PSOE is not the largest party cost him 25 sanchismo, 20 morale and 20 authority, raise the plot to 85, and cost 10 points in any leadership vote (8 in the 2017 race).
+
+### 7.22 Podemos drains the PSOE's left-wing members
+
+- **The drain.** Each month, the left-wing members lost to Podemos (`members_lost`, 0–12) moves 4% of the way towards (Podemos poll − 10) × 0.8. They leave when Podemos is strong and return slowly as it fades.
+- **Más País.** Errejón's split brings 3 points of members back at once.
+- **Effect on leadership contests.** It cuts Sánchez's members-versus-apparatus edge by (members_lost − 6.5): one point per point in the 2017 race, 0.8 in other leadership votes. 6.5 is the level reached by May 2017 on the real path, so the historical race is unchanged; a stronger Podemos than in history hurts him, a weaker one helps.
+- **Sidebar.** It shows the PSOE membership as Left-leaning, Mixed or Moderate-leaning.
