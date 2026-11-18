@@ -334,7 +334,7 @@ if (Q.primary_won) {
 
 = The primary
 
-[? if primary_moderniser = 0 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. ?][? if primary_moderniser = 1 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and José Antonio Pérez Tapias for the party's left, who says you have become what you fought against. [? if lopez_endorses = 1 : Patxi López campaigns at your side. ?][? if lopez_endorses = 0 : Patxi López has stayed out of the race, and out of your campaign. ?] ?] You have spent months touring the local branches in your own car.
+[? if primary_moderniser = 0 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. ?][? if primary_moderniser = 1 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and José Antonio Pérez Tapias for the party's left, who says you have become what you fought against. [? if lopez_endorses = 1 : Patxi López campaigns at your side. ?][? if lopez_endorses = 0 : Patxi López has stayed out of the race, and out of your campaign. ?] ?] [? if year = 2017 : You launched your campaign in January in Dos Hermanas, in Susana Díaz's own province of Seville; she waited until March to declare. ?] You have spent months touring the local branches in your own car.
 
 The members vote. Pedro Sánchez **[+ primary_sanchez +]%**, Susana Díaz **[+ primary_diaz +]%**, [? if primary_moderniser = 0 : Patxi López **[+ primary_lopez +]%**. ?][? if primary_moderniser = 1 : José Antonio Pérez Tapias **[+ primary_tapias +]%**. ?]
 

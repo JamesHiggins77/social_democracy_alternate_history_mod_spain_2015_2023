@@ -301,7 +301,7 @@ on-arrival: rebellion_used = 1
 
 = The rebellion
 
-It happens on a Wednesday afternoon. The critics' aim is to stop your primaries and your congress before they can happen. Seventeen members of the Federal Executive resign at once to force the Executive to dissolve. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional leaders: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
+It happens on a Wednesday afternoon. [? if congress_called = 1 : The critics' aim is to stop your primaries and your congress before they can happen. ?][? if congress_called = 0 : The critics' aim is to remove you before you can lead the party into a third election. ?] In Ferraz, Antonio Pradas reads out the resignations of seventeen members of the Federal Executive, enough to force it to dissolve: among them the party's President, Micaela Navarro, Emiliano García-Page, Ximo Puig, Carme Chacón and Tomás Gómez, and seven Andalusians close to Susana Díaz. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional leaders: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
 
 [? if loyalist_posts >= 4 : Your own people hold enough posts in Ferraz and in the federations to put up a fight. ?][? if loyalist_posts < 4 : You have few loyalists in the party's structures; the apparatus belongs to them. ?]
 
@@ -434,7 +434,7 @@ on-arrival: {! Q.two_authorities = 0; !}
 
 = Two authorities
 
-The party now has two leaderships. Your remaining Executive says it continues in functions; Verónica Pérez says it has ceased to exist and that she is "the only authority" until a caretaker committee takes over. Susana Díaz offers herself as the person who can bring the party together, and rejects a congress "designed around one man". Both sides call the Federal Committee for Saturday morning at Ferraz.
+The party now has two leaderships. Your remaining Executive says it continues in functions; Verónica Pérez says it has ceased to exist and that she is "the only authority" until a caretaker committee takes over. Verónica Pérez asks the Ethics Committee to rule. Its president, Isabel Celaá, and its secretary, Félix Bolaños, are with you, and Celaá refuses to convene it; the other three members, María Jesús Montero, Inés Ayala and Wilfredo Jurado, meet without her and declare the Executive dissolved. Susana Díaz offers herself as the person who can bring the party together, and rejects a congress "designed around one man". Both sides call the Federal Committee for Saturday morning at Ferraz.
 
 - @auth_condition: Announce that you will resign if the Committee votes for abstention
 - @auth_rules: Fight on procedure: dispute Verónica Pérez's authority over the Committee
@@ -460,13 +460,18 @@ new-page: true
 
 At nine in the morning you slip into Ferraz past the waiting press. More than 250 members of the Federal Committee crowd the hall; the meeting starts an hour and a half late, after arguments over who chairs it. Before eleven-thirty the critics refuse to recognise your seventeen remaining Executive members' right to vote. At a quarter to one Verónica Pérez's Mesa takes its seats. A hundred and fifty members ask to speak.
 
-By three in the afternoon you propose yet another Committee meeting. Javier Lambán answers that you are no longer Secretary-General. By six your supporters set up a ballot box to vote on an extraordinary congress; the critics call it illegal.
+By three in the afternoon you play for time: readmit the seventeen who resigned and meet again next week. The critics call the offer "insulting", and Javier Lambán shouts at you that you are no longer the party's highest authority. By six your supporters set up a ballot box behind a screen to vote on an extraordinary congress; the critics call it illegal, and start collecting signatures to remove you as Secretary-General. With every hour, a few more of your own people slip away.
 
 - @fc_ballot: Insist on the ballot box: a secret vote
 - @fc_hands: Accept a public vote by show of hands
+- @fc_delay: Adjourn: the Committee will meet again next week
 
 @fc_ballot
-on-arrival: {! window.SpainGame.federalCommitteeVote(Q, (Q.fc_bonus || 0) - 2); !}
+on-arrival: {! Q.urn_scandal = Math.random() < 0.65 ? 1 : 0; window.SpainGame.federalCommitteeVote(Q, (Q.fc_bonus || 0) + (Q.urn_scandal ? -6 : 3)); !}
+go-to: fc_result
+
+@fc_delay
+on-arrival: {! Q.fc_delay_fail = 1; window.SpainGame.federalCommitteeVote(Q, (Q.fc_bonus || 0) - 4); !}
 go-to: fc_result
 
 @fc_hands
@@ -478,7 +483,7 @@ title: The vote
 
 = The vote
 
-[? if coup_survived = 1 : Shortly after eight in the evening the vote is counted: [+ fc_for +] for the extraordinary congress, [+ fc_against +] against. You have won. The critics walk out into the night; Verónica Pérez's Mesa dissolves itself. The barons will need years to try again. ?][? if coup_survived = 0 : Shortly after eight in the evening the vote is counted: [+ fc_against +] against the extraordinary congress, [+ fc_for +] for. Ten minutes later you announce your resignation as Secretary-General. At nine you face the press. The Committee appoints a caretaker committee under [+ psoe_leader +] to run the party until a new congress. ?]
+[? if urn_scandal = 1 : The secret vote never happens: the critics say the ballot box was "hidden" and unsupervised, and accuse you of trying to rig the vote. In the end it is done by show of hands. ?][? if fc_delay_fail = 1 : The critics refuse to adjourn: more than half of the Committee has signed the motion against you, and the Mesa puts your congress to a vote by show of hands. ?] [? if coup_survived = 1 : Shortly after eight in the evening the vote is counted: [+ fc_for +] for the extraordinary congress, [+ fc_against +] against. You have won. The critics walk out into the night; Verónica Pérez's Mesa dissolves itself. The barons will need years to try again. ?][? if coup_survived = 0 : Shortly after eight in the evening the vote is counted: [+ fc_against +] against the extraordinary congress, [+ fc_for +] for. Ten minutes later you announce your resignation as Secretary-General. At nine you face the press. The Committee appoints a caretaker committee under [+ psoe_leader +] to run the party until a new congress. Of the Committee's 253 members, [+ fc_absent +] did not vote. ?]
 
 @seat_choice
 title: The second vote
@@ -509,3 +514,45 @@ You vote no with the rebels. The caretaker committee opens disciplinary proceedi
 on-arrival: {! Q.sanchismo -= 12; Q.member_morale -= 6; Q.institutionalists_dissent -= 4; !}
 
 You abstain with the group. The members who were chanting your name outside Ferraz feel betrayed.
+
+@three_roads
+title: Three roads
+new-page: true
+tags: sp_event
+view-if: three_roads_due = 1 and sanchez_leader = 1 and acting = 1
+on-arrival: three_roads_due = 0
+
+= Three roads
+
+Two general elections, no government, and a third one at Christmas if nothing changes. On Sunday the PSOE has done badly in the Galician and Basque elections. The barons say the party is losing everywhere under you, and that it is time to let Rajoy govern. There are three roads, and the Federal Committee has to approve whichever you take.
+
+**A government of change**, with Podemos and the nationalist parties: your own preference, but it has nowhere near a majority in the Federal Committee. **Abstain** and let Rajoy govern: what the critics want, and what you have promised the members you will never do. **Keep saying no**, at the risk of a third election: the only road that needs no change in the party's position.
+
+- @roads_congress: Keep saying no, and call primaries and an extraordinary congress to settle the party's line
+- @roads_change: Open talks for a government of change with Podemos and the nationalists
+- @roads_hold: Keep saying no, and wait for the PP to move
+- @roads_abstain: Propose the abstention to the Federal Committee yourself
+
+@roads_congress
+subtitle: The members decide, not the barons; it forces the barons to move now
+on-arrival: {! Q.plot = Math.max(Q.plot || 0, 80); Q.fc_bonus = (Q.fc_bonus || 0) + 2; Q.sanchismo += 4; Q.congress_called = 1; !}
+
+You announce primaries for the leadership on 23 October and an extraordinary congress in December. The members will decide. Within forty-eight hours, the barons answer.
+
+@roads_change
+subtitle: Podemos and the nationalists warm to you; the barons say you want power "at any price"
+on-arrival: {! Q.plot = Math.max(Q.plot || 0, 85); Q.rel_up += 6; Q.rel_erc = (Q.rel_erc || 30) + 3; Q.rel_pnv = (Q.rel_pnv || 45) + 3; Q.regional_leaders_dissent += 8; Q.institutionalists_dissent += 6; !}
+
+You let it be known that you are sounding out Pablo Iglesias and the nationalist parties. Felipe González and the barons say you would rather govern with the independence parties than let Spain have a government.
+
+@roads_hold
+subtitle: Changes nothing; the barons still have their case, and your members their slogan
+on-arrival: {! Q.plot = Math.max(Q.plot || 0, 74); Q.member_morale += 2; !}
+
+"No es no." The barons count the weeks to Christmas.
+
+@roads_abstain
+subtitle: Ends the blockade and the plot against you; the members, the youth and the left of the party will not forgive it
+on-arrival: {! Q.psoe_stance_pp = 'abstain'; Q.abstained_for_pp = 1; Q.plot = Math.min(Q.plot || 0, 20); Q.member_morale -= 20; Q.sanchismo -= 18; Q.progressives_dissent += 25; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 15; Q.institutionalists_dissent -= 10; Q.sanchez_authority -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 4, students: 5, unemployed: 3.5, professionals: 2.5, pensioners: 1 }); } !}
+
+The Federal Committee approves your proposal by a large majority. Susana Díaz praises your "sense of State". Outside Ferraz, the crowd that chanted your name now chants "No es no" at you. Rajoy will be invested; the barons have nothing left to remove you for, for now.

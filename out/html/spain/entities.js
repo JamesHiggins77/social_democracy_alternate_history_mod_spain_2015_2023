@@ -43,6 +43,21 @@
     [['José Antonio Pérez Tapias', 'Pérez Tapias'], 'psoe', 'Leader of Izquierda Socialista; 2014 primary candidate', 'Progressives (the party\'s left current)'],
     [['Cándido Méndez'], 'psoe', 'Secretary-General of the UGT union (to 2016)', 'Trade unionists'],
     [['Pepe Álvarez'], 'psoe', 'Secretary-General of the UGT union (from 2016)', 'Trade unionists'],
+    [['Antonio Pradas', 'Pradas'], 'psoe', 'Secretary of Federal Policy; read out the 17 resignations (Sept 2016)', 'Regional Leaders (susanismo), Andalusian'],
+    [['Micaela Navarro'], 'psoe', 'President of the PSOE (to 2016); among the 17 who resigned', 'Regional Leaders (susanismo), Andalusian'],
+    [['Carme Chacón', 'Chacón'], 'psoe', 'Former Defence Minister; among the 17 who resigned', 'Institutionalists (critic of Sánchez)'],
+    [['Tomás Gómez'], 'psoe', 'Former Madrid socialist leader, removed by Sánchez in 2015; among the 17', 'Critic of Sánchez'],
+    [['Félix Bolaños', 'Bolaños'], 'psoe', 'Secretary of the Ethics Committee (2016)', 'Sanchismo'],
+    [['Inés Ayala'], 'psoe', 'MEP; member of the Ethics Committee (2016)', 'Susanismo'],
+    [['Wilfredo Jurado'], 'psoe', 'Member of the Ethics Committee (2016)', 'Susanismo'],
+    [['Juan Cornejo'], 'psoe', 'Andalusian deputy; a critic at the October 2016 Committee', 'Regional Leaders (susanismo), Andalusian'],
+    [['Idoia Mendia'], 'psoe', 'Leader of the Basque socialists (PSE-EE)', 'Sanchismo, federalist'],
+    [['Luis Tudanca', 'Tudanca'], 'psoe', 'Leader of the Castile and León socialists', 'Sanchismo'],
+    [['Odón Elorza'], 'psoe', 'Deputy, former mayor of San Sebastián', 'Sanchismo, progressive'],
+    [['Sara Hernández'], 'psoe', 'Leader of the Madrid socialists (2015–17)', 'Sanchismo'],
+    [['Patricia Hernández'], 'psoe', 'Canarian socialist leader', 'Susanismo'],
+    [['Jordi Évole', 'Évole'], 'nonpartisan', 'Journalist, presenter of Salvados', 'Independent journalist'],
+    [['César Alierta', 'Alierta'], 'nonpartisan', 'Chairman of Telefónica (to 2016)', 'Business'],
     [['Verónica Pérez'], 'psoe', 'President of the PSOE Federal Committee', 'Regional Leaders (susanismo), Andalusian'],
     [['Patxi López'], 'psoe', 'Former Lehendakari; 2017 primary candidate', 'Between the camps; moderniser'],
     [['Antonio Hernando', 'Hernando'], 'psoe', 'Spokesperson of the parliamentary group', 'Institutionalists'],
@@ -205,7 +220,12 @@
     'Fernando Clavijo': 'Fernando Clavijo (politician)', 'Volodymyr Zelensky': 'Volodymyr Zelenskyy',
     // no English page: Spanish Wikipedia instead ("es:" prefix)
     'Teresa Rodríguez': 'es:Teresa Rodríguez', 'Pepe Álvarez': 'es:Pepe Álvarez', 'Nacho Álvarez': 'es:Nacho Álvarez',
-    'Verónica Pérez': 'es:Verónica Pérez Fernández'
+    'Verónica Pérez': 'es:Verónica Pérez Fernández',
+    'Antonio Pradas': 'es:Antonio Pradas', 'Micaela Navarro': 'es:Micaela Navarro', 'Tomás Gómez': 'es:Tomás Gómez Franco',
+    'Félix Bolaños': 'Félix Bolaños', 'Inés Ayala': 'Inés Ayala', 'Wilfredo Jurado': 'es:Crisis del PSOE de 2016',
+    'Juan Cornejo': 'es:Juan Cornejo', 'Idoia Mendia': 'Idoia Mendia', 'Luis Tudanca': 'es:Luis Tudanca',
+    'Odón Elorza': 'Odón Elorza', 'Sara Hernández': 'es:Sara Hernández Barroso', 'Patricia Hernández': 'es:Patricia Hernández Gutiérrez',
+    'Jordi Évole': 'es:Jordi Évole', 'César Alierta': 'César Alierta'
   };
   var PARTY_WIKI = {
     psoe: "Spanish Socialist Workers' Party", pp: "People's Party (Spain)", up: 'Podemos (Spanish political party)',
@@ -225,6 +245,10 @@
   var TOPICS = [
     [['Article 155'], 'Constitution of Spain', 'The constitutional article allowing direct rule over a region'],
     [['Constitution'], 'Constitution of Spain', 'The Spanish Constitution of 1978'],
+    [['Federal Committee'], 'es:Comité Federal del PSOE', 'The PSOE\'s highest body between congresses: about 250 members'],
+    [['Ethics Committee'], 'es:Crisis del PSOE de 2016', 'The PSOE\'s Commission of Ethics and Guarantees'],
+    [['Salvados'], 'es:Salvados', 'Jordi Évole\'s interview programme on laSexta'],
+    [['No es no'], 'es:Crisis del PSOE de 2016', '"No means no": the slogan of Sánchez\'s refusal to let Rajoy govern'],
     [['Gürtel'], 'Gürtel affair', 'The PP corruption network and its trial'],
     [['La Manada'], 'La Manada rape case', 'The 2016 Pamplona gang-rape case and its sentence'],
     [['Aquarius'], 'Aquarius Dignitus', 'The rescue ship refused by Italy in June 2018'],

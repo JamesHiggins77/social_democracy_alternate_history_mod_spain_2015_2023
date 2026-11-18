@@ -462,3 +462,25 @@ If, while out of the leadership, Sánchez's closest faction is the Modernisers a
 - **López's voters** go 70% to Sánchez if he endorsed, and split evenly if not.
 - **José Antonio Pérez Tapias** (Izquierda Socialista) runs as the progressive candidate, taking 4–16% depending on the progressives' dissent, about four-fifths of it from Sánchez.
 - **Susana Díaz always runs:** the barons removed him, and she wants the party.
+
+### 7.19 The 2016 crisis in detail
+
+Based on the account of the crisis (17 resignations on 28 September, the Committee of 1 October, abstention on 23 October, seat given up on 29 October, Salvados on 31 October):
+- **Three roads.** About ten weeks into a repeat-election deadlock, with the PSOE still voting no, Sánchez chooses:
+
+  | Choice | Effect |
+  |---|---|
+  | Call primaries and an extraordinary congress (historical) | Barons' plot to 80; a small edge in the Committee |
+  | A government of change with Podemos and the nationalists | Plot 85; better relations with Podemos, ERC and the PNV; barons and institutionalists angrier |
+  | Hold at "no" | Plot 74 |
+  | Propose the abstention himself | No coup; the PSOE abstains and Rajoy is invested, at a heavy cost in morale, sanchismo and left voters |
+
+- **The rebellion** names the 17: Pradas, Navarro, García-Page, Puig, Chacón, Tomás Gómez and seven Andalusians.
+- **Two authorities** includes the Ethics Committee split: Celaá and Bolaños against Montero, Ayala and Jurado.
+- **The Committee day** offers three moves:
+  - the secret ballot, with a 65% chance of the "hidden ballot box" scandal (−6) and a small edge otherwise (+3);
+  - a show of hands;
+  - an adjournment, rejected after the signature drive (−4).
+  
+  The result notes the 253 members and those who did not vote.
+- **Other texts:** the Salvados interview (El País/Prisa, Telefónica), the primary timeline (Dos Hermanas in January, Díaz in March), and the regional leaders who stood with Sánchez (Armengol, Iceta, Mendia, Tudanca).

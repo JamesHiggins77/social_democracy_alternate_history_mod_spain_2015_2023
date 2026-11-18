@@ -179,7 +179,7 @@ on-arrival: {! Q.month_actions += 1; Q.bb_interview_timer = 4; !}
 
 = Break your silence
 
-A prime-time interviewer wants your first full account of how you were forced out. Everything you say will be replayed for months.
+[? if year <= 2016 : Jordi Évole wants, for Salvados, ?][? if year > 2016 : A prime-time interviewer wants ?] your first full account of how you were forced out. Everything you say will be replayed for months.
 
 - @iv_story: Tell the whole story: the banks, the media and the barons who wanted you gone
 - @iv_measured: Be measured: explain your reasons, blame nobody by name
@@ -189,7 +189,7 @@ A prime-time interviewer wants your first full account of how you were forced ou
 subtitle: Your followers grow fast; the new leadership and the party's image suffer
 on-arrival: {! Q.sanchismo += 9; Q.populism += 1; Q.network = (Q.network || 0) + 6; Q.rel_leadership = (Q.rel_leadership || 40) - 12; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'psoe', { up: 0.7, cs: 0.3 }, { workers: 0.4, students: 0.5, professionals: 0.3 }); } !}
 
-The interview is a sensation. Millions watch you name the powers that wanted you out. Your phone fills with offers to volunteer; Ferraz accuses you of damaging the party, and the polls show a divided PSOE losing voters.
+The interview is a sensation. Millions watch you name the powers that wanted you out: El País and its owners at Prisa, the banks, César Alierta's Telefónica, none of whom wanted a government with Podemos. Your phone fills with offers to volunteer; Ferraz accuses you of damaging the party, and the polls show a divided PSOE losing voters.
 
 @iv_measured
 subtitle: A steadier rise; little damage
@@ -316,7 +316,7 @@ on-arrival: {! Q.month_actions += 1; Q.bb_baron_timer = 4; !}
 
 = Court a baron
 
-Most regional leaders backed your removal, but not all of them are happy with the new leadership. Ximo Puig, Francina Armengol and the Basque socialists might be persuaded, for a price.
+Most regional leaders backed your removal, but not all of them. Francina Armengol in the Balearics, Miquel Iceta's Catalan socialists, Idoia Mendia's Basque socialists and Luis Tudanca in Castile and León stood with you in October; the question is whether they will say so in public, and at what price.
 
 - @baron_federal: Promise them a federal party with real autonomy for the federations
 - @baron_posts: Promise their people posts in your future Executive

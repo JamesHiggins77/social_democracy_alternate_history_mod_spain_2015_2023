@@ -753,6 +753,7 @@
     var total = 239;
     Q.fc_for = Math.round(total * defence / (defence + attack));
     Q.fc_against = total - Q.fc_for;
+    Q.fc_absent = 253 - total;
     Q.coup_survived = Q.fc_for > Q.fc_against ? 1 : 0;
     Q.coup_cooldown = Q.time + 6;
     if (Q.coup_survived) {
@@ -1565,8 +1566,9 @@
     // saying no, the barons move against its leader
     if (Q.third_election_threat && Q.acting && Q.sanchez_leader && !Q.rebellion_used &&
         Q.formation_weeks >= (Q.threat_week || 10)) {
-      // a third election is the barons' strongest case (October 2016: 132-107)
-      Q.plot = Math.max(Q.plot || 0, 80);
+      // September 2016: Sánchez must choose a road (event three_roads);
+      // whichever he takes, the barons now have their case
+      Q.three_roads_due = 1;
       Q.third_election_threat = 0;
     }
     autoFormation(Q);
