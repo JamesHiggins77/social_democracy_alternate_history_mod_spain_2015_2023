@@ -303,6 +303,7 @@
     Q.pp_majority = (Q.congress.pp || 0) >= 176 ? 1 : 0;
     Q.pp_vox_majority = ((Q.congress.pp || 0) + (Q.congress.vox || 0)) >= 176 ? 1 : 0;
     Q.grand_possible = ((Q.congress.pp || 0) + (Q.congress.psoe || 0)) >= 176 ? 1 : 0;
+    Q.vox_on = voxOn(Q) ? 1 : 0;
     Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
     var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
@@ -450,6 +451,8 @@
     Q.eday_seats = r.totals[me] || 0;
     Q.eday_base_poll = Math.round(((Q.true_poll && Q.true_poll[me]) || 0) * 10) / 10;
     Q.funds_display = Math.floor(Q.funds);
+    // what a fresh spend (one not yet repeated) is now worth, in % of the first
+    Q.eday_next_factor = Math.round(100 / (1 + FINAL_SATURATION * (Q.eday_spent || 0)));
   }
 
   function startFinalCampaign(Q) {
@@ -461,6 +464,13 @@
 
   // kind: 'class' (key: a target group), 'region' (key: a community) or
   // 'attack' (key: a rival party). Costs 1 in funds.
+  // Last-minute money buys little: the airtime is booked and the message is
+  // set. Each spend is worth FINAL_SCALE of an early one, repeating the same
+  // spend halves it again, and every unit already spent in this campaign cuts
+  // the next by FINAL_SATURATION, so money is worth more spent during the
+  // legislature than hoarded for election night. Returns the repeat factor.
+  var FINAL_SCALE = 0.5;
+  var FINAL_SATURATION = 0.1;
   function finalSpend(Q, kind, key) {
     if (!Q.eday) {
       startFinalCampaign(Q);
@@ -470,7 +480,8 @@
     var uk = kind + ':' + key;
     var n = e.uses[uk] || 0;
     e.uses[uk] = n + 1;
-    var f = 1 / (1 + n);
+    var repeat = 1 / (1 + n);
+    var f = FINAL_SCALE * repeat / (1 + FINAL_SATURATION * (Q.eday_spent || 0));
     var addCls = function (p, c, v) {
       e.cls[p] = e.cls[p] || {};
       e.cls[p][c] = (e.cls[p][c] || 0) + v;
@@ -511,7 +522,7 @@
         : 'The attack ads against ' + UI.partyName(key) + ' land. Some of its voters stay at home or look elsewhere.';
     }
     finalCampaignPoll(Q);
-    return f;
+    return repeat;
   }
 
   // After the vote: a fraction of the final push persists; the rest fades.
@@ -836,12 +847,14 @@
     var voxReady = Q.year >= 2018 || Q.vox_breakthrough || Q.cat_crisis_seen ? 1 : 0.3;
     var voxNow = (Q.true_poll && Q.true_poll.vox) || 0;
     // Vox's growth slows as it approaches its ceiling
-    var vox = 0.7 * c * voxReady * (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0)) * Math.max(0, 1 - voxNow / 16);
-    transfer(Q, 'pp', 'vox', { pensioners: vox * 0.45, self_employed: vox * 0.6, workers: vox * 0.35,
-                              professionals: vox * 0.35, homemakers: vox * 0.4, unemployed: vox * 0.3 });
-    transfer(Q, 'cs', 'vox', { self_employed: vox * 0.45, workers: vox * 0.35, professionals: vox * 0.3,
-                              students: vox * 0.25, unemployed: vox * 0.3 });
-    transfer(Q, 'psoe', 'vox', { workers: vox * 0.2, pensioners: vox * 0.15, unemployed: vox * 0.2 });
+    var vox = VOX_CHAOS_RATE * c * voxReady * (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0)) * voxRoom(Q);
+    voxFlow(Q, vox);
+    // ...and, once it has broken through, on the national question, whatever
+    // the general mood: what carried it from 0.2% to 15% in 2018-19 under a
+    // PSOE government that had calmed most of the rest
+    if (voxOn(Q)) {
+      voxFlow(Q, VOX_NATIONAL_RATE * nationalQuestion(Q) * voxRoom(Q));
+    }
     // Podemos too, to a smaller extent
     // after 2016 Podemos is in decline: chaos feeds it far less
     var up = 0.3 * c * (Q.year >= 2017 ? 0.3 : 1);
@@ -871,9 +884,10 @@
     if (Q.year >= 2017) {
       transfer(Q, 'up', { psoe: 0.6, iu: 0.15, mp: 0.25 }, share(Q, 'up', 0.011));
     }
-    // when things calm down, Vox's protest voters drift back to the PP
-    if (Q.chaos < 20 && voxPoll > 3) {
-      transfer(Q, 'vox', 'pp', share(Q, 'vox', 0.01 * (20 - Q.chaos) / 10));
+    // when things calm down, Vox's protest voters drift back to the PP -
+    // but not to a PP that governs with the socialists
+    if (Q.chaos < VOX_CALM && voxPoll > 3 && !(Q.grand_coalition && !Q.acting)) {
+      transfer(Q, 'vox', 'pp', share(Q, 'vox', VOX_CALM_RATE * (VOX_CALM - Q.chaos) / 10));
     }
     // the economy judges the government: unemployment above its
     // historical level costs the governing party
@@ -882,6 +896,81 @@
       var to = gov === 'pp' ? { psoe: 0.5, vox: 0.3, cs: 0.2 } : { pp: 0.5, vox: 0.3, up: 0.2 };
       transfer(Q, gov, to, all(0.025 * (Q.unemp_adj - 1)));
     }
+  }
+
+  // ------------------------------------------------------------------
+  // Vox. Before its breakthrough it is a fringe party (0.2% in 2015, no
+  // seats anywhere) and the game does not treat it as a force: events and
+  // choices only name it once `vox_on` is set.
+  // ------------------------------------------------------------------
+  function voxOn(Q) {
+    return !!(Q.vox_breakthrough || ((Q.congress && Q.congress.vox) || 0) > 0 ||
+      ((Q.true_poll && Q.true_poll.vox) || 0) >= 3);
+  }
+
+  // Vox's growth slows as it nears its ceiling: about a fifth of the vote
+  // normally, a third while a grand coalition leaves it as the only
+  // opposition on the right.
+  var VOX_CEILING = 21;
+  var VOX_CHAOS_RATE = 0.5;
+  var VOX_CEILING_GRAND = 34;
+  function voxRoom(Q) {
+    var now = (Q.true_poll && Q.true_poll.vox) || 0;
+    return Math.max(0, 1 - now / (Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING));
+  }
+
+  // Move `x` (support points in a fully reached class) to Vox: mostly from
+  // the PP and Ciudadanos, a little from the PSOE's older and working-class
+  // voters.
+  function voxFlow(Q, x) {
+    if (!(x > 0)) {
+      return;
+    }
+    transfer(Q, 'pp', 'vox', { pensioners: x * 0.45, self_employed: x * 0.6, workers: x * 0.35,
+                              professionals: x * 0.35, homemakers: x * 0.4, unemployed: x * 0.3 });
+    transfer(Q, 'cs', 'vox', { self_employed: x * 0.45, workers: x * 0.35, professionals: x * 0.3,
+                              students: x * 0.25, unemployed: x * 0.3 });
+    transfer(Q, 'psoe', 'vox', { workers: x * 0.2, pensioners: x * 0.15, unemployed: x * 0.2 });
+  }
+
+  // The national question, in rough monthly units: the Catalan conflict, a
+  // left-wing government that relies on the independence parties, dialogue
+  // and pardons, a progressive social course in government, and migration.
+  var VOX_NATIONAL_RATE = 0.12;
+  // Below this level of chaos Vox's protest voters drift back to the PP
+  // (VOX_CALM_RATE of its vote a month for every ten points of calm).
+  var VOX_CALM = 25;
+  var VOX_CALM_RATE = 0.012;
+  function nationalQuestion(Q) {
+    var leftGov = !Q.acting && !Q.grand_coalition &&
+      (Q.psoe_in_government || Q.pm_party === 'up' || Q.pm_party === 'ps');
+    var catalan = Math.min(30, Q.cat_tension || 0) / 10 + (Q.catalan_crisis ? 1.5 : 0);
+    var separatists = leftGov && Q.depends_on_catalans ? 1.2 : 0;
+    var dialogue = leftGov ? 0.35 * Math.min(4, Q.cat_dialogue || 0) + (Q.pardons_granted ? 0.6 : 0) : 0;
+    var progressive = leftGov ? 0.15 * Math.max(0, (Q.social_prog || 0) - 1) : 0;
+    // the Danish lesson (Frederiksen) takes some of the migration issue from Vox
+    var migration = Math.max(0, yearOf(MIGRATION_BY_YEAR, Q.year) + (Q.migration || 0) - 3) / 4 *
+      (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0));
+    return catalan + separatists + dialogue + progressive + migration;
+  }
+
+  // Vox fills Vistalegre (October 2018). The surge feeds on the Catalan
+  // crisis, on dialogue the right calls weakness and on a PP convicted of
+  // corruption; a hard line in Catalonia takes some of the wind out of it.
+  // Used by the event and by tools/replay_history.js.
+  var VOX_RALLY_BASE = 4;
+  function voxRally(Q) {
+    var push = Math.max(2, VOX_RALLY_BASE + 2 * (Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) +
+      ((Q.pp_scandal || 0) >= 3 ? 2 : 0));
+    Q.vox_push = push;
+    Q.vox_rise_seen = 1;
+    partyRel(Q, 'pp', 'vox', 10);
+    partyRel(Q, 'cs', 'vox', 5);
+    campaign(Q, 'vox', { self_employed: push + 3, pensioners: push - 1, workers: push, homemakers: push - 1,
+                         professionals: push - 2, unemployed: push - 1, students: push - 2 });
+    campaign(Q, 'pp', { self_employed: -2, pensioners: -1 });
+    recalculate(Q);
+    return push;
   }
 
   // A fraction of a party's support in every class (for proportional moves).
@@ -1411,6 +1500,11 @@
     if (Q.censure_passed) {
       formGovernment(Q, 'sanchez');
       Q.government_type = 'PSOE government after a motion of no confidence';
+      // a government born of the censure owes its majority to whoever voted
+      // for it: in June 2018, ERC, PDeCAT and Bildu
+      if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForCensure(Q))) {
+        Q.depends_on_catalans = 1;
+      }
       // the new Prime Minister's bounce (June 2018): left voters come home
       transfer(Q, 'up', { psoe: 1 }, { workers: 2, students: 2, unemployed: 2, professionals: 1.5, pensioners: 1, homemakers: 1 });
       transfer(Q, 'cs', { psoe: 1 }, { professionals: 0.8, workers: 0.5 });
@@ -1886,11 +1980,14 @@
   // ------------------------------------------------------------------
   // General election
   // ------------------------------------------------------------------
-  // Top vote shares (%) in each ballot district, for the map tooltips.
-  function districtShares(ballots, top) {
+  // Top vote shares (%) in each ballot district, for the map tooltips:
+  // [[party, %, seats], ...]. With `seats` ({district: {party: seats}}),
+  // every list that won a seat is included even outside the top five.
+  function districtShares(ballots, top, seats) {
     var out = {};
     Object.keys(ballots).forEach(function (d) {
       var total = 0;
+      var won = (seats && seats[d]) || null;
       var lists = ballots[d].lists.map(function (l) {
         var id = Array.isArray(l) ? l[0] : l.id;
         var v = Array.isArray(l) ? l[2] : l.votes;
@@ -1898,8 +1995,23 @@
         return [id, v];
       });
       lists.sort(function (a, b) { return b[1] - a[1]; });
-      out[d] = lists.slice(0, top || 5).filter(function (l) { return l[1] > 0; })
-        .map(function (l) { return [l[0], Math.round(1000 * l[1] / total) / 10]; });
+      out[d] = lists.filter(function (l, i) { return (i < (top || 5) && l[1] > 0) || (won && won[l[0]] > 0); })
+        .map(function (l) {
+          var row = [l[0], Math.round(1000 * l[1] / total) / 10];
+          if (won) {
+            row.push(won[l[0]] || 0);
+          }
+          return row;
+        });
+    });
+    return out;
+  }
+
+  // Seats elected in each district: {district: n}.
+  function districtMagnitudes(seats) {
+    var out = {};
+    Object.keys(seats || {}).forEach(function (d) {
+      out[d] = Object.keys(seats[d]).reduce(function (n, id) { return n + seats[d][id]; }, 0);
     });
     return out;
   }
@@ -1949,7 +2061,9 @@
     Q.map_winners = provinceWinners(r.ballots);
     Q.general_winners = Q.map_winners;
     Q.map_prev_winners = Q.prev_general_winners;
-    Q.map_shares = districtShares(r.ballots, 5);
+    Q.map_shares = districtShares(r.ballots, 5, r.districts);
+    Q.map_magnitude = districtMagnitudes(r.districts);
+    Q.map_scope = {};
     Q.map_kind = 'general';
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
@@ -2175,9 +2289,14 @@
       var byDistrict = provinceWinners(ballots);
       Object.keys(byDistrict).forEach(function (d) { dw[districtToProvince(d)] = byDistrict[d]; });
       var ds = {};
-      var sharesByDistrict = districtShares(ballots, 5);
-      Object.keys(sharesByDistrict).forEach(function (d) { ds[districtToProvince(d)] = sharesByDistrict[d]; });
-      results.push({ region: region, districtWinners: dw, districtShares: ds, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
+      var dm = {};
+      var sharesByDistrict = districtShares(ballots, 5, r.districts);
+      var mags = districtMagnitudes(r.districts);
+      Object.keys(sharesByDistrict).forEach(function (d) {
+        ds[districtToProvince(d)] = sharesByDistrict[d];
+        dm[districtToProvince(d)] = mags[d];
+      });
+      results.push({ region: region, districtWinners: dw, districtShares: ds, districtSeats: dm, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
                      prevShares: reg.prevShares, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
     });
     Q.regional_elections_due = [];
@@ -2193,12 +2312,29 @@
       });
       Q.map_winners = winners;
       var mapShares = {};
+      var mapMagnitude = {};
+      var mapScope = {};
       results.forEach(function (res) {
+        // provinces that are not themselves districts (islands, Asturias's
+        // districts) show the whole parliament
+        var regionSeats = Object.keys(res.seats).reduce(function (n, id) { return n + res.seats[id]; }, 0);
         var regionTop = Object.keys(res.shares).sort(function (a, b) { return res.shares[b] - res.shares[a]; })
-          .slice(0, 5).map(function (id) { return [id, Math.round(res.shares[id] * 10) / 10]; });
-        provs[res.region].forEach(function (p) { mapShares[p] = res.districtShares[p] || regionTop; });
+          .filter(function (id, i) { return i < 5 || (res.seats[id] || 0) > 0; })
+          .map(function (id) { return [id, Math.round(res.shares[id] * 10) / 10, res.seats[id] || 0]; });
+        provs[res.region].forEach(function (p) {
+          if (res.districtShares[p]) {
+            mapShares[p] = res.districtShares[p];
+            mapMagnitude[p] = res.districtSeats[p];
+          } else {
+            mapShares[p] = regionTop;
+            mapMagnitude[p] = regionSeats;
+            mapScope[p] = res.region;
+          }
+        });
       });
       Q.map_shares = mapShares;
+      Q.map_magnitude = mapMagnitude;
+      Q.map_scope = mapScope;
       Q.map_kind = 'regional';
       Q.map_title = 'Regional elections, ' + Q.month + '/' + Q.year;
     }
@@ -2700,12 +2836,25 @@
   }
 
   // A sitting grand coalition keeps bleeding at both ends: the PSOE's left
-  // and the unions to Podemos, the PP's radical right to Vox.
+  // and the unions to Podemos; on the right, once Vox is a force, it is the
+  // only opposition left and takes the PP's hard right, Ciudadanos's
+  // anti-socialists and some of the PSOE's own older and working-class
+  // voters, month after month (Austria's FPÖ under its grand coalitions).
+  // Before Vox has broken through, the PP's discontented look to
+  // Ciudadanos and a few drift to the fringe.
+  var VOX_GRAND_RATE = 0.5;
   function grandCoalitionWear(Q) {
     if (!Q.grand_coalition || Q.acting) { return; }
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
-    transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, all(0.12));
-    transfer(Q, 'pp', { vox: 0.9, cs: 0.1 }, all(0.12));
+    transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, all(0.2));
+    if (voxOn(Q)) {
+      var x = VOX_GRAND_RATE * Math.max(0.35, voxRoom(Q));
+      transfer(Q, 'pp', 'vox', all(x));
+      transfer(Q, 'cs', 'vox', all(0.3 * x));
+      transfer(Q, 'psoe', 'vox', { workers: 0.25 * x, pensioners: 0.2 * x, unemployed: 0.25 * x });
+    } else {
+      transfer(Q, 'pp', { cs: 0.6, vox: 0.4 }, all(0.12));
+    }
     Q.progressives_dissent += 1.5; Q.trade_unionists_dissent += 1.5;
     Q.member_morale -= 0.5;
   }
@@ -2720,14 +2869,24 @@
       (50 - Parliament.between(Q, 'pp', 'vox')) / 2 + (Q.learned_spd ? 8 : 0) + 20 * (Math.random() - 0.5);
     Q.grand_score = Math.round(score);
     Q.grand_accepted = (Q.grand_possible && score >= 40) ? 1 : 0;
+    // whether Vox is already a force decides who the PP's hard right turns to
+    Q.grand_vox = voxOn(Q) ? 1 : 0;
     if (Q.grand_accepted) {
       Q.investiture_votes += 1;
       formGovernment(Q, 'grand');
       // the PSOE's left-wing voters and members do not forgive it
       transfer(Q, 'psoe', { up: 0.8, iu: 0.1, mp: 0.1 }, { workers: 4, students: 5, unemployed: 4, professionals: 3, pensioners: 1 });
       // the PP's hard right sees a pact with the socialists as treason
-      transfer(Q, 'pp', { vox: 0.85, cs: 0.15 }, { self_employed: 5, pensioners: 2.5, homemakers: 3, professionals: 2, workers: 1.5 });
-      Q.rel_vox = (Q.rel_vox || 0) - 10;
+      if (Q.grand_vox) {
+        transfer(Q, 'pp', { vox: 0.9, cs: 0.1 }, { self_employed: 8, pensioners: 4.5, homemakers: 5, professionals: 3.5,
+                                                 workers: 3, unemployed: 2.5, students: 2 });
+        transfer(Q, 'cs', 'vox', { self_employed: 2, workers: 1.5, professionals: 1, students: 1 });
+        Q.rel_vox = (Q.rel_vox || 0) - 10;
+      } else {
+        // no party of the hard right to go to yet: Ciudadanos, or home
+        transfer(Q, 'pp', 'cs', { self_employed: 3, pensioners: 1.5, homemakers: 1.5, professionals: 2, workers: 1 });
+        shiftSupport(Q, 'pp', { self_employed: -1.5, pensioners: -1, homemakers: -1.5, workers: -0.5 });
+      }
       Q.progressives_dissent += 25; Q.trade_unionists_dissent += 12; Q.member_morale -= 18; Q.sanchismo -= 8;
       Q.regional_leaders_dissent -= 10; Q.institutionalists_dissent -= 8; Q.rel_pp += 15; Q.rel_up -= 25;
       recalculate(Q);
@@ -2993,8 +3152,9 @@
   function renderMap(Q, id) {
     var out = el(id);
     if (out && Q.map_winners) {
-      UI.drawMap(out, Q.map_winners, 'Most-voted party by province (hover for vote shares)',
-        { shares: Q.map_shares, outlines: Q.map_kind === 'regional' ? 'bold' : 'light',
+      UI.drawMap(out, Q.map_winners, 'Most-voted party by province (hover for vote shares and seats)',
+        { shares: Q.map_shares, magnitude: Q.map_magnitude, scope: Q.map_scope,
+          outlines: Q.map_kind === 'regional' ? 'bold' : 'light',
           prevWinners: Q.map_kind === 'general' ? Q.map_prev_winners : null });
     }
   }
@@ -3125,6 +3285,9 @@
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
     grandCoalitionWear: grandCoalitionWear,
+    voxRally: voxRally,
+    voxOn: voxOn,
+    nationalQuestion: nationalQuestion,
     lastChanceInvestiture: lastChanceInvestiture,
     factionLeader: factionLeader,
     comebackPrimary: comebackPrimary,

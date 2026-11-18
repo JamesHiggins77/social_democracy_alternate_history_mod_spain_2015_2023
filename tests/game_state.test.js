@@ -159,12 +159,30 @@ test('final-campaign spending boosts the election-day vote far more than the pol
   const f2 = G.finalSpend(Q, 'class', 'working');
   assert.strictEqual(f1, 1); assert.strictEqual(f2, 0.5);
   G.finalSpend(Q, 'region', 'Andalucía');
-  assert.ok(Q.eday_poll > base + 1, `${Q.eday_poll} vs ${base}`);
+  assert.ok(Q.eday_poll > base + 0.4, `${Q.eday_poll} vs ${base}`);
   const r = G.runGeneralElection(Q);
-  assert.ok(r.voteShares.psoe > base + 1);
+  assert.ok(r.voteShares.psoe > base + 0.4);
   const after = G.trueVote(Q).voteShares.psoe;
   assert.ok(after - base < 0.3 * (r.voteShares.psoe - base), `after ${after}, base ${base}, eday ${r.voteShares.psoe}`);
   assert.strictEqual(Q.eday, null);
+});
+
+test('last-minute money saturates: hoarding funds for election night buys little', () => {
+  const run = spends => {
+    const Q = newQ();
+    Q.year = 2019; Q.month = 4; Q.vm.partyFactor = {}; Q.funds = 50; G.recalculate(Q);
+    const base = G.trueVote(Q).voteShares.psoe;
+    G.startFinalCampaign(Q);
+    spends.forEach(s => G.finalSpend(Q, 'class', s));
+    return { gain: Q.eday_poll - base, next: Q.eday_next_factor };
+  };
+  const groups = ['young', 'students', 'pensioners', 'working', 'middle', 'women', 'unemployed'];
+  const one = run(['working']).gain;
+  const many = run(groups.concat(groups, groups));
+  assert.ok(one > 0.15, `one spend ${one}`);
+  // twenty-one units buy far less than twenty-one times one
+  assert.ok(many.gain < 7 * one, `21 spends ${many.gain} vs one ${one}`);
+  assert.ok(many.next < 35, `a fresh spend after 21 is worth ${many.next}%`);
 });
 
 test('attack ads cut the target party on election day', () => {
@@ -194,6 +212,38 @@ test('province winners feed the results map', () => {
   assert.strictEqual(Q.map_winners['Sevilla'], 'psoe');
   assert.strictEqual(Q.map_winners['Barcelona'], 'up');
   assert.strictEqual(Q.map_winners['Madrid'], 'pp');
+});
+
+test('the results map shows the seats each party won in every province', () => {
+  const Q = newQ();
+  toDecember2015(Q);
+  const total = Object.values(Q.map_magnitude).reduce((a, b) => a + b, 0);
+  assert.strictEqual(total, 350);
+  assert.strictEqual(Q.map_magnitude['Madrid'], 36);
+  Object.keys(Q.map_shares).forEach(p => {
+    const won = Q.map_shares[p].reduce((n, row) => n + row[2], 0);
+    assert.strictEqual(won, Q.map_magnitude[p], `${p}: ${won} of ${Q.map_magnitude[p]}`);
+  });
+  // the real 2015 result in Madrid: PP 13, Podemos 8, PSOE 6, Cs 7 (and IU 2)
+  const madrid = Object.fromEntries(Q.map_shares['Madrid'].map(r => [r[0], r[2]]));
+  assert.strictEqual(madrid.pp, 13);
+  assert.strictEqual(madrid.cs, 7);
+});
+
+test('regional maps show seats by district, or the whole parliament where districts are not provinces', () => {
+  const Q = newQ();
+  advanceUntil(Q, q => q.year === 2019 && q.month === 4);
+  G.endOfMonth(Q);
+  G.runDueRegionalElections(Q);
+  assert.strictEqual(Q.map_kind, 'regional');
+  const won = p => Q.map_shares[p].reduce((n, row) => n + row[2], 0);
+  // Aragón elects by province
+  assert.ok(Q.map_magnitude['Zaragoza'] > 0 && !Q.map_scope['Zaragoza']);
+  assert.strictEqual(won('Zaragoza'), Q.map_magnitude['Zaragoza']);
+  // the Canaries elect by island: each province shows the whole parliament
+  assert.strictEqual(Q.map_scope['Las Palmas'], 'Canarias');
+  assert.strictEqual(Q.map_magnitude['Las Palmas'], 70);
+  assert.strictEqual(won('Las Palmas'), 70);
 });
 
 test('abstaining for Rajoy moves left-wing voters to Podemos', () => {
@@ -756,9 +806,49 @@ test('a grand coalition feeds Podemos and Vox, at formation and while it lasts',
   assert.ok(after.vox > before.vox, 'Vox gains');
   assert.ok(after.psoe < before.psoe && after.pp < before.pp);
   const dissent = R.trade_unionists_dissent;
+  const upPoints = q => Object.values(q.vm.classSupport).reduce((n, c) => n + (c.up || 0), 0);
+  const pts = upPoints(R);
   G.grandCoalitionWear(R); G.recalculate(R);
-  assert.ok(R.true_poll.vox > after.vox && R.true_poll.up > after.up);
+  assert.ok(R.true_poll.vox > after.vox, 'Vox keeps gaining');
+  assert.ok(upPoints(R) > pts, 'the PSOE\'s left keeps leaving for Podemos');
   assert.ok(R.trade_unionists_dissent > dissent);
+});
+
+test('a grand coalition makes Vox the only opposition on the right: big, lasting gains', () => {
+  const Q = newQ();
+  advanceUntil(Q, q => q.year === 2018 && q.month === 10);
+  G.voxRally(Q); Q.vox_breakthrough = 1;
+  advanceUntil(Q, q => q.year === 2019 && q.month === 6);
+  Q.congress = { pp: 100, psoe: 110, vox: 40, up: 40, cs: 30, erc: 15, junts: 7, pnv: 6, bildu: 2 };
+  Q.rel_pp = 90; Q.pp_style_moderate = 1; G.recalculate(Q);
+  const before = Q.true_poll.vox;
+  assert.strictEqual(Q.vox_on, 1);
+  assert.strictEqual(G.grandCoalitionOffer(Q), 1);
+  assert.strictEqual(Q.grand_vox, 1);
+  assert.ok(Q.true_poll.vox > before + 2.5, `formation: ${before} -> ${Q.true_poll.vox}`);
+  for (let i = 0; i < 12; i++) { G.endOfMonth(Q); }
+  assert.ok(Q.true_poll.vox > before + 9, `a year in: ${before} -> ${Q.true_poll.vox}`);
+});
+
+test('before Vox is a force, a grand coalition sends the PP\'s hard right to Ciudadanos or home', () => {
+  const Q = newQ();
+  toDecember2015(Q);
+  Q.rel_pp = 90; Q.pp_style_moderate = 1; G.recalculate(Q);
+  assert.strictEqual(Q.vox_on, 0);
+  const before = Object.assign({}, Q.true_poll);
+  assert.strictEqual(G.grandCoalitionOffer(Q), 1);
+  assert.strictEqual(Q.grand_vox, 0);
+  assert.ok(Q.true_poll.vox - before.vox < 0.2, `Vox ${before.vox} -> ${Q.true_poll.vox}`);
+  assert.ok(Q.true_poll.cs > before.cs + 0.5, `Cs ${before.cs} -> ${Q.true_poll.cs}`);
+});
+
+test('the national question feeds Vox once it has broken through', () => {
+  const calm = newQ(); const hot = newQ();
+  [calm, hot].forEach(q => { q.year = 2019; q.month = 1; q.vox_breakthrough = 1; G.recalculate(q); });
+  hot.psoe_in_government = 1; hot.pm_party = 'psoe'; hot.depends_on_catalans = 1; hot.cat_tension = 20; hot.cat_dialogue = 2;
+  assert.ok(G.nationalQuestion(hot) > G.nationalQuestion(calm) + 2);
+  calm.vox_breakthrough = 0; G.recalculate(calm);
+  assert.strictEqual(G.voxOn(calm), false, 'a fringe party at 0.2% with no seats is not yet a force');
 });
 
 test('the comeback campaign: network, barons and money raise the primary edge; a hostile leadership lowers it', () => {

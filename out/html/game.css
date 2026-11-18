@@ -564,6 +564,11 @@ header #game-title, header #game-author {
   border: 1px solid #999; border-radius: 3px; padding: 0.3em 0.5em; font-size: 0.8em; line-height: 1.35;
   box-shadow: 0 1px 4px rgba(0,0,0,0.25); white-space: nowrap; color: #222; }
 .sp-prov { cursor: default; }
+.sp-tip-mag { color: #666; margin-left: 0.4em; }
+.sp-tip-table { border-collapse: collapse; margin-top: 0.15em; }
+.sp-tip-table th { font-weight: normal; color: #666; text-align: right; padding: 0 0 0 0.8em; font-size: 0.9em; }
+.sp-tip-table td { padding: 0; }
+.sp-tip-table td.sp-num { text-align: right; padding-left: 0.8em; font-variant-numeric: tabular-nums; }
 
 /* Regions tab: clickable rows and the community map */
 .sp-reg-row { cursor: pointer; }
