@@ -1077,7 +1077,6 @@
       if (Q.feijoo_months <= 16) {
         transfer(Q, 'vox', 'pp', all(0.35));
         transfer(Q, 'cs', 'pp', all(0.25));
-        transfer(Q, 'psoe', 'pp', all(0.05));
       }
     }
     // a newly re-invested government gets a stability bounce (late 2016)
@@ -1259,7 +1258,7 @@
         transfer(Q, 'up', 'psoe', all(0.1));
         transfer(Q, 'cs', 'psoe', all(0.05));
       }
-      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.1));
+      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.06));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
       // a governing PP is worn down faster the more its corruption is in the news
       transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15 + 0.05 * Math.min(4, Q.pp_scandal || 0)));
