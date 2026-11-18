@@ -1013,3 +1013,11 @@ test('sanchista advisers move personal loyalty rather than a faction', () => {
   Q.year = 2016; Q.month = 1;
   assert.ok(G.hireAdviser(Q, 'vara'));
 });
+
+test('PSOE recovery: leadership bounce by margin; Vox in several PP regional governments raises the snap-election event', () => {
+  const Q = newQ(); Q.year = 2017; Q.no_mood = 1;
+  const before = Q.vm.classSupport.workers.psoe;
+  G.leadershipBounce(Q, 55);
+  assert.ok(Q.vm.classSupport.workers.psoe > before && Q.leadership_bounce > 0.8);
+  const R = newQ(); G.leadershipBounce(R, 38); assert.ok(!R.leadership_bounce);
+});

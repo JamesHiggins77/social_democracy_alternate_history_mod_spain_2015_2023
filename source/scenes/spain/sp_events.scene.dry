@@ -1670,3 +1670,135 @@ subtitle: Wins some of his voters; the new leadership will not forget it
 on-arrival: {! Q.rel_up -= 10; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 1, workers: 1, professionals: 0.8 }); } !}
 
 Some of his voters come home. His successor takes note.
+
+@call_bluff
+title: Call their bluff
+new-page: true
+tags: sp_event
+view-if: bluff_due = 1 and bluff_seen = 0
+on-arrival: {! Q.bluff_due = 0; Q.bluff_seen = 1; !}
+
+= Call their bluff
+
+The regional elections are over, and the PP now governs with Vox, in coalition or on its votes, in [+ pp_vox_regions +] regions: [+ pp_vox_region_names +]. Vox's vice-presidents are already cutting gender-violence programmes and talking about the Valley of the Fallen. The PP says the general election will be the same. Your team suggests something nobody expects: dissolve the Cortes now, and make the country choose before the summer.
+
+- @bluff_snap: Call a snap general election: let the voters see what a PP-Vox Spain looks like
+- @bluff_wait: Govern on until the end of the legislature
+
+@bluff_snap
+subtitle: The left mobilises behind the PSOE and the right has no time to settle; but you face the voters early
+on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 1.5, workers: 1.5, professionals: 1.2, unemployed: 1, pensioners: 0.8, homemakers: 0.8 }); window.SpainGame.campaign(Q, 'psoe', { pensioners: 1.2, workers: 1, professionals: 0.8, homemakers: 0.8, self_employed: 0.4 }); } Q.sanchismo += 6; Q.member_morale += 6; !}
+
+The morning after the regional elections, you appear in the Moncloa and announce the dissolution of the Cortes. The PP, which expected six months to prepare, scrambles. On the left, everyone understands the question: you, or Feijóo and Abascal.
+
+@bluff_wait
+on-arrival: {! Q.sanchez_authority -= 2; !}
+
+You will finish the legislature. The PP spends the next months governing regions with Vox, and the photographs keep coming.
+
+@labour_reform_vote
+title: The labour reform vote
+new-page: true
+tags: sp_event
+view-if: lr_vote_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and acting = 0 and ((year = 2021 and month >= 12) or year >= 2022)
+max-visits: 1
+on-arrival: lr_vote_seen = 1
+
+= The labour reform vote
+
+Yolanda Díaz's labour reform, agreed with the unions and the employers, comes to Congress: temporary contracts curbed, collective bargaining restored. ERC and Bildu say it does not go far enough; the PP votes no. It passes by a single vote, after a PP deputy presses the wrong button.
+
+- @lr_celebrate: Celebrate the first labour reform in decades agreed by unions and employers
+- @lr_credit: Share the credit with the social partners
+
+@lr_celebrate
+subtitle: Wins workers and the young; the unions approve
+on-arrival: {! Q.trade_unionists_dissent -= 4; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: 1.5, students: 1, unemployed: 1.2, professionals: 0.4 }); } !}
+
+Permanent contracts start to rise within months.
+
+@lr_credit
+subtitle: Wins moderates; good relations with Podemos
+on-arrival: {! Q.rel_up += 4; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { professionals: 0.8, self_employed: 0.6, workers: 0.6 }); } !}
+
+Even the employers' association calls it a reasonable agreement.
+
+@iberian_exception
+title: The Iberian exception
+new-page: true
+tags: sp_event
+view-if: iberian_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and acting = 0 and ((year = 2022 and month >= 4) or year >= 2023)
+max-visits: 1
+on-arrival: iberian_seen = 1
+
+= The Iberian exception
+
+With gas prices soaring after the invasion of Ukraine, Spain and Portugal win Brussels's permission to cap the price of gas used to generate electricity. Electricity bills fall while the rest of Europe's soar.
+
+- @ib_families: Sell it as protecting families
+- @ib_europe: Sell it as Spain leading in Europe
+
+@ib_families
+subtitle: Wins pensioners, families and workers
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 1.4, homemakers: 1.2, workers: 1, self_employed: 0.5 }); window.SpainGame.econ(Q, 0.1, -0.05); } !}
+
+The bills arrive lower than last winter's.
+
+@ib_europe
+subtitle: Better relations with the EU and Portugal; wins professionals
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.intl(Q, 'south', 4); window.SpainGame.campaign(Q, 'psoe', { professionals: 1, pensioners: 0.6 }); } !}
+
+Others start to copy the idea.
+
+@pensions_rise
+title: Pensions rise with prices
+new-page: true
+tags: sp_event
+view-if: pensions_rise_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and acting = 0 and year >= 2023
+max-visits: 1
+on-arrival: pensions_rise_seen = 1
+
+= Pensions rise with prices
+
+In January, ten million pensions rise by 8.5%, in line with inflation, and the minimum wage reaches €1,080. The government says it promised and delivered.
+
+- @pr_campaign: Make it the centre of the campaign
+- @pr_quiet: Let the pay slips speak for themselves
+
+@pr_campaign
+subtitle: A big gain among pensioners and workers; Brussels watches the deficit
+on-arrival: {! Q.fiscal_adj += 0.15; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 2.2, workers: 1.2, homemakers: 0.8 }); } !}
+
+"Promises kept" is everywhere.
+
+@pr_quiet
+subtitle: A smaller gain, no extra spending
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 1.2, workers: 0.6 }); } !}
+
+Pensioners notice anyway.
+
+@eu_presidency
+title: The EU presidency
+new-page: true
+tags: sp_event
+view-if: eu_pres_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and acting = 0 and ((year = 2023 and month >= 6) or year >= 2024)
+max-visits: 1
+on-arrival: eu_pres_seen = 1
+
+= The EU presidency
+
+On 1 July Spain takes the rotating presidency of the Council of the European Union. For six months, Pedro Sánchez chairs Europe's agenda.
+
+- @eup_statesman: Play the statesman at home and abroad
+- @eup_focus: Keep it low-key: domestic politics first
+
+@eup_statesman
+subtitle: Better EU relations; wins moderates
+on-arrival: {! Q.sanchez_authority += 3; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 5); window.SpainGame.campaign(Q, 'psoe', { professionals: 0.8, pensioners: 0.6, self_employed: 0.4 }); } !}
+
+The photographs with Europe's leaders do their work.
+
+@eup_focus
+on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 2); } !}
+
+Brussels is efficient and unremarkable.

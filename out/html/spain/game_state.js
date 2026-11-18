@@ -322,6 +322,15 @@
     if (Q.up_brand !== brand[0]) {
       Q.up_brand = brand[0];
       UI.setPartyName('up', brand[0], brand[1]);
+      if (brand[0] === 'Sumar' && Q.vm && !Q.sumar_merged) {
+        // Sumar (2023) absorbs Más País, IU and Compromís into one list
+        Q.sumar_merged = 1;
+        Object.keys(Q.vm.classSupport).forEach(function (c) {
+          var cs = Q.vm.classSupport[c];
+          // (some of those voters go to the PSOE as the useful vote instead)
+          ['mp', 'iu', 'compromis'].forEach(function (p) { cs.up = (cs.up || 0) + 0.7 * (cs[p] || 0); cs.psoe = (cs.psoe || 0) + 0.3 * (cs[p] || 0); cs[p] = 0; });
+        });
+      }
     }
     Q.up_brand_exists = 1;
     Q.up_leader_is_iglesias = leaderOf(Q, 'up') === 'Pablo Iglesias' || (!Q.iglesias_left && Q.year >= 2021) ? 1 : 0;
@@ -447,7 +456,12 @@
     Q.madrid_pp = mad && mad.government && mad.government.party === 'pp' ? 1 : 0;
     var csSeats = (Q.congress && Q.congress.cs) || 0;
     Q.cs_peak_seats = Math.max(Q.cs_peak_seats || 0, csSeats);
+    var wasCollapsed = Q.cs_collapsed;
     Q.cs_collapsed = Q.cs_peak_seats >= 30 && csSeats < 15 ? 1 : 0;
+    if (Q.cs_collapsed && !wasCollapsed && Q.vm) {
+      // its centrist, moderate voters split: some come home to the PSOE
+      transfer(Q, 'cs', { psoe: 0.35, pp: 0.5, vox: 0.15 }, share(Q, 'cs', 0.3));
+    }
     Q.up_running = Q.true_poll && Q.true_poll.up >= 4 ? 1 : 0;
     Q.lost_majority = Q.lost_majority || 0;
   }
@@ -2633,6 +2647,16 @@
     });
     Q.regional_elections_due = [];
     Q.has_regional_elections = 0;
+    // the PP governing with Vox (in cabinet or on its votes) in several regions
+    var withVox = Object.keys(Q.regions || {}).filter(function (r) {
+      var g = Q.regions[r].government;
+      return g && g.party === 'pp' && (g.cabinet.indexOf('vox') !== -1 || g.support.indexOf('vox') !== -1);
+    });
+    Q.pp_vox_regions = withVox.length;
+    Q.pp_vox_region_names = withVox.join(', ');
+    if (withVox.length >= 2 && !Q.bluff_seen && Q.sanchez_leader && Q.psoe_in_government && !Q.acting && !Q.election_year) {
+      Q.bluff_due = 1;
+    }
     Q.last_regional_results = results;
     if (results.length) {
       Q.funds -= 1;
@@ -2937,6 +2961,7 @@
     Q.primary_lopez = t.c_lopez ? Math.round(1000 * t.c_lopez / sum) / 10 : 0;
     Q.primary_tapias = t.c_tapias ? Math.round(1000 * t.c_tapias / sum) / 10 : 0;
     Q.primary_won = Q.pv_winner === 'c_sanchez' ? 1 : 0;
+    if (Q.primary_won) { leadershipBounce(Q, Q.primary_sanchez); }
     Q.lopez_won = Q.pv_winner === 'c_lopez' ? 1 : 0;
     return Q.primary_won;
   }
@@ -3005,13 +3030,24 @@
     UI.drawMap(el(id + '-map'), Q.pv_winners, 'Winner by province (hover for shares)', { shares: Q.pv_shares, outlines: 'light' });
   }
 
+  // A convincing leadership win brings voters back: the bigger the margin
+  // over 40%, the bigger the bounce (Sánchez's 50% in 2017 was worth points).
+  function leadershipBounce(Q, share) {
+    var b = Math.max(0, (share - 40) * 0.06);
+    if (!b) { return; }
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    transfer(Q, 'up', 'psoe', all(b * 0.6));
+    campaign(Q, 'psoe', all(b * 0.4));
+    Q.leadership_bounce = Math.round(b * 10) / 10;
+  }
+
   function leadershipElection(Q, bonus) {
     var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) + (Q.rig_bonus || 0) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
       (bonus || 0) + 6 * gaussian();
     Q.primary_score = Math.round(score);
     var won = score >= 38 ? 1 : 0;
     Q.primary_won = won;
-    if (won) { Q.mandate_renewed = 1; }
+    if (won) { Q.mandate_renewed = 1; leadershipBounce(Q, clamp(40 + (score - 38) * 0.8, 40, 75)); }
     if (won) {
       Q.sanchez_leader = 1;
       if (Q.pm_party === 'psoe' && !Q.acting) { Q.pm = 'Pedro Sánchez'; }
@@ -3880,6 +3916,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    leadershipBounce: leadershipBounce,
     MOOD: MOOD,
     hireAdviser: hireAdviser, fireAdviser: fireAdviser, advCount: advCount, ADVISERS: ADVISERS,
     regionalGovernment: regionalGovernment,

@@ -25,6 +25,7 @@ until(2016, 10); Q.psoe_stance_pp = 'abstain'; Q.pact_pp_cs = 1; G.formGovernmen
 G.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 2.5, students: 2.5, unemployed: 2, professionals: 1.5 });
 Q.election_year = 0; Q.legislature_start_year = 2016; Q.legislature_start_month = 6;
 until(2017, 2); G.transferRaw(Q, 'up', { psoe: 0.7, iu: 0.1, cs: 0.2 }, { professionals: 1, students: 0.8, workers: 0.6, unemployed: 0.5 }); // Vistalegre II
+until(2017, 5); G.leadershipBounce(Q, 50.3); // the May 2017 primary
 until(2017, 10); Q.catalan_crisis = 1; Q.cat_crisis_seen = 1; G.position(Q, 0, -0.5); // the crisis; Sánchez backs 155
 until(2018, 5); Q.catalan_crisis = 0; Q.cat_tension = 10;
 G.transferRaw(Q, 'up', { psoe: 0.6, iu: 0.2, mp: 0.2 }, { workers: 0.8, unemployed: 0.8, students: 0.6, pensioners: 0.3 }); // chalet
@@ -61,4 +62,10 @@ until(2021, 6);
 Q.pardons_granted = 1; Q.cat_dialogue = (Q.cat_dialogue || 0) + 2; Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 8);
 G.transfer(Q, 'psoe', { pp: 0.5, vox: 0.3, cs: 0.2 }, { pensioners: 2, homemakers: 1.5, self_employed: 1.5 }); G.position(Q, 0, 1.5); // pardons
 until(2021, 12); G.econ(Q, 0.1, -0.3); G.position(Q, -0.3, 0); // labour reform by agreement
+until(2022, 2); G.campaign(Q, 'psoe', { workers: 1.5, students: 1, unemployed: 1.2, professionals: 0.4 }); // labour reform
+until(2022, 5); G.campaign(Q, 'psoe', { pensioners: 1.4, homemakers: 1.2, workers: 1, self_employed: 0.5 }); // Iberian exception
+until(2023, 1); G.campaign(Q, 'psoe', { pensioners: 2.2, workers: 1.2, homemakers: 0.8 }); // pensions with inflation
+until(2023, 6); // 28 May regional elections, the snap election called the next day; Sumar formed
+G.transferRaw(Q, 'up', 'psoe', { students: 1.5, workers: 1.5, professionals: 1.2, unemployed: 1, pensioners: 0.8, homemakers: 0.8 });
+G.campaign(Q, 'psoe', { pensioners: 1.2, workers: 1, professionals: 0.8, homemakers: 0.8, self_employed: 0.4 });
 until(2023, 7, () => { Q.election_year = 2023; Q.election_month = 7; }); elect();

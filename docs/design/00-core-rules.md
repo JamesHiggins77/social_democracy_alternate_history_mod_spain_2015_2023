@@ -562,3 +562,16 @@ Real polling averages swung far more than the game's: the PP went from about 33%
 - **Stability bounce.** A re-invested PP government gains from Cs and the PSOE for its first 6 months.
 - **Corruption wear.** A governing PP wears faster the higher its scandal level.
 - **Result.** Month-to-month movement more than doubled (0.12 to 0.29 points for the PP). The historical replay still lands near the real 2019 results.
+
+### 7.25 The PSOE's road to 121 seats (2023)
+
+- **Leadership bounce.** A leadership win brings voters back in proportion to the margin: (share − 40) × 0.06 support points, 60% from Podemos and 40% fresh. The 2017 primary (50.3%) is worth about 0.6.
+- **Cs collapse.** When Cs collapses, 30% of its remaining support leaves at once: 35% of that to the PSOE, 50% to the PP, 15% to Vox.
+- **Government events:**
+  - the labour reform vote (December 2021 – February 2022);
+  - the Iberian exception (from April 2022);
+  - pensions rising with prices and the minimum wage at €1,080 (2023);
+  - the EU presidency (from June 2023).
+- **Call their bluff.** After regional elections, if the PP governs with Vox (in cabinet or with its support) in two or more regions while Sánchez governs, he can call a snap election. It brings a large swing from Sumar/Podemos to the PSOE and a fresh PSOE campaign gain, with the election two months away.
+- **Sumar (June 2023).** Sumar absorbs Más País, IU and Compromís; 30% of their support goes to the PSOE as the useful vote.
+- **Replay, July 2023:** PSOE 117–124 (real 121), PP 121–132 (137), Sumar 33–36 (31), Vox 36–38 (33).
