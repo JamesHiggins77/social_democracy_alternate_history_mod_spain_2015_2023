@@ -1065,6 +1065,16 @@
         transfer(Q, 'pp', { cs: 0.85, vox: 0.15 }, all(0.3));
       }
     }
+    // Feijóo (from 2022): a moderate, winning PP leader pulls back Cs's last
+    // voters and many who had left for Vox, for over a year
+    if (Q.pp_leader === 'Alberto Núñez Feijóo' && Q.pm_party !== 'pp') {
+      Q.feijoo_months = (Q.feijoo_months || 0) + 1;
+      if (Q.feijoo_months <= 16) {
+        transfer(Q, 'vox', 'pp', all(0.35));
+        transfer(Q, 'cs', 'pp', all(0.25));
+        transfer(Q, 'psoe', 'pp', all(0.05));
+      }
+    }
     // a newly re-invested government gets a stability bounce (late 2016)
     if (Q.pm_party === 'pp' && !Q.acting && (Q.govt_months || 0) >= 1 && Q.govt_months <= 6 && Q.year >= 2016) {
       transfer(Q, 'cs', 'pp', all(0.12));
