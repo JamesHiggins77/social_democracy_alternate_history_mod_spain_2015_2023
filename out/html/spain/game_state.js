@@ -2771,21 +2771,45 @@
       Q.av_need.toLocaleString('en-GB') + ' (5% of the membership).</p><div id="' + id + '-map"></div>';
     UI.drawMap(el(id + '-map'), Q.av_winners, 'Most endorsements by province', { shares: Q.av_shares, outlines: 'light' });
   }
-  // July 2014: the first primary, which the game starts after.
+  // July 2014 primary: official results by autonomous community (PSOE, via Wikipedia);
+  // province winners from the official province results map.
+  var R2014 = {"Andalucía": {"electorate": 48858, "turnout": 70.24, "s": [20843, 61.2], "m": [7846, 23.04], "t": [5366, 15.76]}, "Aragón": {"electorate": 9020, "turnout": 69.43, "s": [3507, 56.46], "m": [1905, 30.67], "t": [800, 12.88]}, "Asturias": {"electorate": 8589, "turnout": 65.08, "s": [1868, 33.76], "m": [2579, 46.61], "t": [1086, 19.63]}, "Baleares": {"electorate": 2734, "turnout": 66.61, "s": [796, 44.25], "m": [763, 42.41], "t": [240, 13.34]}, "País Vasco": {"electorate": 5103, "turnout": 68.82, "s": [1748, 50.19], "m": [1205, 34.6], "t": [530, 15.22]}, "Canarias": {"electorate": 6507, "turnout": 69.13, "s": [2386, 53.59], "m": [1441, 32.37], "t": [625, 14.04]}, "Cantabria": {"electorate": 3251, "turnout": 71.09, "s": [910, 39.72], "m": [1051, 45.88], "t": [330, 14.4]}, "Castilla y León": {"electorate": 10418, "turnout": 72.05, "s": [2912, 39.13], "m": [3437, 46.19], "t": [1092, 14.68]}, "Castilla-La Mancha": {"electorate": 12479, "turnout": 74.68, "s": [4316, 46.62], "m": [3816, 41.22], "t": [1125, 12.15]}, "Cataluña": {"electorate": 20658, "turnout": 47.87, "s": [3648, 37.37], "m": [3946, 40.42], "t": [2168, 22.21]}, "Ceuta": {"electorate": 189, "turnout": 58.2, "s": [35, 32.41], "m": [49, 45.37], "t": [24, 22.22]}, "Extremadura": {"electorate": 10003, "turnout": 75.49, "s": [2885, 38.43], "m": [3829, 51.01], "t": [793, 10.56]}, "Galicia": {"electorate": 11550, "turnout": 69.06, "s": [3946, 50.01], "m": [3059, 38.77], "t": [886, 11.23]}, "La Rioja": {"electorate": 1263, "turnout": 76.56, "s": [443, 46.19], "m": [345, 35.97], "t": [171, 17.83]}, "Madrid": {"electorate": 15883, "turnout": 65.07, "s": [4359, 42.66], "m": [3973, 38.88], "t": [1886, 18.46]}, "Melilla": {"electorate": 285, "turnout": 63.16, "s": [91, 51.12], "m": [66, 37.08], "t": [21, 11.8]}, "Región de Murcia": {"electorate": 6155, "turnout": 72.04, "s": [2048, 46.44], "m": [1780, 40.36], "t": [582, 13.2]}, "Navarra": {"electorate": 1673, "turnout": 73.64, "s": [485, 39.62], "m": [582, 47.55], "t": [157, 12.83]}, "Comunidad Valenciana": {"electorate": 18351, "turnout": 77.44, "s": [6420, 45.42], "m": [5811, 41.11], "t": [1903, 13.46]}};
+  var R2014_MADINA = ["Lugo", "Ourense", "Pontevedra", "Asturias", "Cantabria", "León", "Palencia", "Zamora", "Salamanca", "Valladolid", "Ávila", "Segovia", "Burgos", "Navarra", "Gipuzkoa", "Araba", "Barcelona", "Girona", "Lleida", "Cáceres", "Badajoz", "Toledo", "Ceuta"];
+
   function race2014(Q) {
-    var t = { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 };
-    var map = raceByProvince(t);
-    Q.r14_winners = map.winners; Q.r14_shares = map.shares;
+    var data = lib('SPAIN_ELECTION_DATA', 'election_data.js');
+    var winners = {}, shares = {}, regWinners = {}, regShares = {};
+    Object.keys(R2014).forEach(function (r) {
+      var d = R2014[r];
+      var list = [['c_sanchez', d.s[1]], ['c_madina', d.m[1]], ['c_tapias', d.t[1]]].sort(function (a, b) { return b[1] - a[1]; });
+      var provs = (data && data.regions && data.regions[r]) || [r];
+      provs.forEach(function (p) {
+        regWinners[p] = list[0][0];
+        regShares[p] = list;
+        winners[p] = R2014_MADINA.indexOf(p) !== -1 ? 'c_madina' : 'c_sanchez';
+        shares[p] = list;
+      });
+    });
+    Q.r14_winners = winners; Q.r14_shares = shares; Q.r14_reg_winners = regWinners; Q.r14_reg_shares = regShares;
     Q.r14_rows = [{ id: 'c_sanchez', share: 48.3, votes: 64116 }, { id: 'c_madina', share: 36.0, votes: 47750 },
       { id: 'c_tapias', share: 15.0, votes: 19869 }];
   }
-  function render2014(Q, id) {
+  function render2014(Q, id, mode) {
     var out = el(id);
     if (!out) { return; }
     if (!Q.r14_rows) { race2014(Q); }
+    mode = mode || 'province';
     out.innerHTML = raceTable(Q.r14_rows, 'votes', 'Votes') +
-      '<p class="sp-map-legend">198,123 members registered; 132,850 voted (67.1%). Ratified by the Extraordinary Congress, 26–27 July.</p><div id="' + id + '-map"></div>';
-    UI.drawMap(el(id + '-map'), Q.r14_winners, 'Winner by province (hover for shares)', { shares: Q.r14_shares, outlines: 'light' });
+      '<p class="sp-map-legend">198,123 members registered; 132,850 voted (67.1%). Ratified by the Extraordinary Congress, 26–27 July.</p>' +
+      '<p class="sp-map-legend"><label><input type="radio" name="' + id + '-mode" value="province"' + (mode === 'province' ? ' checked' : '') + '> Province results map</label> ' +
+      '<label><input type="radio" name="' + id + '-mode" value="region"' + (mode === 'region' ? ' checked' : '') + '> Autonomous community results map</label></p>' +
+      '<div id="' + id + '-map"></div>';
+    UI.drawMap(el(id + '-map'), mode === 'region' ? Q.r14_reg_winners : Q.r14_winners,
+      mode === 'region' ? 'Winner by autonomous community' : 'Winner by province',
+      { shares: Q.r14_reg_shares, outlines: mode === 'region' ? 'bold' : 'light' });
+    Array.prototype.forEach.call(out.querySelectorAll('input[name="' + id + '-mode"]'), function (inp) {
+      inp.addEventListener('change', function () { render2014(Q, id, inp.value); });
+    });
   }
 
   function renderPrimary(Q, id) {

@@ -49,6 +49,21 @@ Stability: **[+ chaos_word +]**
 
 {!<div id="sp-side-congress"></div>!}
 
+= Representation
+
+[? if exiled = 1 : [+ my_party_cap +] ?][? if exiled = 0 : The PSOE ?] holds:
+
+Congress of Deputies: **[+ rep_congress +] / 350**
+
+Senate: **[+ rep_senate +] / [+ senate_total +]**
+
+European Parliament: **[+ rep_ep +] / [+ ep_total +]**
+
+Regional parliaments: **[+ rep_regional +] / [+ rep_regional_total +]**
+
+Regional presidencies: **[+ rep_presidencies +] / [+ rep_regions +]** (in government in [+ rep_in_regional_govt +])
+
+
 @politics
 title: Politics
 on-display: {!
@@ -80,20 +95,6 @@ Fed. Committee: **[+ committee_word +]**
 [? if player_in_government = 1 : [+ my_party_cap +] holds [+ my_ministries +] of 14 ministries. ?]
 
 {!<div id="sp-side-cabinet"></div>!}
-
-= Representation
-
-[? if exiled = 1 : [+ my_party_cap +] ?][? if exiled = 0 : The PSOE ?] holds:
-
-Congress of Deputies: **[+ rep_congress +] / 350**
-
-Senate: **[+ rep_senate +] / [+ senate_total +]**
-
-European Parliament: **[+ rep_ep +] / [+ ep_total +]**
-
-Regional parliaments: **[+ rep_regional +] / [+ rep_regional_total +]**
-
-Regional presidencies: **[+ rep_presidencies +] / [+ rep_regions +]** (in government in [+ rep_in_regional_govt +])
 
 = Relations
 
