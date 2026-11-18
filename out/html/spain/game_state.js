@@ -1565,7 +1565,8 @@
     // saying no, the barons move against its leader
     if (Q.third_election_threat && Q.acting && Q.sanchez_leader && !Q.rebellion_used &&
         Q.formation_weeks >= (Q.threat_week || 10)) {
-      Q.plot = Math.max(Q.plot || 0, 62);
+      // a third election is the barons' strongest case (October 2016: 132-107)
+      Q.plot = Math.max(Q.plot || 0, 80);
       Q.third_election_threat = 0;
     }
     autoFormation(Q);
@@ -2376,7 +2377,8 @@
     // while the first attempt to form a government is still open, the barons
     // wait to see how it ends (December 2015 - June 2016): they strike when
     // a repeat election has failed or the formation is over
-    if (Q.acting && (Q.fatigue || 0) === 0 && !Q.election_year) {
+    // nor do they strike in the middle of an election campaign
+    if ((Q.acting && (Q.fatigue || 0) === 0 && !Q.election_year) || Q.election_year) {
       Q.plot = Math.min(Q.plot, 55);
     }
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
