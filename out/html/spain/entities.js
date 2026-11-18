@@ -330,8 +330,8 @@
 
   // party names as they appear in the text
   var PARTY_NAMES = [
-    [['PSOE', 'PSC'], 'psoe'], [['PP', "People's Party", 'Partido Popular'], 'pp'],
-    [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar'], 'up'], [['Ciudadanos', 'Cs'], 'cs'], [['Vox'], 'vox'],
+    [['PSOE', 'PSC', 'PSOE-A', 'PSPV', 'PSdeG', 'PSE-EE', 'FSA-PSOE', 'PSCM', 'PSIB', 'PSN', 'PSOE-M'], 'psoe'], [['PP', "People's Party", 'Partido Popular', 'PPC', 'PPdeG'], 'pp'],
+    [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar', 'En Comú Podem', 'Catalunya en Comú', 'En Marea', 'Elkarrekin Podemos', 'Comuns'], 'up'], [['Ciudadanos', 'Cs'], 'cs'], [['Vox'], 'vox'],
     [['IU', 'Izquierda Unida'], 'iu'], [['ERC'], 'erc'], [['Junts', 'JxCat', 'Convergència', 'CiU'], 'junts'],
     [['PNV'], 'pnv'], [['EH Bildu', 'Bildu'], 'bildu'], [['CUP'], 'cup'], [['Coalición Canaria'], 'cc'],
     [['Más País'], 'mp'], [['Compromís'], 'compromis'], [['UPN'], 'upn'], [['PRC'], 'prc'], [['BNG'], 'bng'],

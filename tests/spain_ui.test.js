@@ -111,3 +111,13 @@ test('regional control: a party without seats is shown as absent, not in opposit
   assert.strictEqual(U.regionControl(gal, { pp: 41, psoe: 14, bng: 7, up: 13 }, 'vox'), 'absent');
   assert.strictEqual(U.regionControl(gal, { pp: 41, psoe: 14, bng: 7, up: 13 }, 'cs'), 'absent');
 });
+
+test('regional affiliates: the PSC in Catalonia, PSOE-A in Andalusia, the Comuns after 2017', () => {
+  const U = require('../out/html/spain/spain_ui.js');
+  assert.strictEqual(U.regionalShort('psoe', 'Cataluña', 2016), 'PSC');
+  assert.strictEqual(U.regionalShort('psoe', 'Andalucía', 2016), 'PSOE-A');
+  assert.strictEqual(U.regionalShort('up', 'Cataluña', 2015), 'CSQP');
+  assert.strictEqual(U.regionalShort('up', 'Cataluña', 2019), 'Comuns');
+  assert.strictEqual(U.regionalShort('vox', 'Madrid', 2019), U.shortName('vox'));
+  assert.ok(/PSC/.test(U.resultsTable({ psoe: 17, cs: 36 }, null, { compact: true, region: 'Cataluña', year: 2017 })));
+});

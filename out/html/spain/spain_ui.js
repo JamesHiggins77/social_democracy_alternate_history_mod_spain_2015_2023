@@ -130,6 +130,36 @@
     return META[id] ? META[id].short : prettyMinor(id.replace(/^x:/, ''));
   }
 
+
+  // Regional affiliates: the name a national party stands under in each
+  // autonomous community. [full name, short name]; a function of the year
+  // where the affiliate changed.
+  var AFFILIATES = {
+    psoe: { 'Andalucía': ['PSOE de Andalucía (PSOE-A)', 'PSOE-A'], 'Aragón': ['PSOE Aragón', 'PSOE-Ar'],
+      'Asturias': ['Federación Socialista Asturiana (FSA-PSOE)', 'FSA-PSOE'], 'Baleares': ['Partit Socialista de les Illes Balears (PSIB-PSOE)', 'PSIB'],
+      'Canarias': ['PSOE Canarias', 'PSOE-Can'], 'Cantabria': ['Partido Socialista de Cantabria (PSC-PSOE)', 'PSC-PSOE'],
+      'Castilla-La Mancha': ['PSOE de Castilla-La Mancha (PSCM-PSOE)', 'PSCM'], 'Castilla y León': ['PSOE de Castilla y León', 'PSOE-CyL'],
+      'Cataluña': ["Partit dels Socialistes de Catalunya (PSC)", 'PSC'], 'Comunidad Valenciana': ['Partit Socialista del País Valencià (PSPV-PSOE)', 'PSPV'],
+      'Extremadura': ['PSOE de Extremadura', 'PSOE-Ex'], 'Galicia': ['Partido dos Socialistas de Galicia (PSdeG-PSOE)', 'PSdeG'],
+      'La Rioja': ['PSOE La Rioja', 'PSOE-LR'], 'Madrid': ['PSOE de Madrid (PSOE-M)', 'PSOE-M'], 'Navarra': ['Partido Socialista de Navarra (PSN-PSOE)', 'PSN'],
+      'País Vasco': ['Partido Socialista de Euskadi (PSE-EE)', 'PSE-EE'], 'Región de Murcia': ['PSOE Región de Murcia (PSRM-PSOE)', 'PSRM'] },
+    pp: { 'Cataluña': ['Partit Popular de Catalunya (PPC)', 'PPC'], 'Galicia': ['Partido Popular de Galicia (PPdeG)', 'PPdeG'],
+      'País Vasco': ['Partido Popular del País Vasco', 'PP Vasco'], 'Navarra': ['PP (with UPN in Navarra Suma from 2019)', 'PP'] },
+    cs: { 'Cataluña': ["Ciutadans (Cs)", "Ciutadans"] },
+    iu: { 'Cataluña': ['Esquerra Unida i Alternativa (EUiA)', 'EUiA'], 'País Vasco': ['Ezker Anitza–IU', 'Ezker Anitza'],
+      'Comunidad Valenciana': ['Esquerra Unida del País Valencià (EUPV)', 'EUPV'], 'Galicia': ['Esquerda Unida', 'EU'] },
+    up: { 'Cataluña': function (y) { return y >= 2017 ? ['Catalunya en Comú–Podem', 'Comuns'] : ['Catalunya Sí que es Pot', 'CSQP']; },
+      'Galicia': function (y) { return y >= 2020 ? ['Galicia en Común', 'GeC'] : ['En Marea', 'En Marea']; },
+      'País Vasco': ['Elkarrekin Podemos', 'Elkarrekin'] }
+  };
+  function affiliate(id, region, year) {
+    var a = AFFILIATES[id] && AFFILIATES[id][region];
+    if (!a) { return null; }
+    return typeof a === 'function' ? a(year || 2016) : a;
+  }
+  function regionalName(id, region, year) { var a = affiliate(id, region, year); return a ? a[0] : partyName(id); }
+  function regionalShort(id, region, year) { var a = affiliate(id, region, year); return a ? a[1] : shortName(id); }
+
   // Register a non-party entry (a primary candidate) for maps and tables.
   function addMeta(id, name, short, color) {
     META[id] = { name: name, color: color, short: short, order: 90 };
@@ -282,7 +312,7 @@
       head = '<tr><th></th><th class="sp-num">Seats</th>' + (prevSeats ? '<th class="sp-num">\u00b1</th>' : '') + '</tr>';
       rows = ids.map(function (id) {
         return '<tr><td><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
-          escapeHtml(shortName(id)) + '</td><td class="sp-num">' + (totals[id] || 0) + '</td>' +
+          escapeHtml(opts.region ? regionalShort(id, opts.region, opts.year) : shortName(id)) + '</td><td class="sp-num">' + (totals[id] || 0) + '</td>' +
           (prevSeats ? '<td class="sp-num sp-change">' + seatChange(id) + '</td>' : '') + '</tr>';
       });
     } else {
@@ -292,7 +322,7 @@
         (prevSeats ? '<th class="sp-num">\u00b1</th>' : '') + '</tr>';
       rows = ids.map(function (id) {
         var cells = '<td><span class="sp-swatch" style="background:' + partyColor(id) + '"></span>' +
-          escapeHtml(partyName(id)) + '</td>';
+          escapeHtml(opts.region ? regionalName(id, opts.region, opts.year) : partyName(id)) + '</td>';
         if (voteShares) {
           var v = voteShares[id] || 0;
           cells += '<td class="sp-num">' + v.toFixed(1) + '%</td>';
@@ -771,6 +801,7 @@
     PARTIES: PARTIES,
     setPartyName: setPartyName,
     addMeta: addMeta,
+    regionalName: regionalName, regionalShort: regionalShort, affiliate: affiliate, AFFILIATES: AFFILIATES,
     prettyMinor: prettyMinor,
     regionControl: regionControl,
     controlColor: controlColor,

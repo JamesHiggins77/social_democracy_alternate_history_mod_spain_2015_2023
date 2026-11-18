@@ -3556,14 +3556,14 @@
       var reg = Q.regions[r];
       var g = reg.government;
       var names = function (list) {
-        return (list || []).map(function (p) { return UI.shortName(p); }).join(' + ');
+        return (list || []).map(function (p) { return UI.regionalShort(p, r, Q.year); }).join(' + ');
       };
       detail.innerHTML = '<p class="sp-gov"><strong>' + g.president + '</strong><br>' +
         (g.type || '') + '<br>Cabinet: ' + names(g.cabinet) +
         (g.support && g.support.length ? '<br>Support: ' + names(g.support) : '') +
         '<br>Next vote: ' + reg.nextElection.slice(0, 7) + '</p>' +
         '<svg id="' + id + '-hemi" class="sp-hemicycle"></svg>' +
-        UI.resultsTable(reg.seats, null, { prevSeats: reg.prevSeats, compact: true });
+        UI.resultsTable(reg.seats, null, { prevSeats: reg.prevSeats, compact: true, region: r, year: Q.year });
       UI.drawHemicycle('#' + id + '-hemi', reg.seats);
     };
     var drawMap = function () {
@@ -3637,10 +3637,10 @@
       var note = res.psoeLost ? ' The PSOE loses the presidency.'
         : (res.psoeWon ? ' The PSOE takes the presidency.' : '');
       return '<h4>' + res.region + '</h4>' +
-        UI.resultsTable(res.seats, res.shares, { prevSeats: res.prevSeats, prevShares: res.prevShares }) +
+        UI.resultsTable(res.seats, res.shares, { prevSeats: res.prevSeats, prevShares: res.prevShares, region: res.region, year: Q.year }) +
         '<p>Government: ' + res.government.president + ' (' +
-        res.government.cabinet.map(UI.partyName).join(' + ') + (res.government.support.length
-          ? ', with support from ' + res.government.support.map(UI.partyName).join(' and ') : '') +
+        res.government.cabinet.map(function (p) { return UI.regionalName(p, res.region, Q.year); }).join(' + ') + (res.government.support.length
+          ? ', with support from ' + res.government.support.map(function (p) { return UI.regionalName(p, res.region, Q.year); }).join(' and ') : '') +
         '). ' + (res.government.type || '') + '.' + note + '</p>';
     }).join('');
     out.innerHTML = html + '<div id="' + id + '-presidencies"></div>';
