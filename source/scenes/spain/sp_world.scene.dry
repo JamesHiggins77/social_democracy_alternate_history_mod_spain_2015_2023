@@ -852,3 +852,14 @@ subtitle: A little of both; nothing that hardens anyone
 on-arrival: {! if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { workers: 0.8, students: 0.8 }); window.SpainGame.transferRaw(Q, 'cs', 'psoe', { professionals: 0.5, pensioners: 0.5 }); } !}
 
 The photograph does its work without you.
+
+@regional_deadlock
+title: No majority in the Parliament
+new-page: true
+tags: sp_event
+view-if: regional_deadlock_due = 1
+on-arrival: regional_deadlock_due = 0
+
+= No majority in [+ regional_deadlock +]
+
+The pro-independence parties won more seats than anyone else, but not a majority between them, and no mainstream party will lend them a single vote: for Ciudadanos it would be the end of everything it stands for, and for the PP or the PSOE a national scandal. The unionist parties cannot add up a majority either. After weeks of failed talks the deadline passes. The Parliament is dissolved, and there will be a repeat election in about four months.

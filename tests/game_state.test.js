@@ -975,3 +975,14 @@ test('dark arts: rigging helps unless exposed, and costs funds', () => {
   }
   assert.ok(exposed > 3 && exposed < 30);
 });
+
+test('Catalonia: no unionist party props up an independence government; no bloc majority means a repeat election', () => {
+  // 2015-style: independence bloc has a majority only with the CUP, Mas is vetoed
+  const g = G.regionalGovernment({ jxsi: 62, cup: 10, cs: 25, psoe: 16, up: 11, pp: 11 }, { party: 'jxsi', president: 'Artur Mas', cabinet: ['jxsi'], support: [] }, 40, 2015);
+  assert.strictEqual(g.party, 'jxsi');
+  assert.strictEqual(g.president, 'Carles Puigdemont');
+  assert.ok(g.support.indexOf('cs') === -1 && g.support.indexOf('pp') === -1);
+  // no majority for either side
+  const r = G.regionalGovernment({ junts: 40, erc: 20, cup: 4, cs: 30, psoe: 25, pp: 6, up: 10 }, { party: 'junts', president: 'X', cabinet: ['junts'], support: [] }, 40, 2021);
+  assert.strictEqual(r.repeat, true);
+});

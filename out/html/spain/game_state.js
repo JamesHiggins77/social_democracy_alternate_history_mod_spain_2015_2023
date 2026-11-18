@@ -2343,6 +2343,28 @@
       party = largest;
       bloc = Object.keys(seats);
     }
+    // Pro-independence parties govern only with each other: no mainstream
+    // party (least of all Cs) will prop them up. Without a majority of
+    // their own the bloc cannot invest anyone: a repeat election.
+    var INDEP = ['jxsi', 'junts', 'erc', 'cup', 'bildu'];
+    var catIndep = ['jxsi', 'junts', 'erc', 'cup'];
+    if (INDEP.indexOf(party) !== -1) {
+      bloc = party === 'bildu' ? ['bildu', 'pnv', 'up', 'iu'] : catIndep;
+      if (sum(bloc) < majority) {
+        // the unionist side may still find a majority of its own
+        // (the Comuns back neither side)
+        var others = Object.keys(seats).filter(function (id) { return INDEP.indexOf(id) === -1 && id !== 'up'; });
+        var otherLeader = bySize(others)[0];
+        if (otherLeader && sum(others) >= majority && party !== 'bildu') {
+          party = otherLeader;
+          bloc = others;
+        } else {
+          return { president: previous ? previous.president : UI.partyName(party) + ' president', party: previous ? previous.party : party,
+                   cabinet: previous ? previous.cabinet : [party], support: previous ? previous.support : [], type: 'Caretaker: no majority, repeat election',
+                   repeat: true };
+        }
+      }
+    }
     var cabinet = [party];
     var support = [];
     var count = seats[party] || 0;
@@ -2356,8 +2378,13 @@
       willing.push('vox');
     }
     // add partners, largest first, until a majority is reached
+    var indepLed = INDEP.indexOf(party) !== -1;
     bySize(bloc.concat(party === 'pp' ? ['vox'] : [])).forEach(function (id) {
       if (id === party || count >= majority) {
+        return;
+      }
+      // unionist and independence parties do not prop each other up
+      if (!indepLed && catIndep.indexOf(id) !== -1 && ['pp', 'cs', 'vox', 'psoe'].indexOf(party) !== -1) {
         return;
       }
       if (willing.indexOf(id) !== -1 && cabinet.length < 3) {
@@ -2381,6 +2408,11 @@
     }
     var president = previous && previous.party === party ? previous.president
       : UI.partyName(party) + ' president';
+    var cupNeeded = indepLed && support.indexOf('cup') !== -1;
+    if (cupNeeded && /Mas/.test(president)) {
+      // the CUP will not invest Artur Mas: a unity candidate is found (January 2016)
+      president = 'Carles Puigdemont';
+    }
     return { president: president, party: party, cabinet: cabinet, support: support, type: type };
   }
 
@@ -2432,6 +2464,14 @@
       reg.lastWasSnap = false;
       reg.nextElection = lib('SpainRegionalRules', 'regional_rules.js')
         .nextRegularElection(region, date, false);
+      if (gov.repeat) {
+        // no investiture possible: a repeat election about four months on
+        var d4 = addMonths(+date.slice(0, 4), +date.slice(5, 7), 4);
+        reg.nextElection = d4[0] + '-' + (d4[1] < 10 ? '0' : '') + d4[1] + '-' + date.slice(8, 10);
+        reg.lastWasSnap = true;
+        Q.regional_deadlock = region;
+        Q.regional_deadlock_due = 1;
+      }
       var dw = {};
       var byDistrict = provinceWinners(ballots);
       Object.keys(byDistrict).forEach(function (d) { dw[districtToProvince(d)] = byDistrict[d]; });
@@ -3680,7 +3720,6 @@
     formGovernment: formGovernment,
     dissolve: dissolve,
     runGeneralElection: runGeneralElection,
-    regionalGovernment: regionalGovernment,
     provinceWinners: provinceWinners,
     runDueRegionalElections: runDueRegionalElections,
     lossReason: lossReason,
@@ -3696,6 +3735,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    regionalGovernment: regionalGovernment,
     hardcore: hardcore, darkArts: darkArts,
     membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
