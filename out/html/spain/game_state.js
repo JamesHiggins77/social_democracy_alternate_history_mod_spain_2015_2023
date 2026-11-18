@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -437,7 +437,34 @@
   // ------------------------------------------------------------------
   var EDAY_PERSIST = 0.15;
   var ATTACK_SPLIT = { pp: { cs: 0.3, vox: 0.3, psoe: 0.2 }, cs: { pp: 0.4, psoe: 0.3 }, up: { psoe: 0.4, iu: 0.2 },
-                       vox: { pp: 0.5, cs: 0.1 }, psoe: { up: 0.3, pp: 0.2 } };
+                       vox: { pp: 0.5, cs: 0.1 }, psoe: { up: 0.3, pp: 0.2 }, iu: { up: 0.4, psoe: 0.3 },
+                       erc: { psoe: 0.25, up: 0.2 }, junts: { erc: 0.2, psoe: 0.15, cs: 0.1 }, cup: { erc: 0.3, up: 0.2 },
+                       bildu: { pnv: 0.2, psoe: 0.2, up: 0.2 }, pnv: { psoe: 0.3, pp: 0.2 } };
+  // groups of parties an attack campaign can target together
+  var ATTACK_GROUPS = { catind: ['erc', 'junts', 'cup'], basque: ['bildu', 'pnv'],
+                        minor: ['cc', 'bng', 'mes', 'prc', 'foro', 'compromis', 'nc', 'te', 'geroa', 'upn'] };
+  var ATTACK_NAMES = { catind: 'the Catalan independence parties', basque: 'the Basque nationalists', minor: 'the regionalist parties' };
+  // A party reduced to its hard core: attacks find nothing to bite on.
+  function hardcore(Q, key) {
+    var poll = (Q.true_poll && Q.true_poll[key]) || 0;
+    if (key === 'vox') { return !Q.vox_on || poll < 3; }
+    if (key === 'iu') { return true; }
+    if (key === 'cs') { return Q.cs_collapsed || (Q.year >= 2019 && poll < 5); }
+    return false;
+  }
+  // What an attack does to relations and the party's factions.
+  function attackRelations(Q, key) {
+    var r = function (p, d) { Q['rel_' + p] = clamp((Q['rel_' + p] === undefined ? 40 : Q['rel_' + p]) + d, 0, 100); };
+    if (key === 'catind') { r('erc', -8); r('junts', -8); r('cs', 4); Q.regional_leaders_dissent -= 4; Q.progressives_dissent += 2; }
+    else if (key === 'basque') { r('pnv', -8); r('bildu', -8); r('cs', 2); Q.regional_leaders_dissent -= 2; }
+    else if (key === 'minor') { ['cc', 'bng', 'prc', 'nc', 'te', 'geroa'].forEach(function (p) { r(p, -5); }); Q.regional_leaders_dissent += 1; }
+    else if (key === 'up') { r('up', -8); r('cs', 3); Q.progressives_dissent += 5; Q.regional_leaders_dissent -= 3; Q.institutionalists_dissent -= 2; Q.modernisers_dissent -= 2; }
+    else if (key === 'pp') { r('pp', -6); Q.progressives_dissent -= 2; Q.institutionalists_dissent += 1; }
+    else if (key === 'cs') { r('cs', -8); Q.progressives_dissent -= 1; Q.modernisers_dissent += 2; }
+    else if (key === 'vox') { r('vox', -5); Q.progressives_dissent -= 2; }
+    else if (key === 'iu') { r('iu', -8); Q.progressives_dissent += 3; }
+    else if (key === 'psoe') { r('psoe', -8); }
+  }
 
   function withEday(Q) {
     var vm = JSON.parse(JSON.stringify(Q.vm));
@@ -518,7 +545,34 @@
     } else if (kind === 'region') {
       mulReg(key, me, 1 + 0.1 * f);
       Q.eday_last = 'Your last week of rallies and adverts is concentrated in ' + key + '.';
+    } else if (kind === 'attack' && hardcore(Q, key)) {
+      // the remaining supporters are the hard core: nothing to bite on
+      var spot = Math.random() < 0.4;
+      if (spot) {
+        Object.keys(Q.vm.classSupport).forEach(function (c) { addCls(key, c, 0.3 * f); });
+      }
+      Q.federal_committee_balance -= 3;
+      attackRelations(Q, key);
+      Q.eday_backfire = spot ? 1 : 0;
+      Q.eday_last = 'The remaining supporters of ' + UI.partyName(key) + ' are so committed that your attacks are unlikely to find purchase, and Ferraz asks why the money was spent on them.' +
+        (spot ? ' Worse, the ads put ' + UI.partyName(key) + ' back in the spotlight.' : '');
+    } else if (kind === 'attack' && ATTACK_GROUPS[key]) {
+      var group = ATTACK_GROUPS[key].filter(function (p) { return p !== me; });
+      Object.keys(Q.vm.classSupport).forEach(function (c) {
+        group.forEach(function (p) {
+          var hitg = Math.min(1.2 * f / group.length * 2, (Q.vm.classSupport[c][p] || 0));
+          addCls(p, c, -hitg);
+          addCls(me, c, hitg * 0.15);
+        });
+      });
+      attackRelations(Q, key);
+      Q.eday_backfire = 0;
+      Q.eday_last = 'Your adverts go after ' + ATTACK_NAMES[key] + '. ' +
+        (key === 'catind' ? 'Ciudadanos and the regional barons approve; ERC and Junts will remember it when the votes are counted in Congress.' :
+         (key === 'basque' ? 'The PNV and Bildu take note: their votes in Congress will be harder to win.' :
+          'The small parties are offended out of all proportion to the votes at stake.'));
     } else if (kind === 'attack') {
+      attackRelations(Q, key);
       var split = ATTACK_SPLIT[key] || {};
       var mine = me === 'psoe' ? 0.25 : 0.2;
       var backfire = Math.random() < 0.2;
@@ -538,6 +592,31 @@
     }
     finalCampaignPoll(Q);
     return repeat;
+  }
+
+  // The dark arts: party money used for dirty work. Each carries a risk of
+  // exposure, which turns it into a scandal. Returns 1 if exposed.
+  function darkArts(Q, act, target) {
+    var risk = { rig: 0.35, meddle: 0.3, sabotage: 0.4 }[act];
+    Q.funds -= act === 'rig' ? 2 : 1;
+    var exposed = Math.random() < risk;
+    Q.dark_exposed = exposed ? 1 : 0;
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    if (act === 'rig') {
+      Q.rig_bonus = exposed ? -6 : 4;
+      if (exposed) { Q.sanchez_authority -= 15; Q.sanchismo -= 10; Q.member_morale -= 10; Q.federal_committee_balance -= 8; campaign(Q, 'psoe', all(-0.8)); }
+    } else if (act === 'meddle') {
+      if (target === 'pp') { campaign(Q, 'pp', all(-0.5)); Q.pp_pressure = (Q.pp_pressure || 0) + 1; }
+      if (target === 'up') { transferRaw(Q, 'up', { mp: 0.4, psoe: 0.6 }, all(0.4)); }
+      if (target === 'cs') { campaign(Q, 'cs', all(-0.5)); }
+      if (exposed) { Q['rel_' + target] = (Q['rel_' + target] || 40) - 20; Q.sanchez_authority -= 10; campaign(Q, 'psoe', all(-0.6)); }
+    } else if (act === 'sabotage') {
+      if (target === 'diaz') { Q.plot = Math.max(0, (Q.plot || 0) - 15); Q.diaz_relation = (Q.diaz_relation || 50) - 15; }
+      else { campaign(Q, target, all(-1)); }
+      if (exposed) { Q.sanchez_authority -= 12; Q.institutionalists_dissent += 8; campaign(Q, 'psoe', all(-1)); if (target === 'diaz') { Q.plot += 25; } }
+    }
+    recalculate(Q);
+    return exposed;
   }
 
   // After the vote: a fraction of the final push persists; the rest fades.
@@ -764,7 +843,8 @@
   // concessions (-). Sets fc_for / fc_against; ousts him if he loses.
   function federalCommitteeVote(Q, bonus) {
     var attack = coupAttack(Q);
-    var defence = coupDefence(Q) + (bonus || 0) + 12 * (Math.random() - 0.5);
+    var defence = coupDefence(Q) + (bonus || 0) + 1.5 * (Q.rig_bonus || 0) + 12 * (Math.random() - 0.5);
+    Q.rig_bonus = 0;
     var total = 239;
     Q.fc_for = Math.round(total * defence / (defence + attack));
     Q.fc_against = total - Q.fc_for;
@@ -2511,7 +2591,7 @@
   // runs on his left instead. Díaz always runs.
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
-    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) - (Q.three_losses ? 8 : 0) - ((Q.members_lost || 0) - 6.5) + 6 * (Math.random() - 0.5), 15, 75);
+    var s = clamp(45 + (x - 60) * 0.5 + (Q.rig_bonus || 0) + comebackBonus(Q) - (Q.three_losses ? 8 : 0) - ((Q.members_lost || 0) - 6.5) + 6 * (Math.random() - 0.5), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
     var tapias = 0;
     Q.primary_moderniser = Q.lopez_decided ? 1 : 0;
@@ -2690,7 +2770,7 @@
   }
 
   function leadershipElection(Q, bonus) {
-    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
+    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) + (Q.rig_bonus || 0) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
       (bonus || 0) + 6 * gaussian();
     Q.primary_score = Math.round(score);
     var won = score >= 38 ? 1 : 0;
@@ -3565,6 +3645,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    hardcore: hardcore, darkArts: darkArts,
     membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,

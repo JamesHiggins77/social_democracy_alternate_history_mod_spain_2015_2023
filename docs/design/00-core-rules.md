@@ -525,3 +525,30 @@ After an October 2016 ouster, the window runs as an event chain:
 - **Más País.** Errejón's split brings 3 points of members back at once.
 - **Effect on leadership contests.** It cuts Sánchez's members-versus-apparatus edge by (members_lost − 6.5): one point per point in the 2017 race, 0.8 in other leadership votes. 6.5 is the level reached by May 2017 on the real path, so the historical race is unchanged; a stronger Podemos than in history hurts him, a weaker one helps.
 - **Sidebar.** It shows the PSOE membership as Left-leaning, Mixed or Moderate-leaning.
+
+### 7.23 Attack ads and the dark arts
+
+- **New attack targets:** IU, the Catalan independence parties (ERC, Junts, CUP), the Basque nationalists (PNV, Bildu), and the regionalists (CC, BNG, Més, PRC, Foro and others). Vox appears only once it exists as a force.
+- **The hard core.** Attacking Vox before its breakthrough (polling under 3%), IU at any time, or Cs after its collapse finds nothing to bite on: the Federal Committee balance falls by 3, and there is a 40% chance of putting the party back in the spotlight (it gains).
+- **Relations.** Every attack moves relations and factions:
+
+  | Target | Effect |
+  |---|---|
+  | Catalan independence parties | ERC and Junts −8; Cs +4; regional barons calmer; Socialist Left a little angrier |
+  | Basque nationalists | PNV and Bildu −8; Cs +2 |
+  | Regionalists | Each −5 |
+  | Podemos | Podemos −8; Cs +3; Socialist Left +5 dissent; barons, institutionalists and modernisers calmer |
+  | PP | PP −6; Socialist Left calmer |
+  | Cs | Cs −8; modernisers +2 dissent |
+  | Vox | Vox −5; Socialist Left calmer |
+  | IU | IU −8; Socialist Left +3 dissent |
+
+- **The dark arts** (party deck card, every 6 months):
+
+  | Action | Cost | Effect | If exposed |
+  |---|---|---|---|
+  | Pad the membership census | 2 | +4 in the next leadership vote (×1.5 in a Federal Committee vote) | 35% chance: −6 instead, plus authority, sanchismo, morale and Committee losses and lost voters |
+  | Meddle in the PP's internal race | 1 | A more divided PP | 30% chance: relations with the PP −20, authority −10 |
+  | Encourage Podemos's dissidents | 1 | Podemos voters drift to Más País and the PSOE | 30% chance: relations with Podemos −20, authority −10 |
+  | Leak a dossier on the PP | 1 | Hurts the PP | 40% chance: the scandal hits the PSOE |
+  | Leak a dossier on Díaz's allies (to 2018) | 1 | Barons' plot −15 | 40% chance: plot +25 |

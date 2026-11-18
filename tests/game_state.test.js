@@ -950,3 +950,28 @@ test('a strong Podemos drains left-wing members from the PSOE and blunts Sánche
   for (let i = 0; i < 36; i++) G.membersDrift(R);
   assert.ok(R.members_lost < 1);
 });
+
+test('attack ads: groups, relation effects, and the hard-core rule', () => {
+  const Q = newQ(); Q.year = 2019; Q.funds = 10; Q.rel_erc = 50; Q.rel_cs = 40;
+  G.finalSpend(Q, 'attack', 'catind');
+  assert.ok(Q.rel_erc < 50 && Q.rel_cs > 40);
+  const fcb = Q.federal_committee_balance;
+  G.finalSpend(Q, 'attack', 'iu');
+  assert.ok(/so committed/.test(Q.eday_last) && Q.federal_committee_balance < fcb);
+  const R = newQ(); R.funds = 10; R.rel_up = 50; const sl = R.progressives_dissent;
+  G.finalSpend(R, 'attack', 'up');
+  assert.ok(R.rel_up < 50 && R.progressives_dissent > sl);
+  assert.ok(G.hardcore(R, 'vox'));
+});
+
+test('dark arts: rigging helps unless exposed, and costs funds', () => {
+  let exposed = 0;
+  for (let i = 0; i < 40; i++) {
+    const Q = newQ(); Q.funds = 5;
+    const e = G.darkArts(Q, 'rig');
+    assert.strictEqual(Q.funds, 3);
+    assert.strictEqual(Q.rig_bonus, e ? -6 : 4);
+    exposed += e;
+  }
+  assert.ok(exposed > 3 && exposed < 30);
+});

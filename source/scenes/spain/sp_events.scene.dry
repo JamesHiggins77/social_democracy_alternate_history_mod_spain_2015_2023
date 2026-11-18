@@ -1324,9 +1324,13 @@ Each spend costs 1 in party funds. Attack ads drive a rival's voters to stay at 
 
 - @fca_pp: Against the PP
 - @fca_cs: Against Ciudadanos
-- @fca_up: Against Podemos
+- @fca_up: Against [+ up_brand +]
 - @fca_vox: Against Vox
 - @fca_psoe: Against the PSOE
+- @fca_iu: Against Izquierda Unida
+- @fca_catind: Against the Catalan independence parties (ERC, Junts, CUP)
+- @fca_basque: Against the Basque nationalists (PNV, Bildu)
+- @fca_minor: Against the regionalist parties (CC, BNG, Més, PRC, Foro and others)
 - @final_campaign: Back
 
 @fca_pp
@@ -1354,9 +1358,38 @@ go-to: final_campaign
 
 @fca_vox
 subtitle: Costs 1 in party funds.
+view-if: vox_on = 1
 choose-if: funds >= 1
 unavailable-subtitle: Needs 1 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'vox'); } !}
+go-to: final_campaign
+
+@fca_iu
+subtitle: Costs 1 in party funds. Its voters are the hard core of the left: there is little to win
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'iu'); } !}
+go-to: final_campaign
+
+@fca_catind
+subtitle: Costs 1 in party funds. Pleases Cs and the regional barons; ERC and Junts will remember it
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'catind'); } !}
+go-to: final_campaign
+
+@fca_basque
+subtitle: Costs 1 in party funds. Hurts relations with the PNV and Bildu
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'basque'); } !}
+go-to: final_campaign
+
+@fca_minor
+subtitle: Costs 1 in party funds. Small gains; the small parties take it personally
+choose-if: funds >= 1
+unavailable-subtitle: Needs 1 in party funds.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.finalSpend(Q, 'attack', 'minor'); } !}
 go-to: final_campaign
 
 @fca_psoe
