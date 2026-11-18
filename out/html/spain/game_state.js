@@ -30,8 +30,8 @@
 
   var FACTIONS = ['institutionalists', 'regional_leaders', 'progressives', 'modernisers', 'trade_unionists'];
   var FACTION_NAMES = {
-    institutionalists: 'Institutionalists', regional_leaders: 'Regional Leaders',
-    progressives: 'Progressives', modernisers: 'Modernisers', trade_unionists: 'Trade Unionists'
+    institutionalists: 'Institutionalists', regional_leaders: 'Regional Barons',
+    progressives: 'Socialist Left', modernisers: 'Modernisers', trade_unionists: 'Trade Unionists'
   };
   var RELATIONS = ['pp', 'cs', 'up', 'iu', 'erc', 'junts', 'pnv', 'bildu', 'cc'];
   var LEFT_BLOC = ['psoe', 'up', 'iu', 'mp', 'compromis', 'mes', 'mxme', 'cha', 'bng', 'geroa'];
@@ -1068,7 +1068,7 @@
     'denmark:frederiksen': 'Vox gains less from migration; progressives object; socially more conservative',
     'germany:gabriel': 'Calmer barons, warmer PP; members uneasy',
     'germany:schulz': 'A burst of member enthusiasm and working-class support; authority dips',
-    'germany:nahles': 'Progressives reassured; PP relations cool',
+    'germany:nahles': 'Socialist Left reassured; PP relations cool',
     'germany:scholz': 'Authority and middle-class appeal',
     'sweden:lofven': 'Higher social cohesion; union goodwill',
     'sweden:andersson': 'Some cohesion, warmer NATO; progressives uneasy',
@@ -2484,6 +2484,165 @@
     return Q.primary_won;
   }
 
+
+  // ------------------------------------------------------------------
+  // PSOE leadership races (2017): endorsements and the primary, run as
+  // elections by province on the party's membership.
+  // ------------------------------------------------------------------
+  var CANDIDATES = {
+    c_sanchez: ['Pedro Sánchez', 'Sánchez', '#E30613'], c_diaz: ['Susana Díaz', 'Díaz', '#F28C00'],
+    c_lopez: ['Patxi López', 'López', '#1E8A3E'], c_tapias: ['José Antonio Pérez Tapias', 'Pérez Tapias', '#7A1E48']
+  };
+  Object.keys(CANDIDATES).forEach(function (k) { UI.addMeta(k, CANDIDATES[k][0], CANDIDATES[k][1], CANDIDATES[k][2]); });
+  // members by federation (2017, about 188,000 in all)
+  var MEMBERS = { 'Andalucía': 46500, 'Comunidad Valenciana': 19000, 'Madrid': 16500, 'Castilla-La Mancha': 14000,
+    'Cataluña': 11500, 'Castilla y León': 10500, 'Extremadura': 9500, 'Galicia': 9500, 'Canarias': 7500,
+    'Asturias': 7000, 'Aragón': 6500, 'País Vasco': 6500, 'Región de Murcia': 6000, 'Baleares': 3500,
+    'Cantabria': 2800, 'Navarra': 2300, 'La Rioja': 1900, 'Ceuta': 400, 'Melilla': 400 };
+  // how each province leans, as a multiplier on a candidate's national share
+  var LEAN = {
+    c_diaz: { 'Sevilla': 1.55, 'Jaén': 1.6, 'Córdoba': 1.5, 'Huelva': 1.5, 'Cádiz': 1.35, 'Granada': 1.4, 'Málaga': 1.25, 'Almería': 1.35,
+      'Badajoz': 1.3, 'Cáceres': 1.15, 'Ciudad Real': 1.3, 'Toledo': 1.2, 'Cuenca': 1.25, 'Albacete': 1.15, 'Guadalajara': 1.0,
+      'Huesca': 1.25, 'Zaragoza': 1.0, 'Teruel': 1.05, 'Asturias': 1.0, 'Murcia': 0.95, 'Madrid': 0.85,
+      'Barcelona': 0.55, 'Girona': 0.55, 'Lleida': 0.6, 'Tarragona': 0.6, 'Baleares': 0.7, 'Bizkaia': 0.7, 'Gipuzkoa': 0.7, 'Araba': 0.75,
+      _default: 0.85 },
+    c_lopez: { 'Bizkaia': 7.5, 'Gipuzkoa': 7, 'Araba': 4.5, 'Navarra': 1.4, 'Cantabria': 1.2, 'La Rioja': 1.1, _default: 0.9 },
+    c_tapias: { 'Madrid': 1.3, 'Barcelona': 1.2, 'Granada': 1.3, _default: 1 },
+    c_sanchez: { _default: 1 }
+  };
+  function provinceList() {
+    var data = lib('SPAIN_ELECTION_DATA', 'election_data.js');
+    var out = [];
+    Object.keys(MEMBERS).forEach(function (r) {
+      var provs = (data && data.regions && data.regions[r]) || [r];
+      provs.forEach(function (p) { out.push([p, r, MEMBERS[r] / provs.length]); });
+    });
+    return out;
+  }
+  // National target shares {cand: %} -> province results whose
+  // member-weighted national total matches the target.
+  function raceByProvince(target) {
+    var provs = provinceList();
+    var cands = Object.keys(target).filter(function (c) { return target[c] > 0; });
+    var adj = {};
+    cands.forEach(function (c) { adj[c] = 1; });
+    var res;
+    for (var it = 0; it < 6; it++) {
+      res = {};
+      var nat = {}, tot = 0;
+      cands.forEach(function (c) { nat[c] = 0; });
+      provs.forEach(function (pr) {
+        var raw = {}, sum = 0;
+        cands.forEach(function (c) {
+          var l = LEAN[c][pr[0]] !== undefined ? LEAN[c][pr[0]] : LEAN[c]._default;
+          raw[c] = target[c] * l * adj[c]; sum += raw[c];
+        });
+        cands.forEach(function (c) { raw[c] = 100 * raw[c] / sum; nat[c] += raw[c] * pr[2]; });
+        tot += pr[2];
+        res[pr[0]] = raw;
+      });
+      cands.forEach(function (c) { adj[c] *= target[c] / (nat[c] / tot); });
+    }
+    var winners = {}, shares = {};
+    Object.keys(res).forEach(function (p) {
+      var list = cands.map(function (c) { return [c, res[p][c]]; }).sort(function (a, b) { return b[1] - a[1]; });
+      winners[p] = list[0][0];
+      shares[p] = list;
+    });
+    return { winners: winners, shares: shares };
+  }
+  var MEMBERSHIP = 187949;
+  // The endorsements (avales), 20 April - 4 May 2017: each candidate needs
+  // 5% of the membership. The apparatus collects them better than it wins votes.
+  function primaryEndorsements(Q) {
+    var t = primaryTargets(Q);
+    var e = {}, sum = 0;
+    Object.keys(t).forEach(function (c) {
+      e[c] = Math.max(0.5, t[c] + (c === 'c_diaz' ? 6 : (c === 'c_sanchez' ? -5 : (c === 'c_lopez' ? -0.5 : -1.5))));
+      sum += e[c];
+    });
+    var gathered = Math.round(MEMBERSHIP * (0.62 + 0.06 * Math.random()));
+    var valid = Math.round(gathered * 0.93);
+    var need = Math.ceil(MEMBERSHIP * 0.05);
+    Q.av_rows = Object.keys(e).map(function (c) {
+      var share = 100 * e[c] / sum;
+      return { id: c, valid: Math.round(valid * share / 100), share: Math.round(share * 10) / 10 };
+    }).sort(function (a, b) { return b.valid - a.valid; });
+    Q.av_gathered = gathered; Q.av_valid = valid; Q.av_need = need;
+    Q.av_out = Q.av_rows.filter(function (r) { return r.valid < need; }).map(function (r) { return r.id; });
+    Q.tapias_out = Q.av_out.indexOf('c_tapias') !== -1 ? 1 : 0;
+    var map = raceByProvince(e);
+    Q.av_winners = map.winners; Q.av_shares = map.shares;
+    Q.av_leader = CANDIDATES[Q.av_rows[0].id][0];
+    Q.endorsements_done = 1;
+  }
+  // National vote targets for the primary, before endorsements.
+  function primaryTargets(Q) {
+    // one draw of the members' mood per race: the endorsements and the vote share it
+    if (!Q.pr_base) {
+      comebackPrimary(Q);
+      Q.pr_base = [Q.primary_sanchez, Q.primary_diaz, Q.primary_lopez, Q.primary_tapias];
+    }
+    Q.primary_sanchez = Q.pr_base[0]; Q.primary_diaz = Q.pr_base[1]; Q.primary_lopez = Q.pr_base[2]; Q.primary_tapias = Q.pr_base[3];
+    var t = { c_sanchez: Q.primary_sanchez, c_diaz: Q.primary_diaz };
+    if (Q.primary_lopez > 0) { t.c_lopez = Q.primary_lopez; }
+    if (Q.primary_tapias > 0) { t.c_tapias = Q.primary_tapias; }
+    if (Q.sanchez_backs_lopez) {
+      // Sánchez stands down for López: most of his members follow
+      t = { c_lopez: (Q.primary_lopez || 10) + Q.primary_sanchez * (Q.sanchez_backs_lopez === 2 ? 0.8 : 0.7),
+            c_diaz: Q.primary_diaz + Q.primary_sanchez * (Q.sanchez_backs_lopez === 2 ? 0.2 : 0.3) };
+    }
+    return t;
+  }
+  // The vote, 21 May 2017. Uses the endorsement round's field.
+  function primaryVote(Q) {
+    var t = primaryTargets(Q);
+    (Q.av_out || []).forEach(function (c) {
+      // a candidate without enough endorsements is off the ballot
+      var v = t[c] || 0; delete t[c];
+      if (t.c_sanchez !== undefined) { t.c_sanchez += v * 0.7; t.c_diaz += v * 0.3; } else { t.c_diaz += v; }
+    });
+    var sum = 0;
+    Object.keys(t).forEach(function (c) { sum += t[c]; });
+    Q.pv_rows = Object.keys(t).map(function (c) {
+      return { id: c, share: Math.round(1000 * t[c] / sum) / 10, votes: Math.round(MEMBERSHIP * 0.795 * t[c] / sum) };
+    }).sort(function (a, b) { return b.share - a.share; });
+    var map = raceByProvince(t);
+    Q.pv_winners = map.winners; Q.pv_shares = map.shares;
+    Q.pv_winner = Q.pv_rows[0].id;
+    Q.pv_winner_name = CANDIDATES[Q.pv_winner][0];
+    Q.primary_sanchez = t.c_sanchez ? Math.round(1000 * t.c_sanchez / sum) / 10 : 0;
+    Q.primary_diaz = Math.round(1000 * t.c_diaz / sum) / 10;
+    Q.primary_lopez = t.c_lopez ? Math.round(1000 * t.c_lopez / sum) / 10 : 0;
+    Q.primary_tapias = t.c_tapias ? Math.round(1000 * t.c_tapias / sum) / 10 : 0;
+    Q.primary_won = Q.pv_winner === 'c_sanchez' ? 1 : 0;
+    Q.lopez_won = Q.pv_winner === 'c_lopez' ? 1 : 0;
+    return Q.primary_won;
+  }
+  function raceTable(rows, valueKey, valueLabel) {
+    return '<table class="sp-results"><thead><tr><th>Candidate</th><th class="sp-num">' + valueLabel +
+      '</th><th class="sp-num">%</th></tr></thead><tbody>' + rows.map(function (r) {
+        return '<tr><td><span class="sp-swatch" style="background:' + CANDIDATES[r.id][2] + '"></span>' + CANDIDATES[r.id][0] +
+          '</td><td class="sp-num">' + r[valueKey].toLocaleString('en-GB') + '</td><td class="sp-num"><b>' + r.share.toFixed(1) + '%</b></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+  function renderEndorsements(Q, id) {
+    var out = el(id);
+    if (!out || !Q.av_rows) { return; }
+    out.innerHTML = raceTable(Q.av_rows, 'valid', 'Valid endorsements') +
+      '<p class="sp-map-legend">Gathered ' + Q.av_gathered.toLocaleString('en-GB') + ' of ' + MEMBERSHIP.toLocaleString('en-GB') +
+      ' members (' + (100 * Q.av_gathered / MEMBERSHIP).toFixed(1) + '%); ' + Q.av_valid.toLocaleString('en-GB') + ' valid. Needed to stand: ' +
+      Q.av_need.toLocaleString('en-GB') + ' (5% of the membership).</p><div id="' + id + '-map"></div>';
+    UI.drawMap(el(id + '-map'), Q.av_winners, 'Most endorsements by province', { shares: Q.av_shares, outlines: 'light' });
+  }
+  function renderPrimary(Q, id) {
+    var out = el(id);
+    if (!out || !Q.pv_rows) { return; }
+    out.innerHTML = raceTable(Q.pv_rows, 'votes', 'Votes') +
+      '<p class="sp-map-legend">Turnout about 79.5% of ' + MEMBERSHIP.toLocaleString('en-GB') + ' members.</p><div id="' + id + '-map"></div>';
+    UI.drawMap(el(id + '-map'), Q.pv_winners, 'Winner by province (hover for shares)', { shares: Q.pv_shares, outlines: 'light' });
+  }
+
   function leadershipElection(Q, bonus) {
     var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) +
       (bonus || 0) + 6 * gaussian();
@@ -3294,8 +3453,8 @@
       return;
     }
     var short = {
-      institutionalists: 'Institutionalists', regional_leaders: 'Regional Leaders',
-      progressives: 'Progressives', modernisers: 'Modernisers', trade_unionists: 'Unionists'
+      institutionalists: 'Institutionalists', regional_leaders: 'Regional Barons',
+      progressives: 'Socialist Left', modernisers: 'Modernisers', trade_unionists: 'Unionists'
     };
     var rows = FACTIONS.map(function (f) {
       return '<tr><td>' + short[f] + '<br><span class="sp-faction-leader">' + factionLeader(Q, f) + '</span></td><td>' +
@@ -3348,6 +3507,8 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
+    renderEndorsements: renderEndorsements, renderPrimary: renderPrimary,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

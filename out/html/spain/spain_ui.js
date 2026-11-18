@@ -130,6 +130,11 @@
     return META[id] ? META[id].short : prettyMinor(id.replace(/^x:/, ''));
   }
 
+  // Register a non-party entry (a primary candidate) for maps and tables.
+  function addMeta(id, name, short, color) {
+    META[id] = { name: name, color: color, short: short, order: 90 };
+  }
+
   // Rename a party at runtime (the name Sánchez gives his own party).
   function setPartyName(id, name, short) {
     if (META[id]) {
@@ -765,6 +770,7 @@
   var api = {
     PARTIES: PARTIES,
     setPartyName: setPartyName,
+    addMeta: addMeta,
     prettyMinor: prettyMinor,
     regionControl: regionControl,
     controlColor: controlColor,

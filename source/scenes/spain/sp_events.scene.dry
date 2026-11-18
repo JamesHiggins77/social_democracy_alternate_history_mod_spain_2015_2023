@@ -320,28 +320,35 @@ You are no longer Secretary-General. [? if leadership_exception_open = 1 : A car
 title: The primary
 new-page: true
 tags: sp_event
-view-if: leadership_exception_open = 1 and ((year = 2017 and month >= 5) or year >= 2018)
+view-if: leadership_exception_open = 1 and endorsements_done = 1 and ((year = 2017 and month >= 5) or year >= 2018)
 max-visits: 1
 on-arrival: {!
-if (window.SpainGame) { window.SpainGame.comebackPrimary(Q); } else { Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0; }
+if (window.SpainGame) { window.SpainGame.primaryVote(Q); } else { Q.primary_won = (Q.member_morale + Q.sanchismo / 2 >= 60) ? 1 : 0; }
 Q.leadership_exception_open = 0;
 if (Q.primary_won) {
     Q.sanchez_leader = 1; Q.sanchez_authority = 70; Q.sanchismo += 20; Q.member_morale += 10;
     Q.federal_committee_balance = 60;
-    Q.red_lines = 0;
+    Q.red_lines = 0; Q.psoe_leader = 'Pedro Sánchez'; Q.psoe_interim = 0; Q.backbench = 0;
+} else {
+    Q.psoe_leader = Q.pv_winner_name; Q.psoe_interim = 0;
+    if (!Q.retired) { Q.backbench = 1; Q.backbench_since = Q.time; }
+    if (Q.lopez_won && Q.sanchez_backs_lopez === 2) { Q.rel_leadership = 85; Q.lopez_gives_post = 1; }
+    if (Q.lopez_won && Q.sanchez_backs_lopez) { Q.sanchismo += 3; Q.rel_leadership = Math.max(Q.rel_leadership || 40, 70); }
 }
 !}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderPrimary(Q, 'sp-primary-result'); }
+!}
 
-= The primary
+= 21 May 2017: the primary
 
-{!<img class="sp-event-img" src="img/spain/Spain/Events/Pedro-Sanchez-primarias-PSOE-Internacional_EDIIMA20170522_0010_19-%20Sanchez%20Primary%20Victory.jpg" alt="">!}
+[? if sanchez_backs_lopez = 0 : [? if primary_moderniser = 0 : Three candidates stand: you, Susana Díaz with the regional barons and the old guard behind her, and Patxi López in between. ?][? if primary_moderniser = 1 : You face Susana Díaz, with the regional barons and the old guard behind her, [? if tapias_out = 0 : and José Antonio Pérez Tapias for the Socialist Left, who says you have become what you fought against. ?][? if tapias_out = 1 : after José Antonio Pérez Tapias failed to collect enough endorsements to stand. ?] [? if lopez_endorses = 1 : Patxi López campaigns at your side. ?][? if lopez_endorses = 0 : Patxi López has stayed out of the race, and out of your campaign. ?] ?] You launched your campaign in Dos Hermanas, in Díaz's own province of Seville, and have spent months touring the local branches in your own car. ?][? if sanchez_backs_lopez > 0 : Patxi López faces Susana Díaz, with your members behind him. You campaign for him across Spain. ?]
 
+Nearly 150,000 members vote.
 
-[? if primary_moderniser = 0 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. ?][? if primary_moderniser = 1 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and José Antonio Pérez Tapias for the party's left, who says you have become what you fought against. [? if lopez_endorses = 1 : Patxi López campaigns at your side. ?][? if lopez_endorses = 0 : Patxi López has stayed out of the race, and out of your campaign. ?] ?] [? if year = 2017 : You launched your campaign in January in Dos Hermanas, in Susana Díaz's own province of Seville; she waited until March to declare. ?] You have spent months touring the local branches in your own car.
+{!<div id="sp-primary-result"></div>!}
 
-The members vote. Pedro Sánchez **[+ primary_sanchez +]%**, Susana Díaz **[+ primary_diaz +]%**, [? if primary_moderniser = 0 : Patxi López **[+ primary_lopez +]%**. ?][? if primary_moderniser = 1 : José Antonio Pérez Tapias **[+ primary_tapias +]%**. ?]
-
-[? if primary_won = 1 : Against the barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. The people who removed you spent months running the party; now they must work for you. ?][? if primary_won = 0 : The members choose Susana Díaz. Your comeback is over, for now. ?]
+[? if primary_won = 1 : Against the regional barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. The people who removed you spent months running the party; now they must work for you. ?][? if primary_won = 0 : [? if lopez_won = 1 : Patxi López is the new Secretary-General. [? if lopez_gives_post = 1 : As agreed, he keeps the "no es no" line and makes you part of his Executive. ?][? if lopez_gives_post = 0 : He thanks you for your support. Your followers wonder whether it should have been you. ?] ?][? if lopez_won = 0 : The members choose [+ pv_winner_name +]. [? if sanchez_backs_lopez = 0 : Your comeback is over, for now. ?] ?] ?]
 
 @deadlock_vote
 title: The King forces a vote
@@ -978,7 +985,7 @@ if (window.SpainGame) { window.SpainGame.oust(Q, false); }
 
 = Removed over the finances
 
-With the party unable to pay its own campaign debts, the Federal Committee meets in emergency session. The regional leaders, the old guard and even some of your own executive vote to remove you for "the ruinous management of the party". A caretaker committee takes over Ferraz.
+With the party unable to pay its own campaign debts, the Federal Committee meets in emergency session. The regional barons, the old guard and even some of your own executive vote to remove you for "the ruinous management of the party". A caretaker committee takes over Ferraz.
 
 [? if leadership_exception_open = 1 : The members have not spoken yet. The next primary is due in May 2017. ?]
 
@@ -1442,9 +1449,9 @@ Andalusia is Susana's campaign.
 title: Patxi López calls
 new-page: true
 tags: sp_event
-view-if: leadership_exception_open = 1 and lopez_decided = 0 and sanchez_moderniser = 1 and ((year = 2017 and month >= 3) or year >= 2018)
+view-if: leadership_exception_open = 1 and lopez_decided = 0 and sanchez_moderniser = 1 and calendar_seen = 1 and (year >= 2017)
 max-visits: 1
-on-arrival: {! Q.lopez_decided = 1; Q.lopez_conditional = Math.random() < 0.6 ? 1 : 0; Q.lopez_endorses = Q.lopez_conditional ? 0 : 1; !}
+on-arrival: {! Q.lopez_decided = 1; Q.lopez_announce_time = Q.time; Q.lopez_conditional = Math.random() < 0.6 ? 1 : 0; Q.lopez_endorses = Q.lopez_conditional ? 0 : 1; !}
 
 = Patxi López calls
 
@@ -1477,3 +1484,120 @@ subtitle: Keeps your hands free; López stays out of the race but backs no one, 
 on-arrival: {! Q.lopez_endorses = 0; Q.sanchismo += 2; Q.modernisers_dissent += 3; !}
 
 "Then I will stay out of it," López says. He does.
+
+@diaz_courts
+title: Susana Díaz holds court
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and diaz_courts_seen = 0 and ((year = 2016 and month >= 11) or year >= 2017)
+max-visits: 1
+on-arrival: diaz_courts_seen = 1
+
+= Susana Díaz holds court
+
+On 17 November Susana Díaz shares a stage with Felipe González; on 16 December, with José Luis Rodríguez Zapatero. She has not said she will run. She does not need to: two former prime ministers and most of the regional barons are standing beside her, and the photographs say the rest.
+
+- @courts_halls: Answer from the local branches: "the party belongs to its members"
+- @courts_attack: Attack the old guard: "the PSOE of the IBEX"
+- @courts_quiet: Say nothing for now
+
+@courts_halls
+subtitle: Builds your network; no new enemies
+on-arrival: {! Q.network = (Q.network || 0) + 5; Q.sanchismo += 3; !}
+
+While she poses with ex-presidents, you sit in a hall in Xàtiva with sixty members.
+
+@courts_attack
+subtitle: Your followers love it; the regional barons and the old guard close ranks against you
+on-arrival: {! Q.sanchismo += 6; Q.populism += 1; Q.regional_leaders_dissent += 6; Q.institutionalists_dissent += 6; !}
+
+"They have the former presidents; we have the members." The line is everywhere by the evening.
+
+@courts_quiet
+on-arrival: {! Q.member_morale -= 1; !}
+
+The season of photographs is hers.
+
+@gestora_calendar
+title: The caretaker committee sets the date
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and calendar_seen = 0 and year >= 2017
+max-visits: 1
+on-arrival: calendar_seen = 1
+
+= The caretaker committee sets the date
+
+[+ psoe_leader +]'s caretaker committee announces the calendar: the new Secretary-General will be chosen by the members in a primary in May, and the 39th Federal Congress will meet in June to set the party's new leadership and programme. To stand, a candidate will need the endorsements of 5% of the membership, collected between 20 April and 4 May.
+
+@lopez_announces
+title: Patxi López announces
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and calendar_seen = 1 and lopez_decided = 0 and sanchez_moderniser = 0
+max-visits: 1
+on-arrival: {! Q.lopez_decided = 1; Q.lopez_announce_time = Q.time; !}
+
+= Patxi López announces
+
+On 15 January, in Fuenlabrada, Patxi López announces that he will run for Secretary-General. He offers himself as the candidate who can unite the party: he stood with you in October, but he is no one's candidate but his own. Your people expect you to answer within days.
+
+- @la_run: Announce your own candidacy, in Dos Hermanas, in Susana Díaz's own province
+- @la_endorse: Endorse López: one candidate against Díaz, not two
+- @la_conditions: Endorse López, on conditions
+- @la_retire: Retire from politics
+
+@la_run
+subtitle: Three candidates: you, López and Díaz
+on-arrival: {! Q.sanchez_backs_lopez = 0; Q.sanchismo += 4; Q.member_morale += 2; !}
+
+On 28 January you announce your candidacy in Dos Hermanas, in the province of Seville. Everyone understands the gesture.
+
+@la_endorse
+subtitle: Most of your members follow you to López; if he wins, you are a backbencher in his party
+on-arrival: {! Q.sanchez_backs_lopez = 1; Q.sanchismo -= 6; Q.rel_leadership = (Q.rel_leadership || 40) + 10; !}
+
+You stand beside López in Madrid. Some of your volunteers cry; others start working for him the next morning.
+
+@la_conditions
+subtitle: López keeps "no es no" and gives you a place in his Executive if he wins; he may find the price too high
+on-arrival: {! Q.lopez_accepts_terms = Math.random() < 0.7 ? 1 : 0; if (Q.lopez_accepts_terms) { Q.sanchez_backs_lopez = 2; Q.sanchismo -= 3; } else { Q.sanchez_backs_lopez = 0; Q.sanchismo += 2; } !}
+
+[? if lopez_accepts_terms = 1 : López accepts: no abstention for the PP, ever again, and a seat in his Executive for you. You endorse him. ?][? if lopez_accepts_terms = 0 : López refuses: he will not be "Sánchez's candidate". You announce your own candidacy in Dos Hermanas on 28 January. ?]
+
+@la_retire
+subtitle: Ends your career
+on-arrival: retired = 1
+
+You announce that you are leaving politics. López and Díaz both praise your service.
+
+@diaz_enters
+title: Susana Díaz enters the race
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and lopez_decided = 1 and diaz_entered = 0 and time >= lopez_announce_time + 2 and retired = 0
+max-visits: 1
+on-arrival: diaz_entered = 1
+
+= Susana Díaz enters the race
+
+On 12 March, in a packed pavilion in Madrid, Susana Díaz finally announces her candidacy. Felipe González, Zapatero and Alfonso Guerra are in the front row, with almost every regional baron. "I want to win," she says, "and I want to win for the PSOE." The old guard has its candidate.
+
+@endorsements
+title: The endorsements
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and diaz_entered = 1 and endorsements_done = 0 and ((year = 2017 and month >= 4) or year >= 2018)
+max-visits: 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.primaryEndorsements(Q); } else { Q.endorsements_done = 1; } !}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderEndorsements(Q, 'sp-avales'); }
+!}
+
+= The endorsements
+
+From 20 April to 4 May the candidates collect the signed endorsements of the members: each needs 5% of the membership to stand. The federations' apparatus is good at this, and it shows.
+
+{!<div id="sp-avales"></div>!}
+
+[+ av_leader +] wins the endorsements. [? if tapias_out = 1 : José Antonio Pérez Tapias falls short and is off the ballot. ?] Endorsements are not votes: in the secrecy of the ballot box, members can sign for one candidate and vote for another.

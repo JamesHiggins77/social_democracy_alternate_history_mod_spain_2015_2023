@@ -903,3 +903,19 @@ test('2017 primary: a moderniser Sánchez gets López behind him and a progressi
   assert.ok(M.primary_tapias >= 4 && M.primary_diaz > 0);
   assert.ok(Math.abs(M.primary_sanchez + M.primary_diaz + M.primary_tapias - 100) < 0.5);
 });
+
+test('2017 race: endorsements and the vote are run by province; López wins the Basque provinces, Díaz Andalusia', () => {
+  const Q = newQ();
+  Q.pr_base = [50.3, 39.9, 9.8, 0];   // the real result
+  G.primaryEndorsements(Q);
+  assert.ok(Q.av_rows.length >= 3 && Q.av_need === Math.ceil(187949 * 0.05));
+  G.primaryVote(Q);
+  const total = Q.pv_rows.reduce((a, r) => a + r.share, 0);
+  assert.ok(Math.abs(total - 100) < 0.5);
+  assert.strictEqual(Q.pv_winners['Bizkaia'], 'c_lopez');
+  assert.strictEqual(Q.pv_winners['Jaén'], 'c_diaz');
+  // Sánchez stands down for López: two candidates
+  const R = newQ(); R.sanchez_backs_lopez = 2; G.primaryEndorsements(R); G.primaryVote(R);
+  assert.deepStrictEqual(R.pv_rows.map(r => r.id).sort(), ['c_diaz', 'c_lopez']);
+  assert.strictEqual(R.primary_won, 0);
+});

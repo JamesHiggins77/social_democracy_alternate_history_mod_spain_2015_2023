@@ -484,3 +484,23 @@ Based on the account of the crisis (17 resignations on 28 September, the Committ
   
   The result notes the 253 members and those who did not vote.
 - **Other texts:** the Salvados interview (El País/Prisa, Telefónica), the primary timeline (Dos Hermanas in January, Díaz in March), and the regional leaders who stood with Sánchez (Armengol, Iceta, Mendia, Tudanca).
+
+### 7.20 The 2016–17 leadership race
+
+After an October 2016 ouster, the window runs as an event chain:
+1. **Díaz holds court** (November–December, with Felipe González and Zapatero).
+2. **The caretaker committee sets the date** (primary in May, 39th Congress in June, endorsements from 5% of members).
+3. **Patxi López announces** (15 January, Fuenlabrada). Sánchez can:
+   - run himself (Dos Hermanas);
+   - endorse López: most of his members follow, and if López wins he stays a backbencher;
+   - endorse López on conditions: López keeps "no es no" and gives him an Executive post (accepted 70% of the time);
+   - retire.
+   
+   If Sánchez is a moderniser, López instead offers to endorse him (§7.18).
+4. **Díaz enters**, two months after López.
+5. **The endorsements** (April–May) are run like an election. The apparatus adds about 6 points to Díaz, and a candidate under 5% of the membership (9,398) is off the ballot. The screen shows a table and a winner-by-province map.
+6. **The primary** (21 May): results table and province map on about 188,000 members.
+
+**How the maps work:** province leans (Díaz in Andalusia, Extremadura and Castilla-La Mancha; López in the Basque Country) are scaled so the member-weighted national result matches the vote.
+
+**Terminology:** the Progressives faction is now the "Socialist Left", and "regional leaders" are now "regional barons".

@@ -76,7 +76,7 @@ The Secretary of Organisation runs the party machine: the federations, the lists
 
 @org_tour
 title: Tour the federations
-subtitle: Calms the regional leaders and firms up the Federal Committee.
+subtitle: Calms the regional barons and firms up the Federal Committee.
 choose-if: advisor_action_timer = 0
 unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
 on-arrival: regional_leaders_dissent -= 6; federal_committee_balance += 3; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
@@ -110,7 +110,7 @@ new-page: true
 
 = Adriana Lastra
 
-Asturian, combative, and one of the few who stayed with you in the worst moments. She speaks to the members, and to Podemos. Faction: Progressives.
+Asturian, combative, and one of the few who stayed with you in the worst moments. She speaks to the members, and to Podemos. Faction: Socialist Left.
 
 - @lastra_up
 - @lastra_members
@@ -196,7 +196,7 @@ new-page: true
 
 = María Jesús Montero
 
-Minister of Finance. Sevillian, fast-talking, and the person who knows where every euro goes. Faction: Regional leaders.
+Minister of Finance. Sevillian, fast-talking, and the person who knows where every euro goes. Faction: Regional barons.
 
 - @montero_tighten
 - @montero_regions
