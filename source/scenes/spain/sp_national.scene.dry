@@ -501,3 +501,18 @@ subtitle: Costs 0.3 in party funds.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'us', 4); window.SpainGame.intl(Q, 'nato', 2); } Q.funds -= 0.3; !}
 
 The photos with senators look prime-ministerial. The bill is not cheap.
+
+@quiet_week
+title: A quiet week
+new-page: true
+is-card: true
+tags: sp_national
+priority: -1
+view-if: weekly = 1
+on-arrival: month_actions += 1
+
+= A quiet week
+
+The other parties are talking to each other, and every interview, rally and campaign you could run has already been run this month. You stay in Ferraz, read the polls and wait for the phone to ring.
+
+# Lowest priority: it is only drawn when no other National politics card is available, so a week of government formation can always be played.

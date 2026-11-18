@@ -56,7 +56,7 @@ on-arrival: rel_up += 3; sanchez_authority += 3; regional_leaders_dissent += 2
 You keep the door open without walking through it on Iglesias's terms. The commentators call it a good afternoon's work.
 
 @reject
-on-arrival: {! Q.rel_up -= 12; Q.rel_cs += 5; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 8; Q.member_morale -= 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {students: 1, workers: 0.5}); } !}
+on-arrival: {! Q.rel_up -= 12; Q.rel_cs += 5; Q.regional_leaders_dissent -= 6; Q.progressives_dissent += 8; Q.member_morale -= 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1, workers: 0.5}); } !}
 
 The barons applaud. Many members, who voted for change, do not.
 
@@ -79,22 +79,29 @@ What will the PSOE do?
 - @limited: Negotiate a limited agreement in exchange for abstention
 - @other_candidate: Demand a different PP candidate
 - @grand: Offer the PP a grand coalition
+- @grand_early: Offer the PP a grand coalition
 
 @against
 on-arrival: {! Q.psoe_stance_pp = "no"; Q.member_morale += 4; Q.rel_pp -= 6; Q.sanchez_authority += 2; if ((Q.fatigue || 0) >= 1 && !Q.psoe_largest && !Q.rebellion_used && !Q.third_election_threat) { Q.regional_leaders_dissent += 10; Q.third_election_threat = 1; Q.threat_week = Math.max((Q.formation_weeks || 0) + 4, 10); } if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); } !}
 go-to: pp_decides
 
 @abstain
-on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 15; Q.progressives_dissent += 20; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 8; Q.institutionalists_dissent -= 6; Q.rel_pp += 10; Q.sanchez_authority -= 10; Q.sanchismo -= 5; Q.progressives_strength -= 5; Q.abstained_for_pp = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {up: 0.85, iu: 0.15}, {workers: 5, students: 5, unemployed: 4, professionals: 3, pensioners: 1}); } !}
+on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 15; Q.progressives_dissent += 20; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 8; Q.institutionalists_dissent -= 6; Q.rel_pp += 10; Q.sanchez_authority -= 10; Q.sanchismo -= 5; Q.progressives_strength -= 5; Q.abstained_for_pp = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.85, iu: 0.15}, {workers: 5, students: 5, unemployed: 4, professionals: 3, pensioners: 1}); } !}
 go-to: pp_decides
 
 @limited
-on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 10; Q.progressives_dissent += 12; Q.institutionalists_dissent -= 4; Q.rel_pp += 6; Q.sanchez_authority -= 5; Q.progressives_strength -= 2; Q.abstained_for_pp = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {up: 0.85, iu: 0.15}, {workers: 2.5, students: 2.5, unemployed: 2, professionals: 1.5}); } !}
+on-arrival: {! Q.psoe_stance_pp = "abstain"; Q.member_morale -= 10; Q.progressives_dissent += 12; Q.institutionalists_dissent -= 4; Q.rel_pp += 6; Q.sanchez_authority -= 5; Q.progressives_strength -= 2; Q.abstained_for_pp = 1; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {up: 0.85, iu: 0.15}, {workers: 2.5, students: 2.5, unemployed: 2, professionals: 1.5}); } !}
 go-to: pp_decides
 
 @grand
-view-if: grand_possible = 1 and right_is_cs = 0
-subtitle: Stable government and a veto on Vox; the PSOE's left and the unions revolt, Podemos and Vox both gain, and keep gaining while it lasts
+view-if: grand_possible = 1 and right_is_cs = 0 and vox_on = 1
+subtitle: Stable government and a veto on Vox; the PSOE's left and the unions revolt. Podemos gains, Vox gains far more as the only opposition on the right, and both keep gaining while it lasts
+on-arrival: {! if (window.SpainGame) { window.SpainGame.grandCoalitionOffer(Q); } !}
+go-to: grand_yes if grand_accepted = 1; grand_no if grand_accepted = 0
+
+@grand_early
+view-if: grand_possible = 1 and right_is_cs = 0 and vox_on = 0
+subtitle: Stable government; the PSOE's left and the unions revolt. Podemos gains on the left, Ciudadanos and abstention on the right, and the bleeding goes on while it lasts
 on-arrival: {! if (window.SpainGame) { window.SpainGame.grandCoalitionOffer(Q); } !}
 go-to: grand_yes if grand_accepted = 1; grand_no if grand_accepted = 0
 
@@ -103,7 +110,9 @@ title: A grand coalition
 
 = A grand coalition
 
-[+ pp_leader +] accepts. For the first time, the PP and the PSOE will govern together: [+ pp_leader +] as Prime Minister, Pedro Sánchez as Deputy Prime Minister, the PSOE with a share of the ministries and a veto on Vox. The barons and the institutions are relieved. Your progressives call it a betrayal, the UGT and CCOO are furious, and Podemos opens its doors to every disappointed socialist. On the right, Santiago Abascal calls it "the PSOE-PP" and says only Vox is left to oppose the left; the PP's hard-liners start to listen.
+[+ pp_leader +] accepts. For the first time, the PP and the PSOE will govern together: [+ pp_leader +] as Prime Minister, Pedro Sánchez as Deputy Prime Minister, the PSOE with a share of the ministries. The barons and the institutions are relieved. Your progressives call it a betrayal, the UGT and CCOO are furious, and Podemos opens its doors to every disappointed socialist.
+
+[? if grand_vox = 1 : On the right, the coalition shuts Vox out of power for the whole legislature. Santiago Abascal calls it "the PSOE-PP" and says only Vox is left to oppose the left. The PP's hard-liners are already listening, and so are some of Ciudadanos's voters and your own in the working-class suburbs. ?][? if grand_vox = 0 : On the right, the PP's hard-liners call it a surrender to the socialists. Some say they will vote for Ciudadanos next time, others that they will not vote at all. ?]
 
 @grand_no
 title: The PP says no
@@ -376,7 +385,7 @@ on-arrival: {! Q.posture = 2; Q.rel_up += 10; Q.rel_cs -= 6; Q.member_morale += 
 The members are energised. In Seville, Toledo and Mérida, regional presidents read the announcement with alarm.
 
 @stability
-on-arrival: {! Q.posture = 3; Q.rel_pp += 10; Q.rel_cs += 5; Q.member_morale -= 8; Q.progressives_dissent += 8; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 3; Q.sanchez_authority -= 3; if (Q.campaign_line == 1) { Q.sanchez_authority -= 4; Q.member_morale -= 6; } if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', {workers: Q.campaign_line == 1 ? 2.5 : 1.5, students: 1.5, unemployed: 1}); } if (window.SpainGame) { window.SpainGame.position(Q, -0.8, 0); } !}
+on-arrival: {! Q.posture = 3; Q.rel_pp += 10; Q.rel_cs += 5; Q.member_morale -= 8; Q.progressives_dissent += 8; Q.institutionalists_dissent -= 5; Q.regional_leaders_dissent -= 3; Q.sanchez_authority -= 3; if (Q.campaign_line == 1) { Q.sanchez_authority -= 4; Q.member_morale -= 6; } if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {workers: Q.campaign_line == 1 ? 2.5 : 1.5, students: 1.5, unemployed: 1}); } if (window.SpainGame) { window.SpainGame.position(Q, -0.8, 0); } !}
 
 Institutional voices welcome your responsibility. Among the members, the word "abstention" is already circulating. [? if campaign_line = 1 : You promised in the campaign that the PSOE would never make Rajoy Prime Minister, and the members have not forgotten. ?]
 
@@ -549,21 +558,7 @@ title: Vox fills Vistalegre
 new-page: true
 tags: sp_event
 view-if: cat_crisis_seen = 1 and vox_rise_seen = 0 and ((year = 2018 and month >= 10) or year >= 2019)
-on-arrival: {!
-Q.vox_rise_seen = 1;
-// The surge feeds on the Catalan crisis: on dialogue the right calls weakness,
-// and on how far the PP has itself moved to the right.
-var push = 8 + 2 * (Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) + (Q.pp_scandal >= 3 ? 2 : 0);
-push = Math.max(3, push);
-Q.vox_push = push;
-if (window.SpainGame) { window.SpainGame.partyRel(Q, 'pp', 'vox', 10); window.SpainGame.partyRel(Q, 'cs', 'vox', 5); }
-if (window.SpainGame) {
-    window.SpainGame.campaign(Q, 'vox', {self_employed: push + 3, pensioners: push - 1, workers: push,
-        homemakers: push - 1, professionals: push - 2, unemployed: push - 1, students: push - 2});
-    window.SpainGame.campaign(Q, 'pp', {self_employed: -2, pensioners: -1});
-    window.SpainGame.recalculate(Q);
-}
-!}
+on-arrival: {! Q.vox_rise_seen = 1; if (window.SpainGame) { window.SpainGame.voxRally(Q); } !}
 
 = Vox fills Vistalegre
 
@@ -1102,9 +1097,13 @@ on-arrival: {! if (window.SpainGame && !Q.eday) { window.SpainGame.startFinalCam
 
 = The final campaign
 
-Polling day is close. Whatever money is left can buy one last push: rallies and adverts in a region, a message aimed at one group, or attack ads against a rival. It moves votes on election day; little of it lasts beyond. Each repeat of the same spend does less than the last.
+Polling day is close. Whatever money is left can buy one last push: rallies and adverts in a region, a message aimed at one group, or attack ads against a rival. It moves votes on election day; little of it lasts beyond.
+
+Last-minute money buys little: the airtime is booked, the message is set and most voters have made up their minds. A spend now does about half of what the same money did during the legislature, repeating one halves it again, and every unit already spent this campaign makes the next one weaker.
 
 Party funds: **[+ funds_display +]**. Spent so far: [+ eday_spent +].
+
+[? if eday_spent > 0 : A new spend now does [+ eday_next_factor +]% of what the first one did. ?]
 
 [+ my_party_cap +] on election day, on current spending: **[+ eday_poll +]%** (without the final push: [+ eday_base_poll +]%), about [+ eday_seats +] seats.
 

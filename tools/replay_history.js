@@ -35,9 +35,10 @@ Q.rel_up = 40; Q.rel_pnv = 50; G.holdCensure(Q); if (!Q.censure_passed) { consol
 // historical decisions in government
 G.position(Q, 0, 1.2); G.target(Q, 'psoe', 'young', 1.5); G.campaign(Q, 'vox', { pensioners: 0.8, self_employed: 0.8, workers: 0.5 }); // Aquarius
 until(2018, 10);
+G.voxRally(Q); // Vox fills Vistalegre (October 2018), as the event does
 G.campaign(Q, 'psoe', { pensioners: 3 }); G.position(Q, 0.3, 0); G.social(Q, 2); // index pensions
-until(2018, 12);
-Q.vox_breakthrough = 1; G.transferRaw(Q, 'pp', 'vox', { pensioners: 3.2, self_employed: 4.5, workers: 2.4, professionals: 2.6, homemakers: 2.4, unemployed: 1.6 }); G.transferRaw(Q, 'cs', 'vox', { self_employed: 1.5, workers: 1, professionals: 1, students: 0.8 }); G.transferRaw(Q, 'psoe', 'vox', { workers: 0.5, unemployed: 0.5 }); // Andalusia
+until(2018, 12); Q.cat_dialogue = (Q.cat_dialogue || 0) + 1; // Pedralbes and the 'relator' (Dec 2018 - Feb 2019)
+Q.vox_breakthrough = 1; G.transferRaw(Q, 'pp', 'vox', { pensioners: 2, self_employed: 3, workers: 1.5, professionals: 1.5, homemakers: 1.5, unemployed: 1 }); G.transferRaw(Q, 'cs', 'vox', { self_employed: 1.5, workers: 1, professionals: 1, students: 0.8 }); G.transferRaw(Q, 'psoe', 'vox', { workers: 0.5, unemployed: 0.5 }); // Andalusia
 G.campaign(Q, 'psoe', { workers: 3, unemployed: 1.5, students: 1, self_employed: -1.5 }); G.position(Q, 1, 0); G.econ(Q, -0.1, 0.25); G.social(Q, 3); // minimum wage +22%
 until(2019, 2);
 // February 2019: the photo of Colón ("the three rights")
@@ -57,6 +58,7 @@ until(2020, 3);
 G.econ(Q, -1.5, 1.0); G.social(Q, 1); G.campaign(Q, 'psoe', { pensioners: 2, homemakers: 1 }); G.campaign(Q, 'vox', { self_employed: 2, professionals: 0.5 }); // strict lockdown
 until(2020, 7); G.econ(Q, 0.4 * 2, -0.2 * 2); // recovery fund, green
 until(2021, 6);
+Q.pardons_granted = 1; Q.cat_dialogue = (Q.cat_dialogue || 0) + 2; Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 8);
 G.transfer(Q, 'psoe', { pp: 0.5, vox: 0.3, cs: 0.2 }, { pensioners: 2, homemakers: 1.5, self_employed: 1.5 }); G.position(Q, 0, 1.5); // pardons
 until(2021, 12); G.econ(Q, 0.1, -0.3); G.position(Q, -0.3, 0); // labour reform by agreement
 until(2023, 7, () => { Q.election_year = 2023; Q.election_month = 7; }); elect();

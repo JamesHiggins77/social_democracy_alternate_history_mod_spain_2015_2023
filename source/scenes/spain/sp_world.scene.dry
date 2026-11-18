@@ -693,7 +693,7 @@ title: Vox breaks through
 new-page: true
 tags: sp_event
 view-if: vox_breakthrough_due = 1
-on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 3.2, self_employed: 4.5, workers: 2.4, professionals: 2.6, homemakers: 2.4, unemployed: 1.6}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1, professionals: 1, students: 0.8}); window.SpainGame.transferRaw(Q, 'psoe', 'vox', {workers: 0.5, unemployed: 0.5}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
+on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 2, self_employed: 3, workers: 1.5, professionals: 1.5, homemakers: 1.5, unemployed: 1}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1, professionals: 1, students: 0.8}); window.SpainGame.transferRaw(Q, 'psoe', 'vox', {workers: 0.5, unemployed: 0.5}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
 
 = Vox breaks through
 

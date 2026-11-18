@@ -220,6 +220,8 @@ Events explain the currents and let the player respond: the abortion law's withd
 
 From a general election until a government is invested or the Cortes are dissolved, each turn is one week ("Week 2, January 2016"); four weeks close the month, which runs the usual monthly routine (funds, poll record, regional elections, drift). The investiture clock counts eight weeks from the first vote. Government Negotiations cards cool down in weeks; other cards cool down at a quarter-month per week. Formation events are timed in weeks since the election: the King's consultations from week 2, Iglesias's offer from week 3, the King turning to Sánchez from week 5, the forced vote at week 16.
 
+A week always has something to play: if every National politics card is on cooldown, the deck offers *A quiet week* (lowest priority, so it only appears when nothing else can), which passes the week. Without it an acting PSOE government with no negotiations deck could run out of cards and stall the game.
+
 ### 7.1 Decks
 
 | Deck | Available | Examples |
@@ -293,7 +295,13 @@ Advisers (pinned, sharing one action timer): Antonio Hernando (parliament), the 
 
 **Chaos** (0–100, shown as Stability: Calm, Restless, Turbulent, Chaotic, In turmoil) is recalculated monthly from: unemployment above 13% and negative growth; an acting government (10, plus 2 a month up to 15) and repeat elections (6 each); migration (a background level by year, highest in 2018 and 2020–21, plus event tension: the Aquarius, Ceuta, the Canary route, Ukraine); the Catalan crisis (15) and its aftermath (the 2019 sentence adds tension that fades); PP corruption while the PP governs; the pandemic (March 2020 to June 2021); and low social cohesion. It is smoothed (70% last month, 30% new).
 
-From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos every month: Vox takes from the PP, Cs and (a little) the PSOE, at 30% strength until it breaks through (2018, or its first regional seats) and slowing as it nears 16%; learning the Danish model cuts its migration-driven gains by a fifth. When chaos falls below 30, Vox's protest voters drift back to the PP. Vox's first regional seats trigger a breakthrough event with a further jump.
+From 2016 (2014–15 follows the real polls), chaos feeds Vox and, less, Podemos every month: Vox takes from the PP, Cs and (a little) the PSOE, at 30% strength until it breaks through (2018, or its first regional seats) and slowing as it nears its ceiling (21%, 34% while a grand coalition sits); learning the Danish model cuts its chaos-driven gains, and the migration part of the national question, by a fifth. When chaos falls below 25, Vox's protest voters drift back to the PP (1.2% of Vox's vote a month for every ten points of calm), except to a PP governing with the PSOE. Vox's first regional seats trigger a breakthrough event with a further jump.
+
+**Vox as a force.** Before its breakthrough Vox is a fringe party (0.2% in 2015, no seats anywhere), and events and choices only name it once `vox_on` is set: Vox has regional seats, seats in Congress or polls 3% or more.
+
+**The national question.** Once Vox is a force it also grows whatever the general mood, on the issues that carried it from 0.2% to 15% in 2018–19 under a PSOE government that had calmed most of the rest (`nationalQuestion`, rate `VOX_NATIONAL_RATE`): Catalan tension and the crisis itself; a left-wing government that relies on ERC, Junts or Bildu (a government born of a censure those parties voted for counts); dialogue and pardons; a progressive social course in government; and migration above its background level.
+
+**Vistalegre.** Vox's October 2018 rally (`voxRally`, used by the event and by the replay) adds 4 support points plus 2 per step of Catalan dialogue, minus the hard line, plus 2 if the PP has been convicted of corruption.
 
 **Ciudadanos**: its losses no longer recover from 2016. As the junior partner of a PP government it is absorbed (mostly by the PP), and from 2019, once Vox polls 5% or more, the right consolidates at its expense. **Podemos** loses 0.8% of its support a month from 2017 to internal strife, plus the Vistalegre II (2017) and Galapagar chalet (2018) events.
 
@@ -322,11 +330,11 @@ Campaign skill (from Labour and Obama) adds up to +30% to campaign gains. Each o
 
 Just before every general election (when Sánchez leads a party), a final-campaign screen lets the party spend what is left, 1 in funds per spend, and shows the projected election-day vote and seats as money goes in:
 
-- **A group** (young people, students, pensioners, working class, middle class, women, the unemployed, rural Spain): +3 support points across the classes it reaches (rural Spain: +6% in six rural communities).
-- **A region** (the thirteen largest communities): +10% to the party's vote there.
-- **Attack ads** against the PP, Cs, Podemos, Vox (or the PSOE, after Sánchez has left it): the rival loses up to 1.6 points in every class; a quarter of that comes to the player's party (a fifth for a new party) and the rest scatters to the rival's neighbours. One attack in five backfires and costs the player's party instead.
+- **A group** (young people, students, pensioners, working class, middle class, women, the unemployed, rural Spain): +1.5 support points across the classes it reaches (rural Spain: +3% in six rural communities).
+- **A region** (the thirteen largest communities): +5% to the party's vote there.
+- **Attack ads** against the PP, Cs, Podemos, Vox (or the PSOE, after Sánchez has left it): the rival loses up to 0.8 points in every class; a quarter of that comes to the player's party (a fifth for a new party) and the rest scatters to the rival's neighbours. One attack in five backfires and costs the player's party instead.
 
-Repeating the same spend within one campaign has diminishing returns (full, 1/2, 1/3...). The effects apply to the election-day vote only; 15% of them persists afterwards, so the polls barely move. The last-minute swing shows up in the pollsters' miss on the results page.
+These are the values for a first spend. Last-minute money buys little (`FINAL_SCALE` = 0.5, half of what the same money once bought), so funds are worth more spent during the legislature than hoarded for election night. Repeating the same spend within one campaign has diminishing returns (full, 1/2, 1/3...), and every unit already spent in the campaign cuts the next by a further 10% (`FINAL_SATURATION`): after ten units a fresh spend does half of what the first did. The screen says what a fresh spend is now worth. Measured in April 2019: one unit on the working class buys +0.3 points on the day; five different spends +0.9; fourteen +1.5; twenty-eight +1.9 (it was +6.9 and 27 seats before the cut). The effects apply to the election-day vote only; 15% of them persists afterwards, so the polls barely move. The last-minute swing shows up in the pollsters' miss on the results page.
 
 ### 7.11 Regions map, representation, people and links
 
@@ -388,15 +396,19 @@ A replay script plays Sánchez's real decisions with the game's own effects (the
 - **Ciudadanos backs a PP government from outside** (as in 2016) unless PP–Cs relations are warm (65+), which spares it the junior partner's slow absorption; propping the PP up still costs it a little. The Catalan crisis rallies anti-independence voters to Cs.
 - **The censure.** A successful motion of no confidence brings the new Prime Minister's bounce (Podemos and Cs voters come to the PSOE), and if it follows a corruption conviction the PP's voters scatter to Cs, Vox and the PSOE.
 - **Podemos declines** faster from 2017 (1.1% of its vote a month), and chaos feeds it only a third as much after 2016.
-- **Vox** grows faster once the Catalan crisis has happened, its Andalusian breakthrough and the 2019 sentence take more PP and Cs voters, and its voters drift back to the PP only when things are calm (chaos under 20).
+- **Vox** grows faster once the Catalan crisis has happened, its Andalusian breakthrough and the 2019 sentence take more PP and Cs voters, and its voters drift back to the PP only when things are calm (chaos under 25). The national question (§7.9) carries it through 2018–19.
 - **Ciudadanos's 2019 collapse.** If, from 2018, Cs could have let the PSOE govern just by abstaining and refused (relations below 50), the repeat election is blamed on it and it loses heavily, mostly to the PP and Vox.
 - **Government.** A new PSOE government draws some Podemos and Cs voters in its first year; wear is gentle afterwards.
 
-Result of the replay (game seats, real in brackets): April 2019 PSOE 107 (123), PP 95 (66), Podemos 46 (42), Cs 55 (57), Vox 10 (24); November 2019 PSOE 121 (120), PP 105 (89), Podemos 44 (35), Cs 16 (10), Vox 25 (52); July 2023 PSOE 108 (121), PP 139 (137), Podemos/Sumar 24 (31), Cs 2 (0), Vox 32 (33). A radical economic line on the same path gives the PSOE 100, 100 and 88 seats instead, with higher unemployment and a stronger Cs. Vox in 2019 is still on the low side.
+Result of the replay (game seats, real in brackets): April 2019 PSOE 99 (123), PP 90 (66), Podemos 46 (42), Cs 47 (57), Vox 30 (24); November 2019 PSOE 109 (120), PP 99 (89), Podemos 41 (35), Cs 13 (10), Vox 49 (52); July 2023 PSOE 96 (121), PP 148 (137), Podemos/Sumar 23 (31), Cs 0 (0), Vox 39 (33). Vox's vote: 11.0% (10.3%), 14.3% (15.1%), 12.6% (12.4%).
+
+An earlier version of the replay left out the Vistalegre rally (October 2018), the largest single Vox event, and so reported Vox far too low in 2019 (10 and 25 seats). With the rally the old model gave Vox 46, 59 and 49 seats: too early and too lasting. The rally is now smaller, the national question carries Vox's growth under a PSOE government, and calm returns its protest voters to the PP faster.
+
+`tools/playtest.js` plays the compiled game headless with random cards and choices (`--grand` always offers a grand coalition when it can). Over 80 random games Vox averages 57 seats at elections from 2019 (15.6%), above history (24, 52, 33) because random play is far more chaotic than the real legislatures: more acting governments, repeat elections and PP governments under scandal.
 
 ### 7.5 Election results
 
-Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows its vote shares, and autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
+Every general and regional result shows vote share, change in vote share, seats, seat share and change in seats against the previous election (green ▲ up, red ▼ down, (-) unchanged), and a map of the most-voted party in each province (Natural Earth boundaries, `tools/build_map.py`); hovering a province shows how many deputies it elects and, for each party, its vote share and the seats it won there (every party with a seat is listed, even outside the top five); on regional maps, provinces that are not themselves districts (the Canary islands, Asturias's districts) show the whole regional parliament. Autonomous communities are outlined (bold on regional-election maps). The sidebar's Regions tab has a dropdown with each community's government (cabinet, external support, majority type) and its parliament's seat diagram.
 
 ## 8. Lessons from the original's community
 
@@ -437,5 +449,6 @@ From player discussion of the Weimar game:
 **Exile cards** for the Pedro Sánchez List, Cs or Podemos: On the road (heartlands, cities, or television), What the party stands for (the party's line, his own, or anti-establishment), and The past comes calling (a scandal from six months after leaving, which can be fought, explained, or ignored as a gamble).
 
 **Grand coalition.** A PP–PSOE grand coalition is possible whenever the two have 176 seats and the PP accepts.
-- At formation: PSOE voters go to Podemos (and IU and Más País), and PP voters go to Vox (and Cs); progressives and unions revolt.
-- While it lasts, every month: further PSOE→Podemos and PP→Vox transfers, and union and progressive dissent rises.
+- At formation: PSOE voters go to Podemos (and IU and Más País); progressives and unions revolt. Once Vox is a force, the PP's hard right goes to Vox in large numbers (about 4 points at once), with some Cs voters; before that, the PP's discontented go to Ciudadanos or stay at home, and the text does not mention Vox.
+- While it lasts, every month: PSOE→Podemos transfers, and union and progressive dissent rises. Once Vox is a force it is the only opposition on the right and takes from the PP (`VOX_GRAND_RATE`), Cs and the PSOE's older and working-class voters; its ceiling rises to 34% and calm no longer sends its voters back to the PP. Before its breakthrough the PP's leak goes mostly to Cs, with a trickle to Vox that can build into a breakthrough.
+- Measured on the real path: a grand coalition after November 2019 takes Vox from 14% to 18% at formation, 23% after a year, 27% after two and 31% (133 seats) by July 2023, against 13% and 39 seats on the real path. The old version gave about +5 points over two years.

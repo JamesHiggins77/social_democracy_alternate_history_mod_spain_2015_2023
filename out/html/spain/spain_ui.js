@@ -310,7 +310,11 @@
 
   // Province map coloured by the party with most votes.
   //   winners: {province: party}; provinces not in winners are drawn grey
-  //   opts.shares: {province: [[party, %], ...]} shown on hover
+  //   opts.shares: {province: [[party, %, seats], ...]} shown on hover (seats
+  //     optional: results saved before they were recorded have none)
+  //   opts.magnitude: {province: seats elected there}
+  //   opts.scope: {province: region} when the figures are the whole
+  //     regional parliament's rather than the province's
   //   opts.outlines: 'bold' or 'light' outlines around autonomous communities
   // ------------------------------------------------------------------
   // Who controls each autonomous community, and how much a party (or
@@ -474,6 +478,8 @@
     }
     opts = opts || {};
     var shares = opts.shares || {};
+    var magnitude = opts.magnitude || {};
+    var scope = opts.scope || {};
     var prev = opts.prevWinners || null;
     var flips = 0;
     var flipped = function (p) {
@@ -522,16 +528,27 @@
     Array.prototype.forEach.call(container.querySelectorAll('.sp-prov'), function (el) {
       el.addEventListener('mousemove', function (ev) {
         var p = el.getAttribute('data-prov');
-        var rows = (shares[p] || []).map(function (s) {
-          return '<div><span class="sp-swatch" style="background:' + partyColor(s[0]) + '"></span>' +
-            escapeHtml(shortName(s[0])) + ' <b>' + s[1].toFixed(1) + '%</b></div>';
+        var list = shares[p] || [];
+        var withSeats = list.some(function (s) { return s[2] !== undefined; });
+        var rows = list.map(function (s) {
+          return '<tr><td><span class="sp-swatch" style="background:' + partyColor(s[0]) + '"></span>' +
+            escapeHtml(shortName(s[0])) + '</td><td class="sp-num"><b>' + s[1].toFixed(1) + '%</b></td>' +
+            (withSeats ? '<td class="sp-num">' + (s[2] || '–') + '</td>' : '') + '</tr>';
         }).join('');
+        var mag = magnitude[p];
+        var head = '<strong>' + escapeHtml(p) + '</strong>' +
+          (mag && !scope[p] ? ' <span class="sp-tip-mag">' + mag + ' seat' + (mag === 1 ? '' : 's') + '</span>' : '');
+        var scopeNote = scope[p] ? '<div><em>Whole parliament of ' + escapeHtml(scope[p]) +
+          (mag ? ' (' + mag + ' seats)' : '') + '</em></div>' : '';
         var flipNote = flipped(p) ? '<div><em>Gained from ' + escapeHtml(shortName(prev[p])) + '</em></div>' : '';
-        tip.innerHTML = '<strong>' + escapeHtml(p) + '</strong>' + flipNote + (rows || '<div>No data</div>');
+        var table = rows ? '<table class="sp-tip-table">' +
+          (withSeats ? '<thead><tr><th></th><th>Votes</th><th>Seats</th></tr></thead>' : '') +
+          '<tbody>' + rows + '</tbody></table>' : '<div>No data</div>';
+        tip.innerHTML = head + scopeNote + flipNote + table;
         var r = wrap.getBoundingClientRect();
         var x = ev.clientX - r.left + 12;
         var y = ev.clientY - r.top + 12;
-        if (x > r.width - 130) { x -= 150; }
+        if (x > r.width - 170) { x -= 190; }
         tip.style.left = x + 'px';
         tip.style.top = y + 'px';
         tip.style.display = 'block';
