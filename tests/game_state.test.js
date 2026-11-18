@@ -1004,3 +1004,11 @@ test('advisers: at most three, hiring and dismissing move their faction, special
   assert.strictEqual(Q.adv_deputy, 1);
   assert.strictEqual(Q.adv_loyalist, 1);
 });
+
+test('sanchista advisers move personal loyalty rather than a faction', () => {
+  const Q = newQ(); const s0 = Q.sanchismo;
+  assert.ok(G.fireAdviser(Q, 'luena'));
+  assert.strictEqual(Q.sanchismo, s0 - 4);
+  Q.year = 2016; Q.month = 1;
+  assert.ok(G.hireAdviser(Q, 'vara'));
+});

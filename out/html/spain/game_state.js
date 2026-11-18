@@ -234,16 +234,21 @@
   var ADVISERS = {
     hernando: ['Antonio Hernando', 'institutionalists', function (Q) { return !Q.rebellion_used; },
       'Parliamentary arithmetic; until the 2016 crisis, when he backs the abstention'],
-    luena: ['César Luena', 'regional_leaders', function (Q) { return !Q.rebellion_used; },
+    luena: ['César Luena', 'sanchistas', function (Q) { return !Q.rebellion_used; },
       'Secretary of Organisation to 2016: the federations and the money'],
     lastra: ['Adriana Lastra', 'progressives', function (Q) { return true; }, 'The members and Podemos'],
     redondo: ['Iván Redondo', 'modernisers', function (Q) { return Q.year >= 2017; }, 'Polling, narrative, the centre (from 2017)'],
     calvo: ['Carmen Calvo', 'institutionalists', function (Q) { return Q.year >= 2017 && (Q.econ_left || 0) <= 4; },
       'Constitutional law and the institutions; equality (from 2017, not on a hard-left line)'],
-    cerdan: ['Santos Cerdán', 'trade_unionists', function (Q) { return !!Q.rebellion_used; },
+    cerdan: ['Santos Cerdán', 'sanchistas', function (Q) { return !!Q.rebellion_used; },
       'The organiser of the comeback (after the 2016 crisis)'],
     tapias: ['José Antonio Pérez Tapias', 'progressives', function (Q) { return (Q.econ_left || 0) >= 3; },
-      'The Socialist Left (only on a left-wing line)']
+      'The Socialist Left (only on a left-wing line)'],
+    ferrer: ['Toni Ferrer', 'trade_unionists', function (Q) { return Q.year >= 2017; }, 'The unions: workers and donations (from 2017)'],
+    puig: ['Ximo Puig', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.econ_left || 0) <= 4; },
+      'Valencia: regional campaigning, calming the barons (from July 2015)'],
+    vara: ['Guillermo Fernández Vara', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.plot || 0) < 50; },
+      'Extremadura: regional campaigning, calming the barons (from July 2015)']
   };
   var ADVISER_MAX = 3;
   function advCount(Q) {
@@ -252,14 +257,16 @@
   function hireAdviser(Q, id) {
     if (Q['adv_' + id] || advCount(Q) >= ADVISER_MAX || !ADVISERS[id][2](Q)) { return false; }
     Q['adv_' + id] = 1;
-    Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) - 3;
+    if (ADVISERS[id][1] === 'sanchistas') { Q.sanchismo += 2; }
+    else { Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) - 3; }
     recalculate(Q);
     return true;
   }
   function fireAdviser(Q, id) {
     if (!Q['adv_' + id]) { return false; }
     Q['adv_' + id] = 0;
-    Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) + 6;
+    if (ADVISERS[id][1] === 'sanchistas') { Q.sanchismo -= 4; Q.member_morale -= 2; }
+    else { Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) + 6; }
     recalculate(Q);
     return true;
   }
@@ -287,6 +294,7 @@
     var ECON_FIGURES = { up: 'Nacho Álvarez', cs: 'Luis Garicano', pp: 'Luis de Guindos' };
     Q.adv_econ_name = eco !== Q.player_party ? (ECON_FIGURES[eco] || UI.partyName(eco) + "'s minister") :
       (Q.year >= 2018 ? 'Nadia Calviño' : 'your Minister of Economy');
+ Q.adv_home_region = Q.adv_puig ? 'Comunidad Valenciana' : 'Extremadura';
     Q.adv_loyalist = (Q.sanchez_leader || Q.backbench || Q.leadership_exception_open || Q.exiled) && !Q.abalos_gone ? 1 : 0;
   }
 

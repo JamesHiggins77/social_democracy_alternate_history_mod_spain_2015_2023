@@ -21,6 +21,8 @@ His current count for your investiture:
 - @cs_channel
 - @group
 - @pnv
+- @fx_inst_0
+- @fx_inst_1
 - @root: Back
 
 @cs_channel
@@ -73,6 +75,8 @@ Secretary of Organisation: he runs the party machine, the federations, the lists
 - @org_tour
 - @org_money
 - @org_discipline
+- @fx_sanch_0
+- @fx_sanch_1
 - @root: Back
 
 @org_tour
@@ -117,6 +121,8 @@ Asturian, combative, and one of the few who stayed with you in the worst moments
 - @lastra_up
 - @lastra_members
 - @lastra_women
+- @fx_left_0
+- @fx_left_1
 - @root: Back
 
 @lastra_up
@@ -160,6 +166,8 @@ A political consultant who once worked for the PP and now works for you. He beli
 - @redondo_poll
 - @redondo_narrative
 - @redondo_centre
+- @fx_mod_0
+- @fx_mod_1
 - @root: Back
 
 @redondo_poll
@@ -247,6 +255,8 @@ The Valencian deputy who was with you before anyone else, and who will be with y
 - @org_money
 - @org_discipline
 - @abalos_road
+- @fx_sanch_0
+- @fx_sanch_1
 - @root: Back
 
 @abalos_road
@@ -272,6 +282,8 @@ Former Minister of Culture, professor of constitutional law, Cordoban. She knows
 
 - @calvo_institutions
 - @calvo_equality
+- @fx_inst_0
+- @fx_inst_1
 - @root: Back
 
 @calvo_institutions
@@ -305,6 +317,8 @@ The Navarrese organiser who collected the signatures and ran the logistics of th
 
 - @cerdan_census
 - @cerdan_navarra
+- @fx_sanch_0
+- @fx_sanch_1
 - @root: Back
 
 @cerdan_census
@@ -338,6 +352,8 @@ new-page: true
 The philosopher of Izquierda Socialista, the party's left current. Faction: Socialist Left.
 
 - @tapias_left
+- @fx_left_0
+- @fx_left_1
 - @root: Back
 
 @tapias_left
@@ -448,15 +464,18 @@ new-page: true
 
 = Your team
 
-You can keep up to three advisers at a time (now [+ adv_count +]). Bringing someone in pleases their faction a little; letting them go angers it more. José Luis Ábalos and the government's ministers do not count.
+You can keep up to three advisers at a time (now [+ adv_count +]). Bringing someone in pleases their faction a little; letting them go angers it more. Each faction brings its own kind of help: Institutionalists keep the party together and speak to everyone; Modernisers bring good governance and moderate, liberal voters; the Socialist Left fires up the base and keeps Podemos close; Sanchistas build personal loyalty and protect your position; Trade Unionists win workers and donations; Regional Barons campaign in their regions, calm the other barons and attract moderates. José Luis Ábalos and the government's ministers do not count.
 
 - @hire_hernando: Bring in Antonio Hernando (Institutionalists)
-- @hire_luena: Bring in César Luena (Secretary of Organisation)
+- @hire_luena: Bring in César Luena (Sanchistas)
 - @hire_lastra: Bring in Adriana Lastra (Socialist Left)
 - @hire_redondo: Bring in Iván Redondo (Modernisers)
 - @hire_calvo: Bring in Carmen Calvo (Institutionalists)
-- @hire_cerdan: Bring in Santos Cerdán (the organisation)
+- @hire_cerdan: Bring in Santos Cerdán (Sanchistas)
 - @hire_tapias: Bring in José Antonio Pérez Tapias (Socialist Left)
+- @hire_ferrer: Bring in Toni Ferrer (Trade Unionists)
+- @hire_puig: Bring in Ximo Puig (Regional Barons)
+- @hire_vara: Bring in Guillermo Fernández Vara (Regional Barons)
 - @fire_hernando: Let Antonio Hernando go
 - @fire_luena: Let César Luena go
 - @fire_lastra: Let Adriana Lastra go
@@ -464,6 +483,9 @@ You can keep up to three advisers at a time (now [+ adv_count +]). Bringing some
 - @fire_calvo: Let Carmen Calvo go
 - @fire_cerdan: Let Santos Cerdán go
 - @fire_tapias: Let José Antonio Pérez Tapias go
+- @fire_ferrer: Let Toni Ferrer go
+- @fire_puig: Let Ximo Puig go
+- @fire_vara: Let Guillermo Fernández Vara go
 - @root: Back
 
 @hire_hernando
@@ -562,4 +584,211 @@ go-to: team
 view-if: adv_tapias = 1
 subtitle: Angers their faction.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'tapias'); } !}
+go-to: team
+
+@fx_inst_0
+title: Keep the party together
+subtitle: Dissent falls in every faction.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! ['institutionalists','regional_leaders','progressives','modernisers','trade_unionists'].forEach(function (f) { Q[f + '_dissent'] -= 2; }); Q.institutionalists_dissent -= 2; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+A month of quiet meetings: nobody leaks, nobody resigns.
+
+@fx_inst_1
+title: A message for every socialist
+subtitle: The PSOE gains a little with every kind of voter, and the party feels united.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.member_morale += 2; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: 0.5, professionals: 0.5, pensioners: 0.5, self_employed: 0.4, students: 0.4, unemployed: 0.4, homemakers: 0.4 }); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+A speech the whole party can share.
+
+@fx_mod_0
+title: Govern well, decide pragmatically
+subtitle: More authority; a reputation for competence.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.sanchez_authority += 3; Q.modernisers_dissent -= 3; if (window.SpainGame && Q.player_in_government) { window.SpainGame.econ(Q, 0.1, -0.02); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Fewer slogans, more results.
+
+@fx_mod_1
+title: Speak to liberal and moderate voters
+subtitle: Wins professionals and the self-employed; warmer Cs; the Socialist Left grumbles.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.rel_cs += 3; Q.progressives_dissent += 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 1.3); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+A moderate, modern PSOE for people who never voted for it.
+
+@fx_left_0
+title: Fire up the base
+subtitle: More enthusiasm among members and supporters.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.member_morale += 5; Q.sanchismo += 2; Q.progressives_dissent -= 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Packed halls and red flags.
+
+@fx_left_1
+title: Keep the bridge to Podemos open
+subtitle: Better relations with Podemos; some of its voters listen.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.rel_up += 7; Q.regional_leaders_dissent += 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 0.4, workers: 0.3 }); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Coffee with Podemos, in public.
+
+@fx_sanch_0
+title: Loyalty first
+subtitle: The plot against you weakens; a firmer hold on the Federal Committee.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.plot = Math.max(0, (Q.plot || 0) - 8); Q.federal_committee_balance += 4; Q.sanchez_authority += 2; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Your people in every federation report back.
+
+@fx_sanch_1
+title: Build the Sánchez brand
+subtitle: Your personal following grows.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.sanchismo += 6; Q.populism += 0.5; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+"Pedro" is now a name the members say with affection.
+
+@fx_union_0
+title: Stand with the working class
+subtitle: Wins workers and the unemployed; the unions approve.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.trade_unionists_dissent -= 4; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'working', 1.4); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Factory gates at six in the morning.
+
+@fx_union_1
+title: Ask the movement for money
+subtitle: Party funds from union-linked donors.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.funds += 1.5; Q.trade_unionists_dissent -= 1; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+The UGT's friends open their wallets.
+
+@fx_baron_0
+title: Campaign in [+ adv_home_region +]
+subtitle: Boosts the PSOE in this baron's region.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! if (window.SpainGame) { window.SpainGame.regionalMod(Q, Q.adv_home_region, 'psoe', 1.04); window.SpainGame.recalculate(Q); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+The regional machine runs at full speed.
+
+@fx_baron_1
+title: Calm the other barons
+subtitle: The barons' plot weakens; regional barons calmer.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.plot = Math.max(0, (Q.plot || 0) - 10); Q.regional_leaders_dissent -= 6; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+One baron vouches for you to the others.
+
+@fx_baron_2
+title: Reach moderate voters
+subtitle: Wins moderate and older voters.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 0.8, self_employed: 0.6, professionals: 0.5 }); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Sensible, provincial, reassuring.
+
+@ferrer
+title: Toni Ferrer
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_ferrer = 1
+new-page: true
+
+= Toni Ferrer
+
+A former leader of the UGT, now in the PSOE's Executive: the party's bridge to the union movement. Faction: Trade Unionists.
+
+- @fx_union_0
+- @fx_union_1
+- @root: Back
+
+@puig_adv
+title: Ximo Puig
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_puig = 1
+new-page: true
+
+= Ximo Puig
+
+President of the Valencian Generalitat (from 2015), a federalist baron with his own electorate. Faction: Regional Barons.
+
+- @fx_baron_0
+- @fx_baron_1
+- @fx_baron_2
+- @root: Back
+
+@vara_adv
+title: Guillermo Fernández Vara
+is-pinned-card: true
+card-image: img/spain/Spain/People/Jornadas_de_Juventudes_Socialistas_de_Olivenza_con_Eduardo_Madina_y_Guillermo_Fernández_Vara_(3).jpg
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_vara = 1
+new-page: true
+
+= Guillermo Fernández Vara
+
+President of Extremadura (from 2015), the most moderate of the barons. Faction: Regional Barons.
+
+- @fx_baron_0
+- @fx_baron_1
+- @fx_baron_2
+- @root: Back
+
+@hire_ferrer
+view-if: adv_ferrer = 0
+subtitle: From 2017. Pleases their faction a little.
+choose-if: adv_can_ferrer = 1
+unavailable-subtitle: From 2017; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'ferrer'); } !}
+go-to: team
+
+@fire_ferrer
+view-if: adv_ferrer = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'ferrer'); } !}
+go-to: team
+
+@hire_puig
+view-if: adv_puig = 0
+subtitle: From July 2015, while he governs Valencia; not on a hard-left line. Pleases their faction a little.
+choose-if: adv_can_puig = 1
+unavailable-subtitle: From July 2015, while he governs Valencia; not on a hard-left line; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'puig'); } !}
+go-to: team
+
+@fire_puig
+view-if: adv_puig = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'puig'); } !}
+go-to: team
+
+@hire_vara
+view-if: adv_vara = 0
+subtitle: From July 2015; not while the barons plot against you. Pleases their faction a little.
+choose-if: adv_can_vara = 1
+unavailable-subtitle: From July 2015; not while the barons plot against you; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'vara'); } !}
+go-to: team
+
+@fire_vara
+view-if: adv_vara = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'vara'); } !}
 go-to: team
