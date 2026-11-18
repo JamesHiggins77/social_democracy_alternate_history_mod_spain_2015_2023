@@ -552,3 +552,13 @@ After an October 2016 ouster, the window runs as an event chain:
   | Encourage Podemos's dissidents | 1 | Podemos voters drift to Más País and the PSOE | 30% chance: relations with Podemos −20, authority −10 |
   | Leak a dossier on the PP | 1 | Hurts the PP | 40% chance: the scandal hits the PSOE |
   | Leak a dossier on Díaz's allies (to 2018) | 1 | Barons' plot −15 | 40% chance: plot +25 |
+
+### 7.24 Poll volatility
+
+Real polling averages swung far more than the game's: the PP went from about 33% (late 2016) to about 17% (2019) and back to 34%.
+- **Public mood** (from July 2016). Each party (and Vox once it is a force) has a mood level that follows an AR(1) process (persistence 0.9, monthly shock 0.35). Each month the change in that level moves voters between parties, zero-sum, so swings come and go over months instead of piling up.
+- **Slower snap-back.** Gains now fade 2.5% of the gap a month (was 3%).
+- **The Ciudadanos surge.** After the Catalan crisis, while the PP governs, Cs drains it for 10 months, Vox taking a small share (late 2017 to mid 2018).
+- **Stability bounce.** A re-invested PP government gains from Cs and the PSOE for its first 6 months.
+- **Corruption wear.** A governing PP wears faster the higher its scandal level.
+- **Result.** Month-to-month movement more than doubled (0.12 to 0.29 points for the PP). The historical replay still lands near the real 2019 results.

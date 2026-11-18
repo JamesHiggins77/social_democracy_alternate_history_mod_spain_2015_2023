@@ -337,6 +337,7 @@ test('governing wears the PSOE down and losses hurt more in government', () => {
   Q.psoe_in_government = 1; Q.government_status = 'formed'; Q.pm_party = 'psoe';
   Q.govt_months = 13;   // past the first year's visibility
   const O = newQ(); O.year = 2018;   // the same month in opposition
+  Q.no_mood = 1; O.no_mood = 1;   // compare like with like: no random mood
   G.endOfMonth(Q); G.endOfMonth(O);
   assert.ok(Q.vm.classSupport.workers.psoe < O.vm.classSupport.workers.psoe);
   const before = Q.vm.classSupport.students.psoe;

@@ -1056,6 +1056,20 @@
       transfer(Q, 'pp', 'cs', { professionals: 0.4, self_employed: 0.3, pensioners: 0.2, workers: 0.25, students: 0.3 });
       transfer(Q, 'psoe', 'cs', { professionals: 0.12, workers: 0.08 });
     }
+    // after the Catalan crisis, Ciudadanos becomes the anti-independence
+    // party of the moment and drains a governing PP for months (late 2017 -
+    // mid 2018, Arrimadas's win in Catalonia)
+    if (Q.cat_crisis_seen && Q.pm_party === 'pp' && !Q.acting && !Q.cs_collapsed) {
+      Q.cs_surge_months = (Q.cs_surge_months || 0) + 1;
+      if (Q.cs_surge_months <= 10) {
+        transfer(Q, 'pp', { cs: 0.85, vox: 0.15 }, all(0.3));
+      }
+    }
+    // a newly re-invested government gets a stability bounce (late 2016)
+    if (Q.pm_party === 'pp' && !Q.acting && (Q.govt_months || 0) >= 1 && Q.govt_months <= 6 && Q.year >= 2016) {
+      transfer(Q, 'cs', 'pp', all(0.12));
+      transfer(Q, 'psoe', 'pp', all(0.05));
+    }
     var voxPoll = (Q.true_poll && Q.true_poll.vox) || 0;
     if (Q.year >= 2019 && voxPoll >= 5) {
       transfer(Q, 'cs', { pp: 0.7, vox: 0.3 }, all(0.012 * voxPoll));
@@ -1183,6 +1197,38 @@
 
   // Governing wears a party down: a little support leaves every month for
   // the opposition (from 2016; the PP's 2014-15 erosion is in the path).
+  // Public mood: persistent random swings between parties (an AR(1) per
+  // party, zero-sum), so polls drift for months the way real ones do,
+  // rather than sitting flat between events.
+  var MOOD = { persist: 0.9, sigma: 0.35, fadeUp: 0.025, fadeDown: 0.01, baseFollow: 0.04 };
+  function moodShocks(Q) {
+    // the June 2016 election is calibrated to the real result: moods start after it
+    if (Q.no_mood || Q.year < 2016 || (Q.year === 2016 && Q.month < 7)) { return; }
+    var parties = ['pp', 'psoe', 'up', 'cs'];
+    if (Q.vox_on) { parties.push('vox'); }
+    Q.mood = Q.mood || {};
+    // the mood is a level that wanders and returns (AR(1)); each month the
+    // change in it moves voters, so swings come and go rather than pile up
+    var d = {};
+    parties.forEach(function (p) {
+      var old = Q.mood[p] || 0;
+      Q.mood[p] = MOOD.persist * old + MOOD.sigma * gaussian();
+      d[p] = Q.mood[p] - old;
+    });
+    var mean = parties.reduce(function (a, p) { return a + d[p]; }, 0) / parties.length;
+    var pos = {}, posSum = 0;
+    parties.forEach(function (p) { d[p] -= mean; if (d[p] > 0) { pos[p] = d[p]; posSum += d[p]; } });
+    if (!posSum) { return; }
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    parties.forEach(function (p) {
+      if (d[p] < 0) {
+        var to = {};
+        Object.keys(pos).forEach(function (q) { to[q] = pos[q] / posSum; });
+        transfer(Q, p, to, all(-d[p]));
+      }
+    });
+  }
+
   function incumbencyWear(Q) {
     if (Q.year < 2016) {
       return;
@@ -1200,7 +1246,8 @@
       }
       transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.1));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
-      transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15));
+      // a governing PP is worn down faster the more its corruption is in the news
+      transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15 + 0.05 * Math.min(4, Q.pp_scandal || 0)));
     }
   }
 
@@ -1804,13 +1851,13 @@
     Object.keys(Q.vm.classSupport).forEach(function (c) {
       ['psoe', 'pp', 'cs'].forEach(function (p) {
         var cur = Q.vm.classSupport[c][p];
-        var rate = cur > initial[c][p] ? 0.03 : 0.01;
+        var rate = cur > initial[c][p] ? MOOD.fadeUp : MOOD.fadeDown;
         // Ciudadanos's losses are permanent once its bubble bursts
         if (p === 'cs' && cur < initial[c][p] && Q.year >= 2016) {
           rate = 0;
         }
         Q.vm.classSupport[c][p] = cur + (initial[c][p] - cur) * rate;
-        initial[c][p] += (Q.vm.classSupport[c][p] - initial[c][p]) * 0.04;
+        initial[c][p] += (Q.vm.classSupport[c][p] - initial[c][p]) * MOOD.baseFollow;
       });
       // a new party without roots loses support unless it keeps campaigning
       if (Q.vm.classSupport[c].ps) {
@@ -1820,6 +1867,7 @@
     Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
     positionDrift(Q);
     incumbencyWear(Q);
+    moodShocks(Q);
     monthlyWorld(Q);
     // foreign relations drift back towards a neutral 55 without attention
     Object.keys(Q.intl || {}).forEach(function (k) {
@@ -3818,6 +3866,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    MOOD: MOOD,
     hireAdviser: hireAdviser, fireAdviser: fireAdviser, advCount: advCount, ADVISERS: ADVISERS,
     regionalGovernment: regionalGovernment,
     hardcore: hardcore, darkArts: darkArts,
