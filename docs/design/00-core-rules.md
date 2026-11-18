@@ -452,3 +452,13 @@ From player discussion of the Weimar game:
 - At formation: PSOE voters go to Podemos (and IU and Más País); progressives and unions revolt. Once Vox is a force, the PP's hard right goes to Vox in large numbers (about 4 points at once), with some Cs voters; before that, the PP's discontented go to Ciudadanos or stay at home, and the text does not mention Vox.
 - While it lasts, every month: PSOE→Podemos transfers, and union and progressive dissent rises. Once Vox is a force it is the only opposition on the right and takes from the PP (`VOX_GRAND_RATE`), Cs and the PSOE's older and working-class voters; its ceiling rises to 34% and calm no longer sends its voters back to the PP. Before its breakthrough the PP's leak goes mostly to Cs, with a trickle to Vox that can build into a breakthrough.
 - Measured on the real path: a grand coalition after November 2019 takes Vox from 14% to 18% at formation, 23% after a year, 27% after two and 31% (133 seats) by July 2023, against 13% and 39 seats on the real path. The old version gave about +5 points over two years.
+
+### 7.18 The 2017 primary when Sánchez is a moderniser
+
+If, while out of the leadership, Sánchez's closest faction is the Modernisers and his economic line is centrist (left score of 2 or less), the 2017 primary changes:
+- **Patxi López does not run.** In March–April 2017 he endorses Sánchez: outright (about 40%) or on conditions (a federal party and a senior post for him).
+  - Accepting the conditions brings the endorsement; the federations will hold Sánchez to the promise, and his left resents the deal.
+  - Refusing them keeps López out of the race but neutral.
+- **López's voters** go 70% to Sánchez if he endorsed, and split evenly if not.
+- **José Antonio Pérez Tapias** (Izquierda Socialista) runs as the progressive candidate, taking 4–16% depending on the progressives' dissent, about four-fifths of it from Sánchez.
+- **Susana Díaz always runs:** the barons removed him, and she wants the party.

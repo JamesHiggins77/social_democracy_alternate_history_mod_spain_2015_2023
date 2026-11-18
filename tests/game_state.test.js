@@ -887,3 +887,19 @@ test('a Prime Minister who loses the PSOE leadership hands the government to its
   assert.notStrictEqual(Q.pm, 'Pedro Sánchez');
   assert.strictEqual(Q.pm_party, 'psoe');
 });
+
+test('2017 primary: a moderniser Sánchez gets López behind him and a progressive rival; Díaz always runs', () => {
+  const Q = newQ();
+  Q.modernisers_dissent = 2; Q.progressives_dissent = 30; Q.trade_unionists_dissent = 20; Q.econ_left = 1;
+  assert.strictEqual(G.isModerniser(Q), 1);
+  Q.econ_left = 5;
+  assert.strictEqual(G.isModerniser(Q), 0);
+  // historical: López runs
+  const H = newQ(); G.comebackPrimary(H);
+  assert.ok(H.primary_lopez > 0 && H.primary_tapias === 0 && H.primary_diaz > 0);
+  // moderniser, endorsed: López out, Pérez Tapias in, Díaz still there
+  const M = newQ(); M.lopez_decided = 1; M.lopez_endorses = 1; G.comebackPrimary(M);
+  assert.strictEqual(M.primary_lopez, 0);
+  assert.ok(M.primary_tapias >= 4 && M.primary_diaz > 0);
+  assert.ok(Math.abs(M.primary_sanchez + M.primary_diaz + M.primary_tapias - 100) < 0.5);
+});

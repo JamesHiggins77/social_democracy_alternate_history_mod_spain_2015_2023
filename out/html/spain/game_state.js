@@ -2419,6 +2419,7 @@
     Q.network_word = Q.network < 15 ? 'A handful of loyalists' : (Q.network < 35 ? 'Organising' : (Q.network < 60 ? 'A real network' : 'A movement'));
     Q.leadership_word = UI.word('relation', Q.rel_leadership);
     Q.comeback_bonus = Math.round(comebackBonus(Q));
+    Q.sanchez_moderniser = isModerniser(Q);
     // out of the leadership with no primary pending: decide what next
     Q.exile_pending = (!Q.sanchez_leader && !Q.leadership_exception_open && !Q.exiled &&
       !Q.backbench && !Q.retired) ? 1 : 0;
@@ -2446,13 +2447,35 @@
       Math.max(0, (40 - (Q.rel_leadership === undefined ? 40 : Q.rel_leadership)) / 10);
   }
 
+  // Is Sánchez running as a moderniser? His closest faction is the
+  // modernisers and his economic line is centrist.
+  function isModerniser(Q) {
+    var m = Q.modernisers_dissent === undefined ? 5 : Q.modernisers_dissent;
+    return (m <= (Q.progressives_dissent || 0) && m <= (Q.trade_unionists_dissent || 0) &&
+      (Q.econ_left || 0) <= 2) ? 1 : 0;
+  }
+
+  // The 2017 primary. Historically Díaz, Sánchez and Patxi López. If
+  // Sánchez runs as a moderniser, López backs him (Q.lopez_endorses: 1
+  // endorsed, 0 stayed out) and a progressive, José Antonio Pérez Tapias,
+  // runs on his left instead. Díaz always runs.
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
     var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) + 6 * (Math.random() - 0.5), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
+    var tapias = 0;
+    Q.primary_moderniser = Q.lopez_decided ? 1 : 0;
+    if (Q.primary_moderniser) {
+      // López's voters follow his endorsement, or split
+      s += lopez * (Q.lopez_endorses ? 0.7 : 0.5);
+      tapias = clamp(4 + (Q.progressives_dissent || 20) / 6 + 3 * (Math.random() - 0.5), 4, 16);
+      s -= tapias * 0.8;
+      lopez = 0;
+    }
     Q.primary_sanchez = Math.round(s * 10) / 10;
     Q.primary_lopez = Math.round(lopez * 10) / 10;
-    Q.primary_diaz = Math.round((100 - s - lopez) * 10) / 10;
+    Q.primary_tapias = Math.round(tapias * 10) / 10;
+    Q.primary_diaz = Math.round((100 - s - lopez - tapias) * 10) / 10;
     Q.primary_won = Q.primary_sanchez > Q.primary_diaz ? 1 : 0;
     return Q.primary_won;
   }
@@ -3321,6 +3344,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
     voxRally: voxRally,

@@ -334,9 +334,9 @@ if (Q.primary_won) {
 
 = The primary
 
-Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. You have spent months touring the local branches in your own car.
+[? if primary_moderniser = 0 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and Patxi López in between. ?][? if primary_moderniser = 1 : Three candidates stand: you, Susana Díaz with the barons and the apparatus behind her, and José Antonio Pérez Tapias for the party's left, who says you have become what you fought against. [? if lopez_endorses = 1 : Patxi López campaigns at your side. ?][? if lopez_endorses = 0 : Patxi López has stayed out of the race, and out of your campaign. ?] ?] You have spent months touring the local branches in your own car.
 
-The members vote. Pedro Sánchez **[+ primary_sanchez +]%**, Susana Díaz **[+ primary_diaz +]%**, Patxi López **[+ primary_lopez +]%**.
+The members vote. Pedro Sánchez **[+ primary_sanchez +]%**, Susana Díaz **[+ primary_diaz +]%**, [? if primary_moderniser = 0 : Patxi López **[+ primary_lopez +]%**. ?][? if primary_moderniser = 1 : José Antonio Pérez Tapias **[+ primary_tapias +]%**. ?]
 
 [? if primary_won = 1 : Against the barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. The people who removed you spent months running the party; now they must work for you. ?][? if primary_won = 0 : The members choose Susana Díaz. Your comeback is over, for now. ?]
 
@@ -1434,3 +1434,43 @@ subtitle: Keeps your distance from her result
 on-arrival: {! Q.diaz_relation -= 3; !}
 
 Andalusia is Susana's campaign.
+
+@lopez_offer
+title: Patxi López calls
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and lopez_decided = 0 and sanchez_moderniser = 1 and ((year = 2017 and month >= 3) or year >= 2018)
+max-visits: 1
+on-arrival: {! Q.lopez_decided = 1; Q.lopez_conditional = Math.random() < 0.6 ? 1 : 0; Q.lopez_endorses = Q.lopez_conditional ? 0 : 1; !}
+
+= Patxi López calls
+
+Patxi López was going to run as the candidate between you and Susana Díaz. But you have spent the months since Ferraz talking about a modern, reforming party, and that is his ground. He will not run against you.
+
+[? if lopez_conditional = 0 : He will endorse you, without conditions: "The party needs to move forward, and Pedro is the one who can take it there." ?][? if lopez_conditional = 1 : He will endorse you, on two conditions: a federal party in which the federations have a real say, and a senior post in your Executive for him. ?]
+
+Not everyone is pleased. José Antonio Pérez Tapias, of Izquierda Socialista, announces that he will run: if you are now the modernisers' candidate, someone has to stand for the left.
+
+- @lopez_thanks: Thank him and welcome his support
+- @lopez_accept: Accept his conditions
+- @lopez_refuse: Refuse: you will not trade posts for endorsements
+
+@lopez_thanks
+view-if: lopez_conditional = 0
+on-arrival: {! Q.modernisers_dissent -= 4; !}
+
+He stands beside you at your next rally in Bilbao.
+
+@lopez_accept
+view-if: lopez_conditional = 1
+subtitle: López's endorsement brings most of his voters; the federations will hold you to the promise, and your left resents the deal
+on-arrival: {! Q.lopez_endorses = 1; Q.federal_promise = (Q.federal_promise || 0) + 1; Q.modernisers_dissent -= 4; Q.regional_leaders_dissent += 2; Q.progressives_dissent += 3; Q.lopez_post = 1; !}
+
+The deal is done in a hotel in Madrid. López will campaign for you.
+
+@lopez_refuse
+view-if: lopez_conditional = 1
+subtitle: Keeps your hands free; López stays out of the race but backs no one, and his voters scatter
+on-arrival: {! Q.lopez_endorses = 0; Q.sanchismo += 2; Q.modernisers_dissent += 3; !}
+
+"Then I will stay out of it," López says. He does.
