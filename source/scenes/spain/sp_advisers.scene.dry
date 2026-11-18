@@ -532,7 +532,7 @@ You can keep up to three advisers at a time (now **[+ adv_count +]**). Bringing 
 view-if: adv_hernando = 0
 subtitle: Only before the 2016 leadership crisis. Pleases their faction a little.
 choose-if: adv_can_hernando = 1
-unavailable-subtitle: Only before the 2016 leadership crisis; you can keep three advisers at a time.
+unavailable-subtitle: Only before the 2016 leadership crisis (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'hernando'); } !}
 go-to: team
 
@@ -546,7 +546,7 @@ go-to: team
 view-if: adv_luena = 0
 subtitle: Only before the 2016 leadership crisis. Pleases their faction a little.
 choose-if: adv_can_luena = 1
-unavailable-subtitle: Only before the 2016 leadership crisis; you can keep three advisers at a time.
+unavailable-subtitle: Only before the 2016 leadership crisis (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'luena'); } !}
 go-to: team
 
@@ -560,7 +560,7 @@ go-to: team
 view-if: adv_lastra = 0
 subtitle: Pleases their faction a little.
 choose-if: adv_can_lastra = 1
-unavailable-subtitle: you can keep three advisers at a time.
+unavailable-subtitle: You can keep three advisers at a time.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'lastra'); } !}
 go-to: team
 
@@ -574,7 +574,7 @@ go-to: team
 view-if: adv_redondo = 0
 subtitle: From 2017. Pleases their faction a little.
 choose-if: adv_can_redondo = 1
-unavailable-subtitle: From 2017; you can keep three advisers at a time.
+unavailable-subtitle: From 2017 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'redondo'); } !}
 go-to: team
 
@@ -588,7 +588,7 @@ go-to: team
 view-if: adv_calvo = 0
 subtitle: From 2017; not on a hard-left economic line. Pleases their faction a little.
 choose-if: adv_can_calvo = 1
-unavailable-subtitle: From 2017; not on a hard-left economic line; you can keep three advisers at a time.
+unavailable-subtitle: From 2017; not on a hard-left economic line (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'calvo'); } !}
 go-to: team
 
@@ -602,7 +602,7 @@ go-to: team
 view-if: adv_cerdan = 0
 subtitle: After the 2016 leadership crisis. Pleases their faction a little.
 choose-if: adv_can_cerdan = 1
-unavailable-subtitle: After the 2016 leadership crisis; you can keep three advisers at a time.
+unavailable-subtitle: After the 2016 leadership crisis (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'cerdan'); } !}
 go-to: team
 
@@ -616,7 +616,7 @@ go-to: team
 view-if: adv_tapias = 0
 subtitle: Only on a left-wing economic line. Pleases their faction a little.
 choose-if: adv_can_tapias = 1
-unavailable-subtitle: Only on a left-wing economic line; you can keep three advisers at a time.
+unavailable-subtitle: Only on a left-wing economic line (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'tapias'); } !}
 go-to: team
 
@@ -795,7 +795,7 @@ President of Extremadura (from 2015), the most moderate of the barons. Faction: 
 view-if: adv_ferrer = 0
 subtitle: From 2017. Pleases their faction a little.
 choose-if: adv_can_ferrer = 1
-unavailable-subtitle: From 2017; you can keep three advisers at a time.
+unavailable-subtitle: From 2017 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'ferrer'); } !}
 go-to: team
 
@@ -809,7 +809,7 @@ go-to: team
 view-if: adv_puig = 0
 subtitle: From July 2015, while he governs Valencia; not on a hard-left line. Pleases their faction a little.
 choose-if: adv_can_puig = 1
-unavailable-subtitle: From July 2015, while he governs Valencia; not on a hard-left line; you can keep three advisers at a time.
+unavailable-subtitle: From July 2015, while he governs Valencia; not on a hard-left line (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'puig'); } !}
 go-to: team
 
@@ -823,7 +823,7 @@ go-to: team
 view-if: adv_vara = 0
 subtitle: From July 2015; not while the barons plot against you. Pleases their faction a little.
 choose-if: adv_can_vara = 1
-unavailable-subtitle: From July 2015; not while the barons plot against you; you can keep three advisers at a time.
+unavailable-subtitle: From July 2015; not while the barons plot against you (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'vara'); } !}
 go-to: team
 
@@ -852,7 +852,7 @@ A former judge who joined your lists in 2016: the institutions trust her.
 view-if: adv_robles = 0
 subtitle: From 2016. Pleases their faction a little.
 choose-if: adv_can_robles = 1
-unavailable-subtitle: From 2016; you can keep three advisers at a time.
+unavailable-subtitle: From 2016 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'robles'); } !}
 go-to: team
 
@@ -881,7 +881,7 @@ Veteran of the Madrid PSOE and the parliamentary group's procedures.
 view-if: adv_simancas = 0
 subtitle: Pleases their faction a little.
 choose-if: adv_can_simancas = 1
-unavailable-subtitle: you can keep three advisers at a time.
+unavailable-subtitle: You can keep three advisers at a time.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'simancas'); } !}
 go-to: team
 
@@ -910,7 +910,7 @@ The economist who wrote your 2015 programme: sound numbers for moderate voters.
 view-if: adv_sevilla = 0
 subtitle: Until 2017. Pleases their faction a little.
 choose-if: adv_can_sevilla = 1
-unavailable-subtitle: Until 2017; you can keep three advisers at a time.
+unavailable-subtitle: Until 2017 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'sevilla'); } !}
 go-to: team
 
@@ -939,7 +939,7 @@ Economist and business-school dean; the programme's link to the business world.
 view-if: adv_escudero = 0
 subtitle: Pleases their faction a little.
 choose-if: adv_can_escudero = 1
-unavailable-subtitle: you can keep three advisers at a time.
+unavailable-subtitle: You can keep three advisers at a time.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'escudero'); } !}
 go-to: team
 
@@ -968,7 +968,7 @@ Your 2014 rival, a Basque moderniser respected across the party.
 view-if: adv_madina = 0
 subtitle: Only before the 2016 crisis. Pleases their faction a little.
 choose-if: adv_can_madina = 1
-unavailable-subtitle: Only before the 2016 crisis; you can keep three advisers at a time.
+unavailable-subtitle: Only before the 2016 crisis (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'madina'); } !}
 go-to: team
 
@@ -997,7 +997,7 @@ Former mayor of San Sebastián and a free spirit on the party's left.
 view-if: adv_elorza = 0
 subtitle: Pleases their faction a little.
 choose-if: adv_can_elorza = 1
-unavailable-subtitle: you can keep three advisers at a time.
+unavailable-subtitle: You can keep three advisers at a time.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'elorza'); } !}
 go-to: team
 
@@ -1026,7 +1026,7 @@ The army officer who denounced harassment, elected for the PSOE in 2015.
 view-if: adv_cantera = 0
 subtitle: From 2016. Pleases their faction a little.
 choose-if: adv_can_cantera = 1
-unavailable-subtitle: From 2016; you can keep three advisers at a time.
+unavailable-subtitle: From 2016 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'cantera'); } !}
 go-to: team
 
@@ -1055,7 +1055,7 @@ Mayor of Valladolid and the comeback's sharpest voice.
 view-if: adv_puente = 0
 subtitle: After the 2016 crisis. Pleases their faction a little.
 choose-if: adv_can_puente = 1
-unavailable-subtitle: After the 2016 crisis; you can keep three advisers at a time.
+unavailable-subtitle: After the 2016 crisis (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'puente'); } !}
 go-to: team
 
@@ -1084,7 +1084,7 @@ The lawyer who fixes everything quietly.
 view-if: adv_bolanos = 0
 subtitle: From 2017. Pleases their faction a little.
 choose-if: adv_can_bolanos = 1
-unavailable-subtitle: From 2017; you can keep three advisers at a time.
+unavailable-subtitle: From 2017 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'bolanos'); } !}
 go-to: team
 
@@ -1113,7 +1113,7 @@ Twenty-two years at the head of the UGT.
 view-if: adv_mendez = 0
 subtitle: From 2016, after he leaves the UGT. Pleases their faction a little.
 choose-if: adv_can_mendez = 1
-unavailable-subtitle: From 2016, after he leaves the UGT; you can keep three advisers at a time.
+unavailable-subtitle: From 2016, after he leaves the UGT (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'mendez'); } !}
 go-to: team
 
@@ -1142,7 +1142,7 @@ Extremaduran labour lawyer, close to the unions.
 view-if: adv_valerio = 0
 subtitle: Pleases their faction a little.
 choose-if: adv_can_valerio = 1
-unavailable-subtitle: you can keep three advisers at a time.
+unavailable-subtitle: You can keep three advisers at a time.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'valerio'); } !}
 go-to: team
 
@@ -1171,7 +1171,7 @@ The UGT's new leader: an ally, never a subordinate.
 view-if: adv_alvarez = 0
 subtitle: From 2016. Pleases their faction a little.
 choose-if: adv_can_alvarez = 1
-unavailable-subtitle: From 2016; you can keep three advisers at a time.
+unavailable-subtitle: From 2016 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'alvarez'); } !}
 go-to: team
 
@@ -1201,7 +1201,7 @@ President of Aragón and one of your fiercest critics, if you can win him over.
 view-if: adv_lamban = 0
 subtitle: From July 2015; never with a Podemos pact or a left-wing line. Pleases their faction a little.
 choose-if: adv_can_lamban = 1
-unavailable-subtitle: From July 2015; never with a Podemos pact or a left-wing line; you can keep three advisers at a time.
+unavailable-subtitle: From July 2015; never with a Podemos pact or a left-wing line (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'lamban'); } !}
 go-to: team
 
@@ -1231,7 +1231,7 @@ President of the Balearic Islands, the most sanchista of the barons.
 view-if: adv_armengol = 0
 subtitle: From July 2015. Pleases their faction a little.
 choose-if: adv_can_armengol = 1
-unavailable-subtitle: From July 2015; you can keep three advisers at a time.
+unavailable-subtitle: From July 2015 (or you already have three advisers).
 on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'armengol'); } !}
 go-to: team
 
