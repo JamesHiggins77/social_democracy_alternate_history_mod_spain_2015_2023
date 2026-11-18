@@ -232,23 +232,30 @@
   // [name, faction (dissent key), requirement, what they do]
   // ------------------------------------------------------------------
   var ADVISERS = {
-    hernando: ['Antonio Hernando', 'institutionalists', function (Q) { return !Q.rebellion_used; },
-      'Parliamentary arithmetic; until the 2016 crisis, when he backs the abstention'],
-    luena: ['César Luena', 'sanchistas', function (Q) { return !Q.rebellion_used; },
-      'Secretary of Organisation to 2016: the federations and the money'],
+    hernando: ['Antonio Hernando', 'institutionalists', function (Q) { return !Q.rebellion_used; }, 'Parliamentary arithmetic, until the 2016 crisis'],
+    calvo: ['Carmen Calvo', 'institutionalists', function (Q) { return Q.year >= 2017 && (Q.econ_left || 0) <= 4; }, 'Constitutional law, the institutions and equality'],
+    robles: ['Margarita Robles', 'institutionalists', function (Q) { return Q.year >= 2016; }, 'A former judge the institutions trust'],
+    simancas: ['Rafael Simancas', 'institutionalists', function (Q) { return true; }, 'Veteran of the parliamentary group'],
+    redondo: ['Iván Redondo', 'modernisers', function (Q) { return Q.year >= 2017; }, 'Polling, narrative, the centre'],
+    sevilla: ['Jordi Sevilla', 'modernisers', function (Q) { return Q.year <= 2017; }, 'The 2015 economic programme'],
+    escudero: ['Manuel Escudero', 'modernisers', function (Q) { return true; }, 'Economist with links to business'],
+    madina: ['Eduardo Madina', 'modernisers', function (Q) { return !Q.rebellion_used; }, 'Your 2014 rival, a Basque moderniser'],
     lastra: ['Adriana Lastra', 'progressives', function (Q) { return true; }, 'The members and Podemos'],
-    redondo: ['Iván Redondo', 'modernisers', function (Q) { return Q.year >= 2017; }, 'Polling, narrative, the centre (from 2017)'],
-    calvo: ['Carmen Calvo', 'institutionalists', function (Q) { return Q.year >= 2017 && (Q.econ_left || 0) <= 4; },
-      'Constitutional law and the institutions; equality (from 2017, not on a hard-left line)'],
-    cerdan: ['Santos Cerdán', 'sanchistas', function (Q) { return !!Q.rebellion_used; },
-      'The organiser of the comeback (after the 2016 crisis)'],
-    tapias: ['José Antonio Pérez Tapias', 'progressives', function (Q) { return (Q.econ_left || 0) >= 3; },
-      'The Socialist Left (only on a left-wing line)'],
-    ferrer: ['Toni Ferrer', 'trade_unionists', function (Q) { return Q.year >= 2017; }, 'The unions: workers and donations (from 2017)'],
-    puig: ['Ximo Puig', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.econ_left || 0) <= 4; },
-      'Valencia: regional campaigning, calming the barons (from July 2015)'],
-    vara: ['Guillermo Fernández Vara', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.plot || 0) < 50; },
-      'Extremadura: regional campaigning, calming the barons (from July 2015)']
+    tapias: ['José Antonio Pérez Tapias', 'progressives', function (Q) { return (Q.econ_left || 0) >= 3; }, 'The Socialist Left, on a left-wing line'],
+    elorza: ['Odón Elorza', 'progressives', function (Q) { return true; }, 'A free spirit on the left of the party'],
+    cantera: ['Zaida Cantera', 'progressives', function (Q) { return Q.year >= 2016; }, 'Army officer turned deputy'],
+    luena: ['César Luena', 'sanchistas', function (Q) { return !Q.rebellion_used; }, 'Secretary of Organisation to 2016'],
+    cerdan: ['Santos Cerdán', 'sanchistas', function (Q) { return !!Q.rebellion_used; }, 'The organiser of the comeback'],
+    puente: ['Óscar Puente', 'sanchistas', function (Q) { return !!Q.rebellion_used; }, 'Mayor of Valladolid, the comeback voice'],
+    bolanos: ['Félix Bolaños', 'sanchistas', function (Q) { return Q.year >= 2017; }, 'The fixer'],
+    ferrer: ['Toni Ferrer', 'trade_unionists', function (Q) { return Q.year >= 2017; }, 'Former UGT leader in the Executive'],
+    mendez: ['Cándido Méndez', 'trade_unionists', function (Q) { return Q.year >= 2016; }, 'Twenty-two years at the head of the UGT'],
+    valerio: ['Magdalena Valerio', 'trade_unionists', function (Q) { return true; }, 'Labour lawyer close to the unions'],
+    alvarez: ['Pepe Álvarez', 'trade_unionists', function (Q) { return Q.year >= 2016; }, 'The new UGT leader'],
+    puig: ['Ximo Puig', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.econ_left || 0) <= 4; }, 'President of Valencia'],
+    vara: ['Guillermo Fernández Vara', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.plot || 0) < 50; }, 'President of Extremadura'],
+    lamban: ['Javier Lambán', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.econ_left || 0) <= 3 && !Q.pact_up; }, 'President of Aragón'],
+    armengol: ['Francina Armengol', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)); }, 'President of the Balearic Islands']
   };
   var ADVISER_MAX = 3;
   function advCount(Q) {
@@ -294,7 +301,9 @@
     var ECON_FIGURES = { up: 'Nacho Álvarez', cs: 'Luis Garicano', pp: 'Luis de Guindos' };
     Q.adv_econ_name = eco !== Q.player_party ? (ECON_FIGURES[eco] || UI.partyName(eco) + "'s minister") :
       (Q.year >= 2018 ? 'Nadia Calviño' : 'your Minister of Economy');
- Q.adv_home_region = Q.adv_puig ? 'Comunidad Valenciana' : 'Extremadura';
+    var HOMES = { puig: 'Comunidad Valenciana', vara: 'Extremadura', lamban: 'Aragón', armengol: 'Baleares' };
+    Q.adv_home_region = 'Extremadura';
+    Object.keys(HOMES).forEach(function (a) { if (Q['adv_' + a]) { Q.adv_home_region = HOMES[a]; } });
     Q.adv_loyalist = (Q.sanchez_leader || Q.backbench || Q.leadership_exception_open || Q.exiled) && !Q.abalos_gone ? 1 : 0;
   }
 

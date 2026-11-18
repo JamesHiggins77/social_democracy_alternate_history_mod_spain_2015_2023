@@ -58,6 +58,12 @@
     [['Patricia Hernández'], 'psoe', 'Canarian socialist leader', 'Susanismo'],
     [['Jordi Évole', 'Évole'], 'nonpartisan', 'Journalist, presenter of Salvados', 'Independent journalist'],
     [['César Alierta', 'Alierta'], 'nonpartisan', 'Chairman of Telefónica (to 2016)', 'Business'],
+    [['Rafael Simancas'], 'psoe', 'Deputy; former leader of the Madrid socialists', 'Institutionalists'],
+    [['Jordi Sevilla'], 'psoe', 'Economist; wrote the 2015 economic programme', 'Modernisers'],
+    [['Manuel Escudero'], 'psoe', 'Economist; head of the 2016 programme', 'Modernisers'],
+    [['Zaida Cantera'], 'psoe', 'Army officer and deputy (from 2015)', 'Socialist Left'],
+    [['Óscar Puente'], 'psoe', 'Mayor of Valladolid', 'Sanchismo'],
+    [['Toni Ferrer'], 'psoe', 'Former UGT leader; PSOE Executive (2017)', 'Trade Unionists'],
     [['Verónica Pérez'], 'psoe', 'President of the PSOE Federal Committee', 'Regional Barons (susanismo), Andalusian'],
     [['Patxi López'], 'psoe', 'Former Lehendakari; 2017 primary candidate', 'Between the camps; moderniser'],
     [['Antonio Hernando', 'Hernando'], 'psoe', 'Spokesperson of the parliamentary group', 'Institutionalists'],
@@ -227,7 +233,7 @@
     'Félix Bolaños': 'Félix Bolaños', 'Inés Ayala': 'Inés Ayala', 'Wilfredo Jurado': 'es:Crisis del PSOE de 2016',
     'Juan Cornejo': 'es:Juan Cornejo', 'Idoia Mendia': 'Idoia Mendia', 'Luis Tudanca': 'es:Luis Tudanca',
     'Odón Elorza': 'Odón Elorza', 'Sara Hernández': 'es:Sara Hernández Barroso', 'Patricia Hernández': 'es:Patricia Hernández Gutiérrez',
-    'Jordi Évole': 'es:Jordi Évole', 'César Alierta': 'César Alierta'
+    'Jordi Évole': 'es:Jordi Évole', 'Rafael Simancas': 'es:Rafael Simancas', 'Jordi Sevilla': 'Jordi Sevilla', 'Manuel Escudero': 'es:Manuel Escudero Zamora', 'Zaida Cantera': 'es:Zaida Cantera', 'Óscar Puente': 'Óscar Puente', 'Toni Ferrer': 'es:Toni Ferrer', 'César Alierta': 'César Alierta'
   };
   var PARTY_WIKI = {
     psoe: "Spanish Socialist Workers' Party", pp: "People's Party (Spain)", up: 'Podemos (Spanish political party)',

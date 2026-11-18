@@ -464,28 +464,68 @@ new-page: true
 
 = Your team
 
-You can keep up to three advisers at a time (now [+ adv_count +]). Bringing someone in pleases their faction a little; letting them go angers it more. Each faction brings its own kind of help: Institutionalists keep the party together and speak to everyone; Modernisers bring good governance and moderate, liberal voters; the Socialist Left fires up the base and keeps Podemos close; Sanchistas build personal loyalty and protect your position; Trade Unionists win workers and donations; Regional Barons campaign in their regions, calm the other barons and attract moderates. José Luis Ábalos and the government's ministers do not count.
+You can keep up to three advisers at a time (now **[+ adv_count +]**). Bringing someone in pleases their faction a little; letting them go angers it more. José Luis Ábalos, your permanent loyalist, and the government's ministers do not count.
 
-- @hire_hernando: Bring in Antonio Hernando (Institutionalists)
-- @hire_luena: Bring in César Luena (Sanchistas)
-- @hire_lastra: Bring in Adriana Lastra (Socialist Left)
-- @hire_redondo: Bring in Iván Redondo (Modernisers)
-- @hire_calvo: Bring in Carmen Calvo (Institutionalists)
-- @hire_cerdan: Bring in Santos Cerdán (Sanchistas)
-- @hire_tapias: Bring in José Antonio Pérez Tapias (Socialist Left)
-- @hire_ferrer: Bring in Toni Ferrer (Trade Unionists)
-- @hire_puig: Bring in Ximo Puig (Regional Barons)
-- @hire_vara: Bring in Guillermo Fernández Vara (Regional Barons)
-- @fire_hernando: Let Antonio Hernando go
-- @fire_luena: Let César Luena go
-- @fire_lastra: Let Adriana Lastra go
-- @fire_redondo: Let Iván Redondo go
-- @fire_calvo: Let Carmen Calvo go
-- @fire_cerdan: Let Santos Cerdán go
-- @fire_tapias: Let José Antonio Pérez Tapias go
-- @fire_ferrer: Let Toni Ferrer go
-- @fire_puig: Let Ximo Puig go
-- @fire_vara: Let Guillermo Fernández Vara go
+**Institutionalists**: keep dissent down and speak to voters and party together. Antonio Hernando[? if adv_hernando = 1 : (on your team) ?], Carmen Calvo[? if adv_calvo = 1 : (on your team) ?], Margarita Robles[? if adv_robles = 1 : (on your team) ?], Rafael Simancas[? if adv_simancas = 1 : (on your team) ?].
+
+**Modernisers**: good governance, pragmatic decisions, liberal and moderate voters. Iván Redondo[? if adv_redondo = 1 : (on your team) ?], Jordi Sevilla[? if adv_sevilla = 1 : (on your team) ?], Manuel Escudero[? if adv_escudero = 1 : (on your team) ?], Eduardo Madina[? if adv_madina = 1 : (on your team) ?].
+
+**Socialist Left**: the base, enthusiasm, good relations with Podemos. Adriana Lastra[? if adv_lastra = 1 : (on your team) ?], José Antonio Pérez Tapias[? if adv_tapias = 1 : (on your team) ?], Odón Elorza[? if adv_elorza = 1 : (on your team) ?], Zaida Cantera[? if adv_cantera = 1 : (on your team) ?].
+
+**Sanchistas**: personal loyalty, sanchismo, your position in the party. César Luena[? if adv_luena = 1 : (on your team) ?], Santos Cerdán[? if adv_cerdan = 1 : (on your team) ?], Óscar Puente[? if adv_puente = 1 : (on your team) ?], Félix Bolaños[? if adv_bolanos = 1 : (on your team) ?].
+
+**Trade Unionists**: the working class and political donations. Toni Ferrer[? if adv_ferrer = 1 : (on your team) ?], Cándido Méndez[? if adv_mendez = 1 : (on your team) ?], Magdalena Valerio[? if adv_valerio = 1 : (on your team) ?], Pepe Álvarez[? if adv_alvarez = 1 : (on your team) ?].
+
+**Regional Barons**: support in their region, calming the barons' plot, moderate voters. Ximo Puig[? if adv_puig = 1 : (on your team) ?], Guillermo Fernández Vara[? if adv_vara = 1 : (on your team) ?], Javier Lambán[? if adv_lamban = 1 : (on your team) ?], Francina Armengol[? if adv_armengol = 1 : (on your team) ?].
+
+- @hire_hernando: Institutionalists: bring in Antonio Hernando
+- @fire_hernando: Institutionalists: let Antonio Hernando go
+- @hire_calvo: Institutionalists: bring in Carmen Calvo
+- @fire_calvo: Institutionalists: let Carmen Calvo go
+- @hire_robles: Institutionalists: bring in Margarita Robles
+- @fire_robles: Institutionalists: let Margarita Robles go
+- @hire_simancas: Institutionalists: bring in Rafael Simancas
+- @fire_simancas: Institutionalists: let Rafael Simancas go
+- @hire_redondo: Modernisers: bring in Iván Redondo
+- @fire_redondo: Modernisers: let Iván Redondo go
+- @hire_sevilla: Modernisers: bring in Jordi Sevilla
+- @fire_sevilla: Modernisers: let Jordi Sevilla go
+- @hire_escudero: Modernisers: bring in Manuel Escudero
+- @fire_escudero: Modernisers: let Manuel Escudero go
+- @hire_madina: Modernisers: bring in Eduardo Madina
+- @fire_madina: Modernisers: let Eduardo Madina go
+- @hire_lastra: Socialist Left: bring in Adriana Lastra
+- @fire_lastra: Socialist Left: let Adriana Lastra go
+- @hire_tapias: Socialist Left: bring in José Antonio Pérez Tapias
+- @fire_tapias: Socialist Left: let José Antonio Pérez Tapias go
+- @hire_elorza: Socialist Left: bring in Odón Elorza
+- @fire_elorza: Socialist Left: let Odón Elorza go
+- @hire_cantera: Socialist Left: bring in Zaida Cantera
+- @fire_cantera: Socialist Left: let Zaida Cantera go
+- @hire_luena: Sanchistas: bring in César Luena
+- @fire_luena: Sanchistas: let César Luena go
+- @hire_cerdan: Sanchistas: bring in Santos Cerdán
+- @fire_cerdan: Sanchistas: let Santos Cerdán go
+- @hire_puente: Sanchistas: bring in Óscar Puente
+- @fire_puente: Sanchistas: let Óscar Puente go
+- @hire_bolanos: Sanchistas: bring in Félix Bolaños
+- @fire_bolanos: Sanchistas: let Félix Bolaños go
+- @hire_ferrer: Trade Unionists: bring in Toni Ferrer
+- @fire_ferrer: Trade Unionists: let Toni Ferrer go
+- @hire_mendez: Trade Unionists: bring in Cándido Méndez
+- @fire_mendez: Trade Unionists: let Cándido Méndez go
+- @hire_valerio: Trade Unionists: bring in Magdalena Valerio
+- @fire_valerio: Trade Unionists: let Magdalena Valerio go
+- @hire_alvarez: Trade Unionists: bring in Pepe Álvarez
+- @fire_alvarez: Trade Unionists: let Pepe Álvarez go
+- @hire_puig: Regional Barons: bring in Ximo Puig
+- @fire_puig: Regional Barons: let Ximo Puig go
+- @hire_vara: Regional Barons: bring in Guillermo Fernández Vara
+- @fire_vara: Regional Barons: let Guillermo Fernández Vara go
+- @hire_lamban: Regional Barons: bring in Javier Lambán
+- @fire_lamban: Regional Barons: let Javier Lambán go
+- @hire_armengol: Regional Barons: bring in Francina Armengol
+- @fire_armengol: Regional Barons: let Francina Armengol go
 - @root: Back
 
 @hire_hernando
@@ -791,4 +831,412 @@ go-to: team
 view-if: adv_vara = 1
 subtitle: Angers their faction.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'vara'); } !}
+go-to: team
+
+@robles_adv
+title: Margarita Robles
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_robles = 1
+new-page: true
+
+= Margarita Robles
+
+A former judge who joined your lists in 2016: the institutions trust her.
+
+- @fx_inst_0
+- @fx_inst_1
+- @root: Back
+
+@hire_robles
+view-if: adv_robles = 0
+subtitle: From 2016. Pleases their faction a little.
+choose-if: adv_can_robles = 1
+unavailable-subtitle: From 2016; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'robles'); } !}
+go-to: team
+
+@fire_robles
+view-if: adv_robles = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'robles'); } !}
+go-to: team
+
+@simancas_adv
+title: Rafael Simancas
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_simancas = 1
+new-page: true
+
+= Rafael Simancas
+
+Veteran of the Madrid PSOE and the parliamentary group's procedures.
+
+- @fx_inst_0
+- @fx_inst_1
+- @root: Back
+
+@hire_simancas
+view-if: adv_simancas = 0
+subtitle: Pleases their faction a little.
+choose-if: adv_can_simancas = 1
+unavailable-subtitle: you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'simancas'); } !}
+go-to: team
+
+@fire_simancas
+view-if: adv_simancas = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'simancas'); } !}
+go-to: team
+
+@sevilla_adv
+title: Jordi Sevilla
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_sevilla = 1
+new-page: true
+
+= Jordi Sevilla
+
+The economist who wrote your 2015 programme: sound numbers for moderate voters.
+
+- @fx_mod_0
+- @fx_mod_1
+- @root: Back
+
+@hire_sevilla
+view-if: adv_sevilla = 0
+subtitle: Until 2017. Pleases their faction a little.
+choose-if: adv_can_sevilla = 1
+unavailable-subtitle: Until 2017; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'sevilla'); } !}
+go-to: team
+
+@fire_sevilla
+view-if: adv_sevilla = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'sevilla'); } !}
+go-to: team
+
+@escudero_adv
+title: Manuel Escudero
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_escudero = 1
+new-page: true
+
+= Manuel Escudero
+
+Economist and business-school dean; the programme's link to the business world.
+
+- @fx_mod_0
+- @fx_mod_1
+- @root: Back
+
+@hire_escudero
+view-if: adv_escudero = 0
+subtitle: Pleases their faction a little.
+choose-if: adv_can_escudero = 1
+unavailable-subtitle: you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'escudero'); } !}
+go-to: team
+
+@fire_escudero
+view-if: adv_escudero = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'escudero'); } !}
+go-to: team
+
+@madina_adv
+title: Eduardo Madina
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_madina = 1
+new-page: true
+
+= Eduardo Madina
+
+Your 2014 rival, a Basque moderniser respected across the party.
+
+- @fx_mod_0
+- @fx_mod_1
+- @root: Back
+
+@hire_madina
+view-if: adv_madina = 0
+subtitle: Only before the 2016 crisis. Pleases their faction a little.
+choose-if: adv_can_madina = 1
+unavailable-subtitle: Only before the 2016 crisis; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'madina'); } !}
+go-to: team
+
+@fire_madina
+view-if: adv_madina = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'madina'); } !}
+go-to: team
+
+@elorza_adv
+title: Odón Elorza
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_elorza = 1
+new-page: true
+
+= Odón Elorza
+
+Former mayor of San Sebastián and a free spirit on the party's left.
+
+- @fx_left_0
+- @fx_left_1
+- @root: Back
+
+@hire_elorza
+view-if: adv_elorza = 0
+subtitle: Pleases their faction a little.
+choose-if: adv_can_elorza = 1
+unavailable-subtitle: you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'elorza'); } !}
+go-to: team
+
+@fire_elorza
+view-if: adv_elorza = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'elorza'); } !}
+go-to: team
+
+@cantera_adv
+title: Zaida Cantera
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_cantera = 1
+new-page: true
+
+= Zaida Cantera
+
+The army officer who denounced harassment, elected for the PSOE in 2015.
+
+- @fx_left_0
+- @fx_left_1
+- @root: Back
+
+@hire_cantera
+view-if: adv_cantera = 0
+subtitle: From 2016. Pleases their faction a little.
+choose-if: adv_can_cantera = 1
+unavailable-subtitle: From 2016; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'cantera'); } !}
+go-to: team
+
+@fire_cantera
+view-if: adv_cantera = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'cantera'); } !}
+go-to: team
+
+@puente_adv
+title: Óscar Puente
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_puente = 1
+new-page: true
+
+= Óscar Puente
+
+Mayor of Valladolid and the comeback's sharpest voice.
+
+- @fx_sanch_0
+- @fx_sanch_1
+- @root: Back
+
+@hire_puente
+view-if: adv_puente = 0
+subtitle: After the 2016 crisis. Pleases their faction a little.
+choose-if: adv_can_puente = 1
+unavailable-subtitle: After the 2016 crisis; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'puente'); } !}
+go-to: team
+
+@fire_puente
+view-if: adv_puente = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'puente'); } !}
+go-to: team
+
+@bolanos_adv
+title: Félix Bolaños
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_bolanos = 1
+new-page: true
+
+= Félix Bolaños
+
+The lawyer who fixes everything quietly.
+
+- @fx_sanch_0
+- @fx_sanch_1
+- @root: Back
+
+@hire_bolanos
+view-if: adv_bolanos = 0
+subtitle: From 2017. Pleases their faction a little.
+choose-if: adv_can_bolanos = 1
+unavailable-subtitle: From 2017; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'bolanos'); } !}
+go-to: team
+
+@fire_bolanos
+view-if: adv_bolanos = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'bolanos'); } !}
+go-to: team
+
+@mendez_adv
+title: Cándido Méndez
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_mendez = 1
+new-page: true
+
+= Cándido Méndez
+
+Twenty-two years at the head of the UGT.
+
+- @fx_union_0
+- @fx_union_1
+- @root: Back
+
+@hire_mendez
+view-if: adv_mendez = 0
+subtitle: From 2016, after he leaves the UGT. Pleases their faction a little.
+choose-if: adv_can_mendez = 1
+unavailable-subtitle: From 2016, after he leaves the UGT; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'mendez'); } !}
+go-to: team
+
+@fire_mendez
+view-if: adv_mendez = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'mendez'); } !}
+go-to: team
+
+@valerio_adv
+title: Magdalena Valerio
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_valerio = 1
+new-page: true
+
+= Magdalena Valerio
+
+Extremaduran labour lawyer, close to the unions.
+
+- @fx_union_0
+- @fx_union_1
+- @root: Back
+
+@hire_valerio
+view-if: adv_valerio = 0
+subtitle: Pleases their faction a little.
+choose-if: adv_can_valerio = 1
+unavailable-subtitle: you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'valerio'); } !}
+go-to: team
+
+@fire_valerio
+view-if: adv_valerio = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'valerio'); } !}
+go-to: team
+
+@alvarez_adv
+title: Pepe Álvarez
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_alvarez = 1
+new-page: true
+
+= Pepe Álvarez
+
+The UGT's new leader: an ally, never a subordinate.
+
+- @fx_union_0
+- @fx_union_1
+- @root: Back
+
+@hire_alvarez
+view-if: adv_alvarez = 0
+subtitle: From 2016. Pleases their faction a little.
+choose-if: adv_can_alvarez = 1
+unavailable-subtitle: From 2016; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'alvarez'); } !}
+go-to: team
+
+@fire_alvarez
+view-if: adv_alvarez = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'alvarez'); } !}
+go-to: team
+
+@lamban_adv
+title: Javier Lambán
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_lamban = 1
+new-page: true
+
+= Javier Lambán
+
+President of Aragón and one of your fiercest critics, if you can win him over.
+
+- @fx_baron_0
+- @fx_baron_1
+- @fx_baron_2
+- @root: Back
+
+@hire_lamban
+view-if: adv_lamban = 0
+subtitle: From July 2015; never with a Podemos pact or a left-wing line. Pleases their faction a little.
+choose-if: adv_can_lamban = 1
+unavailable-subtitle: From July 2015; never with a Podemos pact or a left-wing line; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'lamban'); } !}
+go-to: team
+
+@fire_lamban
+view-if: adv_lamban = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'lamban'); } !}
+go-to: team
+
+@armengol_adv
+title: Francina Armengol
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_armengol = 1
+new-page: true
+
+= Francina Armengol
+
+President of the Balearic Islands, the most sanchista of the barons.
+
+- @fx_baron_0
+- @fx_baron_1
+- @fx_baron_2
+- @root: Back
+
+@hire_armengol
+view-if: adv_armengol = 0
+subtitle: From July 2015. Pleases their faction a little.
+choose-if: adv_can_armengol = 1
+unavailable-subtitle: From July 2015; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'armengol'); } !}
+go-to: team
+
+@fire_armengol
+view-if: adv_armengol = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'armengol'); } !}
 go-to: team
