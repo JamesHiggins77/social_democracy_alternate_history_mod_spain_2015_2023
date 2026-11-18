@@ -1035,6 +1035,11 @@
     if (voxOn(Q)) {
       voxFlow(Q, VOX_NATIONAL_RATE * nationalQuestion(Q) * voxRoom(Q));
     }
+    // above its ceiling, Vox's newest voters drift back to the PP
+    if (voxNow > (Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING)) {
+      var over = (voxNow - VOX_CEILING) / voxNow;
+      transfer(Q, 'vox', { pp: 0.8, cs: 0.1, psoe: 0.1 }, share(Q, 'vox', Math.min(0.15, 0.3 * over)));
+    }
     // Podemos too, to a smaller extent
     // after 2016 Podemos is in decline: chaos feeds it far less
     var up = 0.3 * c * (Q.year >= 2017 ? 0.3 : 1);
@@ -1164,7 +1169,7 @@
   // Used by the event and by tools/replay_history.js.
   var VOX_RALLY_BASE = 4;
   function voxRally(Q) {
-    var push = Math.max(2, VOX_RALLY_BASE + 2 * (Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) +
+    var push = Math.max(2, VOX_RALLY_BASE + 2 * Math.min(2, Q.cat_dialogue || 0) - (Q.cat_hard_line || 0) +
       ((Q.pp_scandal || 0) >= 3 ? 2 : 0));
     Q.vox_push = push;
     Q.vox_rise_seen = 1;
@@ -1214,8 +1219,8 @@
   function moodShocks(Q) {
     // the June 2016 election is calibrated to the real result: moods start after it
     if (Q.no_mood || Q.year < 2016 || (Q.year === 2016 && Q.month < 7)) { return; }
+    // (Vox has its own drivers and ceiling: no mood swings for it)
     var parties = ['pp', 'psoe', 'up', 'cs'];
-    if (Q.vox_on) { parties.push('vox'); }
     Q.mood = Q.mood || {};
     // the mood is a level that wanders and returns (AR(1)); each month the
     // change in it moves voters, so swings come and go rather than pile up
