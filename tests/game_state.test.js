@@ -919,3 +919,25 @@ test('2017 race: endorsements and the vote are run by province; López wins the 
   assert.deepStrictEqual(R.pv_rows.map(r => r.id).sort(), ['c_diaz', 'c_lopez']);
   assert.strictEqual(R.primary_won, 0);
 });
+
+test('Podemos rebrands over time; Iglesias is succeeded according to where Podemos stands', () => {
+  const Q = newQ();
+  assert.strictEqual(G.podemosBrand(Q)[0], 'Podemos');
+  Q.year = 2016; Q.month = 6; assert.strictEqual(G.podemosBrand(Q)[0], 'Unidos Podemos');
+  Q.year = 2020; assert.strictEqual(G.podemosBrand(Q)[0], 'Unidas Podemos');
+  Q.year = 2023; Q.month = 7; assert.strictEqual(G.podemosBrand(Q)[0], 'Sumar');
+  Q.govt_parties = ['psoe', 'up']; Q.acting = 0; Q.rel_up = 60;
+  assert.strictEqual(G.iglesiasSuccessor(Q), 'Yolanda Díaz');
+  Q.govt_parties = ['psoe']; Q.rel_up = 15;
+  assert.strictEqual(G.iglesiasSuccessor(Q), 'Irene Montero');
+});
+
+test('a PP government before Sánchez has renewed his mandate sets off the critics; three defeats sink him', () => {
+  const Q = newQ();
+  Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  Q.plot = 10; Q.pact_pp_cs = 1;
+  G.formGovernment(Q, 'pp');
+  assert.ok(Q.plot >= 82);
+  const R = newQ(); R.mandate_renewed = 1; R.plot = 10; R.congress = Q.congress; G.formGovernment(R, 'pp');
+  assert.ok(R.plot < 60);
+});

@@ -127,6 +127,7 @@
     [['Pablo Iglesias', 'Iglesias'], 'up', 'Leader of Podemos', 'Left populism (pablismo)'],
     [['Íñigo Errejón', 'Errejón'], 'up', 'Podemos co-founder; later Más País', 'Transversal populism (errejonismo)'],
     [['Irene Montero'], 'up', 'Podemos spokesperson; Minister of Equality', 'Pablismo, feminist left'],
+    [['Ione Belarra', 'Belarra'], 'up', 'Secretary-General of Podemos (from 2021); Minister of Social Rights', 'Pablismo, Podemos loyalist'],
     [['Yolanda Díaz'], 'up', 'Minister of Labour; leader of Sumar', 'Communist-turned-pragmatic left'],
     [['Pablo Echenique', 'Echenique'], 'up', 'Secretary of Organisation of Podemos', 'Pablismo'],
     [['Teresa Rodríguez'], 'up', 'Podemos Andalusia', 'Anticapitalistas'],

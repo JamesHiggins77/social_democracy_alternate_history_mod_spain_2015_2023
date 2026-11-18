@@ -134,6 +134,7 @@ if (typeof window !== 'undefined' && window.SpainParliament) {
     var cand = Q.right_candidate || 'pp';
     var v = window.SpainParliament.investiture(Q.congress, cand, Q);
     if (v.passes) {
+        Q.psoe_voted_no = Q.psoe_stance_pp === 'abstain' ? 0 : 1;
         window.SpainGame.holdInvestiture(Q, cand);
         Q.pp_invested_now = 1;
     } else {
@@ -149,7 +150,7 @@ title: A government of the right
 
 = A government of the right
 
-With the PSOE's abstention, [+ right_leader +] is invested Prime Minister: [+ government_type +]. The country has a government. In the PSOE, the argument about who allowed it has only begun. Membership cards are torn up on social media, and the polls show left-wing voters moving to Podemos.
+[? if psoe_voted_no = 0 : With the PSOE's abstention, [+ right_leader +] is invested Prime Minister: [+ government_type +]. The country has a government. In the PSOE, the argument about who allowed it has only begun. Membership cards are torn up on social media, and the polls show left-wing voters moving to Podemos. ?][? if psoe_voted_no = 1 : The PSOE votes no, but the right has the votes without it: [+ right_leader +] is invested Prime Minister, [+ government_type +]. Your "no" changed nothing in the chamber; in Ferraz, the critics say a party that cannot block a government cannot lead one either. ?]
 
 @pp_declines
 title: The right's candidate declines
@@ -1601,3 +1602,38 @@ From 20 April to 4 May the candidates collect the signed endorsements of the mem
 {!<div id="sp-avales"></div>!}
 
 [+ av_leader +] wins the endorsements. [? if tapias_out = 1 : José Antonio Pérez Tapias falls short and is off the ballot. ?] Endorsements are not votes: in the secrecy of the ballot box, members can sign for one candidate and vote for another.
+
+@iglesias_leaves
+title: Pablo Iglesias leaves
+new-page: true
+tags: sp_event
+view-if: iglesias_left = 0 and up_brand_exists = 1 and ((year = 2021 and month >= 3) or year >= 2022) and up_leader_is_iglesias = 1
+max-visits: 1
+on-arrival: {! Q.iglesias_left = 1; Q.up_successor = window.SpainGame ? window.SpainGame.iglesiasSuccessor(Q) : 'Yolanda Díaz'; Q.succ_diaz = Q.up_successor === 'Yolanda Díaz' ? 1 : 0; Q.succ_montero = Q.up_successor === 'Irene Montero' ? 1 : 0; Q.up_in_govt = (Q.govt_parties || []).indexOf('up') !== -1 && !Q.acting ? 1 : 0; !}
+
+= Pablo Iglesias leaves
+
+[? if up_in_govt = 1 : Pablo Iglesias resigns as Second Deputy Prime Minister to run in the Madrid regional election against Isabel Díaz Ayuso. ?][? if up_in_govt = 0 : Pablo Iglesias announces that he will run in the Madrid regional election against Isabel Díaz Ayuso. ?] After a poor result in May he does what few expected: he leaves politics altogether, cuts off his ponytail, and goes back to the university and the media.
+
+[? if succ_diaz = 1 : He has already named his successor: Yolanda Díaz, the Minister of Labour, a communist from Galicia whom even business leaders trust, and who gets on well with you. She will lead the space to the left of the PSOE, and soon she will want a platform of her own. ?][? if succ_montero = 1 : The succession goes to Irene Montero, his partner and the party's most combative voice. Podemos closes ranks and turns its fire on the PSOE. ?][? if succ_diaz = 0 : [? if succ_montero = 0 : Ione Belarra takes over Podemos, with Irene Montero at her side; Yolanda Díaz keeps her distance from the party's internal fights. ?] ?]
+
+- @ig_praise: Praise Iglesias and welcome [+ up_successor +]
+- @ig_court: Court the new leadership: offer a closer partnership
+- @ig_poach: Go after his voters: "the useful vote on the left is the PSOE"
+
+@ig_praise
+on-arrival: {! Q.rel_up += 4; !}
+
+A generous statement costs little.
+
+@ig_court
+subtitle: Closer relations with the left; the regional barons grumble
+on-arrival: {! Q.rel_up += 10; Q.regional_leaders_dissent += 3; !}
+
+[+ up_successor +] takes the call.
+
+@ig_poach
+subtitle: Wins some of his voters; the new leadership will not forget it
+on-arrival: {! Q.rel_up -= 10; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 1, workers: 1, professionals: 0.8 }); } !}
+
+Some of his voters come home. His successor takes note.

@@ -227,7 +227,22 @@
   // ------------------------------------------------------------------
   // Derived quantities, recalculated after every action.
   // ------------------------------------------------------------------
+  // Podemos's names: Podemos; Unidos Podemos with IU (May 2016); Unidas
+  // Podemos (2019); Sumar, Yolanda Díaz's platform (2023).
+  function podemosBrand(Q) {
+    var k = (Q.year || 2014) * 100 + (Q.month || 1);
+    return k >= 202306 ? ['Sumar', 'Sumar'] : (k >= 201903 ? ['Unidas Podemos', 'UP'] :
+      (k >= 201605 ? ['Unidos Podemos', 'UP'] : ['Podemos', 'Podemos']));
+  }
+
   function recalculate(Q) {
+    var brand = podemosBrand(Q);
+    if (Q.up_brand !== brand[0]) {
+      Q.up_brand = brand[0];
+      UI.setPartyName('up', brand[0], brand[1]);
+    }
+    Q.up_brand_exists = 1;
+    Q.up_leader_is_iglesias = leaderOf(Q, 'up') === 'Pablo Iglesias' || (!Q.iglesias_left && Q.year >= 2021) ? 1 : 0;
     var total = 0;
     var weighted = 0;
     FACTIONS.forEach(function (f) {
@@ -1815,6 +1830,7 @@
       return Q.cs_collapsed || Q.rivera_resigns_seen ? 'Inés Arrimadas' : LEADERS.cs;
     }
     if (p === 'up') {
+      if (Q.up_successor) { return Q.up_successor; }
       return Q.year >= 2021 && Q.month >= 5 || Q.year >= 2022 ? 'Yolanda Díaz' : LEADERS.up;
     }
     if (p === 'psoe') {
@@ -1837,6 +1853,12 @@
   }
 
   function formGovernment(Q, candidate) {
+    // a PP government (by majority or with Cs) while Sánchez's leadership
+    // has never been confirmed in a primary of his own: the critics move
+    if ((candidate === 'pp' || candidate === 'cs') && Q.sanchez_leader && !Q.mandate_renewed && !Q.rebellion_used) {
+      Q.plot = Math.max(Q.plot || 0, 82);
+      Q.pp_govt_trigger = 1;
+    }
     var ppHadPower = Q.pm_party === 'pp';
     Q.government_status = 'formed';
     Q.sanchez_nominated = 0;
@@ -1948,6 +1970,18 @@
 
   // Automatic dissolution: election 54 days after the decree (two months
   // later in the monthly calendar).
+  // March-May 2021: Iglesias leaves. Who succeeds him depends on where
+  // Podemos stands and how it gets on with the PSOE.
+  function iglesiasSuccessor(Q) {
+    var inGovt = (Q.govt_parties || []).indexOf('up') !== -1 && !Q.acting;
+    var rel = Q.rel_up === undefined ? 40 : Q.rel_up;
+    var poll = (Q.true_poll && Q.true_poll.up) || 12;
+    if (inGovt && rel >= 45) { return 'Yolanda Díaz'; }
+    if (rel < 30 || poll < 8) { return 'Irene Montero'; }
+    if (!inGovt && poll >= 12) { return 'Ione Belarra'; }
+    return Math.random() < 0.6 ? 'Yolanda Díaz' : 'Ione Belarra';
+  }
+
   // Weeks to automatic dissolution (art. 99.5: two months from the first
   // vote). The first vote rarely comes before the parties have spent about
   // two months negotiating (March 2016, August 2016, July 2019, September
@@ -2149,6 +2183,17 @@
     }
     Q.sanchez_authority += swing / 2;
     Q.member_morale += swing / 2;
+    // three defeats in a short time: even the members lose faith
+    if (Q.sanchez_leader) {
+      var psoeFirst = (r.totals.psoe || 0) >= Math.max(r.totals.pp || 0, r.totals.up || 0, r.totals.cs || 0);
+      Q.loss_times = (Q.loss_times || []).filter(function (t) { return Q.time - t <= 36; });
+      if (!psoeFirst) { Q.loss_times.push(Q.time); }
+      if (Q.loss_times.length >= 3 && !Q.three_losses) {
+        Q.three_losses = 1;
+        Q.sanchismo -= 25; Q.member_morale -= 20; Q.sanchez_authority -= 20;
+        Q.plot = Math.max(Q.plot || 0, 85);
+      }
+    }
     var ppLoss = (old.pp || 0) - (r.totals.pp || 0);
     var ppLargest = (r.totals.pp || 0) >= Math.max(r.totals.psoe || 0, r.totals.cs || 0, r.totals.up || 0, r.totals.ps || 0);
     if (!ppLargest) {
@@ -2465,7 +2510,7 @@
   // runs on his left instead. Díaz always runs.
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
-    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) + 6 * (Math.random() - 0.5), 15, 75);
+    var s = clamp(45 + (x - 60) * 0.5 + comebackBonus(Q) - (Q.three_losses ? 8 : 0) + 6 * (Math.random() - 0.5), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
     var tapias = 0;
     Q.primary_moderniser = Q.lopez_decided ? 1 : 0;
@@ -2644,11 +2689,12 @@
   }
 
   function leadershipElection(Q, bonus) {
-    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) +
+    var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) - (Q.three_losses ? 10 : 0) +
       (bonus || 0) + 6 * gaussian();
     Q.primary_score = Math.round(score);
     var won = score >= 38 ? 1 : 0;
     Q.primary_won = won;
+    if (won) { Q.mandate_renewed = 1; }
     if (won) {
       Q.sanchez_leader = 1;
       if (Q.pm_party === 'psoe' && !Q.acting) { Q.pm = 'Pedro Sánchez'; }
@@ -3507,6 +3553,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderPrimary: renderPrimary,
     isModerniser: isModerniser,

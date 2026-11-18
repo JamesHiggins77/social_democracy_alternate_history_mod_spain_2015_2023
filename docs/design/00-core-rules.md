@@ -504,3 +504,17 @@ After an October 2016 ouster, the window runs as an event chain:
 **How the maps work:** province leans (Díaz in Andalusia, Extremadura and Castilla-La Mancha; López in the Basque Country) are scaled so the member-weighted national result matches the vote.
 
 **Terminology:** the Progressives faction is now the "Socialist Left", and "regional leaders" are now "regional barons".
+
+### 7.21 Podemos's names, Iglesias's exit, and pressure on Sánchez
+
+- **Names.** Podemos is shown as Podemos (to April 2016), Unidos Podemos (May 2016), Unidas Podemos (March 2019) and Sumar (June 2023).
+- **Iglesias leaves** (March–May 2021, while he leads). His successor depends on where Podemos stands:
+  - in government and on good terms with the PSOE (relations 45+): Yolanda Díaz;
+  - relations below 30, or polling under 8%: Irene Montero;
+  - in opposition and polling 12%+: Ione Belarra;
+  - otherwise, Díaz (60%) or Belarra.
+  
+  The player can praise, court (better relations with Podemos, the regional barons grumble) or poach his voters.
+- **PSOE "no" that changes nothing.** When the right has the votes without the PSOE, the result text says the PSOE voted no but couldn't block, instead of describing an abstention.
+- **A PP government before a renewed mandate.** If a PP government forms (alone or with Cs) while Sánchez leads but has never won a leadership election in the game, the barons' plot rises to 82, once.
+- **Three defeats.** Three general elections within 36 months in which the PSOE is not the largest party cost him 25 sanchismo, 20 morale and 20 authority, raise the plot to 85, and cost 10 points in any leadership vote (8 in the 2017 race).
