@@ -256,6 +256,7 @@
     Q.player_party = Q.player_party || 'psoe';
     Q.my_party = Q.player_party === 'psoe' ? 'the PSOE' : UI.partyName(Q.player_party);
     Q.my_party_cap = Q.my_party.charAt(0).toUpperCase() + Q.my_party.slice(1);
+    Q.player_role = Q.player_leads ? '\u00a0(leader),' : ',';
     Q.player_is_cs = Q.player_party === 'cs' ? 1 : 0;
     Q.player_is_up = Q.player_party === 'up' ? 1 : 0;
     Q.player_is_ps = Q.player_party === 'ps' ? 1 : 0;
