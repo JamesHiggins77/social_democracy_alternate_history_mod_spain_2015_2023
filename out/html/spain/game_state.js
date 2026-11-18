@@ -410,7 +410,7 @@
     Q.pp_vox_majority = ((Q.congress.pp || 0) + (Q.congress.vox || 0)) >= 176 ? 1 : 0;
     Q.grand_possible = ((Q.congress.pp || 0) + (Q.congress.psoe || 0)) >= 176 ? 1 : 0;
     Q.vox_on = voxOn(Q) ? 1 : 0;
-    Q.seeking_government = (Q.acting && !Q.psoe_in_government && Q.elections_held >= 1 &&
+    Q.seeking_government = (Q.acting && Q.elections_held >= 1 &&
       !Q.election_year && Q.sanchez_leader) ? 1 : 0;
     var cat = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
     Q.catalonia_independentist = (cat && ['jxsi', 'junts', 'erc'].indexOf(cat.party) !== -1) ? 1 : 0;

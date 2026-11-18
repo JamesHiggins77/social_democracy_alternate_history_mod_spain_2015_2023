@@ -57,7 +57,7 @@ title: Seek investiture
 is-pinned-card: true
 card-image: img/spain/portrait_sanchez_2015.jpg
 tags: sp_advisor
-view-if: sanchez_nominated = 1 and psoe_in_government = 0 and sanchez_leader = 1 and acting = 1
+view-if: sanchez_nominated = 1 and sanchez_leader = 1 and acting = 1
 go-to: sp_investiture
 
 @organisation

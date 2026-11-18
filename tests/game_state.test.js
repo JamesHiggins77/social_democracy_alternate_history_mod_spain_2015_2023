@@ -1021,3 +1021,15 @@ test('PSOE recovery: leadership bounce by margin; Vox in several PP regional gov
   assert.ok(Q.vm.classSupport.workers.psoe > before && Q.leadership_bounce > 0.8);
   const R = newQ(); G.leadershipBounce(R, 38); assert.ok(!R.leadership_bounce);
 });
+
+test('a PSOE government that calls an election can seek investiture as the acting government', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.month = 4;
+  Q.congress = { psoe: 123, pp: 66, cs: 57, up: 42, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4, cc: 2, prc: 1, te: 1, nc: 1, navarra: 1 };
+  G.formGovernment(Q, 'sanchez');            // in office after the motion
+  assert.strictEqual(Q.psoe_in_government, 1);
+  Q.elections_held = 3; Q.government_status = 'acting'; Q.acting = 1; Q.election_year = 0; Q.sanchez_nominated = 1;
+  G.recalculate(Q);
+  assert.strictEqual(Q.acting, 1);
+  assert.strictEqual(Q.seeking_government, 1);
+});
