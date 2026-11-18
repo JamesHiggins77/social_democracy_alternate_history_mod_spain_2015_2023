@@ -116,7 +116,12 @@
   // How each group votes on Mariano Rajoy's (or another PP leader's)
   // investiture. Q.psoe_stance_pp: 'no' or 'abstain', the player's choice.
   function stancesForPP(Q) {
-    var ppFirst = !Q.psoe_largest && ((Q.fatigue || 0) >= 2 || ((Q.fatigue || 0) >= 1 && (Q.formation_weeks || 0) >= 6));
+    // a PSOE led by Sánchez votes as he decides; without him (or with a
+    // caretaker committee) it gives way after a repeat election
+    // ... and even under Sánchez, the barons' deputies will not go to a
+    // fourth election: they break discipline and abstain
+    var fat = Q.fatigue || 0;
+    var ppFirst = !Q.psoe_largest && (Q.sanchez_leader ? fat >= 2 : (fat >= 2 || (fat >= 1 && (Q.formation_weeks || 0) >= 6)));
     return vetoes(Q, {
       pp: 'yes', vox: between(Q, 'pp', 'vox') >= 30 ? 'yes' : 'abstain', upn: 'yes',
       psoe: ppFirst ? 'abstain' : (Q.psoe_stance_pp || 'no'),
@@ -159,11 +164,13 @@
   function stancesForCensure(Q) {
     var scandal = Q.pp_scandal || 0;
     var outWithRajoy = function (id, rel) {
-      return (relation(Q, id, 30) >= rel || scandal >= 3) ? 'yes' : 'abstain';
+      return (relation(Q, id, 30) >= rel || (scandal >= 3 && Q.gurtel_seen)) ? 'yes' : 'abstain';
     };
     return {
       psoe: 'yes', pp: 'no', vox: 'no', upn: 'no',
-      cs: relation(Q, 'cs', 45) >= 75 ? 'yes' : 'no',
+      // Ciudadanos and the PNV want a court ruling, not just headlines,
+      // before they bring down a government (the Gürtel sentence, 2018)
+      cs: relation(Q, 'cs', 45) >= 75 && Q.gurtel_seen ? 'yes' : 'no',
       // a convicted government: Podemos and IU vote to remove it whatever
       // they think of the PSOE (June 2018)
       up: relation(Q, 'up', 35) >= 30 || scandal >= 3 ? 'yes' : 'abstain',
@@ -172,7 +179,7 @@
       erc: outWithRajoy('erc', 50),
       junts: outWithRajoy('junts', 55),
       cup: 'abstain',
-      pnv: (relation(Q, 'pnv', 45) >= 65 || (scandal >= 3 && relation(Q, 'pnv', 45) >= 40)) ? 'yes' : 'no',
+      pnv: Q.gurtel_seen && (relation(Q, 'pnv', 45) >= 40 || scandal >= 3) ? 'yes' : 'no',
       bildu: scandal >= 2 || relation(Q, 'bildu', 10) >= 30 ? 'yes' : 'abstain',
       cc: relation(Q, 'cc', 45) >= 70 ? 'yes' : 'abstain',
       nc: 'yes', bng: 'yes', geroa: 'yes', prc: 'abstain', te: 'yes', foro: 'no'

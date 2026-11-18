@@ -72,8 +72,10 @@ test('a failed investiture starts the clock; dissolution leads to a repeat elect
   Q.pact_cs = 1;
   const v = G.holdInvestiture(Q, 'sanchez');
   assert.strictEqual(v.passes, false);
-  assert.strictEqual(Q.investiture_clock, 8);
-  for (let i = 0; i < 8; i++) G.endOfWeek(Q);
+  // two months from the first vote, which comes about two months after the
+  // election: a vote held straight away does not bring the deadline forward
+  assert.strictEqual(Q.investiture_clock, 16);
+  for (let i = 0; i < 16; i++) G.endOfWeek(Q);
   assert.strictEqual(Q.dissolution_due, 1);
   G.dissolve(Q);
   G.endOfMonth(Q); G.endOfMonth(Q);
@@ -699,6 +701,11 @@ test('after a repeat election there is no third election: the eve-of-dissolution
   Q.year = 2016; Q.month = 9; Q.government_status = 'acting'; Q.fatigue = 1;
   Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
   Q.pact_pp_cs = 1; Q.psoe_stance_pp = 'no'; G.recalculate(Q);
+  // a PSOE led by Sánchez votes no if he says so (October 2016 needed his
+  // fall first) ...
+  assert.ok(!G.lastChanceInvestiture(Q));
+  // ... a PSOE without him gives way
+  Q.sanchez_leader = 0; G.recalculate(Q);
   assert.ok(G.lastChanceInvestiture(Q));
   assert.strictEqual(Q.pm_party, 'pp');
   assert.strictEqual(Q.acting, 0);
@@ -768,4 +775,25 @@ test('the comeback campaign: network, barons and money raise the primary edge; a
   assert.ok(G.comebackBonus(Q) > base + 15);
   Q.rel_leadership = 0;
   assert.ok(G.comebackBonus(Q) < base + 16);
+});
+
+test('blocking Rajoy after a repeat election sets off the barons; an early motion fails without a court ruling', () => {
+  const Q = newQ();
+  Q.year = 2016; Q.month = 9; Q.government_status = 'acting'; Q.fatigue = 1; Q.formation_weeks = 10;
+  Q.congress = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
+  G.recalculate(Q);
+  assert.strictEqual(G.formationClock(Q), 8);
+  Q.formation_weeks = 0;
+  assert.strictEqual(G.formationClock(Q), 16);
+});
+
+test('a Prime Minister who loses the PSOE leadership hands the government to its next leader', () => {
+  const Q = newQ();
+  Q.year = 2019; Q.congress = { psoe: 123, pp: 66, cs: 57, up: 42, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4, cc: 2, prc: 1, te: 1, nc: 1, navarra: 1 };
+  Q.government_status = 'acting'; Q.pact_up = 1;
+  G.formGovernment(Q, 'sanchez'); G.recalculate(Q);
+  assert.strictEqual(Q.pm, 'Pedro Sánchez');
+  G.oust(Q, false);
+  assert.notStrictEqual(Q.pm, 'Pedro Sánchez');
+  assert.strictEqual(Q.pm_party, 'psoe');
 });

@@ -36,11 +36,14 @@ test('Rajoy wins only if the PSOE abstains (2016 arithmetic)', () => {
 
 test('June 2018: the motion of no confidence passes with 180 votes after the Gürtel sentence', () => {
   const seats2016 = { pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 };
-  const v = P.count(seats2016, P.stancesForCensure({ pp_scandal: 3, rel_up: 40, rel_pnv: 45 }));
+  const v = P.count(seats2016, P.stancesForCensure({ pp_scandal: 3, gurtel_seen: 1, rel_up: 40, rel_pnv: 45 }));
   assert.strictEqual(v.yes, 180);
   assert.ok(v.yes >= 176);
   const before = P.count(seats2016, P.stancesForCensure({ pp_scandal: 0, rel_up: 40, rel_pnv: 45 }));
   assert.ok(before.yes < 176);
+  // a pile of corruption stories without a sentence does not move Cs or the PNV
+  const noRuling = P.count(seats2016, P.stancesForCensure({ pp_scandal: 3, rel_up: 40, rel_pnv: 70, rel_cs: 80 }));
+  assert.ok(noRuling.yes < 176);
 });
 
 test('A PSOE budget without Catalan dialogue fails (February 2019 arithmetic)', () => {

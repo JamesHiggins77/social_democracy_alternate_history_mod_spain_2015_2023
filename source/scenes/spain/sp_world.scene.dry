@@ -693,7 +693,7 @@ title: Vox breaks through
 new-page: true
 tags: sp_event
 view-if: vox_breakthrough_due = 1
-on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 2, self_employed: 3, workers: 1.5, professionals: 1.5, homemakers: 1.5, unemployed: 1}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1, professionals: 1, students: 0.8}); window.SpainGame.transferRaw(Q, 'psoe', 'vox', {workers: 0.5, unemployed: 0.5}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
+on-arrival: {! Q.vox_breakthrough_due = 0; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', 'vox', {pensioners: 3.2, self_employed: 4.5, workers: 2.4, professionals: 2.6, homemakers: 2.4, unemployed: 1.6}); window.SpainGame.transferRaw(Q, 'cs', 'vox', {self_employed: 1.5, workers: 1, professionals: 1, students: 0.8}); window.SpainGame.transferRaw(Q, 'psoe', 'vox', {workers: 0.5, unemployed: 0.5}); window.SpainGame.partyRel(Q, 'pp', 'vox', 10); } !}
 
 = Vox breaks through
 
@@ -816,3 +816,36 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 On the same Sunday as the regional and municipal elections, Spain elects its 54 members of the European Parliament in a single national constituency, with no threshold. (After Brexit, Spain will gain five more seats on the same result.)
 
 {!<div id="sp-ep-result"></div>!}
+
+@colon
+title: The photo of Colón
+new-page: true
+tags: sp_event
+view-if: colon_seen = 0 and vox_breakthrough = 1 and sanchez_pm = 1 and year >= 2019
+on-arrival: {! Q.colon_seen = 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'pp', { vox: 0.6, cs: 0.4 }, { pensioners: 0.8, self_employed: 1, professionals: 0.6 }); } !}
+
+= The photo of Colón
+
+Pablo Casado, Albert Rivera and Santiago Abascal share a stage in Madrid's Plaza de Colón, under a giant flag, to demand your resignation over the talks with Catalonia. The photograph is everywhere by the evening. For many voters on the left, and some in the centre, it is the first time the possibility of a government with Vox in it looks real.
+
+- @colon_three: Make it the campaign: "the three rights" against a government of progress
+- @colon_centre: Speak to the moderates: "this is not the Spain of the Constitution"
+- @colon_quiet: Ignore it and talk about pensions and the minimum wage
+
+@colon_three
+subtitle: Mobilises the left behind the PSOE, at Podemos's expense; it hardens the right too
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', { psoe: 0.85, iu: 0.15 }, { students: 2, workers: 2, unemployed: 1.5, professionals: 1.2, homemakers: 0.8 }); window.SpainGame.transferRaw(Q, 'cs', 'psoe', { professionals: 0.8, pensioners: 0.6, workers: 0.5 }); window.SpainGame.campaignRaw(Q, 'vox', { self_employed: 0.5, pensioners: 0.3 }); } Q.rel_cs -= 6; Q.sanchismo += 3; !}
+
+"Spain has three rights now, and they only agree on taking us back." The left rallies behind the one party that can stop them.
+
+@colon_centre
+subtitle: Wins centrist voters from Ciudadanos; less pull on the left
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'cs', 'psoe', { professionals: 1.5, pensioners: 1.2, workers: 0.8, homemakers: 0.8 }); window.SpainGame.transferRaw(Q, 'up', 'psoe', { workers: 0.8, students: 0.6 }); } !}
+
+Moderate voters who left the PSOE for Rivera hear you. Some come home.
+
+@colon_quiet
+subtitle: A little of both; nothing that hardens anyone
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { workers: 0.8, students: 0.8 }); window.SpainGame.transferRaw(Q, 'cs', 'psoe', { professionals: 0.5, pensioners: 0.5 }); } !}
+
+The photograph does its work without you.

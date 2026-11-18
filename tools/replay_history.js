@@ -28,7 +28,7 @@ until(2017, 2); G.transferRaw(Q, 'up', { psoe: 0.7, iu: 0.1, cs: 0.2 }, { profes
 until(2017, 10); Q.catalan_crisis = 1; Q.cat_crisis_seen = 1; G.position(Q, 0, -0.5); // the crisis; Sánchez backs 155
 until(2018, 5); Q.catalan_crisis = 0; Q.cat_tension = 10;
 G.transferRaw(Q, 'up', { psoe: 0.6, iu: 0.2, mp: 0.2 }, { workers: 0.8, unemployed: 0.8, students: 0.6, pensioners: 0.3 }); // chalet
-Q.pp_scandal = (Q.pp_scandal || 0) + 3; G.campaign(Q, 'pp', { pensioners: -3, professionals: -3, self_employed: -2, workers: -2, homemakers: -2 }); // Gürtel
+Q.gurtel_seen = 1; Q.pp_scandal = (Q.pp_scandal || 0) + 3; G.campaign(Q, 'pp', { pensioners: -3, professionals: -3, self_employed: -2, workers: -2, homemakers: -2 }); // Gürtel
 until(2018, 6);
 // June 2018: the motion of no confidence
 Q.rel_up = 40; Q.rel_pnv = 50; G.holdCensure(Q); if (!Q.censure_passed) { console.log('censure FAILED', Q.inv_yes); G.formGovernment(Q, 'sanchez'); }
@@ -37,9 +37,13 @@ G.position(Q, 0, 1.2); G.target(Q, 'psoe', 'young', 1.5); G.campaign(Q, 'vox', {
 until(2018, 10);
 G.campaign(Q, 'psoe', { pensioners: 3 }); G.position(Q, 0.3, 0); G.social(Q, 2); // index pensions
 until(2018, 12);
-Q.vox_breakthrough = 1; G.transferRaw(Q, 'pp', 'vox', { pensioners: 2, self_employed: 3, workers: 1.5, professionals: 1.5, homemakers: 1.5, unemployed: 1 }); G.transferRaw(Q, 'cs', 'vox', { self_employed: 1.5, workers: 1, professionals: 1, students: 0.8 }); G.transferRaw(Q, 'psoe', 'vox', { workers: 0.5, unemployed: 0.5 }); // Andalusia
+Q.vox_breakthrough = 1; G.transferRaw(Q, 'pp', 'vox', { pensioners: 3.2, self_employed: 4.5, workers: 2.4, professionals: 2.6, homemakers: 2.4, unemployed: 1.6 }); G.transferRaw(Q, 'cs', 'vox', { self_employed: 1.5, workers: 1, professionals: 1, students: 0.8 }); G.transferRaw(Q, 'psoe', 'vox', { workers: 0.5, unemployed: 0.5 }); // Andalusia
 G.campaign(Q, 'psoe', { workers: 3, unemployed: 1.5, students: 1, self_employed: -1.5 }); G.position(Q, 1, 0); G.econ(Q, -0.1, 0.25); G.social(Q, 3); // minimum wage +22%
 until(2019, 2);
+// February 2019: the photo of Colón ("the three rights")
+G.transferRaw(Q, 'pp', { vox: 0.6, cs: 0.4 }, { pensioners: 0.8, self_employed: 1, professionals: 0.6 });
+G.transferRaw(Q, 'up', { psoe: 0.85, iu: 0.15 }, { students: 2, workers: 2, unemployed: 1.5, professionals: 1.2, homemakers: 0.8 });
+G.transferRaw(Q, 'cs', 'psoe', { professionals: 0.8, pensioners: 0.6, workers: 0.5 }); G.campaignRaw(Q, 'vox', { self_employed: 0.5, pensioners: 0.3 });
 // February 2019: the budget falls, an election for April
 Q.election_year = 2019; Q.election_month = 4;
 until(2019, 4); elect();

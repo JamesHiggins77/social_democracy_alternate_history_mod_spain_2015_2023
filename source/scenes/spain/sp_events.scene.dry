@@ -81,7 +81,7 @@ What will the PSOE do?
 - @grand: Offer the PP a grand coalition
 
 @against
-on-arrival: {! Q.psoe_stance_pp = "no"; Q.member_morale += 4; Q.rel_pp -= 6; Q.sanchez_authority += 2; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); } !}
+on-arrival: {! Q.psoe_stance_pp = "no"; Q.member_morale += 4; Q.rel_pp -= 6; Q.sanchez_authority += 2; if ((Q.fatigue || 0) >= 1 && !Q.psoe_largest && !Q.rebellion_used && !Q.third_election_threat) { Q.regional_leaders_dissent += 10; Q.third_election_threat = 1; Q.threat_week = Math.max((Q.formation_weeks || 0) + 4, 10); } if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1, students: 1}); } !}
 go-to: pp_decides
 
 @abstain
@@ -1367,4 +1367,71 @@ on-arrival: deadlock_broken = 0
 
 = No third election
 
-On the eve of a second dissolution, with the country facing a third election in a row, [+ deadlock_by +] gives in: its deputies abstain in one last investiture vote. [+ pm +] is invested: [+ government_type +]. [? if sanchez_pm = 0 : [? if sanchez_leader = 1 : The PSOE's members feel betrayed by their own deputies, and Podemos opens its doors to every disappointed socialist. ?] ?][? if sanchez_pm = 1 : The PP calls it a sacrifice for Spain. You call it the voters' verdict. ?]
+On the eve of a second dissolution, with the country facing a third election in a row, [+ deadlock_by +] gives in: its deputies abstain in one last investiture vote. [+ pm +] is invested: [+ government_type +]. [? if sanchez_pm = 0 : [? if sanchez_leader = 1 : [? if group_defied = 1 : You ordered the group to vote no. The barons' deputies abstained anyway: the PSOE group has defied its own Secretary-General in public. ?] The PSOE's members feel betrayed by their own deputies, and Podemos opens its doors to every disappointed socialist. ?] ?][? if sanchez_pm = 1 : The PP calls it a sacrifice for Spain. You call it the voters' verdict. ?]
+
+@censure_budget
+title: The budget vote
+new-page: true
+tags: sp_event
+view-if: sanchez_pm = 1 and censure_budget_seen = 0 and censure_time > 0 and time >= censure_time + 9 and budget_passed = 0 and election_year = 0
+on-arrival: {! Q.censure_budget_seen = 1; if (window.SpainGame) { window.SpainGame.holdBudget(Q); } if (!Q.budget_passed) { Q.sanchez_authority -= 4; } else { Q.budget_year = Q.year; Q.sanchez_authority += 8; } !}
+
+= The budget vote
+
+A government born of a motion of no confidence has to pass a budget of its own, or admit it cannot govern. María Jesús Montero presents the accounts; the Catalan independence parties, with their leaders on trial, decide their fate.
+
+Yes [+ inv_yes +], no [+ inv_no +]. [? if budget_passed = 1 : The budget passes. The legislature can run its course. ?][? if budget_passed = 0 : The budget is defeated. ERC and Junts have voted with the PP, Ciudadanos and Vox. ?]
+
+- @cb_snap: Call an early general election [? if budget_passed = 0 : (the voters can give you the majority this Congress will not) ?]
+- @cb_carry: Govern on with the rolled-over budget
+- @cb_fine: Continue
+
+@cb_snap
+view-if: budget_passed = 0
+subtitle: An election in two months, while the right is divided and you hold the office
+on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); } Q.member_morale += 3; !}
+
+You announce the dissolution of the Cortes. Spain votes in two months.
+
+@cb_carry
+view-if: budget_passed = 0
+subtitle: Keeps you in office; every month without a budget wears the government down
+on-arrival: {! Q.sanchez_authority -= 3; if (window.SpainGame) { window.SpainGame.econ(Q, -0.1, 0); } !}
+
+You govern by decree where you can and by patience where you cannot.
+
+@cb_fine
+view-if: budget_passed = 1
+
+@diaz_snap_2018
+title: Díaz calls an election
+new-page: true
+tags: sp_event
+view-if: diaz_snap18_seen = 0 and year = 2018 and month >= 10 and regions_andalucia_psoe = 1
+max-visits: 1
+on-arrival: {!
+Q.diaz_snap18_seen = 1;
+if (Q.regions && Q.regions['Andalucía']) {
+    Q.regions['Andalucía'].nextElection = '2018-12-02';
+    Q.regions['Andalucía'].lastWasSnap = true;
+}
+!}
+
+= Díaz calls an election
+
+Susana Díaz calls an Andalusian election for 2 December, months early. Her pact with Ciudadanos has run its course, and she would rather face the voters before a general election than after one. In Ferraz, some suspect she also wants a strong result to measure against yours.
+
+- @diaz18_campaign: Campaign at her side: a socialist Andalusia is a socialist Spain
+- @diaz18_distance: Let her run her own campaign
+
+@diaz18_campaign
+subtitle: Costs 1 in party funds; her result becomes your result, good or bad
+on-arrival: {! Q.funds -= 1; Q.diaz_relation += 5; Q.regional_leaders_dissent -= 4; if (window.SpainGame) { window.SpainGame.regionalMod(Q, 'Andalucía', 'psoe', 1.02); window.SpainGame.recalculate(Q); } !}
+
+You share her stages. The old rivals smile for the cameras.
+
+@diaz18_distance
+subtitle: Keeps your distance from her result
+on-arrival: {! Q.diaz_relation -= 3; !}
+
+Andalusia is Susana's campaign.

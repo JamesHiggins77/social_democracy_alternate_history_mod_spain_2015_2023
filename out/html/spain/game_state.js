@@ -1411,13 +1411,15 @@
     if (Q.censure_passed) {
       formGovernment(Q, 'sanchez');
       Q.government_type = 'PSOE government after a motion of no confidence';
+      Q.censure_time = Q.time;
+      Q.censure_budget_seen = 0;
       // the new Prime Minister's bounce (June 2018): left voters come home
       transfer(Q, 'up', { psoe: 1 }, { workers: 2, students: 2, unemployed: 2, professionals: 1.5, pensioners: 1, homemakers: 1 });
       transfer(Q, 'cs', { psoe: 1 }, { professionals: 0.8, workers: 0.5 });
       if ((Q.pp_scandal || 0) >= 3) {
         // a party thrown out of government for corruption: its voters scatter
-        transfer(Q, 'pp', { cs: 0.4, vox: 0.4, psoe: 0.2 },
-          { pensioners: 2, professionals: 2.5, self_employed: 2.5, workers: 1.5, homemakers: 2, students: 1.5, unemployed: 1.5 });
+        transfer(Q, 'pp', { cs: 0.4, vox: 0.3, psoe: 0.3 },
+          { pensioners: 3, professionals: 4, self_employed: 3.5, workers: 2.5, homemakers: 3, students: 2.5, unemployed: 2.5 });
       }
     }
     recalculate(Q);
@@ -1465,6 +1467,13 @@
   function endOfWeek(Q) {
     Q.month_actions = 0;
     Q.formation_weeks = (Q.formation_weeks || 0) + 1;
+    // September 2016: once a third election looms because the PSOE keeps
+    // saying no, the barons move against its leader
+    if (Q.third_election_threat && Q.acting && Q.sanchez_leader && !Q.rebellion_used &&
+        Q.formation_weeks >= (Q.threat_week || 10)) {
+      Q.plot = Math.max(Q.plot || 0, 62);
+      Q.third_election_threat = 0;
+    }
     autoFormation(Q);
     (Q.timers || []).forEach(function (t) {
       if (Q[t + '_timer'] > 0) {
@@ -1687,7 +1696,7 @@
     }
     Q.investiture_votes += 1;
     if (Q.investiture_clock < 0) {
-      Q.investiture_clock = 8;
+      Q.investiture_clock = formationClock(Q);
     }
     if (v.passes) {
       formGovernment(Q, candidate);
@@ -1842,6 +1851,14 @@
 
   // Automatic dissolution: election 54 days after the decree (two months
   // later in the monthly calendar).
+  // Weeks to automatic dissolution (art. 99.5: two months from the first
+  // vote). The first vote rarely comes before the parties have spent about
+  // two months negotiating (March 2016, August 2016, July 2019, September
+  // 2023), so an early vote does not bring the deadline forward.
+  function formationClock(Q) {
+    return 8 + Math.max(0, 8 - (Q.formation_weeks || 0));
+  }
+
   function dissolve(Q) {
     var d = addMonths(Q.year, Q.month, 2);
     Q.election_year = d[0];
@@ -1985,6 +2002,7 @@
     Q.formation_round = (Q.formation_round || 1) + 1;
     Q.formation_start_time = Q.time;
     Q.formation_weeks = 0;
+    Q.third_election_threat = 0;
     Q.week = 1;
     Q.psoe_stance_pp = 'no';
     // Repeat elections: the right regroups and the party blames the leader.
@@ -2007,9 +2025,9 @@
     var swing = (r.totals.psoe || 0) - (old.psoe || 0);
     // bad results arm the barons
     if (Q.sanchez_leader) {
-      if (swing < 0) { Q.plot = (Q.plot || 0) + 1.5 * -swing; }
+      if (swing < 0) { Q.plot = (Q.plot || 0) + 1.0 * -swing; }
       var ps = r.totals.psoe || 0;
-      Q.plot = (Q.plot || 0) + (ps < 90 ? 25 : (ps < 100 ? 15 : 0));
+      Q.plot = (Q.plot || 0) + (ps < 90 ? 20 : (ps < 100 ? 10 : 0));
       if (swing > 0) { Q.plot = Math.max(0, (Q.plot || 0) - swing); }
     }
     Q.sanchez_authority += swing / 2;
@@ -2219,6 +2237,12 @@
     Q.in_leadership_window = (k >= 201606 && k <= 201703) ? 1 : 0;
     // the barons' plot: pressure to overthrow Sánchez (0-100)
     Q.plot = clamp(Q.plot || 0, 0, 100);
+    // while the first attempt to form a government is still open, the barons
+    // wait to see how it ends (December 2015 - June 2016): they strike when
+    // a repeat election has failed or the formation is over
+    if (Q.acting && (Q.fatigue || 0) === 0 && !Q.election_year) {
+      Q.plot = Math.min(Q.plot, 55);
+    }
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
     Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
     Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= 60 && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
@@ -2305,6 +2329,7 @@
     Q.primary_won = won;
     if (won) {
       Q.sanchez_leader = 1;
+      if (Q.pm_party === 'psoe' && !Q.acting) { Q.pm = 'Pedro Sánchez'; }
       Q.sanchez_authority = Math.max(Q.sanchez_authority, 60);
       Q.sanchismo += 10;
       Q.member_morale += 6;
@@ -2334,6 +2359,12 @@
     Q.psoe_interim = 1;
     Q.interim_since = Q.time;
     Q.psoe_leader = Q.year <= 2018 ? 'Javier Fernández' : 'a caretaker committee';
+    // a Prime Minister who loses his party hands the government to its
+    // next leader (the PSOE's group backs its new candidate)
+    if (Q.pm === 'Pedro Sánchez' && Q.pm_party === 'psoe') {
+      Q.pm = Q.psoe_next_leader;
+      Q.pm_lost_party = 1;
+    }
     Q.gestora_abstains = Math.random() < 0.8 ? 1 : 0;
     if (expelled) {
       Q.expelled = 1;
@@ -2652,6 +2683,10 @@
         // the PSOE's deputies abstained: the party pays for it
         transfer(Q, 'psoe', { up: 0.8, iu: 0.2 }, { workers: 2, students: 2, unemployed: 1.5, professionals: 1 });
         Q.member_morale -= 8; Q.progressives_dissent += 10; Q.sanchez_authority -= 6;
+        if (Q.psoe_stance_pp !== 'abstain') {
+          // against his orders: the group has defied its leader
+          Q.group_defied = 1; Q.sanchez_authority -= 20; Q.regional_leaders_dissent += 10; Q.sanchismo += 5;
+        }
       }
       recalculate(Q);
       return true;
@@ -2685,6 +2720,8 @@
       st.psoe = (Q.rel_psoe || 0) >= 45 ? 'yes' : 'abstain';
     }
     if (candidate === 'up' && Q.exiled && pl === 'psoe') { st.psoe = 'no'; }
+    // a caretaker committee does not make Pablo Iglesias Prime Minister
+    if (candidate === 'up' && Q.psoe_interim) { st.psoe = 'no'; }
     if (Q.exiled && pl !== 'psoe') {
       var right = candidate === 'pp' || candidate === 'cs';
       var line = right ? Q.player_line_right : Q.player_line_left;
@@ -2774,7 +2811,7 @@
       }
     }
     if (Q.investiture_clock < 0) {
-      Q.investiture_clock = 8;
+      Q.investiture_clock = formationClock(Q);
       Q.investiture_votes += 1;
     }
     return null;
@@ -3124,6 +3161,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
     lastChanceInvestiture: lastChanceInvestiture,
     factionLeader: factionLeader,
