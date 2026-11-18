@@ -2617,7 +2617,8 @@
   // ------------------------------------------------------------------
   var CANDIDATES = {
     c_sanchez: ['Pedro Sánchez', 'Sánchez', '#E30613'], c_diaz: ['Susana Díaz', 'Díaz', '#F28C00'],
-    c_lopez: ['Patxi López', 'López', '#1E8A3E'], c_tapias: ['José Antonio Pérez Tapias', 'Pérez Tapias', '#7A1E48']
+    c_lopez: ['Patxi López', 'López', '#1E8A3E'], c_tapias: ['José Antonio Pérez Tapias', 'Pérez Tapias', '#E2C33C'],
+    c_madina: ['Eduardo Madina', 'Madina', '#6A5ACD']
   };
   Object.keys(CANDIDATES).forEach(function (k) { UI.addMeta(k, CANDIDATES[k][0], CANDIDATES[k][1], CANDIDATES[k][2]); });
   // members by federation (2017, about 188,000 in all)
@@ -2634,7 +2635,16 @@
       _default: 0.85 },
     c_lopez: { 'Bizkaia': 7.5, 'Gipuzkoa': 7, 'Araba': 4.5, 'Navarra': 1.4, 'Cantabria': 1.2, 'La Rioja': 1.1, _default: 0.9 },
     c_tapias: { 'Madrid': 1.3, 'Barcelona': 1.2, 'Granada': 1.3, _default: 1 },
-    c_sanchez: { _default: 1 }
+    c_sanchez: { _default: 1 },
+    // 2014: Madina carried the north, the Basque Country, Catalonia, Madrid and the west
+    c_madina: (function () {
+      var o = { _default: 0.8 };
+      ['A Coruña', 'Lugo', 'Ourense', 'Asturias', 'León', 'Palencia', 'Burgos', 'Soria', 'Bizkaia', 'Gipuzkoa', 'Araba', 'Navarra',
+       'La Rioja', 'Huesca', 'Barcelona', 'Girona', 'Lleida', 'Zamora', 'Salamanca', 'Valladolid', 'Segovia', 'Ávila', 'Madrid',
+       'Cáceres', 'Badajoz', 'Ceuta'].forEach(function (p) { o[p] = 1.45; });
+      ['Sevilla', 'Jaén', 'Córdoba', 'Huelva', 'Cádiz', 'Granada', 'Málaga', 'Almería'].forEach(function (p) { o[p] = 0.5; });
+      return o;
+    })()
   };
   function provinceList() {
     var data = lib('SPAIN_ELECTION_DATA', 'election_data.js');
@@ -2761,6 +2771,23 @@
       Q.av_need.toLocaleString('en-GB') + ' (5% of the membership).</p><div id="' + id + '-map"></div>';
     UI.drawMap(el(id + '-map'), Q.av_winners, 'Most endorsements by province', { shares: Q.av_shares, outlines: 'light' });
   }
+  // July 2014: the first primary, which the game starts after.
+  function race2014(Q) {
+    var t = { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 };
+    var map = raceByProvince(t);
+    Q.r14_winners = map.winners; Q.r14_shares = map.shares;
+    Q.r14_rows = [{ id: 'c_sanchez', share: 48.3, votes: 64116 }, { id: 'c_madina', share: 36.0, votes: 47750 },
+      { id: 'c_tapias', share: 15.0, votes: 19869 }];
+  }
+  function render2014(Q, id) {
+    var out = el(id);
+    if (!out) { return; }
+    if (!Q.r14_rows) { race2014(Q); }
+    out.innerHTML = raceTable(Q.r14_rows, 'votes', 'Votes') +
+      '<p class="sp-map-legend">198,123 members registered; 132,850 voted (67.1%). Ratified by the Extraordinary Congress, 26–27 July.</p><div id="' + id + '-map"></div>';
+    UI.drawMap(el(id + '-map'), Q.r14_winners, 'Winner by province (hover for shares)', { shares: Q.r14_shares, outlines: 'light' });
+  }
+
   function renderPrimary(Q, id) {
     var out = el(id);
     if (!out || !Q.pv_rows) { return; }
@@ -3649,7 +3676,7 @@
     membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
-    renderEndorsements: renderEndorsements, renderPrimary: renderPrimary,
+    renderEndorsements: renderEndorsements, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
