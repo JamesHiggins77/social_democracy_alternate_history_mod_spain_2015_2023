@@ -2,7 +2,7 @@ title: Antonio Hernando
 is-pinned-card: true
 card-image: img/spain/portrait_hernando.jpg
 tags: sp_advisor
-view-if: sanchez_leader = 1
+view-if: sanchez_leader = 1 and adv_hernando = 1
 new-page: true
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) {
@@ -59,15 +59,16 @@ view-if: sanchez_nominated = 1 and psoe_in_government = 0 and sanchez_leader = 1
 go-to: sp_investiture
 
 @organisation
-title: Secretary of Organisation
+title: César Luena
 is-pinned-card: true
+card-image: img/spain/Spain/People/20130515_Cesar_Luena_(cropped).jpg
 tags: sp_advisor
-view-if: sanchez_leader = 1
+view-if: sanchez_leader = 1 and adv_luena = 1
 new-page: true
 
-= [? if year < 2017 : César Luena ?][? if year >= 2017 : José Luis Ábalos ?]
+= César Luena
 
-The Secretary of Organisation runs the party machine: the federations, the lists, the money. Faction: loyal to the leadership.
+Secretary of Organisation: he runs the party machine, the federations, the lists, the money. Loyal to you, and resented by the regional barons.
 
 - @org_tour
 - @org_money
@@ -104,8 +105,9 @@ A few federations get new caretaker committees. The message is understood.
 @lastra
 title: Adriana Lastra
 is-pinned-card: true
+card-image: img/spain/Spain/People/(Adriana_Lastra)_2018._Asamblea_Abierta_sobre_pensiones_dignas_(39128555145)_(cropped).jpg
 tags: sp_advisor
-view-if: sanchez_leader = 1
+view-if: sanchez_leader = 1 and adv_lastra = 1
 new-page: true
 
 = Adriana Lastra
@@ -148,7 +150,7 @@ Equal pay, the wage gap, gender violence: the PSOE's feminist agenda gets a mont
 title: Iván Redondo
 is-pinned-card: true
 tags: sp_advisor
-view-if: sanchez_leader = 1 and year >= 2017
+view-if: sanchez_leader = 1 and adv_redondo = 1
 new-page: true
 
 = Iván Redondo
@@ -229,3 +231,335 @@ unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +
 on-arrival: rel_pnv += 5; rel_erc += 5; advisor_action_timer = 2; month_actions += 1; last_advisor_action = 1
 
 Investments for the Basque Country, a commission for Catalonia. The budget arithmetic improves.
+
+@abalos
+title: José Luis Ábalos
+is-pinned-card: true
+tags: sp_advisor
+view-if: adv_loyalist = 1
+new-page: true
+
+= José Luis Ábalos
+
+The Valencian deputy who was with you before anyone else, and who will be with you whatever happens: in Ferraz, on the backbenches, or on the road. [? if year >= 2017 : Secretary of Organisation since your return. ?] He does not count against the three advisers you can keep.
+
+- @org_tour
+- @org_money
+- @org_discipline
+- @abalos_road
+- @root: Back
+
+@abalos_road
+title: Work the phones for you
+subtitle: Your network and following grow.
+view-if: sanchez_leader = 0
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.network = (Q.network || 0) + 6; Q.sanchismo += 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Ábalos spends a month calling every secretary of every local branch who ever shook your hand.
+
+@calvo
+title: Carmen Calvo
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_calvo = 1
+new-page: true
+
+= Carmen Calvo
+
+Former Minister of Culture, professor of constitutional law, Cordoban. She knows the institutions and how to talk to them. Faction: Institutionalists.
+
+- @calvo_institutions
+- @calvo_equality
+- @root: Back
+
+@calvo_institutions
+title: Reassure the institutions
+subtitle: Institutionalists calmer; more authority.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.institutionalists_dissent -= 6; Q.sanchez_authority += 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Calvo spends the month with judges, the Council of State and the Crown's advisers.
+
+@calvo_equality
+title: An equality agenda
+subtitle: Wins women voters; the Socialist Left approves.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.progressives_dissent -= 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'women', 1.2); } !}
+
+The PSOE's feminist programme gets a face.
+
+@cerdan
+title: Santos Cerdán
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_cerdan = 1
+new-page: true
+
+= Santos Cerdán
+
+The Navarrese organiser who collected the signatures and ran the logistics of the comeback. He knows every federation's census by heart.
+
+- @cerdan_census
+- @cerdan_navarra
+- @root: Back
+
+@cerdan_census
+title: Organise the members
+subtitle: More morale and a stronger hand in the Federal Committee.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.member_morale += 4; Q.federal_committee_balance += 4; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Branch by branch, the party's lists fill with your people.
+
+@cerdan_navarra
+title: Talks with the small parties
+subtitle: Better relations with the regionalists and Bildu.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.rel_geroa = (Q.rel_geroa || 40) + 6; Q.rel_bildu = (Q.rel_bildu || 10) + 4; Q.rel_pnv += 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+Quiet talks in Pamplona and Bilbao.
+
+@tapias_adv
+title: José Antonio Pérez Tapias
+is-pinned-card: true
+card-image: img/spain/Spain/People/Presentación_candidatura_Pérez_Tapias_en_Callao_14_junio_2014_(15).jpg
+tags: sp_advisor
+view-if: sanchez_leader = 1 and adv_tapias = 1
+new-page: true
+
+= José Antonio Pérez Tapias
+
+The philosopher of Izquierda Socialista, the party's left current. Faction: Socialist Left.
+
+- @tapias_left
+- @root: Back
+
+@tapias_left
+title: Speak to the left
+subtitle: Socialist Left calmer; Podemos voters listen; the barons do not like it.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.progressives_dissent -= 6; Q.regional_leaders_dissent += 2; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; if (window.SpainGame) { window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 0.6, workers: 0.5 }); } !}
+
+A manifesto signed by a hundred left-wing intellectuals backs the PSOE.
+
+@deputy_pm
+title: Deputy Prime Minister
+is-pinned-card: true
+tags: sp_advisor
+view-if: adv_deputy = 1
+new-page: true
+
+= [+ adv_deputy_name +], Deputy Prime Minister
+
+[? if adv_deputy_partner = 1 : Your coalition partner's leader sits at your right hand in the Council of Ministers. Everything you agree with them, their party will vote for; everything you do not, the press will hear about. ?][? if adv_deputy_partner = 0 : Your deputy runs the government's day-to-day business and coordinates the ministries. ?] The government's posts do not count against your three advisers.
+
+- @dep_coord
+- @dep_partner
+- @root: Back
+
+@dep_coord
+title: Coordinate the ministries
+subtitle: More authority; the government looks competent.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.sanchez_authority += 4; Q.institutionalists_dissent -= 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+A month without leaks between ministries.
+
+@dep_partner
+title: Settle a dispute with the partner
+view-if: adv_deputy_partner = 1
+subtitle: Better relations with the coalition partner.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! var k = 'rel_' + Q.adv_deputy_party; Q[k] = (Q[k] || 40) + 8; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+A long dinner in the Moncloa ends the week's quarrel.
+
+@econ_minister
+title: Minister of Economy
+is-pinned-card: true
+tags: sp_advisor
+view-if: adv_econ = 1
+new-page: true
+
+= [+ adv_econ_name +], Minister of Economy
+
+The person Brussels and the markets listen to. A government post: it does not count against your three advisers.
+
+- @econ_brussels
+- @econ_growth
+- @root: Back
+
+@econ_brussels
+title: Reassure Brussels
+subtitle: Better relations with the EU; the unions grumble.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.trade_unionists_dissent += 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); } !}
+
+The Eurogroup is satisfied.
+
+@econ_growth
+title: A plan for growth
+subtitle: A little more growth, a little more deficit.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! Q.fiscal_adj += 0.1; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; if (window.SpainGame) { window.SpainGame.econ(Q, 0.2, -0.05); } !}
+
+Investment is brought forward.
+
+@pm_adviser
+title: The Prime Minister
+is-pinned-card: true
+tags: sp_advisor
+view-if: adv_pm = 1
+new-page: true
+
+= [+ adv_pm_name +], Prime Minister
+
+You are the junior partner: the Prime Minister is not your adviser so much as your counterpart, and the person whose good will decides what your ministers can do.
+
+- @pm_ask
+- @root: Back
+
+@pm_ask
+title: Ask for a concession
+subtitle: Your following grows; relations with the Prime Minister's party cool.
+choose-if: advisor_action_timer = 0
+unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?]
+on-arrival: {! var k = 'rel_' + Q.pm_party; Q[k] = (Q[k] || 40) - 4; Q.sanchismo += 4; Q.member_morale += 2; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
+
+You get it, and the Prime Minister remembers that you asked.
+
+@team
+title: Your team
+is-pinned-card: true
+tags: sp_advisor
+view-if: sanchez_leader = 1
+new-page: true
+
+= Your team
+
+You can keep up to three advisers at a time (now [+ adv_count +]). Bringing someone in pleases their faction a little; letting them go angers it more. José Luis Ábalos and the government's ministers do not count.
+
+- @hire_hernando: Bring in Antonio Hernando (Institutionalists)
+- @hire_luena: Bring in César Luena (Secretary of Organisation)
+- @hire_lastra: Bring in Adriana Lastra (Socialist Left)
+- @hire_redondo: Bring in Iván Redondo (Modernisers)
+- @hire_calvo: Bring in Carmen Calvo (Institutionalists)
+- @hire_cerdan: Bring in Santos Cerdán (the organisation)
+- @hire_tapias: Bring in José Antonio Pérez Tapias (Socialist Left)
+- @fire_hernando: Let Antonio Hernando go
+- @fire_luena: Let César Luena go
+- @fire_lastra: Let Adriana Lastra go
+- @fire_redondo: Let Iván Redondo go
+- @fire_calvo: Let Carmen Calvo go
+- @fire_cerdan: Let Santos Cerdán go
+- @fire_tapias: Let José Antonio Pérez Tapias go
+- @root: Back
+
+@hire_hernando
+view-if: adv_hernando = 0
+subtitle: Only before the 2016 leadership crisis. Pleases their faction a little.
+choose-if: adv_can_hernando = 1
+unavailable-subtitle: Only before the 2016 leadership crisis; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'hernando'); } !}
+go-to: team
+
+@fire_hernando
+view-if: adv_hernando = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'hernando'); } !}
+go-to: team
+
+@hire_luena
+view-if: adv_luena = 0
+subtitle: Only before the 2016 leadership crisis. Pleases their faction a little.
+choose-if: adv_can_luena = 1
+unavailable-subtitle: Only before the 2016 leadership crisis; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'luena'); } !}
+go-to: team
+
+@fire_luena
+view-if: adv_luena = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'luena'); } !}
+go-to: team
+
+@hire_lastra
+view-if: adv_lastra = 0
+subtitle: Pleases their faction a little.
+choose-if: adv_can_lastra = 1
+unavailable-subtitle: you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'lastra'); } !}
+go-to: team
+
+@fire_lastra
+view-if: adv_lastra = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'lastra'); } !}
+go-to: team
+
+@hire_redondo
+view-if: adv_redondo = 0
+subtitle: From 2017. Pleases their faction a little.
+choose-if: adv_can_redondo = 1
+unavailable-subtitle: From 2017; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'redondo'); } !}
+go-to: team
+
+@fire_redondo
+view-if: adv_redondo = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'redondo'); } !}
+go-to: team
+
+@hire_calvo
+view-if: adv_calvo = 0
+subtitle: From 2017; not on a hard-left economic line. Pleases their faction a little.
+choose-if: adv_can_calvo = 1
+unavailable-subtitle: From 2017; not on a hard-left economic line; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'calvo'); } !}
+go-to: team
+
+@fire_calvo
+view-if: adv_calvo = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'calvo'); } !}
+go-to: team
+
+@hire_cerdan
+view-if: adv_cerdan = 0
+subtitle: After the 2016 leadership crisis. Pleases their faction a little.
+choose-if: adv_can_cerdan = 1
+unavailable-subtitle: After the 2016 leadership crisis; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'cerdan'); } !}
+go-to: team
+
+@fire_cerdan
+view-if: adv_cerdan = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'cerdan'); } !}
+go-to: team
+
+@hire_tapias
+view-if: adv_tapias = 0
+subtitle: Only on a left-wing economic line. Pleases their faction a little.
+choose-if: adv_can_tapias = 1
+unavailable-subtitle: Only on a left-wing economic line; you can keep three advisers at a time.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.hireAdviser(Q, 'tapias'); } !}
+go-to: team
+
+@fire_tapias
+view-if: adv_tapias = 1
+subtitle: Angers their faction.
+on-arrival: {! if (window.SpainGame) { window.SpainGame.fireAdviser(Q, 'tapias'); } !}
+go-to: team

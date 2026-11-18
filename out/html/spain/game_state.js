@@ -227,6 +227,69 @@
   // ------------------------------------------------------------------
   // Derived quantities, recalculated after every action.
   // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Advisers: up to three at a time, hired and dismissed by the player.
+  // [name, faction (dissent key), requirement, what they do]
+  // ------------------------------------------------------------------
+  var ADVISERS = {
+    hernando: ['Antonio Hernando', 'institutionalists', function (Q) { return !Q.rebellion_used; },
+      'Parliamentary arithmetic; until the 2016 crisis, when he backs the abstention'],
+    luena: ['César Luena', 'regional_leaders', function (Q) { return !Q.rebellion_used; },
+      'Secretary of Organisation to 2016: the federations and the money'],
+    lastra: ['Adriana Lastra', 'progressives', function (Q) { return true; }, 'The members and Podemos'],
+    redondo: ['Iván Redondo', 'modernisers', function (Q) { return Q.year >= 2017; }, 'Polling, narrative, the centre (from 2017)'],
+    calvo: ['Carmen Calvo', 'institutionalists', function (Q) { return Q.year >= 2017 && (Q.econ_left || 0) <= 4; },
+      'Constitutional law and the institutions; equality (from 2017, not on a hard-left line)'],
+    cerdan: ['Santos Cerdán', 'trade_unionists', function (Q) { return !!Q.rebellion_used; },
+      'The organiser of the comeback (after the 2016 crisis)'],
+    tapias: ['José Antonio Pérez Tapias', 'progressives', function (Q) { return (Q.econ_left || 0) >= 3; },
+      'The Socialist Left (only on a left-wing line)']
+  };
+  var ADVISER_MAX = 3;
+  function advCount(Q) {
+    return Object.keys(ADVISERS).filter(function (a) { return Q['adv_' + a]; }).length;
+  }
+  function hireAdviser(Q, id) {
+    if (Q['adv_' + id] || advCount(Q) >= ADVISER_MAX || !ADVISERS[id][2](Q)) { return false; }
+    Q['adv_' + id] = 1;
+    Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) - 3;
+    recalculate(Q);
+    return true;
+  }
+  function fireAdviser(Q, id) {
+    if (!Q['adv_' + id]) { return false; }
+    Q['adv_' + id] = 0;
+    Q[ADVISERS[id][1] + '_dissent'] = (Q[ADVISERS[id][1] + '_dissent'] || 0) + 6;
+    recalculate(Q);
+    return true;
+  }
+  // Recomputed each turn: who may be hired, and who holds the government
+  // posts that come with their own adviser card (not counted in the three).
+  function adviserFlags(Q) {
+    Q.adv_count = advCount(Q);
+    Object.keys(ADVISERS).forEach(function (a) {
+      if (Q['adv_' + a] && !ADVISERS[a][2](Q)) { Q['adv_' + a] = 0; Q['adv_left_' + a] = 1; }
+      Q['adv_can_' + a] = !Q['adv_' + a] && Q.adv_count < ADVISER_MAX && ADVISERS[a][2](Q) ? 1 : 0;
+    });
+    var inGov = Q.player_in_government && !Q.acting;
+    var leads = inGov && Q.pm_party === Q.player_party;
+    Q.adv_pm = inGov && !leads ? 1 : 0;
+    Q.adv_pm_name = Q.adv_pm ? Q.pm : '';
+    Q.adv_deputy = leads ? 1 : 0;
+    // the posts follow the coalition agreement (Q.cabinet): a partner may hold them
+    var holder = function (m) { return Q.cabinet && Q.cabinet[m] ? Q.cabinet[m].party : Q.player_party; };
+    var dep = holder('deputy');
+    Q.adv_deputy_partner = dep !== Q.player_party ? 1 : 0;
+    Q.adv_deputy_party = dep;
+    Q.adv_deputy_name = Q.adv_deputy_partner ? leaderOf(Q, dep) : 'Carmen Calvo';
+    var eco = holder('economy');
+    Q.adv_econ = leads ? 1 : 0;
+    var ECON_FIGURES = { up: 'Nacho Álvarez', cs: 'Luis Garicano', pp: 'Luis de Guindos' };
+    Q.adv_econ_name = eco !== Q.player_party ? (ECON_FIGURES[eco] || UI.partyName(eco) + "'s minister") :
+      (Q.year >= 2018 ? 'Nadia Calviño' : 'your Minister of Economy');
+    Q.adv_loyalist = (Q.sanchez_leader || Q.backbench || Q.leadership_exception_open || Q.exiled) && !Q.abalos_gone ? 1 : 0;
+  }
+
   // Podemos's names: Podemos; Unidos Podemos with IU (May 2016); Unidas
   // Podemos (2019); Sumar, Yolanda Díaz's platform (2023).
   function podemosBrand(Q) {
@@ -236,6 +299,8 @@
   }
 
   function recalculate(Q) {
+    if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; }
+    adviserFlags(Q);
     var brand = podemosBrand(Q);
     if (Q.up_brand !== brand[0]) {
       Q.up_brand = brand[0];
@@ -359,6 +424,7 @@
       Q['hint_' + p] = lessonHint(Q, p);
     });
     checkLeadership(Q);
+    adviserFlags(Q);
     // flags for conditional world events
     var mad = Q.regions && Q.regions['Madrid'];
     Q.madrid_pp = mad && mad.government && mad.government.party === 'pp' ? 1 : 0;
@@ -3735,6 +3801,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    hireAdviser: hireAdviser, fireAdviser: fireAdviser, advCount: advCount, ADVISERS: ADVISERS,
     regionalGovernment: regionalGovernment,
     hardcore: hardcore, darkArts: darkArts,
     membersDrift: membersDrift,

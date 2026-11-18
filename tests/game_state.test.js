@@ -986,3 +986,21 @@ test('Catalonia: no unionist party props up an independence government; no bloc 
   const r = G.regionalGovernment({ junts: 40, erc: 20, cup: 4, cs: 30, psoe: 25, pp: 6, up: 10 }, { party: 'junts', president: 'X', cabinet: ['junts'], support: [] }, 40, 2021);
   assert.strictEqual(r.repeat, true);
 });
+
+test('advisers: at most three, hiring and dismissing move their faction, special posts do not count', () => {
+  const Q = newQ();
+  assert.strictEqual(G.advCount(Q), 3);
+  Q.year = 2018;
+  assert.strictEqual(G.hireAdviser(Q, 'redondo'), false);   // full
+  const before = Q.institutionalists_dissent;
+  assert.ok(G.fireAdviser(Q, 'hernando'));
+  assert.strictEqual(Q.institutionalists_dissent, before + 6);
+  const m = Q.modernisers_dissent;
+  assert.ok(G.hireAdviser(Q, 'redondo'));
+  assert.strictEqual(Q.modernisers_dissent, m - 3);
+  // a coalition with Podemos: the Deputy PM card shows the partner's leader
+  Q.year = 2020; Q.congress = { psoe: 120, up: 35, pp: 89, vox: 52, cs: 10, erc: 13, junts: 8, pnv: 6, bildu: 5, mp: 3 };
+  Q.pact_up = 1; G.formGovernment(Q, 'sanchez'); G.allocateCabinet(Q, 'hard'); G.recalculate(Q);
+  assert.strictEqual(Q.adv_deputy, 1);
+  assert.strictEqual(Q.adv_loyalist, 1);
+});
