@@ -319,6 +319,9 @@ on-arrival: {! Q.cat_sentence_seen = 1; Q.cat_tension = (Q.cat_tension || 0) + 1
 
 = The sentence
 
+{!<img class="sp-event-img" src="img/spain/Spain/Events/Judici_9N_Mas-Ortega-Rigau_0038-%20protests%20trial.jpg" alt="">!}
+
+
 The Supreme Court sentences the independence leaders to between nine and thirteen years for sedition. Barcelona burns for a week: barricades, burning containers, the airport blockaded. The images play on every channel in Spain, and Vox's rallies fill up.
 
 - @sentence_order: Order first: full support for the police

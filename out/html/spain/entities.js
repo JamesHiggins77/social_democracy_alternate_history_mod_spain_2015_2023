@@ -164,6 +164,7 @@
     [['Yolanda Barcina'], 'upn', 'President of Navarre (to 2015)', 'Navarrese regionalist right'],
     [['Mónica Oltra'], 'compromis', 'Vice-President of Valencia', 'Valencian left'],
     [['Joan Baldoví'], 'compromis', 'Compromís deputy', 'Valencian left'],
+    [['Francisco Franco', 'Franco'], 'nonpartisan', 'Dictator of Spain, 1939–1975', 'Francoism'],
     [['Felipe VI'], 'crown', 'King of Spain', 'Head of State'],
     [['Juan Carlos I', 'Juan Carlos'], 'crown', 'King of Spain until 2014', 'Former Head of State'],
     // foreign politicians
@@ -242,6 +243,42 @@
                     'Unidas Podemos': 'Unidas Podemos', 'Unidos Podemos': 'Unidas Podemos' };
 
   // Events, processes and legal texts: phrase, Wikipedia title, short note.
+
+  // Images supplied with the game (out/html/img/spain/Spain): portraits,
+  // party logos, organisation emblems.
+  var IMG = 'img/spain/Spain/';
+  var PARTY_IMG = {
+    psoe: 'Party Logos/Logotipo_electoral_del_PSOE.png', pp: 'Party Logos/Logo_del_PP_(2022).svg.webp',
+    up: 'Party Logos/Logo_de_Podemos_(2022).svg.webp', cs: 'Party Logos/Ciudadanos_logo_2017.svg.webp',
+    vox: 'Party Logos/VOX_logo.svg.webp', iu: 'Party Logos/Logo_Izquierda_Unida,_versión_bocadillo.svg.webp',
+    erc: 'Party Logos/ERC_logo_2025.svg.webp', junts: 'Party Logos/Logotip_Junts_per_Catalunya.svg.webp',
+    pnv: 'Party Logos/Logo_PNV_2025.svg.webp', bildu: 'Party Logos/Logo_de_EH_Bildu_(2023).svg.webp',
+    cc: 'Party Logos/Coalición_Canaria.svg', mp: 'Party Logos/Más_País_logo.svg.webp',
+    upn: 'Party Logos/Logo_UPN_2017.svg.webp', bng: 'Party Logos/Bloque_Nacionalista_Galego.svg.webp',
+    upyd: 'Party Logos/Logotipo_de_UPYD_2018-2020.svg.webp', syriza: 'Party Logos/SYRIZA_logo_2020.svg.webp'
+  };
+  var PERSON_IMG = {
+    'Pedro Sánchez': 'People/Pedro_Sánchez_2018_(cropped).jpg', 'Mariano Rajoy': 'People/Mariano_Rajoy_in_2018.jpg',
+    'Pablo Iglesias': 'People/Pablo_Iglesias_Ahora_Madrid_2015_-_05_(cropped).jpg', 'Albert Rivera': 'People/Albert_Rivera_in_2019_(cropped).jpg',
+    'Susana Díaz': 'People/30.12.28_Mensaje_Fin_de_Año_4_(cropped2).jpg', 'Adriana Lastra': 'People/(Adriana_Lastra)_2018._Asamblea_Abierta_sobre_pensiones_dignas_(39128555145)_(cropped).jpg',
+    'César Luena': 'People/20130515_Cesar_Luena_(cropped).jpg', 'Ada Colau': 'People/Ada_Colau_(17533430830).jpg',
+    'Alberto Ruiz-Gallardón': 'People/Alberto_Ruiz-Gallardón_na_Coruña.jpg', 'Alexis Tsipras': 'People/Alexis_Tsipras,_prime_minister_of_Greece_(cropped).jpg',
+    'Artur Mas': 'People/Artur_Mas_-_Fotografia_oficial.jpg', 'Cándido Méndez': 'People/Cándido_Méndez_2014_(cropped).jpg',
+    'Felipe VI': 'People/Daiga_Mieriņa_tiekas_ar_Spānijas_karali_-_53814974005_(cropped)-2.jpg', 'Francisco Franco': 'People/Francisco_Franco_posed_portrait_photograph.jpg',
+    'Eduardo Madina': 'People/Jornadas_de_Juventudes_Socialistas_de_Olivenza_con_Eduardo_Madina_y_Guillermo_Fernández_Vara_(3).jpg',
+    'Guillermo Fernández Vara': 'People/Jornadas_de_Juventudes_Socialistas_de_Olivenza_con_Eduardo_Madina_y_Guillermo_Fernández_Vara_(3).jpg',
+    'Manuela Carmena': 'People/Manuela_Carmena_-_Ahora_Madrid._Acto_Cebada,_19_Abril_2015_(17199397141)_(cropped).jpg',
+    'Pepe Álvarez': 'People/Pepe_AlvarezOKOK.jpg', 'José Antonio Pérez Tapias': 'People/Presentación_candidatura_Pérez_Tapias_en_Callao_14_junio_2014_(15).jpg',
+    'Juan Carlos I': 'People/Rey_Juan_Carlos_2013.jpg'
+  };
+  var TOPIC_IMG = {
+    'European Union': 'Interntational Bodies/Flag_of_Europe.svg', 'NATO': 'Interntational Bodies/Flag_of_NATO.svg',
+    'Security Council': 'Interntational Bodies/Flag_of_the_United_Nations.svg', 'United Nations': 'Interntational Bodies/Flag_of_the_United_Nations.svg',
+    'Party of European Socialists': 'Interntational Bodies/Party_of_European_Socialists.svg.webp',
+    'Socialist International': 'Interntational Bodies/Red_Rose_(Socialism).svg', 'Progressive Alliance': 'Interntational Bodies/Red_Rose_(Socialism).svg',
+    'UGT': 'General/Logo_de_UGT_(2021).svg.webp', 'Valley of the Fallen': 'Events/SPA-2014-San_Lorenzo_de_El_Escorial-Valley_of_the_Fallen_(Valle_de_los_Caídos).jpg'
+  };
+  function imgUrl(rel) { return rel ? encodeURI(IMG + rel) : ''; }
   var TOPICS = [
     [['Article 155'], 'Constitution of Spain', 'The constitutional article allowing direct rule over a region'],
     [['Constitution'], 'Constitution of Spain', 'The Spanish Constitution of 1978'],
@@ -256,6 +293,8 @@
     [['Valley of the Fallen'], 'Valley of the Fallen', 'Franco\'s mausoleum'],
     [['Security Council'], 'United Nations Security Council', 'Spain held a seat in 2015–16'],
     [['NATO'], 'NATO', 'The North Atlantic alliance'],
+    [['United Nations'], 'United Nations', 'The UN'],
+    [['UGT'], 'Unión General de Trabajadores', 'The socialist trade union, founded by Pablo Iglesias Posse in 1888'],
     [['state of alarm'], 'State of alarm (Spain)', 'The emergency regime of the Constitution'],
     [['Western Sahara'], 'Western Sahara', 'The former Spanish colony claimed by Morocco'],
     [['Pegasus'], 'Pegasus (spyware)', 'The spyware found on Catalan and government phones'],
@@ -520,11 +559,11 @@
     if (hit.kind === 'person') {
       var p = PEOPLE[hit.i];
       var title = PERSON_WIKI[p[0][0]] === undefined ? p[0][0] : PERSON_WIKI[p[0][0]];
-      return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: p[3], wiki: title };
+      return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: p[3], wiki: title, img: imgUrl(PERSON_IMG[p[0][0]]) };
     }
     if (hit.kind === 'topic') {
       var t = TOPICS[hit.i];
-      return { kind: 'topic', name: text, wiki: t[1], note: t[2] };
+      return { kind: 'topic', name: text, wiki: t[1], note: t[2], img: imgUrl(TOPIC_IMG[t[0][0]]) };
     }
     return { kind: 'party', party: hit.id, wiki: NAME_WIKI[text] || PARTY_WIKI[hit.id] || null };
   }
@@ -634,12 +673,14 @@
     var more = linked && info.wiki ? '<div class="sp-ent-more">Click to open on ' + (/^es:/.test(info.wiki) ? 'Spanish ' : '') +
       'Wikipedia ↗</div>' : '';
     if (info.kind === 'topic') {
-      return '<div><strong>' + info.wiki.replace(/^es:/, '') + '</strong></div><div class="sp-ent-wing">' + info.note + '</div>' + more;
+      return (info.img ? '<img class="sp-ent-emblem" src="' + info.img + '" alt="">' : '') +
+        '<div><strong>' + info.wiki.replace(/^es:/, '') + '</strong></div><div class="sp-ent-wing">' + info.note + '</div>' + more;
     }
     var pi = partyInfo(info.party);
-    var badge = '<span class="sp-ent-logo" style="background:' + pi.color + '">' + pi.short + '</span>';
+    var logo = PARTY_IMG[info.party] ? '<img class="sp-ent-plogo" src="' + imgUrl(PARTY_IMG[info.party]) + '" alt="' + pi.short + '">' : '';
+    var badge = logo || '<span class="sp-ent-logo" style="background:' + pi.color + '">' + pi.short + '</span>';
     if (info.kind === 'person') {
-      return '<div class="sp-ent-head">' + badge + '<div><strong>' + info.name + '</strong><br>' + pi.name +
+      return '<div class="sp-ent-head">' + (info.img ? '<img class="sp-ent-photo" src="' + info.img + '" alt="">' : '') + badge + '<div><strong>' + info.name + '</strong><br>' + pi.name +
         '</div></div><div>' + info.role + '</div>' + (info.wing ? '<div class="sp-ent-wing">' + info.wing + '</div>' : '') + more;
     }
     var desc = partySentence(info.party);
@@ -701,7 +742,7 @@
     run();
   }
 
-  var api = { partySentence: partySentence, currentLeader: currentLeader, PEOPLE: PEOPLE, PARTY_NAMES: PARTY_NAMES, TOPICS: TOPICS, wikiUrl: wikiUrl, lookup: lookup, cardHtml: cardHtml, annotate: annotate,
+  var api = { partySentence: partySentence, currentLeader: currentLeader, PEOPLE: PEOPLE, PARTY_IMG: PARTY_IMG, PERSON_IMG: PERSON_IMG, TOPIC_IMG: TOPIC_IMG, IMG: IMG, PARTY_NAMES: PARTY_NAMES, TOPICS: TOPICS, wikiUrl: wikiUrl, lookup: lookup, cardHtml: cardHtml, annotate: annotate,
               install: install, regex: function () { return RE; } };
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;

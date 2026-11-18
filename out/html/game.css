@@ -599,3 +599,8 @@ a.sp-ent { text-decoration: none; }
 .sp-arr-mid { color: #9a6a00; }
 .sp-arr-no { color: #a3202a; }
 .sp-faction-leader { font-size: 0.85em; color: #6a6157; }
+
+.sp-ent-photo { flex: none; width: 52px; height: 64px; object-fit: cover; object-position: top; border-radius: 4px; }
+.sp-ent-plogo { flex: none; height: 28px; max-width: 64px; object-fit: contain; background: #fff; border-radius: 3px; padding: 2px; }
+.sp-ent-emblem { display: block; height: 36px; max-width: 90px; object-fit: contain; margin-bottom: 6px; }
+.sp-event-img { display: block; width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin: 4px 0 12px; }
