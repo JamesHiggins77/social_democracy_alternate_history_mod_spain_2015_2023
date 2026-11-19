@@ -307,6 +307,51 @@
     Q.adv_loyalist = (Q.sanchez_leader || Q.backbench || Q.leadership_exception_open || Q.exiled) && !Q.abalos_gone ? 1 : 0;
   }
 
+  // ------------------------------------------------------------------
+  // Municipal elections (May 2015, 2019, 2023): a heuristic on national
+  // polls. Councillors (about 67,000) follow vote shares adjusted for local
+  // strength: the old parties' rural networks, independents and local
+  // lists, and new parties' thin implantation.
+  // ------------------------------------------------------------------
+  var LOCAL_COUNCILLORS = 67500;
+  var LOCAL_FACTOR = { pp: 1.45, psoe: 1.3, up: 0.45, cs: 0.55, vox: 0.55, iu: 0.9, pnv: 1.6, erc: 1.6, junts: 1.7,
+                       bildu: 1.8, cc: 1.6, bng: 1.6, prc: 1.6, compromis: 1.3, mp: 0.5, upn: 1.5, pacma: 0, upyd: 0.4 };
+  var LOCAL_INDEPENDENTS = 0.11;
+  function localElections(Q) {
+    var poll = Q.true_poll || {};
+    var raw = {}, sum = 0;
+    Object.keys(poll).forEach(function (p) {
+      if (/^x:/.test(p) || !(poll[p] > 0.3)) { return; }
+      var f = LOCAL_FACTOR[p] === undefined ? 0.8 : LOCAL_FACTOR[p];
+      // Vox stood in few towns at first: its local lists grow with time
+      if (p === 'vox') { f = Q.year >= 2023 ? 0.15 : 0.05; }
+      raw[p] = poll[p] * f;
+      sum += raw[p];
+    });
+    var seats = {};
+    Object.keys(raw).forEach(function (p) {
+      seats[p] = Math.round(LOCAL_COUNCILLORS * (1 - LOCAL_INDEPENDENTS) * raw[p] / sum);
+    });
+    seats.ind = Math.round(LOCAL_COUNCILLORS * LOCAL_INDEPENDENTS);
+    var prev = Q.local_seats || null;
+    Q.local_prev = prev;
+    Q.local_seats = seats;
+    Q.local_year = Q.year;
+    var top = Object.keys(seats).filter(function (p) { return p !== 'ind'; }).sort(function (a, b) { return seats[b] - seats[a]; })[0];
+    Q.local_winner = UI.partyName(top);
+    Q.local_psoe = seats.psoe || 0;
+    Q.local_psoe_change = prev ? (seats.psoe || 0) - (prev.psoe || 0) : 0;
+    // a poor night: the PSOE loses councillors, or the PP beats it clearly
+    Q.local_poor = (prev && Q.local_psoe_change < -500) || (seats.pp || 0) > 1.1 * (seats.psoe || 0) ? 1 : 0;
+    Q.local_due = 1;
+    if (Q.local_poor && !Q.bluff_seen && Q.sanchez_leader && Q.psoe_in_government && !Q.acting && !Q.election_year) {
+      Q.bluff_due = 1;
+    }
+    Q.rep_local = seats[Q.player_party || 'psoe'] || 0;
+    Q.rep_local_total = LOCAL_COUNCILLORS;
+    return seats;
+  }
+
   // Podemos's names: Podemos; Unidos Podemos with IU (May 2016); Unidas
   // Podemos (2019); Sumar, Yolanda Díaz's platform (2023).
   function podemosBrand(Q) {
@@ -986,6 +1031,10 @@
     var t = Q.year * 12 + Q.month;
     plotDrift(Q);
     grandCoalitionWear(Q);
+    if (Q.month === 5 && (Q.year === 2015 || Q.year === 2019 || Q.year === 2023) && Q.local_done !== Q.year) {
+      Q.local_done = Q.year;
+      localElections(Q);
+    }
     membersDrift(Q);
     // the economy: growth shocks fade within a year; unemployment follows
     // growth (Okun) and its own adjustments fade slowly
@@ -2347,6 +2396,7 @@
     Q.congress = r.totals;
     Q.vote_shares = r.voteShares;
     Q.elections_held = (Q.elections_held || 0) + 1;
+    Q.cortes_history = Q.cortes_history || [];
     // no fixed campaign cost: the party spends what it chooses in the
     // final campaign
     // the previous general election's winners, to mark provinces that flip
@@ -2413,6 +2463,7 @@
     if (verdict.lost) {
       Q.loss_reason = verdict.reason;
     }
+    Q.cortes_history.push({ date: Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month, seats: JSON.parse(JSON.stringify(r.totals)) });
     var swing = (r.totals.psoe || 0) - (old.psoe || 0);
     // bad results arm the barons
     if (Q.sanchez_leader) {
@@ -2654,9 +2705,7 @@
     });
     Q.pp_vox_regions = withVox.length;
     Q.pp_vox_region_names = withVox.join(', ');
-    if (withVox.length >= 2 && !Q.bluff_seen && Q.sanchez_leader && Q.psoe_in_government && !Q.acting && !Q.election_year) {
-      Q.bluff_due = 1;
-    }
+    // (the snap election itself is offered after a poor municipal night: localElections)
     Q.last_regional_results = results;
     if (results.length) {
       Q.funds -= 1;
@@ -3020,6 +3069,28 @@
     Array.prototype.forEach.call(out.querySelectorAll('input[name="' + id + '-mode"]'), function (inp) {
       inp.addEventListener('change', function () { render2014(Q, id, inp.value); });
     });
+  }
+
+  // End of game: every Congress the game produced, side by side.
+  function renderCortesHistory(Q, id) {
+    var out = el(id);
+    var h = Q.cortes_history || [];
+    if (!out || !h.length) { return; }
+    var parties = {};
+    h.forEach(function (e) { Object.keys(e.seats).forEach(function (p) { if (e.seats[p] > 0) { parties[p] = Math.max(parties[p] || 0, e.seats[p]); } }); });
+    var ids = Object.keys(parties).sort(function (a, b) { return parties[b] - parties[a]; });
+    out.innerHTML = '<table class="sp-results"><thead><tr><th>Party</th>' + h.map(function (e) { return '<th class="sp-num">' + e.date + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + ids.map(function (p) {
+        return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p) + '"></span>' + UI.shortName(p) + '</td>' +
+          h.map(function (e) { return '<td class="sp-num">' + (e.seats[p] || '–') + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody></table>';
+  }
+  function renderLocal(Q, id) {
+    var out = el(id);
+    if (!out || !Q.local_seats) { return; }
+    var t = {}; Object.keys(Q.local_seats).forEach(function (p) { if (p !== 'ind') { t[p] = Q.local_seats[p]; } });
+    out.innerHTML = UI.resultsTable(t, null, { prevSeats: Q.local_prev ? (function () { var o = {}; Object.keys(Q.local_prev).forEach(function (p) { if (p !== 'ind') { o[p] = Q.local_prev[p]; } }); return o; })() : null, compact: true }) +
+      '<p class="sp-map-legend">Independents and local lists: ' + Q.local_seats.ind.toLocaleString('en-GB') + ' councillors. About ' + LOCAL_COUNCILLORS.toLocaleString('en-GB') + ' in all.</p>';
   }
 
   function renderPrimary(Q, id) {
@@ -3916,6 +3987,7 @@
     aiStances: aiStances,
     leaderOf: leaderOf,
     comebackBonus: comebackBonus,
+    localElections: localElections, renderLocal: renderLocal, renderCortesHistory: renderCortesHistory,
     leadershipBounce: leadershipBounce,
     MOOD: MOOD,
     hireAdviser: hireAdviser, fireAdviser: fireAdviser, advCount: advCount, ADVISERS: ADVISERS,

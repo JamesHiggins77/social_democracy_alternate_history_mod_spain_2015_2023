@@ -1680,7 +1680,7 @@ on-arrival: {! Q.bluff_due = 0; Q.bluff_seen = 1; !}
 
 = Call their bluff
 
-The regional elections are over, and the PP now governs with Vox, in coalition or on its votes, in [+ pp_vox_regions +] regions: [+ pp_vox_region_names +]. Vox's vice-presidents are already cutting gender-violence programmes and talking about the Valley of the Fallen. The PP says the general election will be the same. Your team suggests something nobody expects: dissolve the Cortes now, and make the country choose before the summer.
+The municipal elections have gone badly for the PSOE, and the PP is ready to govern town halls and regions with Vox[? if pp_vox_regions > 0 : , as it already does in [+ pp_vox_region_names +] ?]. Vox's vice-presidents are already cutting gender-violence programmes and talking about the Valley of the Fallen. The PP says the general election will be the same. Your team suggests something nobody expects: dissolve the Cortes now, and make the country choose before the summer.
 
 - @bluff_snap: Call a snap general election: let the voters see what a PP-Vox Spain looks like
 - @bluff_wait: Govern on until the end of the legislature
@@ -1802,3 +1802,21 @@ The photographs with Europe's leaders do their work.
 on-arrival: {! if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 2); } !}
 
 Brussels is efficient and unremarkable.
+
+@local_elections
+title: Municipal elections
+new-page: true
+tags: sp_event
+view-if: local_due = 1
+on-arrival: local_due = 0
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderLocal(Q, 'sp-local-result'); }
+!}
+
+= May [+ local_year +]: municipal elections
+
+Spain elects its town and city councils. [+ local_winner +] wins the most councillors.
+
+{!<div id="sp-local-result"></div>!}
+
+[? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it loses [+ local_psoe_change +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]

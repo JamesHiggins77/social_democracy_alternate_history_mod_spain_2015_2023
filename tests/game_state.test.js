@@ -1033,3 +1033,13 @@ test('a PSOE government that calls an election can seek investiture as the actin
   assert.strictEqual(Q.acting, 1);
   assert.strictEqual(Q.seeking_government, 1);
 });
+
+test('municipal elections and the Cortes history', () => {
+  const Q = newQ();
+  const seats = G.localElections(Q);
+  const total = Object.values(seats).reduce((a, b) => a + b, 0);
+  assert.ok(Math.abs(total - 67500) < 50 && !seats.pacma);
+  toDecember2015(Q);
+  assert.strictEqual(Q.cortes_history.length, 1);
+  assert.strictEqual(Object.values(Q.cortes_history[0].seats).reduce((a, b) => a + b, 0), 350);
+});

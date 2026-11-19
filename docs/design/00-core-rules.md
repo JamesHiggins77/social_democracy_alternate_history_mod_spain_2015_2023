@@ -575,3 +575,12 @@ Real polling averages swung far more than the game's: the PP went from about 33%
 - **Call their bluff.** After regional elections, if the PP governs with Vox (in cabinet or with its support) in two or more regions while Sánchez governs, he can call a snap election. It brings a large swing from Sumar/Podemos to the PSOE and a fresh PSOE campaign gain, with the election two months away.
 - **Sumar (June 2023).** Sumar absorbs Más País, IU and Compromís; 30% of their support goes to the PSOE as the useful vote.
 - **Replay, July 2023:** PSOE 117–124 (real 121), PP 121–132 (137), Sumar 33–36 (31), Vox 36–38 (33).
+
+### 7.26 Municipal elections, the snap election, and the Cortes history
+
+- **Municipal elections** (May 2015, 2019, 2023) are worked out from national polls:
+  - about 67,500 councillors, 11% to independents and local lists;
+  - each party's poll share is multiplied by its local strength: PP 1.45, PSOE 1.3, regionalists and nationalists 1.3–1.8, IU 0.9, Podemos 0.45, Cs 0.55, Vox 0.05 in 2019 and 0.15 from 2023 (it stood in few towns at first);
+  - an event shows the result. The sidebar's Representation adds local councillors.
+- **Call their bluff** is now offered after a poor municipal night: the PSOE loses more than 500 councillors, or the PP has 10% more than it. Sánchez must be governing.
+- **The Cortes history.** Every general election's Congress is recorded, and the end screens (game over or December 2023) show it as one table: parties by election.

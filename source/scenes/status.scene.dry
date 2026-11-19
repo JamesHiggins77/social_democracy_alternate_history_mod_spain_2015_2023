@@ -63,6 +63,8 @@ Regional parliaments: **[+ rep_regional +] / [+ rep_regional_total +]**
 
 Regional presidencies: **[+ rep_presidencies +] / [+ rep_regions +]** (in government in [+ rep_in_regional_govt +])
 
+[? if rep_local_total > 0 : Local councillors: **[+ rep_local +] / [+ rep_local_total +]** ?]
+
 
 @politics
 title: Politics
