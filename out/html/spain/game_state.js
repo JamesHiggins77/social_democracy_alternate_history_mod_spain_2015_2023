@@ -398,6 +398,7 @@
     });
     seats.ind = Math.round(LOCAL_COUNCILLORS * LOCAL_INDEPENDENTS);
     Q.local_prev_poll = Q.local_final_poll || null;
+    Q.local_prev_year = Q.local_year || 2011;
     Q.local_final_poll = JSON.parse(JSON.stringify(Q.poll || poll));
     Q.local_shares = JSON.parse(JSON.stringify(poll));
     if (Q.local_shares.vox) { Q.local_shares.vox *= (Q.year >= 2023 ? 0.15 : 0.05) / 0.55; }
@@ -1785,6 +1786,8 @@
   function europeanElection(Q) {
     var shares = JSON.parse(JSON.stringify(Q.true_poll || {}));
     Q.ep_prev_shares = Q.ep_shares || EP_2014_SHARES;
+    Q.ep_prev_date = Q.ep_date || '2014-05';
+    Q.ep_date = Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month;
     Q.ep_final_poll = JSON.parse(JSON.stringify(Q.poll || {}));
     Q.ep_shares = shares;
     Q.ep_prev = Q.ep_seats;
@@ -3233,6 +3236,7 @@
       p[c] = Math.max(1, v); sum += p[c];
     });
     var rows = Object.keys(p).map(function (c) { return [c, Math.round(1000 * p[c] / sum) / 10]; }).sort(function (a, b) { return b[1] - a[1]; });
+    Q['ppoll_date_' + stage] = Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month + '-' + (stage === 'signatures' ? '05' : '10');
     Q['ppoll_raw_' + stage] = {}; rows.forEach(function (r) { Q['ppoll_raw_' + stage][r[0]] = r[1]; });
     Q['ppoll_' + stage] = rows.map(function (r) { return CANDIDATES[r[0]][0] + ' ' + r[1].toFixed(1) + '%'; }).join(', ');
     return rows;
@@ -3331,7 +3335,7 @@
     // (Sigma Dos, 8-10 Jul)
     var norm = function (m, s, t) { var k = m + s + t; return { c_madina: 100 * m / k, c_sanchez: 100 * s / k, c_tapias: 100 * t / k }; };
     var p0 = norm(43.0, 24.0, 6.0), p1 = norm(34.8, 31.5, 10.6), res = { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 };
-    var pc = pollChangeTable(['c_sanchez', 'c_madina', 'c_tapias'].map(function (c) {
+    var pc = chart2014() + pollChangeTable(['c_sanchez', 'c_madina', 'c_tapias'].map(function (c) {
       return { name: CANDIDATES[c][0], colour: CANDIDATES[c][2], start: p0[c], end: p1[c], result: res[c] };
     }), 'Start of the race', 'How the polls moved during the race') +
       '<p class="sp-map-legend">Polls of PSOE voters, not members, as shares of those naming one of the three candidates. Start: Metroscopia/El País, 16–17 June (sample 159). Final: Sigma Dos/El Mundo, 8–10 July (sample 500). Nearly every poll of the campaign had Madina ahead; only one Sigma Dos poll (30 June–3 July) put Sánchez first.</p>';
@@ -4382,9 +4386,58 @@
       .sort(function (a, b) { return ((result || end)[b] || 0) - ((result || end)[a] || 0); })
       .map(function (k) { return { name: UI.shortName(k), colour: UI.partyColor(k), start: start ? start[k] : null, end: end ? end[k] : null, result: result ? result[k] : null }; });
   }
+  // The race chart above each poll-change table.
+  function ym(y, m) { return y + '-' + (m < 10 ? '0' : '') + m; }
+  function seriesBetween(Q, from, to) {
+    return pollSeries(Q).filter(function (r) { return r.date > from && r.date < to; });
+  }
+  function raceChart(Q, kind) {
+    var div = document.createElement('div');
+    var now = ym(Q.year, Q.month);
+    if (kind === 'general') {
+      var recs = Q.election_records || [];
+      var prev = recs.length >= 2 ? recs[recs.length - 2].date.split('-') : ['2011', '11'];
+      var from = ym(+prev[0], +prev[1]);
+      UI.drawRaceChart(div, seriesBetween(Q, from, now), { start: Q.prev_vote_shares || null, startDate: from, result: Q.vote_shares, resultDate: now,
+        title: 'The polls since the last general election' });
+    } else if (kind === 'european') {
+      UI.drawRaceChart(div, seriesBetween(Q, Q.ep_prev_date || '2014-05', now), { start: Q.ep_prev_shares, startDate: Q.ep_prev_date || '2014-05', result: Q.ep_shares, resultDate: now,
+        title: 'National polls since the last European election' });
+    } else if (kind === 'local') {
+      UI.drawRaceChart(div, seriesBetween(Q, ym(Q.local_prev_year || 2011, 5), now), { resultDate: now,
+        title: 'National polls since the last municipal elections', note: 'municipal votes are counted in councillors, not shown here' });
+    } else {
+      var cc = function (c) { return CANDIDATES[c][2]; }, cn = function (c) { return CANDIDATES[c][1]; };
+      var rows = [], res = {};
+      if (Q.ppoll_raw_signatures) { rows.push(Object.assign({ date: Q.ppoll_date_signatures }, Q.ppoll_raw_signatures)); }
+      if (kind === 'primary' && Q.ppoll_raw_vote) { rows.push(Object.assign({ date: Q.ppoll_date_vote }, Q.ppoll_raw_vote)); }
+      ((kind === 'primary' ? Q.pv_rows : Q.av_rows) || []).forEach(function (r) { res[r.id] = r.share; });
+      UI.drawRaceChart(div, rows, { color: cc, name: cn, result: res, resultDate: now + '-21', dots: false,
+        title: kind === 'primary' ? 'The polls during the race' : 'The first poll against the endorsements' });
+    }
+    return div.innerHTML;
+  }
+  // The 2014 primary: every published poll of PSOE voters from the start of
+  // the three-way race (Wikipedia, "2014 PSOE leadership election"), as
+  // shares of those naming Madina, Sánchez or Pérez Tapias. Dates are the
+  // last day of fieldwork. [Madina, Sánchez, Tapias]
+  var POLLS_2014 = [['2014-06-17', 43.0, 24.0, 6.0, 'Metroscopia'], ['2014-06-19', 35.5, 16.7, 6.2, 'Sigma Dos'],
+    ['2014-06-26', 35.1, 18.8, 6.7, 'Sigma Dos'], ['2014-06-26', 35.0, 28.0, 9.0, 'Metroscopia'],
+    ['2014-07-01', 40.0, 27.0, 12.0, 'Metroscopia'], ['2014-07-03', 27.0, 30.8, 8.3, 'Sigma Dos'],
+    ['2014-07-06', 34.0, 21.5, 8.3, 'NC Report'], ['2014-07-10', 34.8, 31.5, 10.6, 'Sigma Dos']];
+  function chart2014() {
+    var div = document.createElement('div');
+    var rows = POLLS_2014.map(function (p) { var k = p[1] + p[2] + p[3]; return { date: p[0], c_madina: 100 * p[1] / k, c_sanchez: 100 * p[2] / k, c_tapias: 100 * p[3] / k }; });
+    UI.drawRaceChart(div, rows, { color: function (c) { return CANDIDATES[c][2]; }, name: function (c) { return CANDIDATES[c][1]; },
+      result: { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 }, resultDate: '2014-07-13', dots: true,
+      title: 'Every poll of the race', note: 'polls of PSOE voters, shares of those naming one of the three' });
+    return div.innerHTML;
+  }
   function renderPollChange(Q, id, kind) {
     var out = el(id);
     if (!out) { return; }
+    var chart = '';
+    try { chart = raceChart(Q, kind); } catch (e) { chart = ''; }
     if (kind === 'general') {
       var start = Q.prev_vote_shares;
       if (!start) {
@@ -4393,17 +4446,17 @@
         Object.keys(b).forEach(function (pr) { b[pr].lists.forEach(function (l) { var id2 = Array.isArray(l) ? l[0] : l.id, v = Array.isArray(l) ? l[2] : l.votes; start[id2] = (start[id2] || 0) + v; tot += v; }); });
         Object.keys(start).forEach(function (k) { start[k] = 100 * start[k] / tot; });
       }
-      out.innerHTML = pollChangeTable(partyRows(start, Q.prev_poll, Q.vote_shares, 1), 'Last election', 'How the polls moved since the last general election');
+      out.innerHTML = chart + pollChangeTable(partyRows(start, Q.prev_poll, Q.vote_shares, 1), 'Last election', 'How the polls moved since the last general election');
     } else if (kind === 'european') {
-      out.innerHTML = pollChangeTable(partyRows(Q.ep_prev_shares || null, Q.ep_final_poll, Q.ep_shares, 1), 'Last European election', 'How the national polls moved since the last European election');
+      out.innerHTML = chart + pollChangeTable(partyRows(Q.ep_prev_shares || null, Q.ep_final_poll, Q.ep_shares, 1), 'Last European election', 'How the national polls moved since the last European election');
     } else if (kind === 'local') {
-      out.innerHTML = pollChangeTable(partyRows(Q.local_prev_poll || null, Q.local_final_poll, null, 1), 'Last municipal election', 'How the national polls moved since the last municipal elections');
+      out.innerHTML = chart + pollChangeTable(partyRows(Q.local_prev_poll || null, Q.local_final_poll, null, 1), 'Last municipal election', 'How the national polls moved since the last municipal elections');
     } else if (kind === 'primary' || kind === 'endorsements') {
       var s0 = Q.ppoll_raw_signatures || {}, s1 = kind === 'primary' ? (Q.ppoll_raw_vote || {}) : {};
       var res = {};
       (kind === 'primary' ? Q.pv_rows : Q.av_rows || []).forEach(function (r) { res[r.id] = r.share; });
       var ids = Object.keys(Object.assign({}, s0, s1, res));
-      out.innerHTML = pollChangeTable(ids.map(function (c) {
+      out.innerHTML = chart + pollChangeTable(ids.map(function (c) {
         return { name: CANDIDATES[c][0], colour: CANDIDATES[c][2], start: s0[c], end: s1[c], result: res[c] };
       }).sort(function (a, b) { return (b.result || 0) - (a.result || 0); }), 'Start of the race',
         kind === 'primary' ? 'How the polls moved during the race' : 'The first poll against the endorsements');

@@ -675,6 +675,85 @@
       parts.join('') + '</svg>';
   }
 
+
+  // A poll-of-polls chart for one race: polls from a start date to the
+  // vote, the previous result at the start and the result at the end.
+  // rows: [{ date: 'YYYY-MM' or 'YYYY-MM-DD', <id>: % }]; opts: { color(id),
+  // name(id), start: {id: %}, startDate, result: {id: %}, resultDate,
+  // dots: true to mark single polls and draw a running average }
+  function drawRaceChart(container, rows, opts) {
+    if (!container) { return; }
+    opts = opts || {};
+    var col = opts.color || partyColor, nm = opts.name || shortName;
+    var day = function (d) { var p = d.split('-'); return Date.UTC(+p[0], +p[1] - 1, p[2] ? +p[2] : 15) / 864e5; };
+    var pts = [];
+    if (opts.start && opts.startDate) { pts.push(Object.assign({ date: opts.startDate, _res: 1 }, opts.start)); }
+    (rows || []).forEach(function (r) { pts.push(r); });
+    if (!pts.length) { container.innerHTML = ''; return; }
+    var endDate = opts.resultDate || pts[pts.length - 1].date;
+    var x0 = day(pts[0].date), x1 = Math.max(day(endDate), x0 + 1);
+    var ids = {};
+    pts.concat(opts.result ? [opts.result] : []).forEach(function (r) { Object.keys(r).forEach(function (k) { if (k !== 'date' && k !== '_res' && r[k] >= (opts.min || 2)) { ids[k] = 1; } }); });
+    ids = Object.keys(ids);
+    var top = 10;
+    pts.concat(opts.result ? [opts.result] : []).forEach(function (r) { ids.forEach(function (k) { top = Math.max(top, r[k] || 0); }); });
+    top = Math.ceil((top + 2) / 10) * 10;
+    var W = opts.width || 560, H = opts.height || 260, fs = 10;
+    var m = { l: 30, r: 74, t: 8, b: 22 };
+    var X = function (d) { return m.l + (day(d) - x0) / (x1 - x0) * (W - m.l - m.r); };
+    var Y = function (v) { return H - m.b - v / top * (H - m.t - m.b); };
+    var parts = [];
+    for (var g = 0; g <= top; g += 10) {
+      parts.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(g) + '" y2="' + Y(g) + '" stroke="#ccc" stroke-width="0.5"/><text x="' + (m.l - 3) + '" y="' + (Y(g) + 3) + '" font-size="' + fs + '" text-anchor="end" fill="#777">' + g + '</text>');
+    }
+    var spanDays = x1 - x0, MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (spanDays < 120) {
+      // weekly ticks
+      for (var t = Math.ceil(x0 / 7) * 7; t <= x1; t += 7) {
+        var dt = new Date(t * 864e5);
+        parts.push('<text x="' + (m.l + (t - x0) / spanDays * (W - m.l - m.r)) + '" y="' + (H - 6) + '" font-size="' + fs + '" text-anchor="middle" fill="#777">' + dt.getUTCDate() + ' ' + MONTHS[dt.getUTCMonth()] + '</text>');
+      }
+    } else {
+      var y0 = new Date(x0 * 864e5).getUTCFullYear(), y1 = new Date(x1 * 864e5).getUTCFullYear();
+      for (var yr = y0; yr <= y1 + 1; yr++) {
+        var tx = Date.UTC(yr, 0, 1) / 864e5;
+        if (tx < x0 || tx > x1) { continue; }
+        parts.push('<line x1="' + X(yr + '-01-01') + '" x2="' + X(yr + '-01-01') + '" y1="' + m.t + '" y2="' + (H - m.b) + '" stroke="#e3e3e3" stroke-width="0.5"/><text x="' + X(yr + '-01-01') + '" y="' + (H - 6) + '" font-size="' + fs + '" text-anchor="middle" fill="#777">' + yr + '</text>');
+      }
+    }
+    // the vote itself
+    parts.push('<line x1="' + X(endDate) + '" x2="' + X(endDate) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" stroke="#999" stroke-width="0.8" stroke-dasharray="3,3"/>');
+    var labels = [];
+    ids.forEach(function (k) {
+      var line = pts.filter(function (r) { return r[k] !== undefined && r[k] !== null; });
+      if (opts.dots) {
+        // single polls as dots, the line as a running average of the last three
+        line.forEach(function (r) { if (!r._res) { parts.push('<circle cx="' + X(r.date).toFixed(1) + '" cy="' + Y(r[k]).toFixed(1) + '" r="2.4" fill="' + col(k) + '" fill-opacity="0.45"><title>' + escapeHtml(nm(k)) + ' ' + r[k].toFixed(1) + '% (' + r.date + ')</title></circle>'); } });
+        line = line.map(function (r, i) { var w = line.slice(Math.max(0, i - 2), i + 1); var o = { date: r.date }; o[k] = w.reduce(function (a, b) { return a + b[k]; }, 0) / w.length; return o; });
+      }
+      if (line.length) {
+        parts.push('<path d="' + line.map(function (r, i) { return (i ? 'L' : 'M') + X(r.date).toFixed(1) + ',' + Y(r[k]).toFixed(1); }).join('') + '" fill="none" stroke="' + col(k) + '" stroke-width="2.2" stroke-linejoin="round"><title>' + escapeHtml(nm(k)) + '</title></path>');
+      }
+      if (opts.start && opts.start[k] !== undefined && opts.startDate) {
+        parts.push('<rect x="' + (X(opts.startDate) - 3) + '" y="' + (Y(opts.start[k]) - 3) + '" width="6" height="6" fill="#fff" stroke="' + col(k) + '" stroke-width="1.5"><title>' + escapeHtml(nm(k)) + ': ' + opts.start[k].toFixed(1) + '% at the last election</title></rect>');
+      }
+      var endV = opts.result && opts.result[k] !== undefined ? opts.result[k] : (line.length ? line[line.length - 1][k] : null);
+      if (opts.result && opts.result[k] !== undefined) {
+        var cx = X(endDate), cy = Y(opts.result[k]);
+        parts.push('<path d="M' + cx + ',' + (cy - 5) + 'L' + (cx + 5) + ',' + cy + 'L' + cx + ',' + (cy + 5) + 'L' + (cx - 5) + ',' + cy + 'Z" fill="' + col(k) + '" stroke="#fff" stroke-width="1"><title>' + escapeHtml(nm(k)) + ': ' + opts.result[k].toFixed(1) + '% result</title></path>');
+      }
+      if (endV !== null) { labels.push({ k: k, y: Y(endV), v: endV }); }
+    });
+    labels.sort(function (a, b) { return a.y - b.y; });
+    for (var i = 1; i < labels.length; i++) { if (labels[i].y - labels[i - 1].y < fs + 1) { labels[i].y = labels[i - 1].y + fs + 1; } }
+    labels.forEach(function (l) {
+      parts.push('<text x="' + (W - m.r + 8) + '" y="' + (l.y + 3) + '" font-size="' + fs + '" fill="' + col(l.k) + '" font-weight="bold">' + escapeHtml(nm(l.k)) + ' ' + l.v.toFixed(1) + '</text>');
+    });
+    container.innerHTML = (opts.title ? '<p><strong>' + escapeHtml(opts.title) + '</strong></p>' : '') +
+      '<svg class="sp-poll-chart" viewBox="0 0 ' + W + ' ' + H + '">' + parts.join('') + '</svg>' +
+      '<p class="sp-map-legend">' + (opts.start ? '□ last result · ' : '') + (opts.dots ? 'dots: single polls · line: average of the last three · ' : 'line: monthly polling average · ') + (opts.result ? '◆ result' : '') + (opts.note ? ' — ' + escapeHtml(opts.note) : '') + '</p>';
+  }
+
   function drawHemicycle(selector, totals) {
     if (!root.d3 || !root.d3.parliament) {
       return;
@@ -820,6 +899,7 @@
     drawHemicycle: drawHemicycle,
     drawMap: drawMap,
     drawPollChart: drawPollChart,
+    drawRaceChart: drawRaceChart,
     signed: signed,
     SCENARIOS: SCENARIOS,
     runScenario: runScenario,

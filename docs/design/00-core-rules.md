@@ -687,3 +687,10 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
 - **Not covered:**
   - Regional elections have no regional polls in the model.
   - The non-primary leadership contests have no polls.
+
+### 7.36 Race charts
+
+Every election result now has a poll-of-polls chart above the poll-change table. It shows the monthly polling average from the last election of the same kind to the vote. The last result is marked as hollow squares at the start, and the result as diamonds on the election line.
+- **2017 primary:** the chart shows the start-of-race and final polls against the result.
+- **2014 opening:** the chart plots all eight published polls of PSOE voters from 16 June to 10 July as dots, with a line averaging the last three.
+- **Municipal elections:** the chart shows national polls only. The municipal result is counted in councillors, so it isn't plotted.
