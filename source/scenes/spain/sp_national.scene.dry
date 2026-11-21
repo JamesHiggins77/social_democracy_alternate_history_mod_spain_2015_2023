@@ -67,6 +67,7 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 Classic social democracy, and still the PSOE's strongest ground.
 
 @corruption_speech
+view-if: role_in_gov = 0
 subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
@@ -102,9 +103,11 @@ The cameras are on. Your opponent is across the table. How do you play it?
 - @aggressive: Go for the jugular: question the Prime Minister's decency over corruption
 - @presidential: Look presidential: calm, numbers, proposals
 - @left: Fight Podemos for the left
+- @defend_record: Defend the government's record
 - @easy_discard
 
 @aggressive
+view-if: role_in_gov = 0
 on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, students: 2, unemployed: 2, pensioners: -1}); } Q.rel_pp -= 12; Q.member_morale += 6; Q.institutionalists_dissent += 3; !}
 
 "You are not a decent man," you tell him. The clip is everywhere by midnight. The members love it; the commentators are split.
@@ -113,6 +116,12 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {wor
 on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 2, professionals: 2, self_employed: 1}); } Q.sanchez_authority += 3; !}
 
 No knockout, no gaffe. The undecided see a possible Prime Minister.
+
+@defend_record
+view-if: role_in_gov = 1
+on-arrival: {! var f = Math.max(0.4, 1.3 - (Q.govt_months || 0) / 48); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.5 * f, workers: 1.2 * f, professionals: 0.8 * f}); } Q.sanchez_authority += 2; !}
+
+You are the one being attacked, so you answer with numbers: pensions, jobs, the minimum wage. [? if govt_years >= 4 : After this long in office, the record is also a list of things that went wrong. ?]
 
 @left
 on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, unemployed: 2, students: 1}); window.SpainGame.campaign(Q, 'up', {workers: -1, unemployed: -1}); } Q.rel_up -= 8; if (window.SpainGame) { window.SpainGame.position(Q, 1, 0); } !}
@@ -519,3 +528,161 @@ on-arrival: month_actions += 1
 The other parties are talking to each other, and every interview, rally and campaign you could run has already been run this month. You stay in Ferraz, read the polls and wait for the phone to ring.
 
 # Lowest priority: it is only drawn when no other National politics card is available, so a week of government formation can always be played.
+
+@campaign_message
+title: The campaign message
+new-page: true
+is-card: true
+tags: sp_national
+view-if: sanchez_active = 1 and message_timer <= 0 and (election_year > 0 or general_election_due = 1 or year * 12 + month >= (legislature_start_year + 4) * 12 + legislature_start_month - 6)
+on-arrival: month_actions += 1; message_timer = 3
+
+= The campaign message
+
+Every campaign needs one sentence. What you can credibly say depends on where the PSOE stands: you are **[+ role_word +]**.[? if role_in_gov = 1 : The government has been in office [+ govt_years +] years. ?]
+
+- @msg_change
+- @msg_waiting
+- @msg_stop_right
+- @msg_delivered_supply
+- @msg_stability_supply
+- @msg_our_turn
+- @msg_our_ministers
+- @msg_brake
+- @msg_lead_next
+- @msg_continuity
+- @msg_dont_undo
+- @msg_stronger_psoe
+- @msg_majority_finish
+- @msg_blockade
+- @msg_record
+- @msg_dont_risk
+- @easy_discard
+
+@msg_change
+title: Time for a change of government
+subtitle: The opposition's message: stronger the longer the government has lasted.
+view-if: role_opposition = 1
+on-arrival: {! var w = Math.min(2, 0.5 + (Q.govt_months || 0) / 24); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1.2 * w, professionals: 1 * w, students: 1 * w, self_employed: 0.5 * w}); } if (window.SpainGame && Q.pm_party) { window.SpainGame.campaign(Q, Q.pm_party, { professionals: -0.5 * w, workers: -0.4 * w }); } !}
+
+"[+ pm +] has had his chance." The longer the government has lasted, the better it works.
+
+@msg_waiting
+title: A government in waiting
+subtitle: Credibility: professionals and pensioners; less exciting.
+view-if: role_opposition = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 1.2, pensioners: 1, self_employed: 0.5}); } Q.sanchez_authority += 2; !}
+
+A shadow programme, costed, and a team that looks ready to govern.
+
+@msg_stop_right
+title: Stop the right and the far right
+subtitle: Mobilises the left; Podemos loses some useful votes to you.
+view-if: role_opposition = 1 and vox_breakthrough = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', { students: 0.8, workers: 0.8 }); } if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {homemakers: 0.5, pensioners: 0.4}); }  !}
+
+A vote for the PSOE is the only vote that stops [+ right_leader +] governing with Vox.
+
+@msg_delivered_supply
+title: We made them deliver
+subtitle: Claim credit for the government's best measures without owning its failures.
+view-if: role_supply = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 0.8, pensioners: 0.8, unemployed: 0.6}); } if (window.SpainGame && Q.pm_party) { window.SpainGame.transfer(Q, Q.pm_party, 'psoe', { workers: 0.4, pensioners: 0.4 }); } Q['rel_' + Q.pm_party] = (Q['rel_' + Q.pm_party] || 40) - 5; !}
+
+Every rise in the minimum wage, every pension increase: the PSOE's votes made it happen.
+
+@msg_stability_supply
+title: The party of stability
+subtitle: Moderates reward you for keeping Spain governable; your own left grumbles.
+view-if: role_supply = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, self_employed: 0.6, professionals: 0.6}); } Q.progressives_dissent += 3; !}
+
+Without the PSOE there would have been no government at all.
+
+@msg_our_turn
+title: Now it is our turn to lead
+subtitle: Break with the government you sustain: a clear choice, and a burned bridge.
+view-if: role_supply = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1, students: 1, professionals: 0.6}); } Q['rel_' + Q.pm_party] = (Q['rel_' + Q.pm_party] || 40) - 15; Q.member_morale += 4; !}
+
+You announce that the PSOE will no longer prop up anyone else's government.
+
+@msg_our_ministers
+title: Our ministers delivered
+subtitle: Claim the ministries you hold; worth more the more of them you have.
+view-if: role_junior = 1
+on-arrival: {! var m = Math.min(1.5, 0.3 + 0.15 * (Q.my_ministries || 0)); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: m, pensioners: 0.8 * m, homemakers: 0.6 * m}); }  !}
+
+The PSOE's ministers list what they did with their departments.
+
+@msg_brake
+title: The brake on [+ pm +]
+subtitle: Distance yourself from the senior partner: wins its unhappy voters, strains the coalition.
+view-if: role_junior = 1
+on-arrival: {! if (window.SpainGame && Q.pm_party) { window.SpainGame.transfer(Q, Q.pm_party, 'psoe', { professionals: 0.8, workers: 0.6, students: 0.5 }); } Q['rel_' + Q.pm_party] = (Q['rel_' + Q.pm_party] || 40) - 10; Q.coalition_strain = (Q.coalition_strain || 0) + 2; !}
+
+Without the PSOE in the government, it would have been much worse.
+
+@msg_lead_next
+title: Lead the next government
+subtitle: Ask to be the senior partner: bold, divisive inside the coalition.
+view-if: role_junior = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 0.9, students: 0.8, professionals: 0.5}); } Q['rel_' + Q.pm_party] = (Q['rel_' + Q.pm_party] || 40) - 12; Q.member_morale += 5; !}
+
+The PSOE asks to lead, not to follow.
+
+@msg_continuity
+title: Four more years of progress
+subtitle: Continuity: strong while the government is fresh, weaker as it ages.
+view-if: role_coalition = 1 or role_minority = 1
+on-arrival: {! var f = Math.max(0.4, 1.3 - (Q.govt_months || 0) / 48); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.2 * f, workers: 1 * f, homemakers: 0.8 * f}); }  !}
+
+Pensions up, unemployment down, rights expanded: finish the job.
+
+@msg_dont_undo
+title: Don't let the right undo it
+subtitle: Fear of a PP–Vox government: mobilises the left, squeezes the partner.
+view-if: role_in_gov = 1 and vox_breakthrough = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', { students: 0.7, workers: 0.7, homemakers: 0.4 }); } if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 0.5}); }  !}
+
+Everything this government did, a PP–Vox government would repeal in its first month.
+
+@msg_stronger_psoe
+title: A stronger PSOE, a less dependent government
+subtitle: Squeeze your coalition partner for its voters; the partner resents it.
+view-if: role_coalition = 1
+on-arrival: {! var pt = (Q.govt_parties || []).filter(function (p) { return p !== Q.player_party; })[0]; if (window.SpainGame && pt) { window.SpainGame.transfer(Q, pt, 'psoe', { workers: 1, students: 0.8, professionals: 0.6 }); } if (pt) { Q['rel_' + pt] = (Q['rel_' + pt] || 40) - 10; } Q.coalition_strain = (Q.coalition_strain || 0) + 2; !}
+
+The stronger the PSOE, the less the government depends on anyone else.
+
+@msg_majority_finish
+title: Give us the majority to finish the job
+subtitle: A minority government asks for a mandate: moderates like it, partners do not.
+view-if: role_minority = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, professionals: 0.8, self_employed: 0.5}); } ['up', 'erc', 'pnv'].forEach(function (p) { Q['rel_' + p] = (Q['rel_' + p] || 40) - 4; }); !}
+
+Every law this term was a negotiation. A stronger PSOE would not need to beg.
+
+@msg_blockade
+title: They blocked everything
+subtitle: Blame the opposition for the budgets and laws that failed.
+view-if: role_minority = 1 or role_coalition = 1
+on-arrival: {! var b = Math.min(1.6, 0.4 + 0.4 * ((Q.budget_passed === 0 ? 1 : 0) + (Q.laws_failed || 0))); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: b, pensioners: b, students: 0.6 * b}); } Q.rel_pp -= 5; !}
+
+The right voted against pensions, against the minimum wage, against the budget.
+
+@msg_record
+title: Our record
+subtitle: A majority government runs on what it did: as good as the economy.
+view-if: role_majority = 1
+on-arrival: {! var e = Math.max(-0.5, Math.min(1.5, (Q.growth || 0) / 2 - ((Q.unemployment || 15) - 12) / 6)); if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: e, pensioners: e, workers: e, self_employed: 0.6 * e}); }  !}
+
+The economy, the jobs, the pensions: the record speaks for itself[? if growth < 1 : , though not as loudly as you would like ?].
+
+@msg_dont_risk
+title: Don't risk it
+subtitle: Stability against adventure; works with older voters, bores the young.
+view-if: role_majority = 1 or role_minority = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1.2, homemakers: 0.6, students: -0.4}); }  !}
+
+Stability, or a jump into the unknown.

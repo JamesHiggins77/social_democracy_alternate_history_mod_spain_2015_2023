@@ -111,7 +111,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'offer', 'terr', 'eurol', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'offer', 'terr', 'eurol', 'message', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -439,6 +439,7 @@
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
     lawFlags(Q);
+    roleFlags(Q);
     catalanCrisisState(Q, false);
     var brand = podemosBrand(Q);
     if (Q.up_brand !== brand[0]) {
@@ -3520,6 +3521,7 @@
       Q.laws_passed = (Q.laws_passed || 0) + (kind === 'pass' ? 1 : 0);
     } else {
       // a lost vote: a small embarrassment for the government
+      Q.laws_failed = (Q.laws_failed || 0) + 1;
       campaign(Q, 'psoe', all(-0.25));
       Q.sanchez_authority -= 2;
     }
@@ -3550,6 +3552,29 @@
     Q['rel_' + p] = (Q['rel_' + p] || 40) + 5;
     recalculate(Q);
   }
+
+  // The PSOE's place in the system, which decides what it can campaign on:
+  // opposition, supply (keeps another party's government alive from
+  // outside), junior partner, coalition leader, minority or majority.
+  function roleFlags(Q) {
+    var me = Q.player_party || 'psoe';
+    var inGov = Q.player_in_government && !Q.acting;
+    var seats = (Q.congress || {})[me] || 0;
+    var role = 'opposition';
+    if (inGov && Q.pm_party !== me) { role = 'junior'; }
+    else if (inGov && (Q.govt_parties || []).length > 1) { role = 'coalition'; }
+    else if (inGov && seats >= 176) { role = 'majority'; }
+    else if (inGov) { role = 'minority'; }
+    else if (!Q.acting && (Q.psoe_backs_iglesias === 'external' || Q.gestora_invested || Q.psoe_supply)) { role = 'supply'; }
+    Q.role = role;
+    ['opposition', 'supply', 'junior', 'coalition', 'minority', 'majority'].forEach(function (r) { Q['role_' + r] = role === r ? 1 : 0; });
+    Q.role_word = { opposition: 'in opposition', supply: 'keeping another party\'s government in office', junior: 'junior partner in a coalition',
+      coalition: 'leading a coalition government', minority: 'leading a minority government', majority: 'governing with a majority' }[role];
+    Q.role_in_gov = inGov ? 1 : 0;
+    // how worn the government is: change works against an old one
+    Q.govt_years = Math.round((Q.govt_months || 0) / 12 * 10) / 10;
+  }
+
   function lawFlags(Q) {
     Q.budget_deals = Q.budget_deals || {};
     Object.keys(Q.congress || {}).forEach(function (p) { Q['seats_' + p] = Q.congress[p]; });
@@ -4692,7 +4717,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

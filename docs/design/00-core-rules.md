@@ -735,3 +735,19 @@ Every election result now has a poll-of-polls chart above the poll-change table.
 - the primary bonus is +4, not +8.
 
 Over a year from a plot of 40, the plot ends near 55 in opposition, near 30 for a PM relying on the left only, and near 55 for a PM relying on the left and the independence parties.
+
+### 7.40 Campaign messages depend on the PSOE's role
+
+`roleFlags` sets the PSOE's role, and a new card, "The campaign message", offers only messages that role can credibly use. The card is available from six months before the legislature ends, or once an election is due.
+
+| Role | Messages |
+|---|---|
+| Opposition | Time for a change of government (stronger the longer the government has lasted) · A government in waiting · Stop the right and the far right |
+| Supply | We made them deliver · The party of stability · Now it is our turn to lead (burns the bridge) |
+| Junior partner | Our ministers delivered (scales with ministries held) · The brake on the PM · Lead the next government |
+| Coalition leader | Four more years of progress (fades with time in office) · A stronger PSOE, a less dependent government (squeezes the partner) · They blocked everything |
+| Minority leader | Four more years · Give us the majority to finish the job · They blocked everything · Don't risk it |
+| Majority | Our record (as good as the economy) · Don't risk it |
+| Any government | Don't let the right undo it (once Vox has broken through) |
+
+Opposition-only attacks are now hidden while the PSOE governs: the debate's "question the Prime Minister's decency" and the rally's "end the PP's corruption". In government, the debate offers "Defend the government's record", which weakens with time in office.
