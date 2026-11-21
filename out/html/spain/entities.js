@@ -287,6 +287,30 @@
   };
   function imgUrl(rel) { return rel ? encodeURI(IMG + rel) : ''; }
   var TOPICS = [
+
+    // the chambers and levels of government
+    [['Congress of Deputies'], 'Congress of Deputies', '<b>The lower house: 350 deputies</b>, elected every four years by D\'Hondt in 52 provincial districts (3% threshold per province). It invests and can remove the Prime Minister, passes the budget and every law, and has the last word over the Senate. Created by the 1978 Constitution; its building, the Palacio de las Cortes, dates from 1850.'],
+    [['Senate'], 'Senate of Spain', '<b>The upper house: 208 elected senators plus about 58 appointed by the regional parliaments.</b> Each mainland province elects four by limited vote (the first party usually takes three). It can veto or amend bills, but Congress overrides it by absolute majority, or by simple majority after two months. Its one decisive power: authorising direct rule over a region under Article 155, used for the first time in October 2017.'],
+    [['European Parliament'], 'European Parliament', '<b>Spain\'s seats in the European Parliament: 54 from 2014, 59 after Brexit (2020)</b>, out of 751 (705 after Brexit). Spain votes as a single national constituency with no threshold. The Parliament co-legislates with the Council of the EU, approves the EU budget and the Commission. Spanish MEPs sit in European groups: the PSOE in the Socialists and Democrats (S&D), the PP in the European People\'s Party.'],
+    [['Regional parliaments'], 'Autonomous communities of Spain', '<b>The 17 regional parliaments of the autonomous communities</b>, 1,268 seats in all, created between 1979 and 1983. They elect the regional president, pass regional laws and budgets and run health, education and social services. Andalusia, Catalonia, Galicia and the Basque Country choose their own election dates; the other 13 vote together in May every four years. Each parliament also appoints senators.'],
+    [['Regional governments'], 'Autonomous communities of Spain', '<b>The 17 regional governments</b> (and the cities of Ceuta and Melilla). Led by a president elected by the regional parliament, they spend about a third of all public money: hospitals, schools, social services, regional police in Catalonia and the Basque Country. Their presidents, the "barons", are the most powerful figures in the PSOE and the PP outside Madrid.'],
+    [['Local government'], 'Municipalities of Spain', '<b>Spain\'s 8,131 municipalities and about 67,500 councillors</b>, elected every four years on the last Sunday of May by closed lists and D\'Hondt (5% threshold). The councillors elect the mayor. Town halls run urban planning, local police, water, waste and public transport; for parties they are the base of their organisation and their campaigns.'],
+    [['municipal councils', 'town halls'], 'Municipalities of Spain', 'Spain\'s 8,131 town councils: about 67,500 councillors elected every four years in May, who elect the mayor and run planning, local police and services.'],
+    // the ministries
+    [['First Deputy Prime Minister'], 'Deputy Prime Minister of Spain', 'Coordinates the government and chairs the weekly meeting of under-secretaries that prepares the Council of Ministers; stands in for the Prime Minister. Carmen Calvo held the post from 2018, Nadia Calviño from 2021, María Jesús Montero from 2023.'],
+    [['Minister of Finance'], 'Ministry of Finance (Spain)', 'Ministry of Finance (Hacienda): taxes, the Tax Agency, the state budget and the financing of the regions. It writes the budget and negotiates it in Congress. María Jesús Montero held it from 2018 to 2026.'],
+    [['Minister of Economic Affairs'], 'Ministry of Economic Affairs (Spain)', 'Ministry of Economic Affairs: macroeconomic policy, Spain\'s voice in the Eurogroup and with Brussels, banking and the recovery funds. Nadia Calviño held it from 2018 to 2023, then Carlos Cuerpo.'],
+    [['Minister of Foreign Affairs'], 'Ministry of Foreign Affairs (Spain)', 'Ministry of Foreign Affairs, the European Union and Cooperation: diplomacy, the embassies, relations with the EU, Morocco and Latin America, and Gibraltar.'],
+    [['Minister of Interior'], 'Ministry of the Interior (Spain)', 'Ministry of the Interior: the National Police and the Civil Guard, prisons, migration at the borders (Ceuta, Melilla, the Canaries) and the running of elections.'],
+    [['Minister of Defence'], 'Ministry of Defence (Spain)', 'Ministry of Defence: the armed forces, missions abroad, NATO commitments and the intelligence service (CNI). Margarita Robles held it from 2018.'],
+    [['Minister of Justice'], 'Ministry of Justice (Spain)', 'Ministry of Justice: the courts\' resources, the prosecution service\'s relations with the government, pardons (as for the Catalan leaders in 2021) and the reform of criminal law.'],
+    [['Minister of Labour'], 'Ministry of Labour and Social Economy', 'Ministry of Labour: employment law, the minimum wage, collective bargaining and social dialogue with unions and employers. Yolanda Díaz used it to pass the 2021 labour reform and raise the minimum wage.'],
+    [['Minister of Social Rights and Pensions'], 'Ministry of Inclusion, Social Security and Migration', 'Social Security, pensions and the Minimum Living Income; under coalition governments also dependency care and social rights (the Ministry of Social Rights of 2020).'],
+    [['Minister of Health'], 'Ministry of Health (Spain)', 'Ministry of Health: national health policy and coordination of the regions, which run the hospitals. It led the response to COVID-19 under Salvador Illa (2020–21).'],
+    [['Minister of Education'], 'Ministry of Education (Spain)', 'Ministry of Education: the national curriculum, teacher training rules and grants; the regions run the schools. Every government passes its own education law, such as the LOMLOE (2020).'],
+    [['Minister of Territorial Policy'], 'Ministry of Territorial Policy (Spain)', 'Ministry of Territorial Policy: relations with the autonomous communities, the transfer of powers and the State\'s delegates in the regions; the ministry that handles Catalonia day to day.'],
+    [['Minister of Ecological Transition'], 'Ministry for the Ecological Transition', 'Ministry for the Ecological Transition: energy, climate, water and the coast. Created in 2018 for Teresa Ribera; it oversaw the end of coal mining and the growth of renewables.'],
+    [['Minister of Equality'], 'Ministry of Equality (Spain)', 'Ministry of Equality: gender equality, violence against women, LGBTI rights. Re-created in 2020 for Irene Montero, it drafted the "only yes means yes" and Trans laws.'],
     [['Article 155'], 'Constitution of Spain', 'The constitutional article allowing direct rule over a region'],
     [['Constitution'], 'Constitution of Spain', 'The Spanish Constitution of 1978'],
     [['Federal Committee'], 'es:Comité Federal del PSOE', 'The PSOE\'s highest body between congresses: about 250 members'],
@@ -334,16 +358,32 @@
     [['only yes means yes', 'only yes'], 'es:Ley Orgánica de Garantía Integral de la Libertad Sexual', 'The 2022 sexual-consent law']
   ];
 
+
+  // The PSOE's regional federations: their own card, in the PSOE's colour.
+  // [names], full name, region, note, Wikipedia title
+  var AFFILIATES = [
+    [['PSOE-A'], 'Partido Socialista Obrero Español de Andalucía', 'Andalusia', 'The largest federation of the PSOE, with about a quarter of its members. It governed Andalusia without a break from 1982 to 2019, under Rodríguez de la Borbolla, Chaves, Griñán and Susana Díaz, and is the stronghold of susanismo.', 'es:Partido Socialista Obrero Español de Andalucía'],
+    [['PSC'], 'Partit dels Socialistes de Catalunya', 'Catalonia', 'A separate party federated with the PSOE since 1978, with its own group in the Catalan Parliament. Led by Miquel Iceta and then Salvador Illa, who won the 2021 Catalan election and became president in 2024.', 'Socialists\' Party of Catalonia'],
+    [['PSPV'], 'Partit Socialista del País Valencià', 'Valencia', 'The PSOE in the Valencian Community. Under Ximo Puig it governed from 2015 to 2023 with Compromís and Podemos (the Botànic pact).', 'es:Partido Socialista del País Valenciano-PSOE'],
+    [['PSdeG'], 'Partido dos Socialistas de Galicia', 'Galicia', 'The PSOE in Galicia, out of the Xunta since 2009 and overtaken by the BNG in 2020.', 'es:Partido dos Socialistas de Galicia-PSOE'],
+    [['PSE-EE'], 'Partido Socialista de Euskadi–Euskadiko Ezkerra', 'Basque Country', 'The PSOE in the Basque Country, junior partner of the PNV in the Basque government from 2016. Led by Idoia Mendia, an ally of Sánchez.', 'es:Partido Socialista de Euskadi-Euskadiko Ezkerra'],
+    [['FSA-PSOE'], 'Federación Socialista Asturiana', 'Asturias', 'The PSOE in Asturias, the federation of Javier Fernández and then Adrián Barbón, in government for most of the democratic period.', 'es:Federación Socialista Asturiana'],
+    [['PSCM'], 'Partido Socialista de Castilla-La Mancha', 'Castilla-La Mancha', 'The PSOE in Castilla-La Mancha, the federation of Emiliano García-Page, who won absolute majorities in 2019 and 2023.', 'es:Partido Socialista de Castilla-La Mancha-PSOE'],
+    [['PSIB'], 'Partit Socialista de les Illes Balears', 'Balearic Islands', 'The PSOE in the Balearics, which governed from 2015 to 2023 under Francina Armengol.', 'es:Partido Socialista de las Islas Baleares'],
+    [['PSN'], 'Partido Socialista de Navarra', 'Navarre', 'The PSOE in Navarre. María Chivite has governed with Geroa Bai since 2019, with Bildu abstaining.', 'es:Partido Socialista de Navarra'],
+    [['PSOE-M'], 'Partido Socialista Obrero Español de la Comunidad de Madrid', 'Madrid', 'The PSOE in the Madrid region, out of power there since 1995.', 'es:Partido Socialista de Madrid']
+  ];
+
   // party names as they appear in the text
   var PARTY_NAMES = [
-    [['PSOE', 'PSC', 'PSOE-A', 'PSPV', 'PSdeG', 'PSE-EE', 'FSA-PSOE', 'PSCM', 'PSIB', 'PSN', 'PSOE-M'], 'psoe'], [['PP', "People's Party", 'Partido Popular', 'PPC', 'PPdeG'], 'pp'],
+    [['PSOE'], 'psoe'], [['PP', "People's Party", 'Partido Popular', 'PPC', 'PPdeG'], 'pp'],
     [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar', 'En Comú Podem', 'Catalunya en Comú', 'En Marea', 'Elkarrekin Podemos', 'Comuns'], 'up'], [['Ciudadanos', 'Cs'], 'cs'], [['Vox'], 'vox'],
     [['IU', 'Izquierda Unida'], 'iu'], [['ERC'], 'erc'], [['Junts', 'JxCat', 'Convergència', 'CiU'], 'junts'],
     [['PNV'], 'pnv'], [['EH Bildu', 'Bildu'], 'bildu'], [['CUP'], 'cup'], [['Coalición Canaria'], 'cc'],
     [['Más País'], 'mp'], [['Compromís'], 'compromis'], [['UPN'], 'upn'], [['PRC'], 'prc'], [['BNG'], 'bng'],
     [['Teruel Existe'], 'te'], [['Geroa Bai'], 'geroa'], [['UPyD'], 'upyd'], [['Pedro Sánchez List'], 'ps'],
     [['Italian Democratic Party'], 'pditaly'], [['PASOK'], 'pasok'],
-    [['British Labour', 'Labour'], 'labour'], [['German SPD', 'SPD'], 'spd'], [['Syriza'], 'syriza'],
+    [['British Labour', 'Labour Party', 'Labour'], 'labour'], [['German SPD', 'SPD'], 'spd'], [['Syriza'], 'syriza'],
     [['US Democrats', 'Democratic Party'], 'usdem'], [['Portuguese Socialists'], 'psportugal'],
     [['Danish Social Democrats'], 'dksd'], [['Swedish Social Democrats'], 'sap'],
     [['Polisario'], 'polisario']
@@ -546,6 +586,9 @@
   PARTY_NAMES.forEach(function (p) {
     p[0].forEach(function (n) { if (!INDEX[n]) { INDEX[n] = { kind: 'party', id: p[1] }; names.push(n); } });
   });
+  AFFILIATES.forEach(function (a, i) {
+    a[0].forEach(function (n) { INDEX[n] = { kind: 'affiliate', i: i }; names.push(n); });
+  });
   TOPICS.forEach(function (t, i) {
     t[0].forEach(function (n) { if (!INDEX[n]) { INDEX[n] = { kind: 'topic', i: i }; names.push(n); } });
   });
@@ -567,6 +610,10 @@
       var p = PEOPLE[hit.i];
       var title = PERSON_WIKI[p[0][0]] === undefined ? p[0][0] : PERSON_WIKI[p[0][0]];
       return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: p[3], wiki: title, img: imgUrl(PERSON_IMG[p[0][0]]) };
+    }
+    if (hit.kind === 'affiliate') {
+      var af = AFFILIATES[hit.i];
+      return { kind: 'affiliate', party: 'psoe', name: af[1], region: af[2], note: af[3], wiki: af[4] };
     }
     if (hit.kind === 'topic') {
       var t = TOPICS[hit.i];
@@ -689,6 +736,10 @@
     if (info.kind === 'person') {
       return '<div class="sp-ent-head">' + (info.img ? '<img class="sp-ent-photo" src="' + info.img + '" alt="">' : '') + badge + '<div><strong>' + info.name + '</strong><br>' + pi.name +
         '</div></div><div>' + info.role + '</div>' + (info.wing ? '<div class="sp-ent-wing">' + info.wing + '</div>' : '') + more;
+    }
+    if (info.kind === 'affiliate') {
+      return '<div class="sp-ent-head">' + badge + '<div><strong>' + info.name + '</strong><br>Regional federation of the PSOE: ' + info.region +
+        '</div></div><div class="sp-ent-desc">' + info.note + '</div><div class="sp-ent-wing">Part of the ' + pi.name + '.</div>' + more;
     }
     var desc = partySentence(info.party);
     var lead = currentLeader(info.party);

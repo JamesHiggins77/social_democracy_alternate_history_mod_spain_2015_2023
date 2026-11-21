@@ -134,6 +134,11 @@
     drawPollError(Q, '2015');
     Q.poll_noise = {};
     Q.regions = RegionalModel.startingParliaments(REGIONAL, '2014-07-13');
+    // the real early elections: Andalusia (Díaz's snap of 22 March 2015),
+    // Catalonia (the plebiscitary election of 27 September 2015), and
+    // Galicia and the Basque Country together on 25 September 2016
+    var snaps = { 'Andalucía': '2015-03-22', 'Cataluña': '2015-09-27', 'Galicia': '2016-09-25', 'País Vasco': '2016-09-25' };
+    Object.keys(snaps).forEach(function (r) { if (Q.regions[r]) { Q.regions[r].nextElection = snaps[r]; } });
 
     // Government: Rajoy's majority, with the election called for December
     Q.pm = 'Mariano Rajoy';
@@ -2821,7 +2826,7 @@
     var count = seats[party] || 0;
     // Ciudadanos stayed out of regional cabinets until 2019, Podemos until 2017
     var willing = (COALITION_PARTNERS[party] || []).filter(function (id) {
-      if (id === 'cs' && year && year < 2019) { return false; }
+      if (id === 'cs' && year && year < 2018) { return false; }
       if (id === 'up' && year && year < 2017) { return false; }
       return true;
     });
@@ -2872,7 +2877,26 @@
     (Q.regional_elections_due || []).forEach(function (region) {
       var reg = Q.regions[region];
       var date = reg.nextElection;
+      // Andalusia, December 2018: 36 years of PSOE government, the ERE
+      // corruption trial, a listless Díaz campaign and the backlash over
+      // Catalonia. The PSOE fell from 47 seats to 33 and lost the Junta to
+      // PP and Cs with Vox's votes. The swing applies whoever leads the
+      // PSOE (it was a regional verdict on susanismo) and lasts.
+      if (region === 'Andalucía' && date === '2018-12-02' && !Q.and18_swing) {
+        Q.and18_swing = 1;
+        Q.regional_only = Q.regional_only || {};
+        Q.regional_only[region] = { psoe: 0.66, cs: 1.75, pp: 1.3, vox: 0.9 };
+      }
+      // swings that belong to regional elections only (they do not carry
+      // over to general elections in the region)
+      var ro = (Q.regional_only || {})[region], saved = null;
+      if (ro) {
+        Q.vm.regionalMod[region] = Q.vm.regionalMod[region] || {};
+        saved = JSON.parse(JSON.stringify(Q.vm.regionalMod[region]));
+        Object.keys(ro).forEach(function (k) { var am = Q.vm.regionalMod[region]; am[k] = (am[k] === undefined ? 1 : am[k]) * ro[k]; });
+      }
       var ballots = RegionalModel.regionalBallots(Q.vm, base(), REGIONAL, region, date);
+      if (saved) { Q.vm.regionalMod[region] = saved; }
       var r = lib('SpainRegionalRules', 'regional_rules.js').electRegion(region, ballots, date,
         REGIONAL.regions[region]);
       var flat = {};
@@ -2880,6 +2904,8 @@
       var shares = VoteModel.nationalShares(flat);
       var before = reg.government;
       var gov = regionalGovernment(r.totals, before, Q.pp_vox_relation, Q.year);
+      var RLEAD = { 'Andalucía': { pp: 'Juanma Moreno', cs: 'Juan Marín', vox: 'Francisco Serrano' } };
+      if (RLEAD[region] && RLEAD[region][gov.party] && /president$/.test(gov.president)) { gov.president = RLEAD[region][gov.party]; }
       var real = RegionalModel.GOVERNMENTS_2015[region];
       if (date <= RegionalModel.HISTORY_END && real && real.party === gov.party) {
         gov = JSON.parse(JSON.stringify(real));
@@ -2912,9 +2938,12 @@
       reg.voteShares = shares;
       reg.government = gov;
       reg.lastElection = date;
+      // Susana Díaz called the next Andalusian election early, for 2 December 2018
+      var keepNext = region === 'Andalucía' && date === '2015-03-22' ? '2018-12-02' : null;
       reg.lastWasSnap = false;
       reg.nextElection = lib('SpainRegionalRules', 'regional_rules.js')
         .nextRegularElection(region, date, false);
+      if (keepNext) { reg.nextElection = keepNext; reg.lastWasSnap = true; }
       if (gov.repeat) {
         // no investiture possible: a repeat election about four months on
         var d4 = addMonths(+date.slice(0, 4), +date.slice(5, 7), 4);
@@ -3380,11 +3409,11 @@
     if (!out) { return; }
     var colour = UI.partyColor(Q.player_party || 'psoe');
     var rows = [['Congress of Deputies', Q.rep_congress, 350], ['Senate', Q.rep_senate, Q.senate_total],
-      ['European Parliament', Q.rep_ep, Q.ep_total], ['Regional parliaments', Q.rep_regional, Q.rep_regional_total],
+      ['European Parliament', Q.rep_ep, Q.ep_total, ' (Spain\'s seats)'], ['Regional parliaments', Q.rep_regional, Q.rep_regional_total],
       ['Regional governments', Q.rep_presidencies, Q.rep_regions], ['Local government', Q.rep_local, Q.rep_local_total]];
     out.innerHTML = '<table class="sp-rep">' + rows.filter(function (r) { return r[2] > 0; }).map(function (r) {
       var v = r[1] || 0, pct = Math.min(100, 100 * v / r[2]);
-      return '<tr><th>' + r[0] + '</th><td><div class="sp-rep-num">' + v.toLocaleString('en-GB') + ' / ' + r[2].toLocaleString('en-GB') +
+      return '<tr><th>' + r[0] + (r[3] ? '<span class="sp-rep-sub">' + r[3] + '</span>' : '') + '</th><td><div class="sp-rep-num">' + v.toLocaleString('en-GB') + ' / ' + r[2].toLocaleString('en-GB') +
         '</div><div class="sp-rep-bar"><span style="width:' + pct.toFixed(1) + '%;background:' + colour + '"></span></div></td></tr>';
     }).join('') + '</table>' +
       (Q.rep_in_regional_govt ? '<p class="sp-map-legend">In government in ' + Q.rep_in_regional_govt + ' regions.</p>' : '');
@@ -3860,7 +3889,8 @@
     var rows = [['pm', 'Prime Minister']].concat(MINISTRIES).map(function (m) {
       var c = cab[m[0]];
       if (!c) { return ''; }
-      return '<tr><td>' + m[1] + '</td><td><span class="sp-swatch" style="background:' + UI.partyColor(c.party) +
+      var label = m[0] === 'pm' || m[0] === 'deputy' ? m[1] : 'Minister of ' + m[1];
+      return '<tr><td>' + label + '</td><td><span class="sp-swatch" style="background:' + UI.partyColor(c.party) +
         '"></span>' + c.name + '</td></tr>';
     }).join('');
     out.innerHTML = (Q.acting ? '<p><em>Acting government.</em></p>' : '') +
@@ -4427,7 +4457,7 @@
     ['2014-07-06', 34.0, 21.5, 8.3, 'NC Report'], ['2014-07-10', 34.8, 31.5, 10.6, 'Sigma Dos']];
   function chart2014() {
     var div = document.createElement('div');
-    var rows = POLLS_2014.map(function (p) { var k = p[1] + p[2] + p[3]; return { date: p[0], c_madina: 100 * p[1] / k, c_sanchez: 100 * p[2] / k, c_tapias: 100 * p[3] / k }; });
+    var rows = POLLS_2014.map(function (p) { var k = p[1] + p[2] + p[3]; return { date: p[0], pollster: p[4], c_madina: 100 * p[1] / k, c_sanchez: 100 * p[2] / k, c_tapias: 100 * p[3] / k }; });
     UI.drawRaceChart(div, rows, { color: function (c) { return CANDIDATES[c][2]; }, name: function (c) { return CANDIDATES[c][1]; },
       result: { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 }, resultDate: '2014-07-13', dots: true,
       title: 'Every poll of the race', note: 'polls of PSOE voters, shares of those naming one of the three' });

@@ -694,3 +694,12 @@ Every election result now has a poll-of-polls chart above the poll-change table.
 - **2017 primary:** the chart shows the start-of-race and final polls against the result.
 - **2014 opening:** the chart plots all eight published polls of PSOE voters from 16 June to 10 July as dots, with a line averaging the last three.
 - **Municipal elections:** the chart shows national polls only. The municipal result is counted in councillors, so it isn't plotted.
+
+### 7.37 Hover cards, Andalusia 2018, chart hover
+
+- **Hover cards for every level of government:** Congress of Deputies, Senate, European Parliament (labelled "Spain's seats"), regional parliaments, regional governments, local government and municipal councils. Each card gives the institution's powers and history.
+- **Ministries:** every ministry has a card with its responsibilities. Cabinet rows now read "Minister of Labour" and so on, which also fixes "Labour" linking to the UK Labour Party.
+- **Regional federations:** the PSOE's federations (PSOE-A, PSC, PSPV, PSdeG, PSE-EE, FSA-PSOE, PSCM, PSIB, PSN, PSOE-M) have their own cards in the PSOE's colour, which link to the PSOE.
+- **Regional calendar:** the real early elections are now scheduled: Andalusia on 22 March 2015 and 2 December 2018, Catalonia on 27 September 2015, Galicia and the Basque Country on 25 September 2016. Before, Andalusia's 2015 election was dated 2012, so the game held a spurious 2016 vote.
+- **Andalusia, December 2018:** the swing of that election is applied to Andalusian regional votes only: PSOE ×0.66, Cs ×1.75, PP ×1.3, Vox ×0.9. In the historical replay the result is PP 25, PSOE 33, Cs 23, Vox 10, AA 18, and Juanma Moreno forms a PP–Cs government with Vox's support. Cs may join regional cabinets from 2018.
+- **Race charts:** hover anywhere over the chart to see that poll's figures, with the pollster where known. A dashed line now joins each party's last poll to its result.

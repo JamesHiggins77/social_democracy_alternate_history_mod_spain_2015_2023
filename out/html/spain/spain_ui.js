@@ -733,6 +733,12 @@
       }
       if (line.length) {
         parts.push('<path d="' + line.map(function (r, i) { return (i ? 'L' : 'M') + X(r.date).toFixed(1) + ',' + Y(r[k]).toFixed(1); }).join('') + '" fill="none" stroke="' + col(k) + '" stroke-width="2.2" stroke-linejoin="round"><title>' + escapeHtml(nm(k)) + '</title></path>');
+        // the last poll joined to the result, dashed
+        var lp = line[line.length - 1];
+        if (opts.result && opts.result[k] !== undefined && lp.date !== endDate) {
+          parts.push('<line x1="' + X(lp.date).toFixed(1) + '" y1="' + Y(lp[k]).toFixed(1) + '" x2="' + X(endDate).toFixed(1) + '" y2="' + Y(opts.result[k]).toFixed(1) +
+            '" stroke="' + col(k) + '" stroke-width="1.6" stroke-dasharray="4,3"/>');
+        }
       }
       if (opts.start && opts.start[k] !== undefined && opts.startDate) {
         parts.push('<rect x="' + (X(opts.startDate) - 3) + '" y="' + (Y(opts.start[k]) - 3) + '" width="6" height="6" fill="#fff" stroke="' + col(k) + '" stroke-width="1.5"><title>' + escapeHtml(nm(k)) + ': ' + opts.start[k].toFixed(1) + '% at the last election</title></rect>');
@@ -748,6 +754,20 @@
     for (var i = 1; i < labels.length; i++) { if (labels[i].y - labels[i - 1].y < fs + 1) { labels[i].y = labels[i - 1].y + fs + 1; } }
     labels.forEach(function (l) {
       parts.push('<text x="' + (W - m.r + 8) + '" y="' + (l.y + 3) + '" font-size="' + fs + '" fill="' + col(l.k) + '" font-weight="bold">' + escapeHtml(nm(l.k)) + ' ' + l.v.toFixed(1) + '</text>');
+    });
+    // hover: one invisible column per poll date, listing every figure
+    var cols = pts.slice();
+    if (opts.result) { cols.push(Object.assign({ date: endDate, _final: 1 }, opts.result)); }
+    cols.forEach(function (r, i) {
+      var x = X(r.date), prevX = i ? X(cols[i - 1].date) : m.l, nextX = i < cols.length - 1 ? X(cols[i + 1].date) : W - m.r;
+      var a = Math.max(m.l, (x + prevX) / 2), b = Math.min(W - m.r + 6, (x + nextX) / 2);
+      if (i === 0) { a = Math.max(m.l - 4, x - 6); }
+      if (b - a < 2) { return; }
+      var head = r._final ? 'Result' : (r._res ? 'Last result' : (r.pollster ? r.pollster + ', ' : 'Polls, ')) + (r._final ? '' : '');
+      var txt = (r._final ? 'Result, ' : (r._res ? 'Last election, ' : (r.pollster ? r.pollster + ', ' : 'Polls, '))) + r.date + '\n' +
+        ids.filter(function (k) { return r[k] !== undefined && r[k] !== null; }).sort(function (p, q) { return r[q] - r[p]; })
+          .map(function (k) { return nm(k) + ': ' + r[k].toFixed(1) + '%'; }).join('\n');
+      parts.push('<rect class="sp-hover-col" x="' + a.toFixed(1) + '" y="' + m.t + '" width="' + (b - a).toFixed(1) + '" height="' + (H - m.t - m.b) + '"><title>' + escapeHtml(txt) + '</title></rect>');
     });
     container.innerHTML = (opts.title ? '<p><strong>' + escapeHtml(opts.title) + '</strong></p>' : '') +
       '<svg class="sp-poll-chart" viewBox="0 0 ' + W + ' ' + H + '">' + parts.join('') + '</svg>' +

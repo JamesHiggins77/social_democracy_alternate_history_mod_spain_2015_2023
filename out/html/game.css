@@ -611,3 +611,6 @@ a.sp-ent { text-decoration: none; }
 .sp-rep-num { font-variant-numeric: tabular-nums; }
 .sp-rep-bar { height: 12px; border: 1px solid #999; background: #fff; margin-top: 2px; }
 .sp-rep-bar span { display: block; height: 100%; }
+.sp-rep-sub { display:block; font-weight:normal; font-size:0.8em; color:#6b6b6b; }
+.sp-hover-col { fill: transparent; pointer-events: all; }
+.sp-hover-col:hover { fill: rgba(0,0,0,0.06); }

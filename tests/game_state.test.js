@@ -94,9 +94,9 @@ test('regional elections fall due in May 2019 and change governments', () => {
   const results = G.runDueRegionalElections(Q);
   assert.ok(results.length >= 12);
   assert.strictEqual(Q.regions['Madrid'].nextElection, '2023-05-28');
-  // Andalusia keeps its own calendar: without Díaz's snap election it votes
-  // at the end of its 2012 term
-  assert.strictEqual(Q.regions['Andalucía'].lastElection, '2016-03-25');
+  // Andalusia keeps its own calendar: Díaz's snaps of March 2015 and
+  // December 2018
+  assert.strictEqual(Q.regions['Andalucía'].lastElection, '2018-12-02');
 });
 
 test('a PP leader is invested if the PSOE abstains', () => {
