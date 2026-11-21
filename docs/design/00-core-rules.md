@@ -584,3 +584,19 @@ Real polling averages swung far more than the game's: the PP went from about 33%
   - an event shows the result. The sidebar's Representation adds local councillors.
 - **Call their bluff** is now offered after a poor municipal night: the PSOE loses more than 500 councillors, or the PP has 10% more than it. Sánchez must be governing.
 - **The Cortes history.** Every general election's Congress is recorded, and the end screens (game over or December 2023) show it as one table: parties by election.
+
+### 7.27 A harder leadership race; personal resources
+
+- **The vote.** Sánchez's share is 42 + 12·tanh((morale + sanchismo/2 − 75)/30) + 0.6 × campaign edge (network, barons won over, personal resources), with gaussian noise (sd 5). Without at least 2 personal resources, −3 more.
+- **The endorsements.** The apparatus adds 12 points (more when the regional barons are strong) to Díaz's signatures and takes 80% of that from Sánchez's.
+- **Measured over 200–300 games:**
+
+  | Play | Endorsements won | Vote won | Average share |
+  |---|---|---|---|
+  | History-like | about 1% | about 60% | 47% |
+  | Very strong | about 90% | 100% | 64% |
+
+- **Personal resources.** While Sánchez is out of the leadership and not leading a party of his own, the sidebar shows personal resources instead of party funds.
+  - Earned from: the memoir (+3), small donations, wealthy donors, consultancy work.
+  - Spent on: the campaign of the comeback (rallies, online adverts, a tour of Andalusia that weakens Díaz's apparatus) and on the dark arts.
+- **Back in the leadership,** party funds take over again.

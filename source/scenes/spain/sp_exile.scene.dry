@@ -38,7 +38,8 @@ A publisher offers you an advance for your account of the last years. The workin
 - @root: Not now
 
 @book_yes
-on-arrival: sanchismo += 6; funds += 1; populism += 1
+subtitle: Personal resources +3 (or party funds +1 if you lead a party); your following grows
+on-arrival: {! Q.sanchismo += 6; Q.populism += 1; if (Q.personal_mode) { Q.war_chest = (Q.war_chest || 0) + 3; } else { Q.funds += 1; } !}
 
 It sells well. Everyone in politics reads the chapter about themselves first.
 
@@ -239,7 +240,7 @@ on-arrival: {! Q.rel_leadership = (Q.rel_leadership || 40) + 2; !}
 You keep your powder dry.
 
 @bb_money
-title: The war chest
+title: Personal resources
 new-page: true
 is-card: true
 tags: sp_exile
@@ -607,3 +608,49 @@ subtitle: A gamble: it may die, or it may grow
 on-arrival: {! Q.past_grew = Math.random() < 0.5 ? 1 : 0; if (Q.past_grew) { Q.sanchismo -= 6; if (window.SpainGame) { window.SpainGame.transferRaw(Q, Q.player_party, { pp: 0.3, cs: 0.3, psoe: 0.4 }, { professionals: 0.8, pensioners: 0.8, homemakers: 0.6 }); } } !}
 
 [? if past_grew = 1 : It grows. By the end of the month there are three more stories and a call for a parliamentary inquiry. ?][? if past_grew = 0 : The story dies on its own. ?]
+
+@bb_spend
+title: The campaign of the comeback
+new-page: true
+is-card: true
+tags: sp_exile
+view-if: personal_mode = 1 and bb_spend_timer <= 0 and war_chest >= 1
+on-arrival: {! Q.month_actions += 1; Q.bb_spend_timer = 2; !}
+
+= The campaign of the comeback
+
+You have [+ war_chest_display +] in personal resources. The party will not pay for your campaign; you will.
+
+- @spend_rallies: Rallies in the local branches
+- @spend_ads: Online adverts aimed at members
+- @spend_south: A tour of Andalusia, in Díaz's own federation
+- @spend_save: Save it for the vote
+
+@spend_rallies
+subtitle: Costs 1 personal resource. Your network grows
+choose-if: war_chest >= 1
+unavailable-subtitle: Needs 1 personal resource.
+on-arrival: {! Q.war_chest -= 1; Q.network = (Q.network || 0) + 6; Q.member_morale += 1; !}
+
+Sixty halls in a month, folding chairs and borrowed microphones.
+
+@spend_ads
+subtitle: Costs 1 personal resource. Your following grows; a fifth of the time a clumsy advert backfires
+choose-if: war_chest >= 1
+unavailable-subtitle: Needs 1 personal resource.
+on-arrival: {! Q.war_chest -= 1; Q.ad_flop = Math.random() < 0.2 ? 1 : 0; Q.sanchismo += Q.ad_flop ? -2 : 5; !}
+
+[? if ad_flop = 1 : The advert is mocked as a personality cult. ?][? if ad_flop = 0 : The members see you every day on their phones. ?]
+
+@spend_south
+subtitle: Costs 2 personal resources. Weakens Díaz's apparatus before the endorsements; the barons resent it
+choose-if: war_chest >= 2
+unavailable-subtitle: Needs 2 personal resources.
+on-arrival: {! Q.war_chest -= 2; Q.regional_leaders_strength = (Q.regional_leaders_strength || 30) - 4; Q.network = (Q.network || 0) + 3; Q.regional_leaders_dissent += 3; !}
+
+In Seville, Córdoba and Jaén, socialists who never signed for anyone sign for you.
+
+@spend_save
+on-arrival: {! Q.bb_spend_timer = 1; !}
+
+You keep the money for the last weeks.

@@ -1043,3 +1043,24 @@ test('municipal elections and the Cortes history', () => {
   assert.strictEqual(Q.cortes_history.length, 1);
   assert.strictEqual(Object.values(Q.cortes_history[0].seats).reduce((a, b) => a + b, 0), 350);
 });
+
+test('2017 race is hard: a history-like Sánchez usually loses the endorsements and the vote is close', () => {
+  let av = 0, won = 0;
+  for (let i = 0; i < 200; i++) {
+    const Q = newQ();
+    Object.assign(Q, { member_morale: 55, sanchismo: 45, network: 30, war_chest: 2, rel_leadership: 30, members_lost: 6.5 });
+    G.primaryEndorsements(Q); if (Q.av_rows[0].id === 'c_sanchez') av++;
+    G.primaryVote(Q); if (Q.primary_won) won++;
+  }
+  assert.ok(av < 40, 'endorsements ' + av);
+  assert.ok(won > 60 && won < 170, 'vote ' + won);
+});
+
+test('out of the leadership, dirty work is paid from personal resources', () => {
+  const Q = newQ(); Q.sanchez_leader = 0; Q.backbench = 1; Q.war_chest = 3; Q.funds = 5;
+  G.recalculate(Q);
+  assert.strictEqual(Q.personal_mode, 1);
+  G.darkArts(Q, 'meddle', 'pp');
+  assert.strictEqual(Q.war_chest, 2);
+  assert.strictEqual(Q.funds, 5);
+});

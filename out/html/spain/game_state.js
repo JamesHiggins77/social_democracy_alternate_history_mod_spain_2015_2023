@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'dark', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -740,7 +740,8 @@
   // exposure, which turns it into a scandal. Returns 1 if exposed.
   function darkArts(Q, act, target) {
     var risk = { rig: 0.35, meddle: 0.3, sabotage: 0.4 }[act];
-    Q.funds -= act === 'rig' ? 2 : 1;
+    var cost = act === 'rig' ? 2 : 1;
+    if (!Q.sanchez_leader && !Q.exiled) { Q.war_chest = (Q.war_chest || 0) - cost; } else { Q.funds -= cost; }
     var exposed = Math.random() < risk;
     Q.dark_exposed = exposed ? 1 : 0;
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
@@ -2807,6 +2808,12 @@
     Q.network_word = Q.network < 15 ? 'A handful of loyalists' : (Q.network < 35 ? 'Organising' : (Q.network < 60 ? 'A real network' : 'A movement'));
     Q.leadership_word = UI.word('relation', Q.rel_leadership);
     Q.comeback_bonus = Math.round(comebackBonus(Q));
+    // out of the leadership (and not leading a party of his own), Sánchez
+    // spends his personal resources, not the party's
+    Q.personal_mode = !Q.sanchez_leader && !Q.exiled ? 1 : 0;
+    Q.war_chest_display = Math.round((Q.war_chest || 0) * 10) / 10;
+    Q.spendable = Q.personal_mode ? (Q.war_chest || 0) : Q.funds;
+    Q.spend_name = Q.personal_mode ? 'personal resources' : 'party funds';
     Q.sanchez_moderniser = isModerniser(Q);
     // out of the leadership with no primary pending: decide what next
     Q.exile_pending = (!Q.sanchez_leader && !Q.leadership_exception_open && !Q.exiled &&
@@ -2849,7 +2856,9 @@
   // runs on his left instead. Díaz always runs.
   function comebackPrimary(Q) {
     var x = (Q.member_morale || 50) + (Q.sanchismo || 20) / 2;
-    var s = clamp(45 + (x - 60) * 0.5 + (Q.rig_bonus || 0) + comebackBonus(Q) - (Q.three_losses ? 8 : 0) - ((Q.members_lost || 0) - 6.5) + 6 * (Math.random() - 0.5), 15, 75);
+    // a contest against the whole apparatus: enthusiasm has diminishing
+    // returns and the campaign needs money of its own
+    var s = clamp(42 + 12 * Math.tanh((x - 75) / 30) + (Q.rig_bonus || 0) + 0.6 * comebackBonus(Q) - ((Q.war_chest || 0) < 2 ? 3 : 0) - (Q.three_losses ? 8 : 0) - ((Q.members_lost || 0) - 6.5) + 5 * gaussian(), 15, 75);
     var lopez = clamp(10 + 4 * (Math.random() - 0.5), 5, 15);
     var tapias = 0;
     Q.primary_moderniser = Q.lopez_decided ? 1 : 0;
@@ -2952,7 +2961,10 @@
     var t = primaryTargets(Q);
     var e = {}, sum = 0;
     Object.keys(t).forEach(function (c) {
-      e[c] = Math.max(0.5, t[c] + (c === 'c_diaz' ? 6 : (c === 'c_sanchez' ? -5 : (c === 'c_lopez' ? -0.5 : -1.5))));
+      // the federations' apparatus collects signatures far better than it
+      // wins secret ballots; the stronger the barons, the bigger the gap
+      var app = 12 + 0.15 * Math.max(0, (Q.regional_leaders_strength || 30) - 25);
+      e[c] = Math.max(0.5, t[c] + (c === 'c_diaz' ? app : (c === 'c_sanchez' ? -0.8 * app : (c === 'c_lopez' ? -0.5 : -1.5))));
       sum += e[c];
     });
     var gathered = Math.round(MEMBERSHIP * (0.62 + 0.06 * Math.random()));

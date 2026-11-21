@@ -30,7 +30,7 @@ Morale: **[+ morale_word +]**
 
 Unity: **[+ unity_word +]**
 
-Party funds: **[+ funds_display +]** ([+ funds_income_text +]/mo)[? if in_debt = 1 : , in debt ?]
+[? if personal_mode = 0 : Party funds: **[+ funds_display +]** ([+ funds_income_text +]/mo)[? if in_debt = 1 : , in debt ?] ?][? if personal_mode = 1 : Personal resources: **[+ war_chest_display +]** (memoir, consultancy, donations; spent on your own campaign) ?]
 
 [? if investiture_clock > 0 : Dissolution in [+ investiture_clock +] wk. ?]
 

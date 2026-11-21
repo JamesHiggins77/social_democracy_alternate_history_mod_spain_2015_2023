@@ -474,42 +474,42 @@ Someone in your circle knows people who know how things are done: census lists t
 - @da_no: No: if it came out, it would finish you
 
 @da_rig
-subtitle: Costs 2 in party funds. A few points in the next leadership vote or Federal Committee; if exposed, a scandal that turns it against you
-choose-if: funds >= 2
-unavailable-subtitle: Needs 2 in party funds.
+subtitle: Costs 2 in [+ spend_name +]. A few points in the next leadership vote or Federal Committee; if exposed, a scandal that turns it against you
+choose-if: spendable >= 2
+unavailable-subtitle: Needs 2 in [+ spend_name +].
 on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'rig'); } !}
 
 [? if dark_exposed = 0 : New members appear on the lists of friendly local branches. Nobody asks where they came from. ?][? if dark_exposed = 1 : El País publishes the story: hundreds of "ghost members" signed up in your friends' branches. The Ethics Committee opens an inquiry, and the barons have a new weapon. ?]
 
 @da_meddle_pp
-subtitle: Costs 1 in party funds. A more divided PP; if exposed, relations with the PP collapse
-choose-if: funds >= 1
-unavailable-subtitle: Needs 1 in party funds.
+subtitle: Costs 1 in [+ spend_name +]. A more divided PP; if exposed, relations with the PP collapse
+choose-if: spendable >= 1
+unavailable-subtitle: Needs 1 in [+ spend_name +].
 on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'meddle', 'pp'); } !}
 
 [? if dark_exposed = 0 : Quiet help finds its way to the PP's least electable candidate. ?][? if dark_exposed = 1 : The PP discovers who has been helping its internal rebels. Génova calls it "an attack on democracy". ?]
 
 @da_meddle_up
-subtitle: Costs 1 in party funds. Podemos splits a little more; if exposed, relations with Podemos collapse
-choose-if: funds >= 1
-unavailable-subtitle: Needs 1 in party funds.
+subtitle: Costs 1 in [+ spend_name +]. Podemos splits a little more; if exposed, relations with Podemos collapse
+choose-if: spendable >= 1
+unavailable-subtitle: Needs 1 in [+ spend_name +].
 on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'meddle', 'up'); } !}
 
 [? if dark_exposed = 0 : Podemos's critics find they have more friends in the press than they expected. ?][? if dark_exposed = 1 : Iglesias produces the messages: the PSOE has been stirring Podemos's internal war. ?]
 
 @da_sabotage_pp
-subtitle: Costs 1 in party funds. Hurts the PP; if exposed, the scandal is yours
-choose-if: funds >= 1
-unavailable-subtitle: Needs 1 in party funds.
+subtitle: Costs 1 in [+ spend_name +]. Hurts the PP; if exposed, the scandal is yours
+choose-if: spendable >= 1
+unavailable-subtitle: Needs 1 in [+ spend_name +].
 on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'sabotage', 'pp'); } !}
 
 [? if dark_exposed = 0 : The dossier runs on the front page. The PP's week is spent explaining. ?][? if dark_exposed = 1 : The dossier's source is traced back to Ferraz. The story is no longer the PP; it is you. ?]
 
 @da_sabotage_diaz
 view-if: year <= 2018
-subtitle: Costs 1 in party funds. Weakens the plot against you; if exposed, the barons strike
-choose-if: funds >= 1
-unavailable-subtitle: Needs 1 in party funds.
+subtitle: Costs 1 in [+ spend_name +]. Weakens the plot against you; if exposed, the barons strike
+choose-if: spendable >= 1
+unavailable-subtitle: Needs 1 in [+ spend_name +].
 on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'sabotage', 'diaz'); } !}
 
 [? if dark_exposed = 0 : Stories about the Andalusian federation's finances unsettle Díaz's allies. ?][? if dark_exposed = 1 : The leak is traced to your team. The regional barons say you have declared war on your own party. ?]
