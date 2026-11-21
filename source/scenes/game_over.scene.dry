@@ -11,6 +11,8 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 
 [? if retired = 1 : Pedro Sánchez's political career ends here. ?][? if retired = 0 and no_way_back = 0 : With the right holding a commanding majority, or no party left to lead, there is no route back to government for Pedro Sánchez before the end of the period. ?]
 
+**Time as Prime Minister: [+ pm_years_text +] years.** The real Pedro Sánchez governed from June 2018 to the end of 2026, about 8.5 years. [? if beat_history = 1 : You have matched or beaten him. ?][? if beat_history = 0 : You fell short of his record. ?]
+
 ## The Cortes, election by election
 
 {!<div id="sp-cortes-history"></div>!}
@@ -19,16 +21,16 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 - @root.start_menu: Return to the main menu
 
 @survived
-title: The end of 2023
+title: The end of 2026
 new-page: true
 on-arrival: game_over = 1
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderCortesHistory(Q, 'sp-cortes-history'); }
 !}
 
-= December 2023
+= December 2026
 
-[? if sanchez_leader = 1 : Pedro Sánchez reaches the end of 2023 as leader of the PSOE. ?][? if exiled = 1 : Pedro Sánchez reaches the end of 2023 in [+ my_party +][? if player_leads = 1 : , as its leader ?]. ?][? if backbench = 1 : Pedro Sánchez reaches the end of 2023 on the PSOE backbenches. ?]
+[? if sanchez_leader = 1 : Pedro Sánchez reaches the end of 2026 as leader of the PSOE. ?][? if exiled = 1 : Pedro Sánchez reaches the end of 2026 in [+ my_party +][? if player_leads = 1 : , as its leader ?]. ?][? if backbench = 1 : Pedro Sánchez reaches the end of 2026 on the PSOE backbenches. ?]
 
 [? if sanchez_pm = 1 : He is Prime Minister: [+ government_type +]. ?][? if sanchez_pm = 0 : [? if player_in_government = 1 : His party is in government under [+ pm +]: [+ government_type +]. ?][? if player_in_government = 0 : The Prime Minister is [+ pm +]. ?] ?]
 

@@ -1873,3 +1873,189 @@ on-arrival: realign_due = 0
 [? if realign_cs = 1 : For two years Ciudadanos has polled ahead of the PP. Now the PP's own voters, its donors and half its mayors follow: Albert Rivera is the leader of the Spanish centre-right, and Génova is a party of the past. ?][? if realign_cs = 0 : Vox has outpolled the PP for a year and a half. The PP's voters stop pretending: Santiago Abascal is now the leader of the Spanish right, and the PP is reduced to its old provincial strongholds. ?]
 
 [+ realign_name +] is now the main party of the right.
+
+@begona_case
+title: Five days of reflection
+new-page: true
+tags: sp_event
+view-if: begona_seen = 0 and sanchez_pm = 1 and ((year = 2024 and month >= 4) or year >= 2025)
+max-visits: 1
+on-arrival: begona_seen = 1
+
+= Five days of reflection
+
+A Madrid judge opens an investigation into Begoña Gómez, your wife, on a complaint from Manos Limpias based on press cuttings. Within months your brother David's job at the Badajoz provincial council is also before a judge. The right speaks of a corrupt family; your supporters speak of lawfare.
+
+- @begona_reflect: Withdraw for five days to decide whether it is worth it
+- @begona_fight: Say nothing and keep governing
+
+@begona_reflect
+title: The letter to the citizens
+on-arrival: {! Q.sanchismo += 8; Q.member_morale += 6; Q.sanchez_authority += 4; Q.rel_pp -= 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: 0.5, students: 0.5, pensioners: 0.3 }); window.SpainGame.campaign(Q, 'pp', { professionals: 0.3, self_employed: 0.3 }); } !}
+
+Thousands rally outside Ferraz asking you to stay. On the fifth day you stay. Your opponents call it theatre; your voters call it dignity. The cases continue.
+
+@begona_fight
+title: Governing through it
+on-arrival: {! Q.sanchez_authority -= 2; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: -0.2, professionals: -0.2, pensioners: -0.2, self_employed: -0.2, students: -0.2, unemployed: -0.2, homemakers: -0.2 }); } !}
+
+The headlines keep coming, week after week.
+
+@koldo_case
+title: The Koldo case
+new-page: true
+tags: sp_event
+view-if: koldo_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and year >= 2024
+max-visits: 1
+on-arrival: {! Q.koldo_seen = 1; Q.abalos_gone = 1; Q.adv_cerdan_was = Q.adv_cerdan; Q.adv_cerdan = 0; Q.adv_offer_cerdan = 0; Q.sanchez_authority -= 6; Q.member_morale -= 6; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: -0.7, professionals: -0.7, pensioners: -0.7, self_employed: -0.7, students: -0.7, unemployed: -0.7, homemakers: -0.7 }); } !}
+
+= The Koldo case
+
+Masks bought at the height of the pandemic, commissions, a former bodyguard turned adviser: the Civil Guard's reports on Koldo García reach José Luis Ábalos, your old Minister of Transport and organisation secretary, who is expelled from the group and later jailed pending trial. Then, in June 2025, a recording reaches Santos Cerdán, the man who collected the signatures for your comeback. He resigns as Secretary of Organisation the same day.[? if adv_cerdan_was = 1 : Cerdán was on your team. Every photograph of the two of you is on the front pages. ?]
+
+- @koldo_sorry: Ask forgiveness and order an external audit
+- @koldo_deny: Call it a conspiracy
+
+@koldo_sorry
+title: Forgiveness
+on-arrival: {! Q.sanchez_authority += 2; Q.institutionalists_dissent -= 3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { professionals: 0.3, pensioners: 0.2 }); } !}
+
+"I trusted the wrong people." It hurts, and it is believed by more people than you feared.
+
+@koldo_deny
+title: A conspiracy
+on-arrival: {! Q.sanchismo += 3; Q.modernisers_dissent += 5; Q.institutionalists_dissent += 5; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { professionals: -0.5, self_employed: -0.3 }); } !}
+
+The base believes you. Almost nobody else does.
+
+@dana
+title: The DANA
+new-page: true
+tags: sp_event
+view-if: dana_seen = 0 and ((year = 2024 and month >= 10) or year >= 2025)
+max-visits: 1
+on-arrival: {! Q.dana_seen = 1; if (window.SpainGame) { window.SpainGame.econ(Q, -0.1, 0); window.SpainGame.social(Q, -2); } !}
+
+= The DANA
+
+On 29 October 2024 a cut-off low dumps a year's rain on the south of Valencia in a few hours. More than two hundred people die in Paiporta, Catarroja, Sedaví. The regional alert reaches phones when the water is already in the garages. In Paiporta, the King, the Valencian president and [? if sanchez_pm = 1 : you ?][? if sanchez_pm = 0 : the Prime Minister ?] are pelted with mud.
+
+- @dana_central: [? if sanchez_pm = 1 : Declare a national emergency and take command ?][? if sanchez_pm = 0 : Demand that the State take command ?]
+- @dana_support: [? if sanchez_pm = 1 : "If they need help, let them ask for it": support the regional government ?][? if sanchez_pm = 0 : Support the relief effort quietly ?]
+
+@dana_central
+title: The State takes command
+on-arrival: {! Q.sanchez_authority += 3; Q.regional_leaders_dissent += 3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 0.4, workers: 0.4 }); window.SpainGame.campaign(Q, 'pp', { pensioners: -0.4, workers: -0.3 }); } !}
+
+Soldiers, engineers and money arrive at once. The Valencian government is blamed for its silence that afternoon.
+
+@dana_support
+title: A shared failure
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: -0.3, workers: -0.3 }); window.SpainGame.campaign(Q, 'pp', { pensioners: -0.4 }); window.SpainGame.voxFlow(Q, 0.4); } !}
+
+Every administration blames another. Vox blames all of them, and grows.
+
+@blackout
+title: The blackout
+new-page: true
+tags: sp_event
+view-if: blackout_seen = 0 and ((year = 2025 and month >= 4) or year >= 2026)
+max-visits: 1
+on-arrival: {! Q.blackout_seen = 1; if (window.SpainGame) { window.SpainGame.econ(Q, -0.05, 0); } if (Q.psoe_in_government) { Q.sanchez_authority -= 2; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { self_employed: -0.3, professionals: -0.2 }); } } !}
+
+= The blackout
+
+At 12:33 on 28 April 2025 the whole Iberian peninsula goes dark. Trains stop in tunnels, traffic lights fail, people listen to transistor radios in the street. Power returns overnight. The argument over renewables, nuclear and the grid operator lasts for months.
+
+@junts_break
+title: Junts breaks the pact
+new-page: true
+tags: sp_event
+view-if: junts_break_seen = 0 and sanchez_pm = 1 and depends_on_catalans = 1 and ((year = 2025 and month >= 10) or year >= 2026)
+max-visits: 1
+on-arrival: {! Q.junts_break_seen = 1; Q.rel_junts = Math.max(0, (Q.rel_junts || 40) - 35); Q.sanchez_authority -= 4; !}
+
+= Junts breaks the pact
+
+From Waterloo, Carles Puigdemont announces that Junts is breaking with the PSOE: the amnesty has not been applied to him, Catalan is still not official in the European Union, the powers over immigration have not arrived. Junts will vote against every bill and every budget. Your majority is gone; the legislature will go on without budgets.
+
+- @junts_court: Court Junts back with new concessions
+- @junts_alone: Govern by decree and dare them to bring you down
+
+@junts_court
+title: Back to Waterloo
+on-arrival: {! Q.rel_junts += 15; Q.const_line += 0.5; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: -0.4, self_employed: -0.3 }); } !}
+
+Another envoy, another document. Junts listens, and promises nothing.
+
+@junts_alone
+title: Governing alone
+on-arrival: {! Q.sanchismo += 3; Q.budget_timer = 12; !}
+
+Without Junts there will be no budget. You govern with what you have.
+
+@montero_andalusia
+title: Montero goes south
+new-page: true
+tags: sp_event
+view-if: montero_south_seen = 0 and psoe_in_government = 1 and sanchez_leader = 1 and ((year = 2026 and month >= 3) or year >= 2027)
+max-visits: 1
+on-arrival: {! Q.montero_south_seen = 1; Q.regional_leaders_dissent -= 3; !}
+
+= Montero goes south
+
+María Jesús Montero, First Deputy Prime Minister and Minister of Finance, leaves the government to lead the PSOE into the Andalusian election against Juanma Moreno. Seven years of budgets and regional financing leave with her. Carlos Cuerpo and the new Finance team inherit a government without a budget.
+
+@ceuta_crisis
+title: Crisis in Ceuta
+new-page: true
+tags: sp_event
+view-if: ceuta_seen = 0 and ((year = 2026 and month >= 7) or year >= 2027)
+max-visits: 1
+on-arrival: {! Q.ceuta_seen = 1; if (window.SpainGame) { window.SpainGame.migration(Q, 6); } !}
+
+= Crisis in Ceuta
+
+In July 2026 thousands of people, many of them teenagers, swim and climb into Ceuta as the Moroccan border police look away. The army is deployed on the beach of El Tarajal.
+
+- @ceuta_firm: Close the border and send the army
+- @ceuta_rabat: Call Rabat and settle it quietly
+
+@ceuta_firm
+title: The army on the beach
+on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { pensioners: 0.3, self_employed: 0.2 }); window.SpainGame.intl(Q, 'eu', -1); } Q.progressives_dissent += 3; Q.rel_up -= 4; !}
+
+The images are hard, and the border holds.
+
+@ceuta_rabat
+title: The Rabat channel
+on-arrival: {! if (window.SpainGame) { window.SpainGame.voxFlow(Q, 0.5); } Q.rel_up += 2; !}
+
+Morocco closes the border again within days. Vox calls it submission.
+
+@dissolution_2026
+title: The last autumn of the legislature
+new-page: true
+tags: sp_event
+view-if: diss26_seen = 0 and sanchez_pm = 1 and election_year = 0 and year = 2026 and month >= 10
+max-visits: 1
+on-arrival: diss26_seen = 1
+
+= The last autumn of the legislature
+
+Without budgets since 2023, without Junts, with your Secretary of Organisation in court, the legislature is exhausted. The Constitution gives you until the summer of 2027.
+
+- @diss_now: Dissolve the Cortes: a general election on 29 November
+- @diss_wait: Hold on into 2027
+
+@diss_now
+title: Dissolution
+on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); } Q.election_month = 11; Q.member_morale += 3; !}
+
+The decree appears in the Boletín Oficial del Estado the next morning. The campaign begins.
+
+@diss_wait
+title: Holding on
+on-arrival: {! Q.sanchez_authority -= 3; !}
+
+You will govern until the last possible day.

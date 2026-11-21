@@ -15,7 +15,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
     Q.loss_text = window.SpainGame.lossReason(Q);
 }
 Q.is_lost = Q.loss_text ? 1 : 0;
-Q.reached_end = (Q.year > 2023) ? 1 : 0;
+Q.reached_end = (Q.year > 2026) ? 1 : 0;
 Q.acting = Q.government_status == 'acting' ? 1 : 0;
 Q.has_event = 0;
 var scene = this.game.scenes['post_event.events_choice'];

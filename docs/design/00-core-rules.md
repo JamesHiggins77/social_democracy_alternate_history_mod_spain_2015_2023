@@ -647,3 +647,18 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
 - **Attack lines:** each rival's attack line is shown in the PSOE panel.
 - **Vox's ceiling rises** under a hard-left PSOE government, a grand coalition, a long Catalan crisis, an ultraprogressive social line, European integration or plurinational federalism.
 - **Realignment:** if Cs outpolls the PP for 24 months, or Vox polls 20%+ and above the PP for 18 months, a third of the PP's remaining voters follow the new leader of the right. With Vox dominant, its ceiling is 42.
+
+### 7.33 Extended to December 2026
+
+- **End date:** the game now ends in December 2026 (title: Spain 2015–2026).
+- **Data:** the economic tables are extended with 2024–26 figures. A European election is held in June 2024.
+- **Goal:** the time Sánchez spends as Prime Minister is tracked (`pm_months`). The end screen compares it with the real record of about 8.5 years (102 months, June 2018 to December 2026).
+- **New events, 2024–26:**
+  - the Begoña Gómez and David Sánchez cases (five days of reflection);
+  - the Koldo case (Ábalos, and Cerdán in 2025; removes them from your team);
+  - the DANA floods (October 2024);
+  - the April 2025 blackout;
+  - Junts breaking the pact (October 2025);
+  - Montero leaving for Andalusia (March 2026);
+  - the Ceuta crisis (July 2026);
+  - the choice to dissolve the Cortes in October 2026 for an election on 29 November.

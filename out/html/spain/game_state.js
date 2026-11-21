@@ -41,24 +41,26 @@
 
   // General government deficit and debt (% of GDP), Eurostat/Bank of Spain
   // figures by year. The game adds the player's policy adjustments on top.
+  // Pedro Sánchez's real time in office: June 2018 to December 2026.
+  var REAL_PM_MONTHS = 102;
   var DEFICIT_BY_YEAR = { 2015: 5.2, 2016: 4.3, 2017: 3.0, 2018: 2.5, 2019: 3.1, 2020: 10.1,
-                          2021: 6.7, 2022: 4.7, 2023: 3.5 };
+                          2021: 6.7, 2022: 4.7, 2023: 3.5, 2024: 3.2, 2025: 2.6, 2026: 2.3 };
   var DEBT_BY_YEAR = { 2015: 103.3, 2016: 102.7, 2017: 101.8, 2018: 100.4, 2019: 98.2, 2020: 120.3,
-                       2021: 116.8, 2022: 111.6, 2023: 107.7 };
+                       2021: 116.8, 2022: 111.6, 2023: 107.7, 2024: 101.8, 2025: 101.0, 2026: 100.2 };
   function yearValue(table, year) {
-    return table[Math.max(2015, Math.min(2023, year))];
+    return table[Math.max(2015, Math.min(2026, year))];
   }
   // Unemployment (EPA annual average, %) and real GDP growth (INE, %).
   var UNEMP_BY_YEAR = { 2014: 24.4, 2015: 22.1, 2016: 19.6, 2017: 17.2, 2018: 15.3, 2019: 14.1,
-                        2020: 15.5, 2021: 14.8, 2022: 12.9, 2023: 12.2 };
+                        2020: 15.5, 2021: 14.8, 2022: 12.9, 2023: 12.2, 2024: 11.3, 2025: 10.5, 2026: 10.0 };
   var GROWTH_BY_YEAR = { 2014: 1.4, 2015: 3.8, 2016: 3.0, 2017: 3.0, 2018: 2.3, 2019: 2.0,
-                         2020: -11.2, 2021: 6.4, 2022: 5.8, 2023: 2.5 };
+                         2020: -11.2, 2021: 6.4, 2022: 5.8, 2023: 2.5, 2024: 3.5, 2025: 2.9, 2026: 2.2 };
   // Background migration pressure by year (arrivals by sea: 2018 peak on the
   // Strait, 2020-21 Canaries route), on the chaos scale.
   var MIGRATION_BY_YEAR = { 2014: 1, 2015: 2, 2016: 2, 2017: 4, 2018: 8, 2019: 4, 2020: 6, 2021: 8,
-                            2022: 3, 2023: 5 };
+                            2022: 3, 2023: 5, 2024: 7, 2025: 4, 2026: 4 };
   function yearOf(table, year) {
-    return table[Math.max(2014, Math.min(2023, year))];
+    return table[Math.max(2014, Math.min(2026, year))];
   }
 
   var cachedBase = null;
@@ -479,6 +481,8 @@
     Q.player_is_ps = Q.player_party === 'ps' ? 1 : 0;
     Q.sanchez_active = (Q.sanchez_leader || Q.exiled) ? 1 : 0;
     Q.sanchez_pm = Q.pm === 'Pedro Sánchez' && !Q.acting ? 1 : 0;
+    Q.pm_years_text = ((Q.pm_months || 0) / 12).toFixed(1);
+    Q.beat_history = (Q.pm_months || 0) >= REAL_PM_MONTHS ? 1 : 0;
     Q.player_in_government = (!Q.acting && (Q.govt_parties || []).indexOf(Q.player_party) !== -1) ? 1 : 0;
     Q.populism = clamp(Q.populism || 0, 0, 10);
     Q.style_word = UI.word('style', Q.populism);
@@ -2155,6 +2159,7 @@
     positionDrift(Q);
     lineDrift(Q);
     rightRealignment(Q);
+    if (Q.pm === 'Pedro Sánchez') { Q.pm_months = (Q.pm_months || 0) + 1; }
     incumbencyWear(Q);
     moodShocks(Q);
     monthlyWorld(Q);
@@ -2218,7 +2223,7 @@
       }
     });
     Q.regional_elections_due = due;
-    if (Q.year === 2019 && Q.month === 5 && Q.ep_held !== 2019) {
+    if (((Q.year === 2019 && Q.month === 5) || (Q.year === 2024 && Q.month === 6)) && Q.ep_held !== Q.year) {
       europeanElection(Q);
     }
     Q.has_regional_elections = due.length > 0 ? 1 : 0;

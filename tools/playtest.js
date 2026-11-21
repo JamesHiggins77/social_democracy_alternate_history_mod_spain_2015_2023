@@ -79,7 +79,7 @@ async function playOne(game) {
     if (q.grand_coalition && !grand) {
       grand = q.year + '-' + String(q.month).padStart(2, '0');
     }
-    if (q.year > 2023) { break; }
+    if (q.year > 2026) { break; }
     const scene = e.getCurrentScene();
     if (scene.isHand) {
       const hand = e.state.currentHands[e.state.sceneId] || [];
