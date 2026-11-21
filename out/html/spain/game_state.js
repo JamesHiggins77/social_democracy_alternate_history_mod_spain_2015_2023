@@ -1825,7 +1825,11 @@
   function representation(Q) {
     var me = Q.player_party || 'psoe';
     if (!Q.senate_elected) {
-      Q.senate_elected = senateElected(DATA.elections['2011'].provinces);
+      // the real 2011 result (Ministry of the Interior): PP 136, PSOE 48,
+      // CiU 9, Entesa (PSC-ICV-EUiA) 7, PNV 4, Amaiur 3, CC 1. The model's
+      // limited-vote rule gets close (PP 138, PSOE 53, CiU 10) but misses
+      // the Entesa split and Canarias. Entesa counted as PSC 6 + ICV 1.
+      Q.senate_elected = { pp: 136, psoe: 54, iu: 1, junts: 9, pnv: 4, bildu: 3, cc: 1 };
     }
     var appointed = senateAppointed(Q);
     var senate = {};
