@@ -662,3 +662,16 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
   - Montero leaving for Andalusia (March 2026);
   - the Ceuta crisis (July 2026);
   - the choice to dissolve the Cortes in October 2026 for an election on 29 November.
+
+### 7.34 Fixes
+
+- **Dark arts:** meddling in Podemos no longer throws a script error (an internal call used the exported name `transferRaw`).
+- **Vox-led governments:** if Vox outseats the PP, a right-wing government is led by Santiago Abascal (Vox–PP coalition or Vox majority), which ends the game for the left. Previously such runs showed a "PP minority government" with a small PP.
+- **Vox growth toned down:**
+  - The extra room from the new drivers is capped at 8 points.
+  - A long Catalan crisis only counts after 24 months.
+  - The line-driven flows to Vox are halved.
+  - Vox realignment needs Vox at 22% or more and over 3 points ahead of the PP for 24 months.
+  - A realignment moves a quarter of the PP's voters, not a third.
+  - In random playtests, Vox averages about 21%, the same as before these features.
+- **Other leadership contests are harder:** strong barons and an active plot now count against Sánchez, and the pass mark rises from 38 to 50. With a typical party state he wins about 70% of the time, with a weak one almost never, and with a strong one always.

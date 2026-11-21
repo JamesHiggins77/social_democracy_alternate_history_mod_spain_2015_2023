@@ -470,7 +470,7 @@
     Q.pm_is_pp = Q.pm_party === 'pp' ? 1 : 0;
     Q.right_candidate = (Q.congress.cs || 0) > (Q.congress.pp || 0) ? 'cs' : 'pp';
     Q.right_is_cs = Q.right_candidate === 'cs' ? 1 : 0;
-    Q.right_leader = Q.right_candidate === 'cs' ? leaderOf(Q, 'cs') : (Q.pp_leader || 'Mariano Rajoy');
+    Q.right_leader = Q.right_candidate === 'cs' ? leaderOf(Q, 'cs') : ((Q.congress.vox || 0) > (Q.congress.pp || 0) ? 'Santiago Abascal' : (Q.pp_leader || 'Mariano Rajoy'));
     Q.pp_leader_short = surname(Q.pp_leader || 'Mariano Rajoy');
     Q.player_party = Q.player_party || 'psoe';
     Q.my_party = Q.player_party === 'psoe' ? 'the PSOE' : UI.partyName(Q.player_party);
@@ -821,7 +821,7 @@
       if (exposed) { Q.sanchez_authority -= 15; Q.sanchismo -= 10; Q.member_morale -= 10; Q.federal_committee_balance -= 8; campaign(Q, 'psoe', all(-0.8)); }
     } else if (act === 'meddle') {
       if (target === 'pp') { campaign(Q, 'pp', all(-0.5)); Q.pp_pressure = (Q.pp_pressure || 0) + 1; }
-      if (target === 'up') { transferRaw(Q, 'up', { mp: 0.4, psoe: 0.6 }, all(0.4)); }
+      if (target === 'up') { transfer(Q, 'up', { mp: 0.4, psoe: 0.6 }, all(0.4)); }
       if (target === 'cs') { campaign(Q, 'cs', all(-0.5)); }
       if (exposed) { Q['rel_' + target] = (Q['rel_' + target] || 40) - 20; Q.sanchez_authority -= 10; campaign(Q, 'psoe', all(-0.6)); }
     } else if (act === 'sabotage') {
@@ -964,7 +964,7 @@
     var e = Q.econ_left || 0, so = Q.social_prog || 0, c = Q.const_line_eff || 0, u = Q.eu_line_eff || 0;
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
     // Vox gains most from Anti-Capitalist, Progressive, European Integration, Plurinational Federalist
-    var v = Math.max(0, e - 6) * 0.08 + Math.max(0, so - 3) * 0.05 + Math.max(0, u - 3) * 0.12 + Math.max(0, c - 3) * 0.18;
+    var v = Math.max(0, e - 6) * 0.04 + Math.max(0, so - 3) * 0.025 + Math.max(0, u - 3) * 0.06 + Math.max(0, c - 3) * 0.09;
     if (v > 0 && voxOn(Q)) { voxFlow(Q, v * voxRoom(Q)); }
     // Podemos gains most from Neoliberal, Centralist Unionist and socially moderate positions
     var p = Math.max(0, -3 - e) * 0.15 + Math.max(0, -3 - c) * 0.15 + Math.max(0, -so) * 0.08;
@@ -986,15 +986,15 @@
     var t = Q.true_poll || {};
     var pp = t.pp || 0, cs = t.cs || 0, vox = t.vox || 0;
     Q.cs_lead_months = cs > pp ? (Q.cs_lead_months || 0) + 1 : Math.max(0, (Q.cs_lead_months || 0) - 2);
-    Q.vox_lead_months = vox > pp && vox >= 20 ? (Q.vox_lead_months || 0) + 1 : Math.max(0, (Q.vox_lead_months || 0) - 2);
-    var who = Q.cs_lead_months >= 24 ? 'cs' : (Q.vox_lead_months >= 18 ? 'vox' : '');
+    Q.vox_lead_months = vox > pp + 3 && vox >= 22 ? (Q.vox_lead_months || 0) + 1 : Math.max(0, (Q.vox_lead_months || 0) - 2);
+    var who = Q.cs_lead_months >= 24 ? 'cs' : (Q.vox_lead_months >= 24 ? 'vox' : '');
     if (!who) { return; }
     Q.right_dominant = who;
     Q.realign_due = 1;
     Q.realign_name = UI.partyName(who); Q.realign_cs = who === 'cs' ? 1 : 0;
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
     // a third of the PP's remaining voters follow the new leader of the right
-    transfer(Q, 'pp', who === 'cs' ? { cs: 0.85, vox: 0.15 } : { vox: 0.8, cs: 0.2 }, share(Q, 'pp', 0.35));
+    transfer(Q, 'pp', who === 'cs' ? { cs: 0.85, vox: 0.15 } : { vox: 0.8, cs: 0.2 }, share(Q, 'pp', 0.25));
     recalculate(Q);
   }
 
@@ -1338,9 +1338,9 @@
     if (Q.right_dominant === 'vox') { return 42; }
     var leftGov = Q.psoe_in_government && !Q.acting && !Q.grand_coalition;
     var c = Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING;
-    c += (leftGov && (Q.econ_left || 0) > 6 ? 5 : 0) + Math.min(5, (Q.cat_crisis_months || 0) / 8) +
-      (leftGov && (Q.social_prog || 0) > 5 ? 3 : 0) + ((Q.eu_line_eff || 0) >= 3 ? 2.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 3 : 0);
-    return c;
+    var extra = (leftGov && (Q.econ_left || 0) > 6 ? 3 : 0) + Math.min(3, Math.max(0, (Q.cat_crisis_months || 0) - 24) / 12) +
+      (leftGov && (Q.social_prog || 0) > 5 ? 2 : 0) + ((Q.eu_line_eff || 0) >= 3 ? 1.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 2 : 0);
+    return c + Math.min(8, extra);
   }
   function voxRoom(Q) {
     var now = (Q.true_poll && Q.true_poll.vox) || 0;
@@ -1381,9 +1381,9 @@
       (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0));
     var hardLeft = leftGov && (Q.econ_left || 0) > 6 ? 0.8 : 0;
     var grand = Q.grand_coalition && !Q.acting ? 1 : 0;
-    var longCrisis = Math.min(1.2, (Q.cat_crisis_months || 0) / 20);
-    var lines = ((Q.eu_line_eff || 0) >= 3 ? 0.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 0.7 : 0);
-    return catalan + separatists + dialogue + progressive + migration + hardLeft + grand + longCrisis + lines;
+    var longCrisis = Math.min(0.8, Math.max(0, (Q.cat_crisis_months || 0) - 24) / 30);
+    var lines = ((Q.eu_line_eff || 0) >= 3 ? 0.3 : 0) + ((Q.const_line_eff || 0) >= 3 ? 0.4 : 0);
+    return catalan + separatists + dialogue + progressive + migration + 0.6 * (hardLeft + grand) + longCrisis + lines;
   }
 
   // Vox fills Vistalegre (October 2018). The surge feeds on the Catalan
@@ -2427,7 +2427,15 @@
       var csJoins = (Q.player_party === 'cs' && Q.player_line_right === 'coalition') ||
         (Q.pact_pp_cs && Parliament.between(Q, 'cs', 'pp') >= 65);
       Q.cs_supports_pp = Q.pact_pp_cs && !csJoins ? 1 : 0;
-      if (csJoins && cs >= 20) {
+      if (vox > (Q.congress.pp || 0)) {
+        // Vox is the larger party of the right: Abascal leads the government
+        Q.pm = 'Santiago Abascal';
+        Q.pm_party = 'vox';
+        Q.govt_parties = (Q.congress.vox || 0) >= 176 ? ['vox'] : ['vox', 'pp'];
+        Q.government_type = Q.govt_parties.length > 1 ? 'Vox–PP coalition government' : 'Vox majority government';
+        Q.loss_reason = 'Vox leads a government of the right with a majority in Congress. ' +
+          'There is no route back to government for the left before the end of the period.';
+      } else if (csJoins && cs >= 20) {
         Q.govt_parties = ['pp', 'cs'];
         Q.government_type = 'PP–Ciudadanos coalition government';
       } else if (vox >= 15 && (Q.pp_vox_relation || 50) >= 60 && (Q.congress.pp || 0) + cs < 176) {
@@ -3501,11 +3509,13 @@
 
   function leadershipElection(Q, bonus) {
     var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) + (Q.rig_bonus || 0) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
-      (bonus || 0) + 6 * gaussian();
+      (bonus || 0) + 6 * gaussian() -
+      // the apparatus: strong barons and an active plot work for the other candidate
+      0.3 * Math.max(0, (Q.regional_leaders_strength || 30) - 15) - 0.08 * (Q.plot || 0);
     Q.primary_score = Math.round(score);
-    var won = score >= 38 ? 1 : 0;
+    var won = score >= 50 ? 1 : 0;
     Q.primary_won = won;
-    if (won) { Q.mandate_renewed = 1; leadershipBounce(Q, clamp(40 + (score - 38) * 0.8, 40, 75)); }
+    if (won) { Q.mandate_renewed = 1; leadershipBounce(Q, clamp(40 + (score - 50) * 0.8, 40, 75)); }
     if (won) {
       Q.sanchez_leader = 1;
       if (Q.pm_party === 'psoe' && !Q.acting) { Q.pm = 'Pedro Sánchez'; }
