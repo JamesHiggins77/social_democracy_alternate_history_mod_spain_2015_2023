@@ -1077,7 +1077,11 @@
       ((Q.congress.psoe || 0) < 100 && !Q.psoe_in_government && Q.elections_held >= 1 ? 1.5 : 0);
     // a Prime Minister holds the patronage of the State (ministries, the
     // BOE, the lists): plots grow slowly and fade fast
-    if (Q.sanchez_pm) { d = (d > 0 ? 0.4 * d : d) - 1; }
+    // ...unless the government rests on the independence parties as well as
+    // the left: then the barons have a cause the party can rally to
+    if (Q.sanchez_pm) {
+      d = Q.depends_on_catalans ? (d > 0 ? 0.75 * d : d) + 0.6 : (d > 0 ? 0.4 * d : d) - 1;
+    }
     Q.plot = clamp((Q.plot || 0) * 0.98 + d, 0, 100);
   }
 
@@ -1166,7 +1170,7 @@
     var attack = coupAttack(Q);
     // against a sitting Prime Minister the plotters are weaker: the
     // ministers, the group and most members stand with the government
-    var pmBonus = Q.sanchez_pm ? 20 : 0;
+    var pmBonus = Q.sanchez_pm ? (Q.depends_on_catalans ? 8 : 20) : 0;
     if (defend === 'resign') {
       oust(Q, false);
       Q.coup_survived = 0;
@@ -1178,7 +1182,7 @@
       if (Q.bluff_called) { callElection(Q); Q.sanchez_authority -= 4; }
       else { Q.sanchez_authority -= 3; Q.regional_leaders_dissent += 4; }
     } else if (defend === 'members') {
-      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? 8 : 0));
+      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? (Q.depends_on_catalans ? 4 : 8) : 0));
     } else {
       var defence = coupDefence(Q) + pmBonus + 16 * (Math.random() - 0.5);
       Q.coup_survived = defence >= attack ? 1 : 0;
@@ -3054,7 +3058,7 @@
     }
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
     Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
-    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= (Q.sanchez_pm ? 75 : 60) && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= (Q.sanchez_pm ? (Q.depends_on_catalans ? 66 : 75) : 60) && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
     Q.coup_vs_pm = Q.coup_due && Q.sanchez_pm ? 1 : (Q.coup_vs_pm && Q.rebellion_used ? Q.coup_vs_pm : 0);
     // a caretaker committee hands over to an elected leader after eight months
     if (!Q.sanchez_leader && Q.psoe_interim && Q.time - (Q.interim_since || Q.time) >= 8) {

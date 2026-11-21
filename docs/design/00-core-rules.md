@@ -727,3 +727,11 @@ Every election result now has a poll-of-polls chart above the poll-change table.
   - European: May 2019, June 2024;
   - regional: the next region due;
   - municipal: May 2019, 2023, 2027.
+
+**Dependence on the independence parties (7.39 addendum):** a Prime Minister who relies on the left alone is well protected. One whose majority also needs ERC and Junts gives the barons a cause the party can rally to. In that case:
+- the plot keeps 75% of its growth and gains 0.6 a month, instead of 40% growth and fading by 1;
+- the coup threshold is 66, not 75;
+- the Federal Committee bonus is +8, not +20;
+- the primary bonus is +4, not +8.
+
+Over a year from a plot of 40, the plot ends near 55 in opposition, near 30 for a PM relying on the left only, and near 55 for a PM relying on the left and the independence parties.

@@ -1122,3 +1122,14 @@ test('cabinet: only a Deputy PM holds two posts; 2016 names fit the year', () =>
     if (y === 2016 && parties[0] === 'psoe') { assert.notStrictEqual(Q.cabinet.finance.name, 'María Jesús Montero'); }
   }
 });
+
+test('a PM relying on the independence parties is easier to plot against than one relying on the left alone', () => {
+  const run = (pm, cat) => {
+    const Q = newQ(); Q.year = 2020; Q.sanchez_leader = 1; Q.plot = 40;
+    Q.federal_committee_balance = 40; Q.dissent_percent = 35;
+    for (let i = 0; i < 12; i++) { Q.sanchez_pm = pm; Q.depends_on_catalans = cat; G.plotDrift(Q); }
+    return Q.plot;
+  };
+  assert.ok(run(1, 0) < run(1, 1));
+  assert.ok(run(1, 1) <= run(0, 0) + 15);
+});
