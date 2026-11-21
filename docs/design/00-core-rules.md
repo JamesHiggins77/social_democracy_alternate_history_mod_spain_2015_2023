@@ -675,3 +675,15 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
   - A realignment moves a quarter of the PP's voters, not a third.
   - In random playtests, Vox averages about 21%, the same as before these features.
 - **Other leadership contests are harder:** strong barons and an active plot now count against Sánchez, and the pass mark rises from 38 to 50. With a typical party state he wins about 70% of the time, with a weak one almost never, and with a strong one always.
+
+### 7.35 How the polls moved
+
+- **What the results show:** a table with each party's or candidate's share at the start point, the final poll, the poll change and the result. It appears on:
+  - general elections (from the last general election's result);
+  - European elections (from the last European result; 2014 shares are built in);
+  - municipal elections (national polls since the last municipal elections);
+  - the 2017 endorsements and primary vote (from the poll at the start of the race).
+- **Not covered:**
+  - The 2014 opening primary is still to do: its poll figures need checking first.
+  - Regional elections have no regional polls in the model.
+  - The non-primary leadership contests have no polls.

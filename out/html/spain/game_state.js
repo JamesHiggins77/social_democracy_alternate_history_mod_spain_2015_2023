@@ -397,6 +397,8 @@
       seats[p] = Math.round(LOCAL_COUNCILLORS * (1 - LOCAL_INDEPENDENTS) * raw[p] / sum);
     });
     seats.ind = Math.round(LOCAL_COUNCILLORS * LOCAL_INDEPENDENTS);
+    Q.local_prev_poll = Q.local_final_poll || null;
+    Q.local_final_poll = JSON.parse(JSON.stringify(Q.poll || poll));
     Q.local_shares = JSON.parse(JSON.stringify(poll));
     if (Q.local_shares.vox) { Q.local_shares.vox *= (Q.year >= 2023 ? 0.15 : 0.05) / 0.55; }
     var prev = Q.local_seats || null;
@@ -1776,10 +1778,14 @@
 
   // European Parliament: one national constituency, D'Hondt, no threshold.
   // 54 seats from 2014, 59 after Brexit (February 2020).
+  // 2014 European election vote shares (Ministry of the Interior)
+  var EP_2014_SHARES = { pp: 26.1, psoe: 23.0, iu: 10.0, up: 8.0, upyd: 6.5, junts: 5.4, erc: 4.0, cs: 3.2, bildu: 2.1, compromis: 1.9 };
   var EP_2014 = { pp: 16, psoe: 14, iu: 6, up: 5, upyd: 4, junts: 2, pnv: 1, erc: 2, cs: 2, bildu: 1, compromis: 1 };
 
   function europeanElection(Q) {
     var shares = JSON.parse(JSON.stringify(Q.true_poll || {}));
+    Q.ep_prev_shares = Q.ep_shares || EP_2014_SHARES;
+    Q.ep_final_poll = JSON.parse(JSON.stringify(Q.poll || {}));
     Q.ep_shares = shares;
     Q.ep_prev = Q.ep_seats;
     Q.ep_seats = dhondtSeats(shares, Q.year * 100 + Q.month >= 202002 ? 59 : 54);
@@ -3227,6 +3233,7 @@
       p[c] = Math.max(1, v); sum += p[c];
     });
     var rows = Object.keys(p).map(function (c) { return [c, Math.round(1000 * p[c] / sum) / 10]; }).sort(function (a, b) { return b[1] - a[1]; });
+    Q['ppoll_raw_' + stage] = {}; rows.forEach(function (r) { Q['ppoll_raw_' + stage][r[0]] = r[1]; });
     Q['ppoll_' + stage] = rows.map(function (r) { return CANDIDATES[r[0]][0] + ' ' + r[1].toFixed(1) + '%'; }).join(', ');
     return rows;
   }
@@ -4340,6 +4347,59 @@
       : '<p><strong>The polls</strong> were close this time.</p>';
   }
 
+
+  // How the polls moved between two points (the last election, or the start
+  // of a race) and the final poll, beside the result.
+  // rows: [{ name, colour, start, end, result }]
+  function pollChangeTable(rows, startLabel, title) {
+    var f = function (x) { return x === undefined || x === null ? '–' : x.toFixed(1) + '%'; };
+    var d = function (a, b) {
+      if (a === undefined || a === null || b === undefined || b === null) { return '–'; }
+      var x = b - a, c = Math.abs(x) < 0.05 ? '' : (x > 0 ? ' style="color:#1a7f37"' : ' style="color:#b42318"');
+      return '<span' + c + '>' + (x > 0 ? '+' : '') + x.toFixed(1) + '</span>';
+    };
+    return '<p><strong>' + title + '</strong></p><table class="sp-results"><thead><tr><th>' + 'Party' + '</th><th class="sp-num">' + startLabel +
+      '</th><th class="sp-num">Final poll</th><th class="sp-num">Poll change</th><th class="sp-num">Result</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td><span class="sp-swatch" style="background:' + r.colour + '"></span>' + r.name + '</td><td class="sp-num">' + f(r.start) +
+          '</td><td class="sp-num">' + f(r.end) + '</td><td class="sp-num">' + d(r.start, r.end) + '</td><td class="sp-num"><b>' + f(r.result) + '</b></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+  function partyRows(start, end, result, min) {
+    var ids = {};
+    [start, end, result].forEach(function (o) { Object.keys(o || {}).forEach(function (k) { if (!/^x:/.test(k)) { ids[k] = 1; } }); });
+    return Object.keys(ids).filter(function (k) { return Math.max((start || {})[k] || 0, (end || {})[k] || 0, (result || {})[k] || 0) >= (min || 1); })
+      .sort(function (a, b) { return ((result || end)[b] || 0) - ((result || end)[a] || 0); })
+      .map(function (k) { return { name: UI.shortName(k), colour: UI.partyColor(k), start: start ? start[k] : null, end: end ? end[k] : null, result: result ? result[k] : null }; });
+  }
+  function renderPollChange(Q, id, kind) {
+    var out = el(id);
+    if (!out) { return; }
+    if (kind === 'general') {
+      var start = Q.prev_vote_shares;
+      if (!start) {
+        start = {};
+        var b = DATA.elections['2011'].provinces, tot = 0;
+        Object.keys(b).forEach(function (pr) { b[pr].lists.forEach(function (l) { var id2 = Array.isArray(l) ? l[0] : l.id, v = Array.isArray(l) ? l[2] : l.votes; start[id2] = (start[id2] || 0) + v; tot += v; }); });
+        Object.keys(start).forEach(function (k) { start[k] = 100 * start[k] / tot; });
+      }
+      out.innerHTML = pollChangeTable(partyRows(start, Q.prev_poll, Q.vote_shares, 1), 'Last election', 'How the polls moved since the last general election');
+    } else if (kind === 'european') {
+      out.innerHTML = pollChangeTable(partyRows(Q.ep_prev_shares || null, Q.ep_final_poll, Q.ep_shares, 1), 'Last European election', 'How the national polls moved since the last European election');
+    } else if (kind === 'local') {
+      out.innerHTML = pollChangeTable(partyRows(Q.local_prev_poll || null, Q.local_final_poll, null, 1), 'Last municipal election', 'How the national polls moved since the last municipal elections');
+    } else if (kind === 'primary' || kind === 'endorsements') {
+      var s0 = Q.ppoll_raw_signatures || {}, s1 = kind === 'primary' ? (Q.ppoll_raw_vote || {}) : {};
+      var res = {};
+      (kind === 'primary' ? Q.pv_rows : Q.av_rows || []).forEach(function (r) { res[r.id] = r.share; });
+      var ids = Object.keys(Object.assign({}, s0, s1, res));
+      out.innerHTML = pollChangeTable(ids.map(function (c) {
+        return { name: CANDIDATES[c][0], colour: CANDIDATES[c][2], start: s0[c], end: s1[c], result: res[c] };
+      }).sort(function (a, b) { return (b.result || 0) - (a.result || 0); }), 'Start of the race',
+        kind === 'primary' ? 'How the polls moved during the race' : 'The first poll against the endorsements');
+    }
+  }
+
   function renderRegionalResults(Q, id) {
     var out = el(id);
     if (!out) {
@@ -4457,7 +4517,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

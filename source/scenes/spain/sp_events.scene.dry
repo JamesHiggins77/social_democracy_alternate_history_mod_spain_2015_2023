@@ -233,6 +233,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.renderMap(Q, 'sp-election-map');
     window.SpainGame.renderPollMiss(Q, 'sp-election-pollmiss');
     window.SpainGame.renderSenate(Q, 'sp-election-senate');
+    window.SpainGame.renderPollChange(Q, 'sp-election-pollchange', 'general');
 }
 !}
 
@@ -245,6 +246,8 @@ Vote share, seats and seat share, with the change since the previous election.
 [+ election_verdict +]
 
 {!<div id="sp-election-arrangements"></div>!}
+
+{!<div id="sp-election-pollchange"></div>!}
 
 {!<div id="sp-election-pollmiss"></div>!}
 
@@ -345,7 +348,7 @@ if (Q.primary_won) {
 }
 !}
 on-display: {!
-if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderPrimary(Q, 'sp-primary-result'); }
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderPrimary(Q, 'sp-primary-result'); window.SpainGame.renderPollChange(Q, 'sp-primary-pollchange', 'primary'); }
 !}
 
 = 21 May 2017: the primary
@@ -355,6 +358,8 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 Nearly 150,000 members vote.
 
 {!<div id="sp-primary-result"></div>!}
+
+{!<div id="sp-primary-pollchange"></div>!}
 
 [? if primary_won = 1 : Against the regional barons, the elders and the apparatus, Pedro Sánchez is Secretary-General again. The people who removed you spent months running the party; now they must work for you. ?][? if primary_won = 0 : [? if lopez_won = 1 : Patxi López is the new Secretary-General. [? if lopez_gives_post = 1 : As agreed, he keeps the "no es no" line and makes you part of his Executive. ?][? if lopez_gives_post = 0 : He thanks you for your support. Your followers wonder whether it should have been you. ?] ?][? if lopez_won = 0 : The members choose [+ pv_winner_name +]. [? if sanchez_backs_lopez = 0 : Your comeback is over, for now. ?] ?] ?]
 
@@ -1661,7 +1666,7 @@ view-if: leadership_exception_open = 1 and diaz_entered = 1 and endorsements_don
 max-visits: 1
 on-arrival: {! if (window.SpainGame) { window.SpainGame.primaryEndorsements(Q); window.SpainGame.primaryPoll(Q, 'vote'); } else { Q.endorsements_done = 1; } !}
 on-display: {!
-if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderEndorsements(Q, 'sp-avales'); }
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderEndorsements(Q, 'sp-avales'); window.SpainGame.renderPollChange(Q, 'sp-avales-pollchange', 'endorsements'); }
 !}
 
 = The endorsements
@@ -1669,6 +1674,8 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 From 20 April to 4 May the candidates collect the signed endorsements of the members: each needs 5% of the membership to stand. The federations' apparatus is good at this, and it shows.
 
 {!<div id="sp-avales"></div>!}
+
+{!<div id="sp-avales-pollchange"></div>!}
 
 [+ av_leader +] wins the endorsements. [? if tapias_out = 1 : José Antonio Pérez Tapias falls short and is off the ballot. ?] Endorsements are not votes: in the secrecy of the ballot box, members can sign for one candidate and vote for another.
 
@@ -1848,7 +1855,7 @@ tags: sp_event
 view-if: local_due = 1
 on-arrival: local_due = 0
 on-display: {!
-if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderLocal(Q, 'sp-local-result'); window.SpainGame.renderLocalMap(Q, 'sp-local-map'); }
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderLocal(Q, 'sp-local-result'); window.SpainGame.renderLocalMap(Q, 'sp-local-map'); window.SpainGame.renderPollChange(Q, 'sp-local-pollchange', 'local'); }
 !}
 
 = May [+ local_year +]: municipal elections
@@ -1858,6 +1865,8 @@ Spain elects its town and city councils. [+ local_winner +] wins the most counci
 {!<div id="sp-local-result"></div>!}
 
 {!<div id="sp-local-map"></div>!}
+
+{!<div id="sp-local-pollchange"></div>!}
 
 [? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it loses [+ local_psoe_change +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]
 
