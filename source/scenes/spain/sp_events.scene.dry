@@ -1873,17 +1873,17 @@ Spain elects its town and city councils. [+ local_winner +] wins the most counci
 [? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it loses [+ local_psoe_change +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]
 
 @realignment
-title: The realignment of the right
+title: A realignment
 new-page: true
 tags: sp_event
 view-if: realign_due = 1
 on-arrival: realign_due = 0
 
-= The realignment of the right
+= [+ realign_name +] overtakes [+ realign_old +]
 
-[? if realign_cs = 1 : For two years Ciudadanos has polled ahead of the PP. Now the PP's own voters, its donors and half its mayors follow: Albert Rivera is the leader of the Spanish centre-right, and Génova is a party of the past. ?][? if realign_cs = 0 : Vox has outpolled the PP for a year and a half. The PP's voters stop pretending: Santiago Abascal is now the leader of the Spanish right, and the PP is reduced to its old provincial strongholds. ?]
+[? if realign_right = 1 : For two years [+ realign_name +] has polled ahead of [+ realign_old +]. Donors, mayors and commentators start to treat it as the main party of the Spanish right. [+ realign_old +] does not collapse overnight, but from now on its voters drift away month after month. ?][? if realign_psoe_lost = 1 : The sorpasso has happened, and it has lasted: [+ realign_name +] has polled ahead of the PSOE for two years. For the first time since 1977 the PSOE is not the main party of the Spanish left, and every month more of its voters follow the new leader. ?][? if realign_psoe_back = 1 : The PSOE is back: it has polled ahead of [+ realign_old +] for two years, and the left's voters drift home. ?][? if realign_left_other = 1 : [+ realign_name +] has overtaken [+ realign_old +] for good on the left. ?][? if realign_iu = 1 : Izquierda Unida has polled ahead of Podemos for a year and a half. The old communist-led coalition takes back its place as the main radical left party, and Podemos's voters begin to drift to it. ?][? if realign_up_back = 1 : Podemos has polled ahead of Izquierda Unida for a year and a half, and takes back its place as the main radical left party. ?]
 
-[+ realign_name +] is now the main party of the right.
+[+ realign_name +] is now the leading party of its camp.
 
 @begona_case
 title: Five days of reflection

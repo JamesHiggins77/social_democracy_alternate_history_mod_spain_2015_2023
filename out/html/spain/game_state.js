@@ -990,25 +990,54 @@
     Q.const_line = (Q.const_line || 0) * 0.995;
     if (Q.catalan_crisis) { Q.cat_crisis_months = (Q.cat_crisis_months || 0) + 1; }
   }
-  // Realignment of the right: if Ciudadanos outpolls the PP for two years,
-  // PP voters follow it and it becomes the main party of the right; the
-  // same can happen to Vox if it grows very large.
+  // Realignments: when a challenger polls above the leading party of its
+  // camp for long enough it becomes the camp's main party, and from then on
+  // the old leader bleeds support to it month by month (and a little to the
+  // third party of the camp) rather than all at once.
+  //   right: Cs over the PP for 24 months, or Vox (22%+) over the PP for 24
+  //   left: Podemos or IU over the PSOE for 24 months
+  //   radical left: IU over Podemos for 18 months
+  var REALIGN = [
+    { key: 'right', camp: ['pp', 'cs', 'vox'], months: 24, min: { vox: 22 } },
+    { key: 'left', camp: ['psoe', 'up', 'iu'], months: 24, min: {} },
+    { key: 'radical', camp: ['up', 'iu'], months: 18, min: {} }
+  ];
   function rightRealignment(Q) {
-    if (Q.right_dominant) { return; }
     var t = Q.true_poll || {};
-    var pp = t.pp || 0, cs = t.cs || 0, vox = t.vox || 0;
-    Q.cs_lead_months = cs > pp ? (Q.cs_lead_months || 0) + 1 : Math.max(0, (Q.cs_lead_months || 0) - 2);
-    Q.vox_lead_months = vox > pp + 3 && vox >= 22 ? (Q.vox_lead_months || 0) + 1 : Math.max(0, (Q.vox_lead_months || 0) - 2);
-    var who = Q.cs_lead_months >= 24 ? 'cs' : (Q.vox_lead_months >= 24 ? 'vox' : '');
-    if (!who) { return; }
-    Q.right_dominant = who;
-    Q.realign_due = 1;
-    Q.realign_name = UI.partyName(who); Q.realign_cs = who === 'cs' ? 1 : 0;
-    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
-    // a third of the PP's remaining voters follow the new leader of the right
-    transfer(Q, 'pp', who === 'cs' ? { cs: 0.85, vox: 0.15 } : { vox: 0.8, cs: 0.2 }, share(Q, 'pp', 0.25));
-    recalculate(Q);
+    Q.realign = Q.realign || {};
+    REALIGN.forEach(function (R) {
+      var st = Q.realign[R.key] = Q.realign[R.key] || { leader: R.camp[0], lead: {} };
+      // who is ahead of the current leader, and for how long
+      R.camp.forEach(function (p) {
+        if (p === st.leader) { return; }
+        var ahead = (t[p] || 0) > (t[st.leader] || 0) + (p === 'vox' ? 3 : 0) && (t[p] || 0) >= (R.min[p] || 0);
+        st.lead[p] = ahead ? (st.lead[p] || 0) + 1 : Math.max(0, (st.lead[p] || 0) - 2);
+        if (st.lead[p] >= R.months) {
+          st.old = st.leader; st.leader = p; st.lead = {}; st.bleed = 36;
+          Q.realign_due = 1; Q.realign_kind = R.key;
+          Q.realign_name = UI.partyName(p); Q.realign_old = UI.partyName(st.old);
+          Q.realign_cs = p === 'cs' ? 1 : 0;
+          Q.realign_psoe_lost = R.key === 'left' && st.old === 'psoe' ? 1 : 0;
+          Q.realign_psoe_back = R.key === 'left' && p === 'psoe' ? 1 : 0;
+          Q.realign_right = R.key === 'right' ? 1 : 0;
+          Q.realign_left_other = R.key === 'left' && !Q.realign_psoe_lost && !Q.realign_psoe_back ? 1 : 0;
+          Q.realign_iu = R.key === 'radical' && p === 'iu' ? 1 : 0;
+          Q.realign_up_back = R.key === 'radical' && p === 'up' ? 1 : 0;
+          if (R.key === 'right') { Q.right_dominant = p === 'pp' ? '' : p; }
+          if (R.key === 'left') { Q.left_dominant = p; }
+        }
+      });
+      // the slow bleed: about 1.5% of the old leader's support a month for
+      // up to three years, while it still polls above two thirds of the new one
+      if (st.bleed > 0 && st.old && Q.vm && (t[st.old] || 0) > 0.66 * (t[st.leader] || 0)) {
+        var third = R.camp.filter(function (p) { return p !== st.old && p !== st.leader; })[0];
+        var to = {}; to[st.leader] = third ? 0.8 : 1; if (third) { to[third] = 0.2; }
+        transfer(Q, st.old, to, share(Q, st.old, 0.015));
+        st.bleed -= 1;
+      } else if (st.bleed > 0) { st.bleed -= 1; }
+    });
   }
+
 
   // Monthly cost of the PSOE's position: beyond a threshold, moderates leave.
   var POSITION_THRESHOLD = 3;

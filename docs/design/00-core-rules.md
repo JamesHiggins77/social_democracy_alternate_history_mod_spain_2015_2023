@@ -773,3 +773,12 @@ Opposition-only attacks are now hidden while the PSOE governs: the debate's "que
   - **Cs:** about 5% abstain on PP+Vox votes.
 - **Vote record:** after every law, budget, investiture and no-confidence vote, the result shows which parties voted yes, no or abstained, with rebels marked.
 - **Senate:** if the government's parties lack a Senate majority and a bill passed with fewer than 176 votes, the Senate vetoes it. The law (or a budget's spending) takes effect two months later, when Congress lifts the veto. An event announces it.
+
+### 7.42 Realignments are gradual, on the right and on the left
+
+`rightRealignment` now tracks three contests:
+- **Right:** PP, Cs and Vox. A challenger takes over after 24 months ahead. Vox also needs to poll at least 22% and be more than 3 points ahead.
+- **Left:** PSOE, Podemos and IU. A challenger takes over after 24 months ahead of the leader. Either Podemos or IU can become the main party of the left, and the PSOE can win the position back.
+- **Radical left:** Podemos and IU. A challenger takes over after 18 months ahead.
+
+The switch is no longer a one-off transfer. Each month for up to three years, while the old leader still polls above two thirds of the new one, 1.5% of the old leader's support moves away. 80% goes to the new leader and 20% to the camp's third party, so the PP bleeds to Cs and a little to Vox, or to Vox and a little to Cs. A tested case: the PP falls from 19.7 to 17.2 in a year while Cs rises from 20.7 to 22.3. Each switch fires an event.
