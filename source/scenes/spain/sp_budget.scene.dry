@@ -1,0 +1,235 @@
+title: Budget negotiations
+
+= Budget negotiations
+
+@bud_pnv
+title: Budget talks: PNV
+is-card: true
+tags: sp_budget
+view-if: seats_pnv > 0 and bdeal_pnv = 0
+
+= Budget talks with PNV
+
+PNV has [+ seats_pnv +] seats. Their price for voting yes: Investment in the Basque Country and the transfer of rail commuter services.
+
+- @bud_pnv_yes: Pay the price
+- @root: Refuse
+
+@bud_pnv_yes
+title: Deal with PNV
+on-arrival: {! Q.fiscal_adj -= 0.05; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'pnv'); } !}
+
+= A deal with PNV
+
+PNV will vote for the budget.
+
+@bud_erc
+title: Budget talks: ERC
+is-card: true
+tags: sp_budget
+view-if: seats_erc > 0 and bdeal_erc = 0
+
+= Budget talks with ERC
+
+ERC has [+ seats_erc +] seats. Their price for voting yes: A dialogue table on Catalonia and money for Rodalies trains.
+
+- @bud_erc_yes: Pay the price
+- @root: Refuse
+
+@bud_erc_yes
+title: Deal with ERC
+on-arrival: {! Q.cat_dialogue += 1; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'erc'); } !}
+
+= A deal with ERC
+
+ERC will vote for the budget.
+
+@bud_junts
+title: Budget talks: Junts
+is-card: true
+tags: sp_budget
+view-if: seats_junts > 0 and bdeal_junts = 0
+
+= Budget talks with Junts
+
+Junts has [+ seats_junts +] seats. Their price for voting yes: Powers over immigration and a Catalan quota of spending.
+
+- @bud_junts_yes: Pay the price
+- @root: Refuse
+
+@bud_junts_yes
+title: Deal with Junts
+on-arrival: {! Q.cat_dialogue += 1; Q.sanchez_authority -= 2; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'junts'); } !}
+
+= A deal with Junts
+
+Junts will vote for the budget.
+
+@bud_bildu
+title: Budget talks: EH Bildu
+is-card: true
+tags: sp_budget
+view-if: seats_bildu > 0 and bdeal_bildu = 0
+
+= Budget talks with EH Bildu
+
+EH Bildu has [+ seats_bildu +] seats. Their price for voting yes: Housing money and the end of the gag law.
+
+- @bud_bildu_yes: Pay the price
+- @root: Refuse
+
+@bud_bildu_yes
+title: Deal with EH Bildu
+on-arrival: {! Q.sanchez_authority -= 2; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'bildu'); } !}
+
+= A deal with EH Bildu
+
+EH Bildu will vote for the budget.
+
+@bud_up
+title: Budget talks: Unidas Podemos
+is-card: true
+tags: sp_budget
+view-if: seats_up > 0 and bdeal_up = 0
+
+= Budget talks with Unidas Podemos
+
+Unidas Podemos has [+ seats_up +] seats. Their price for voting yes: A bigger minimum-wage rise and rent controls.
+
+- @bud_up_yes: Pay the price
+- @root: Refuse
+
+@bud_up_yes
+title: Deal with Unidas Podemos
+on-arrival: {! Q.fiscal_adj -= 0.1; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'up'); } !}
+
+= A deal with Unidas Podemos
+
+Unidas Podemos will vote for the budget.
+
+@bud_cs
+title: Budget talks: Ciudadanos
+is-card: true
+tags: sp_budget
+view-if: seats_cs > 0 and bdeal_cs = 0
+
+= Budget talks with Ciudadanos
+
+Ciudadanos has [+ seats_cs +] seats. Their price for voting yes: Lower income tax for the self-employed and no deals with the separatists.
+
+- @bud_cs_yes: Pay the price
+- @root: Refuse
+
+@bud_cs_yes
+title: Deal with Ciudadanos
+on-arrival: {! Q.cat_dialogue -= 1; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'cs'); } !}
+
+= A deal with Ciudadanos
+
+Ciudadanos will vote for the budget.
+
+@bud_cc
+title: Budget talks: Coalición Canaria
+is-card: true
+tags: sp_budget
+view-if: seats_cc > 0 and bdeal_cc = 0
+
+= Budget talks with Coalición Canaria
+
+Coalición Canaria has [+ seats_cc +] seats. Their price for voting yes: A Canary Islands development fund.
+
+- @bud_cc_yes: Pay the price
+- @root: Refuse
+
+@bud_cc_yes
+title: Deal with Coalición Canaria
+on-arrival: {! Q.fiscal_adj -= 0.03; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'cc'); } !}
+
+= A deal with Coalición Canaria
+
+Coalición Canaria will vote for the budget.
+
+@bud_bng
+title: Budget talks: BNG
+is-card: true
+tags: sp_budget
+view-if: seats_bng > 0 and bdeal_bng = 0
+
+= Budget talks with BNG
+
+BNG has [+ seats_bng +] seats. Their price for voting yes: Rail investment in Galicia.
+
+- @bud_bng_yes: Pay the price
+- @root: Refuse
+
+@bud_bng_yes
+title: Deal with BNG
+on-arrival: {! Q.fiscal_adj -= 0.03; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'bng'); } !}
+
+= A deal with BNG
+
+BNG will vote for the budget.
+
+@bud_compromis
+title: Budget talks: Compromís
+is-card: true
+tags: sp_budget
+view-if: seats_compromis > 0 and bdeal_compromis = 0
+
+= Budget talks with Compromís
+
+Compromís has [+ seats_compromis +] seats. Their price for voting yes: A fairer funding settlement for Valencia.
+
+- @bud_compromis_yes: Pay the price
+- @root: Refuse
+
+@bud_compromis_yes
+title: Deal with Compromís
+on-arrival: {! Q.fiscal_adj -= 0.03; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'compromis'); } !}
+
+= A deal with Compromís
+
+Compromís will vote for the budget.
+
+@bud_prc
+title: Budget talks: PRC
+is-card: true
+tags: sp_budget
+view-if: seats_prc > 0 and bdeal_prc = 0
+
+= Budget talks with PRC
+
+PRC has [+ seats_prc +] seats. Their price for voting yes: The Cantabrian rail and hospital investments.
+
+- @bud_prc_yes: Pay the price
+- @root: Refuse
+
+@bud_prc_yes
+title: Deal with PRC
+on-arrival: {! Q.fiscal_adj -= 0.02; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'prc'); } !}
+
+= A deal with PRC
+
+PRC will vote for the budget.
+
+@bud_te
+title: Budget talks: Teruel Existe
+is-card: true
+tags: sp_budget
+view-if: seats_te > 0 and bdeal_te = 0
+
+= Budget talks with Teruel Existe
+
+Teruel Existe has [+ seats_te +] seats. Their price for voting yes: Roads and depopulation money for Teruel.
+
+- @bud_te_yes: Pay the price
+- @root: Refuse
+
+@bud_te_yes
+title: Deal with Teruel Existe
+on-arrival: {! Q.fiscal_adj -= 0.02; if (window.SpainGame) { window.SpainGame.budgetDeal(Q, 'te'); } !}
+
+= A deal with Teruel Existe
+
+Teruel Existe will vote for the budget.
+

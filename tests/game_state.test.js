@@ -1064,3 +1064,22 @@ test('out of the leadership, dirty work is paid from personal resources', () => 
   assert.strictEqual(Q.war_chest, 2);
   assert.strictEqual(Q.funds, 5);
 });
+
+test('legislation: a bill passes once, then can be expanded or repealed; budget deals buy votes', () => {
+  const Q = {}; Q.no_mood = 1;
+  G.newGame(Q, 0);
+  Q.year = 2021; Q.player_in_government = 1; Q.pm_party = 'psoe'; Q.govt_parties = ['psoe', 'up'];
+  Q.congress = { psoe: 120, pp: 89, vox: 52, up: 35, erc: 13, cs: 10, junts: 8, pnv: 6, bildu: 5, mp: 3, cc: 1, bng: 1, prc: 1, te: 1, upn: 2, compromis: 1, cup: 2 };
+  G.recalculate(Q);
+  assert.strictEqual(Q.law_can_euthanasia, 1);
+  const v = G.voteLaw(Q, 'euthanasia', 'pass');
+  assert.ok(v.yes >= 176);
+  assert.strictEqual(Q.law_euthanasia, 1);
+  G.recalculate(Q);
+  assert.strictEqual(Q.law_can_euthanasia, 0);
+  assert.strictEqual(Q.law_canx_euthanasia, 1);
+  G.budgetDeal(Q, 'pnv');
+  assert.strictEqual(Q.bdeal_pnv, 1);
+  G.holdBudget(Q);
+  assert.deepStrictEqual(Q.budget_deals, {});
+});

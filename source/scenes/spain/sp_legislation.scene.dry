@@ -1,0 +1,288 @@
+title: Legislative agenda
+new-page: true
+is-card: true
+tags: sp_government
+view-if: player_in_government = 1 and pm_is_pp = 0 and law_timer <= 0
+frequency: 80
+
+= The legislative agenda
+
+Bills go to Congress. Ordinary laws need more yes than no votes; organic laws need an absolute majority of 176. A law passed once can only be expanded or repealed. Partners who dislike a bill will say so in public.
+
+- @pass_imv: Present the Minimum Living Income
+- @pass_euthanasia: Present the Euthanasia Law
+- @pass_education: Present the Education reform (LOMLOE)
+- @pass_memory: Present the Democratic Memory Law
+- @pass_consent: Present the Only Yes Means Yes
+- @pass_housing: Present the Housing Law
+- @pass_trans: Present the Trans and LGBTI Rights Law
+- @pass_animal: Present the Animal Welfare Law
+- @pass_wealth: Present the Solidarity tax on large fortunes
+- @pass_amnesty: Present the Amnesty Law
+- @expand_imv: Expand the Minimum Living Income
+- @expand_euthanasia: Expand the Euthanasia Law
+- @expand_education: Expand the Education reform (LOMLOE)
+- @expand_memory: Expand the Democratic Memory Law
+- @expand_consent: Expand the Only Yes Means Yes
+- @expand_housing: Expand the Housing Law
+- @expand_trans: Expand the Trans and LGBTI Rights Law
+- @expand_animal: Expand the Animal Welfare Law
+- @expand_wealth: Expand the Solidarity tax on large fortunes
+- @expand_amnesty: Expand the Amnesty Law
+- @repeal_imv: Repeal the Minimum Living Income
+- @repeal_euthanasia: Repeal the Euthanasia Law
+- @repeal_education: Repeal the Education reform (LOMLOE)
+- @repeal_memory: Repeal the Democratic Memory Law
+- @repeal_consent: Repeal the Only Yes Means Yes
+- @repeal_housing: Repeal the Housing Law
+- @repeal_trans: Repeal the Trans and LGBTI Rights Law
+- @repeal_animal: Repeal the Animal Welfare Law
+- @repeal_wealth: Repeal the Solidarity tax on large fortunes
+- @repeal_amnesty: Repeal the Amnesty Law
+- @root: Not this month
+
+@pass_imv
+title: Pass: Minimum Living Income
+view-if: law_can_imv = 1
+subtitle: Likely count: [+ law_odds_imv +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'imv', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_euthanasia
+title: Pass: Euthanasia Law
+view-if: law_can_euthanasia = 1
+subtitle: Likely count: [+ law_odds_euthanasia +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'euthanasia', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_education
+title: Pass: Education reform (LOMLOE)
+view-if: law_can_education = 1
+subtitle: Likely count: [+ law_odds_education +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'education', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_memory
+title: Pass: Democratic Memory Law
+view-if: law_can_memory = 1
+subtitle: Likely count: [+ law_odds_memory +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'memory', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_consent
+title: Pass: Only Yes Means Yes
+view-if: law_can_consent = 1
+subtitle: Likely count: [+ law_odds_consent +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'consent', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_housing
+title: Pass: Housing Law
+view-if: law_can_housing = 1
+subtitle: Likely count: [+ law_odds_housing +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'housing', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_trans
+title: Pass: Trans and LGBTI Rights Law
+view-if: law_can_trans = 1
+subtitle: Likely count: [+ law_odds_trans +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'trans', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_animal
+title: Pass: Animal Welfare Law
+view-if: law_can_animal = 1
+subtitle: Likely count: [+ law_odds_animal +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'animal', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_wealth
+title: Pass: Solidarity tax on large fortunes
+view-if: law_can_wealth = 1
+subtitle: Likely count: [+ law_odds_wealth +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'wealth', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@pass_amnesty
+title: Pass: Amnesty Law
+view-if: law_can_amnesty = 1
+subtitle: Likely count: [+ law_odds_amnesty +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'amnesty', 'pass'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_imv
+title: Expand: Minimum Living Income
+view-if: law_canx_imv = 1
+subtitle: Likely count: [+ law_odds_imv +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'imv', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_euthanasia
+title: Expand: Euthanasia Law
+view-if: law_canx_euthanasia = 1
+subtitle: Likely count: [+ law_odds_euthanasia +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'euthanasia', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_education
+title: Expand: Education reform (LOMLOE)
+view-if: law_canx_education = 1
+subtitle: Likely count: [+ law_odds_education +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'education', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_memory
+title: Expand: Democratic Memory Law
+view-if: law_canx_memory = 1
+subtitle: Likely count: [+ law_odds_memory +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'memory', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_consent
+title: Expand: Only Yes Means Yes
+view-if: law_canx_consent = 1
+subtitle: Likely count: [+ law_odds_consent +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'consent', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_housing
+title: Expand: Housing Law
+view-if: law_canx_housing = 1
+subtitle: Likely count: [+ law_odds_housing +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'housing', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_trans
+title: Expand: Trans and LGBTI Rights Law
+view-if: law_canx_trans = 1
+subtitle: Likely count: [+ law_odds_trans +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'trans', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_animal
+title: Expand: Animal Welfare Law
+view-if: law_canx_animal = 1
+subtitle: Likely count: [+ law_odds_animal +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'animal', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_wealth
+title: Expand: Solidarity tax on large fortunes
+view-if: law_canx_wealth = 1
+subtitle: Likely count: [+ law_odds_wealth +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'wealth', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@expand_amnesty
+title: Expand: Amnesty Law
+view-if: law_canx_amnesty = 1
+subtitle: Likely count: [+ law_odds_amnesty +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'amnesty', 'expand'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_imv
+title: Repeal: Minimum Living Income
+view-if: law_canr_imv = 1
+subtitle: Likely count: [+ law_odds_imv +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'imv', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_euthanasia
+title: Repeal: Euthanasia Law
+view-if: law_canr_euthanasia = 1
+subtitle: Likely count: [+ law_odds_euthanasia +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'euthanasia', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_education
+title: Repeal: Education reform (LOMLOE)
+view-if: law_canr_education = 1
+subtitle: Likely count: [+ law_odds_education +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'education', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_memory
+title: Repeal: Democratic Memory Law
+view-if: law_canr_memory = 1
+subtitle: Likely count: [+ law_odds_memory +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'memory', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_consent
+title: Repeal: Only Yes Means Yes
+view-if: law_canr_consent = 1
+subtitle: Likely count: [+ law_odds_consent +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'consent', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_housing
+title: Repeal: Housing Law
+view-if: law_canr_housing = 1
+subtitle: Likely count: [+ law_odds_housing +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'housing', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_trans
+title: Repeal: Trans and LGBTI Rights Law
+view-if: law_canr_trans = 1
+subtitle: Likely count: [+ law_odds_trans +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'trans', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_animal
+title: Repeal: Animal Welfare Law
+view-if: law_canr_animal = 1
+subtitle: Likely count: [+ law_odds_animal +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'animal', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_wealth
+title: Repeal: Solidarity tax on large fortunes
+view-if: law_canr_wealth = 1
+subtitle: Likely count: [+ law_odds_wealth +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'wealth', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@repeal_amnesty
+title: Repeal: Amnesty Law
+view-if: law_canr_amnesty = 1
+subtitle: Likely count: [+ law_odds_amnesty +]
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.voteLaw(Q, 'amnesty', 'repeal'); } !}
+go-to: law_won if law_passed_now = 1; law_lost if law_passed_now = 0
+
+@law_won
+title: The bill passes
+
+= [+ law_name +]: passed
+
+Yes [+ law_yes +], no [+ law_no +], abstentions [+ law_abstain +]. The vote is carried.[? if law_partner_split = 1 : A coalition partner voted against, and the cracks are on every front page. ?]
+
+@law_lost
+title: The bill falls
+
+= [+ law_name +]: defeated
+
+Yes [+ law_yes +], no [+ law_no +], abstentions [+ law_abstain +]. The government loses a vote in its own Congress. It is not fatal, but it is noted.[? if law_partner_split = 1 : A coalition partner voted against, and the cracks are on every front page. ?]
+
+@dare
+title: A popular bill
+new-page: true
+is-card: true
+tags: sp_national
+view-if: player_in_government = 0 and sanchez_leader = 1 and law_timer <= 0
+
+= Dare them to vote it down
+
+From opposition, the PSOE can table a popular bill: a rise in the minimum wage, rent relief, a pensions guarantee. If it passes, you set the agenda. If the government kills it, they own the refusal.
+
+- @dare_go: Table the bill
+- @root: Not now
+
+@dare_go
+title: The bill is tabled
+on-arrival: {! Q.month_actions += 1; Q.law_timer = 3; if (window.SpainGame) { window.SpainGame.dareBill(Q); } !}
+
+= The vote on the PSOE bill
+
+[? if dare_passed = 1 : The opposition parties combine and the bill passes. The government is outvoted on its own floor. ?][? if dare_passed = 0 : The governing majority votes it down. Your bill fails, but now they have to explain why. ?]

@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -363,6 +363,7 @@
   function recalculate(Q) {
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; }
     adviserFlags(Q);
+    lawFlags(Q);
     var brand = podemosBrand(Q);
     if (Q.up_brand !== brand[0]) {
       Q.up_brand = brand[0];
@@ -1830,6 +1831,13 @@
     var v = Parliament.count(Q.congress, Parliament.stancesForBudget(Q));
     Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
     Q.budget_passed = v.yes > v.no ? 1 : 0;
+    if (!Q.budget_passed) {
+      // losing the budget is a major humiliation for any government
+      var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+      campaign(Q, Q.pm_party || 'psoe', all(-1.2));
+      Q.sanchez_authority -= 6;
+    }
+    Q.budget_deals = {};
     return v;
   }
 
@@ -3121,6 +3129,125 @@
       (Q.rep_in_regional_govt ? '<p class="sp-map-legend">In government in ' + Q.rep_in_regional_govt + ' regions.</p>' : '');
   }
 
+
+  // ------------------------------------------------------------------
+  // Legislation. A government bill goes to Congress; ordinary laws need
+  // more yes than no, organic laws an absolute majority (176). A passed
+  // law can be expanded or repealed, never passed again.
+  // stance lists: who votes yes / no regardless; others by relation.
+  // ------------------------------------------------------------------
+  var LAWS = {
+    imv: { name: 'Minimum Living Income', organic: 0, from: 2018, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'pnv', 'bng', 'cc', 'nc', 'prc', 'te', 'compromis', 'cs'], no: [],
+      text: 'A guaranteed income for the poorest households, paid by Social Security.',
+      effect: { workers: 1, unemployed: 2.5, homemakers: 1 }, econ: [-0.05, 0], social: 3, line: [0.5, 0], partnerHate: [] },
+    euthanasia: { name: 'Euthanasia Law', organic: 1, from: 2018, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'pnv', 'cs', 'bng', 'compromis', 'nc', 'junts'], no: ['pp', 'vox', 'upn'],
+      text: 'The right to a medically assisted death, with safeguards.', effect: { students: 1, professionals: 1, pensioners: -0.5 }, social: 1, line: [0, 1], partnerHate: [] },
+    education: { name: 'Education reform (LOMLOE)', organic: 1, from: 2018, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'pnv', 'compromis', 'nc', 'bng'], no: ['pp', 'vox', 'cs', 'upn'],
+      text: 'Reverses the PP\'s education law: less weight for religion and for state-funded private schools.', effect: { professionals: 0.6, students: 0.8, self_employed: -0.6 }, social: 1, line: [0.3, 1], partnerHate: ['cs'] },
+    memory: { name: 'Democratic Memory Law', organic: 0, from: 2018, yes: ['up', 'iu', 'mp', 'pnv', 'bildu', 'compromis'], no: ['pp', 'vox', 'cs', 'upn', 'junts', 'cup'],
+      text: 'State-led exhumations, a DNA bank, Franco-era sentences annulled.', effect: { students: 0.8, workers: 0.4, pensioners: -0.4 }, social: 0, line: [0, 0.8], partnerHate: ['cs'] },
+    consent: { name: 'Only Yes Means Yes', organic: 1, from: 2019, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'pnv', 'cs', 'compromis', 'bng', 'nc'], no: ['pp', 'vox'],
+      text: 'Consent at the centre of sexual offences law.', effect: { students: 1, homemakers: 0.8 }, social: 1, line: [0, 1], partnerHate: [], risk: 'consent' },
+    housing: { name: 'Housing Law', organic: 0, from: 2019, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'compromis', 'bng'], no: ['pp', 'vox', 'cs', 'junts', 'upn'],
+      text: 'Rent caps in stressed areas and a public housing stock.', effect: { students: 1.5, workers: 0.8, self_employed: -1 }, econ: [-0.05, 0], social: 2, line: [1, 0], partnerHate: ['cs', 'pnv'] },
+    trans: { name: 'Trans and LGBTI Rights Law', organic: 0, from: 2020, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'compromis', 'bng'], no: ['pp', 'vox'],
+      text: 'Legal gender self-determination and a ban on conversion therapy.', effect: { students: 1, pensioners: -0.6, homemakers: -0.4 }, social: 0, line: [0, 1.5], partnerHate: [], split: 'progressives' },
+    animal: { name: 'Animal Welfare Law', organic: 0, from: 2020, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'compromis'], no: ['pp', 'vox', 'upn'],
+      text: 'New protections for pets, and a fight over hunting dogs.', effect: { students: 0.6, professionals: 0.3, self_employed: -0.5 }, social: 0, line: [0, 0.5], partnerHate: [], split: 'regional_leaders' },
+    wealth: { name: 'Solidarity tax on large fortunes', organic: 0, from: 2019, yes: ['up', 'iu', 'mp', 'erc', 'bildu', 'compromis', 'bng'], no: ['pp', 'vox', 'cs', 'junts', 'upn', 'pnv'],
+      text: 'A temporary tax on fortunes above three million euros.', effect: { workers: 1, unemployed: 0.8, self_employed: -1.2, professionals: -0.6 }, fiscal: -0.1, line: [1.2, 0], partnerHate: ['cs'] },
+    amnesty: { name: 'Amnesty Law', organic: 1, from: 2023, yes: ['up', 'erc', 'junts', 'bildu', 'pnv', 'bng', 'cup'], no: ['pp', 'vox', 'cs', 'upn', 'cc'],
+      text: 'An amnesty for everyone prosecuted over the Catalan independence process.', effect: { pensioners: -1.5, self_employed: -1.2, professionals: -0.6 }, social: 0, line: [0, 0], cat: 2, partnerHate: ['cs'], vox: 3 }
+  };
+  function lawStances(Q, id, repeal) {
+    var L = LAWS[id], st = {};
+    Object.keys(Q.congress || {}).forEach(function (p) {
+      if (p === 'psoe' || (Q.govt_parties || []).indexOf(p) !== -1) { st[p] = 'yes'; }
+      else if (L.yes.indexOf(p) !== -1) { st[p] = 'yes'; }
+      else if (L.no.indexOf(p) !== -1) { st[p] = 'no'; }
+      else {
+        var r = Q['rel_' + p] === undefined ? 40 : Q['rel_' + p];
+        st[p] = r >= 60 ? 'yes' : (r >= 40 ? 'abstain' : 'no');
+      }
+      if (repeal) { st[p] = st[p] === 'yes' ? 'no' : (st[p] === 'no' ? 'yes' : 'abstain'); st.psoe = 'yes'; }
+    });
+    // a partner that hates the bill votes no, and the coalition creaks
+    (L.partnerHate || []).forEach(function (p) { if ((Q.govt_parties || []).indexOf(p) !== -1 && !repeal) { st[p] = 'no'; } });
+    return st;
+  }
+  // kind: 'pass' | 'expand' | 'repeal'. Returns the tally.
+  function voteLaw(Q, id, kind) {
+    var L = LAWS[id];
+    var v = Parliament.count(Q.congress, lawStances(Q, id, kind === 'repeal'));
+    var passes = L.organic && kind !== 'repeal' ? v.yes >= 176 : v.yes > v.no;
+    Q.law_yes = v.yes; Q.law_no = v.no; Q.law_abstain = v.abstain; Q.law_name = L.name; Q.law_passed_now = passes ? 1 : 0;
+    Q.law_partner_split = 0;
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    var f = kind === 'expand' ? 0.6 : (kind === 'repeal' ? -1 : 1);
+    if (passes) {
+      Q['law_' + id] = kind === 'repeal' ? -1 : (kind === 'expand' ? 2 : 1);
+      var eff = {};
+      Object.keys(L.effect).forEach(function (c) { eff[c] = L.effect[c] * f; });
+      campaign(Q, 'psoe', eff);
+      if (L.social) { social(Q, L.social * f); }
+      if (L.econ) { econ(Q, L.econ[0] * f, L.econ[1] * f); }
+      if (L.fiscal) { Q.fiscal_adj += L.fiscal * f; }
+      if (L.line) { position(Q, L.line[0] * f, L.line[1] * f); }
+      if (L.cat) { Q.cat_dialogue = (Q.cat_dialogue || 0) + L.cat * f; }
+      if (L.vox && f > 0) { voxFlow(Q, L.vox * 0.3); }
+      if (L.split) { Q[L.split + '_dissent'] += 4 * f; }
+      Q.laws_passed = (Q.laws_passed || 0) + (kind === 'pass' ? 1 : 0);
+    } else {
+      // a lost vote: a small embarrassment for the government
+      campaign(Q, 'psoe', all(-0.25));
+      Q.sanchez_authority -= 2;
+    }
+    // partners who were overruled or who voted against show the cracks
+    (Q.govt_parties || []).forEach(function (p) {
+      if (p !== 'psoe' && (L.partnerHate || []).indexOf(p) !== -1 && kind !== 'repeal') {
+        Q['rel_' + p] = (Q['rel_' + p] || 40) - 8; Q.coalition_strain = (Q.coalition_strain || 0) + 1; Q.law_partner_split = 1;
+      }
+    });
+    Q.law_timer = 2;
+    recalculate(Q);
+    return v;
+  }
+  // In opposition: dare the government to vote down a popular bill.
+  function dareBill(Q) {
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    var govNo = (Q.congress[Q.pm_party] || 0);
+    var others = 350 - govNo - (Q.congress.vox || 0);
+    Q.dare_passed = others > govNo + (Q.congress.vox || 0) && Math.random() < 0.5 ? 1 : 0;
+    if (Q.dare_passed) { campaign(Q, 'psoe', all(0.5)); campaign(Q, Q.pm_party, all(-0.4)); Q.member_morale += 3; }
+    else { campaign(Q, 'psoe', all(0.25)); campaign(Q, Q.pm_party, all(-0.2)); }
+    recalculate(Q);
+  }
+  // A concession bought for a party's budget vote. Costs are paid at once.
+  function budgetDeal(Q, p) {
+    Q.budget_deals = Q.budget_deals || {};
+    Q.budget_deals[p] = 1;
+    Q['rel_' + p] = (Q['rel_' + p] || 40) + 5;
+    recalculate(Q);
+  }
+  function lawFlags(Q) {
+    Q.budget_deals = Q.budget_deals || {};
+    Object.keys(Q.congress || {}).forEach(function (p) { Q['seats_' + p] = Q.congress[p]; });
+    ['pnv', 'erc', 'junts', 'bildu', 'cc', 'up', 'cs', 'prc', 'te', 'bng', 'compromis'].forEach(function (p) {
+      Q['bdeal_' + p] = Q.budget_deals[p] ? 1 : 0;
+      if (Q['seats_' + p] === undefined) { Q['seats_' + p] = 0; }
+    });
+    Object.keys(LAWS).forEach(function (id) {
+      var st = Q['law_' + id] || 0;
+      Q['law_can_' + id] = st === 0 && Q.year >= LAWS[id].from ? 1 : 0;
+      Q['law_canx_' + id] = st === 1 ? 1 : 0;
+      Q['law_canr_' + id] = st >= 1 ? 1 : 0;
+      if (Q.congress) {
+        var v = Parliament.count(Q.congress, lawStances(Q, id, false));
+        Q['law_odds_' + id] = v.yes + '–' + v.no + (LAWS[id].organic ? ' (organic: needs 176)' : '');
+      }
+    });
+  }
+
   function renderPrimary(Q, id) {
     var out = el(id);
     if (!out || !Q.pv_rows) { return; }
@@ -4024,7 +4151,8 @@
     membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
-    renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
+    voteLaw: voteLaw, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

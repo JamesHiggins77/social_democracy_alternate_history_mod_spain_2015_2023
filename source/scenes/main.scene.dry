@@ -20,6 +20,7 @@ max-cards: 3
 - @deck_party
 - @deck_negotiations
 - @deck_government
+- @deck_budget
 - @deck_catalonia
 - @deck_exile
 - #sp_advisor
@@ -54,6 +55,14 @@ card-image: img/spain/bg_congreso_hemiciclo.jpg
 is-deck: true
 
 - #sp_government
+
+@deck_budget
+title: Budget negotiations
+view-if: player_in_government = 1 and pm_is_pp = 0 and min_finance = 1 and budget_timer <= 2
+card-image: img/spain/bg_congreso_hemiciclo.jpg
+is-deck: true
+
+- #sp_budget
 
 @deck_catalonia
 title: Catalan crisis

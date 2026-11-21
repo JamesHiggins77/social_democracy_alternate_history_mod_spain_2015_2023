@@ -600,3 +600,13 @@ Real polling averages swung far more than the game's: the PP went from about 33%
   - Earned from: the memoir (+3), small donations, wealthy donors, consultancy work.
   - Spent on: the campaign of the comeback (rallies, online adverts, a tour of Andalusia that weakens Díaz's apparatus) and on the dark arts.
 - **Back in the leadership,** party funds take over again.
+
+### 7.28 Legislation and budget negotiations
+
+- **Legislative agenda** (government card, every 2 months): ten bills from the real 2018–2023 record (Minimum Living Income, euthanasia, LOMLOE, Democratic Memory, Only Yes Means Yes, Housing, Trans law, Animal Welfare, wealth tax, Amnesty). Each goes to a Congress count: ordinary laws need yes > no, organic laws 176 yes. Each party has a fixed stance; unlisted parties vote by relation.
+- A law passes once (`law_<id>` = 1), then can be expanded (2, 60% of the effect) or repealed (−1, reverses the effect).
+- Partners who dislike a bill (e.g. Cs on housing or the wealth tax) vote no, lose 8 relation and add coalition strain.
+- A lost vote: −0.25 PSOE support across classes, −2 authority.
+- **Opposition:** "A popular bill" lets the PSOE dare the government to vote it down; a small gain either way, larger if it passes.
+- **Budget negotiations deck** (opens 2 months before a budget is due): one card per party with seats, each naming a price (Basque investment, Catalan dialogue, minimum wage, tax cuts). Paying signs a deal; that party votes yes on the next budget. Deals reset after the vote.
+- A lost budget is a major humiliation: −1.2 support across classes and −6 authority, on top of the existing card penalty.

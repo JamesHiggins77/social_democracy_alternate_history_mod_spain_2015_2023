@@ -190,6 +190,12 @@
   // dialogue offered to Catalonia, which ERC and Junts demand.
   function stancesForBudget(Q) {
     var dialogue = Q.cat_dialogue || 0;
+    var st = budgetBase(Q, dialogue);
+    // parties that signed a budget deal vote for it
+    Object.keys(Q.budget_deals || {}).forEach(function (p) { if (Q.budget_deals[p]) { st[p] = 'yes'; } });
+    return st;
+  }
+  function budgetBase(Q, dialogue) {
     return {
       psoe: 'yes', pp: 'no', vox: 'no', upn: 'no',
       cs: relation(Q, 'cs', 45) >= 70 ? 'yes' : 'no',
