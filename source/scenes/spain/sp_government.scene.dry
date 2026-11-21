@@ -298,25 +298,25 @@ The government's programme is agreed. Now the ministries must be shared with [+ 
 
 {!<div id="sp-cabinet-draft"></div>!}
 
-- @cab_standard: Accept the draft: ministries in proportion to seats
+- @cab_standard: [? if cab_share_set = 1 : Sign the draft: the share was settled before the vote ?][? if cab_share_set = 0 : Accept the draft: ministries in proportion to seats ?]
 - @cab_generous: [? if player_senior = 1 : Be generous: a stronger deputy premiership and two more ministries for the partner ?][? if player_senior = 0 : Accept whatever the senior partner offers ?]
 - @cab_hard: Drive a hard bargain: keep every economic and security ministry
 - @cab_economy: Insist on Finance and Economic Affairs
 - @cab_social: Ask for the social ministries: Labour, Social Rights, Health, Education, Equality
 
 @cab_standard
-on-arrival: {! Q.cabinet_pending = 0; !}
+on-arrival: {! Q.cabinet_pending = 0; Q.cab_share_set = 0; Q.cab_share = ''; !}
 
 The draft is signed as it stands.
 
 @cab_generous
-view-if: player_senior = 1
-on-arrival: {! Q.cabinet_pending = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'generous'); } Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) + 10; Q.regional_leaders_dissent += 4; !}
+view-if: player_senior = 1 and cab_share_set = 0
+on-arrival: {! Q.cabinet_pending = 0; Q.cab_share_set = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'generous'); } Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) + 10; Q.regional_leaders_dissent += 4; !}
 
 Your partner is delighted. Your own ministers-in-waiting are not.
 
 @cab_hard
-view-if: player_senior = 1
+view-if: player_senior = 1 and cab_share_set = 0
 on-arrival: {! Q.cabinet_pending = 0; if (window.SpainGame) { window.SpainGame.allocateCabinet(Q, 'hard'); } Q['rel_' + Q.cabinet_partner] = (Q['rel_' + Q.cabinet_partner] || 40) - 12; Q.sanchez_authority += 3; !}
 
 You keep the levers of power. Your partner signs, and starts counting the slights.

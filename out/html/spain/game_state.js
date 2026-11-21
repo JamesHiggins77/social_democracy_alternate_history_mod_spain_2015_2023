@@ -148,6 +148,7 @@
     Q.psoe_in_government = 0;
     Q.legislature_start_year = 2011;
     Q.legislature_start_month = 12;
+    Q.cab_share_set = 0; Q.cab_share = '';
     Q.investiture_clock = -1;   // weeks to automatic dissolution; -1 = not started
     Q.week = 1;                 // week of the month during government formation
     Q.formation_weeks = 0;      // weeks since the last general election
@@ -2462,7 +2463,7 @@
       }
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
-    allocateCabinet(Q, 'standard');
+    allocateCabinet(Q, Q.cab_share && (Q.govt_parties || []).length > 1 ? Q.cab_share : 'standard');
     // a coalition with the player's party in it: the agreement is negotiated
     Q.cabinet_pending = ((Q.govt_parties || []).length > 1 &&
       (Q.govt_parties || []).indexOf(Q.player_party || 'psoe') !== -1 && (Q.sanchez_leader || Q.exiled)) ? 1 : 0;
@@ -3810,12 +3811,56 @@
            justice: 'Iván Espinosa de los Monteros', territorial: 'Rocío Monasterio', education: 'Rocío Monasterio' }
   };
 
+  // Before 2018 nobody had yet held these posts for the PSOE or Podemos:
+  // plausible names from Sánchez's 2015-16 team and from the government
+  // Iglesias proposed in February 2016 (Iglesias as Deputy PM, Julio
+  // Rodríguez at Defence, Domènech on plurinationality, and so on).
+  var MINISTER_NAMES_2016 = {
+    psoe: { pm: 'Pedro Sánchez', deputy: 'Meritxell Batet', finance: 'Jordi Sevilla', economy: 'Manuel Escudero',
+            foreign: 'Trinidad Jiménez', interior: 'Antonio Hernando', defence: 'Zaida Cantera', justice: 'Margarita Robles',
+            labour: 'Magdalena Valerio', social_rights: 'Luz Rodríguez', health: 'Carmen Montón', education: 'Ángel Gabilondo',
+            territorial: 'Patxi López', ecology: 'Hugo Morán', equality: 'Adriana Lastra' },
+    up: { deputy: 'Pablo Iglesias', territorial: 'Xavier Domènech', education: 'Carolina Bescansa', economy: 'Nacho Álvarez',
+          finance: 'Carlos Sánchez Mato', defence: 'Julio Rodríguez', social_rights: 'Íñigo Errejón', labour: 'Alberto Garzón',
+          health: 'Pablo Echenique', equality: 'Irene Montero', ecology: 'Juantxo López de Uralde', foreign: 'Pablo Bustinduy' }
+  };
+  // further real ministers or senior figures, used when a name is taken
+  var SPARE_MINISTERS = {
+    pp: { a: 'Dolors Montserrat', b: 'Íñigo Méndez de Vigo', c: 'Ana Pastor', d: 'Juan Ignacio Zoido', e: 'Álvaro Nadal', f: 'Isabel García Tejerina' },
+    psoe: { a: 'José Luis Ábalos', b: 'Reyes Maroto', c: 'Luis Planas', d: 'Pedro Duque', e: 'Isabel Rodríguez' },
+    up: { a: 'Ione Belarra', b: 'Ernest Urtasun', c: 'Sira Rego' },
+    cs: { a: 'Juan Carlos Girauta', b: 'José Manuel Villegas', c: 'Begoña Villacís' },
+    vox: { a: 'Jorge Buxadé', b: 'Macarena Olona', c: 'Iván Espinosa de los Monteros' }
+  };
   function ministerName(party, key, Q) {
     if (key === 'pm') {
       return Q.pm;
     }
-    var n = MINISTER_NAMES[party] && MINISTER_NAMES[party][key];
+    var table = (Q.year < 2018 && MINISTER_NAMES_2016[party]) ? MINISTER_NAMES_2016[party] : MINISTER_NAMES[party];
+    var n = table && table[key];
     return n || ('a ' + UI.shortName(party) + ' nominee');
+  }
+  // Only a Deputy Prime Minister may hold a second ministry (as Iglesias did
+  // with Social Rights in 2020). Anyone else named twice is replaced by an
+  // unused name from the same party's list.
+  function dedupeCabinet(Q, cab) {
+    var holds = {};
+    var order = ['deputy'].concat(MINISTRIES.map(function (m) { return m[0]; }).filter(function (k) { return k !== 'deputy'; }));
+    order.forEach(function (k) {
+      var c = cab[k];
+      if (!c) { return; }
+      var n = c.name, prev = holds[n];
+      var ok = !prev || (prev.length === 1 && prev[0] === 'deputy' && cab.deputy && cab.deputy.party === c.party);
+      if (!ok) {
+        var pools = [(Q.year < 2018 && MINISTER_NAMES_2016[c.party]) || {}, MINISTER_NAMES[c.party] || {}, MINISTER_NAMES_2016[c.party] || {}, SPARE_MINISTERS[c.party] || {}];
+        var alt = null;
+        pools.forEach(function (t) { Object.keys(t).forEach(function (kk) { var nm = t[kk]; if (!alt && kk !== 'pm' && !holds[nm] && nm !== Q.pm) { alt = nm; } }); });
+        c.name = alt || ('a ' + UI.shortName(c.party) + ' nominee');
+        n = c.name;
+      }
+      holds[n] = (holds[n] || []).concat([k]);
+    });
+    return cab;
   }
 
   // plan: 'standard', 'generous' or 'hard' (seen from the senior party when
@@ -3828,7 +3873,7 @@
     var keys = MINISTRIES.map(function (m) { return m[0]; });
     if (parties.length === 1) {
       keys.forEach(function (k) { cab[k] = { party: senior, name: ministerName(senior, k, Q) }; });
-      Q.cabinet = cab;
+      Q.cabinet = dedupeCabinet(Q, cab);
       cabinetFlags(Q);
       return cab;
     }
@@ -3860,7 +3905,7 @@
       var party = partnerGets.indexOf(k) !== -1 ? partner : senior;
       cab[k] = { party: party, name: ministerName(party, k, Q) };
     });
-    Q.cabinet = cab;
+    Q.cabinet = dedupeCabinet(Q, cab);
     Q.cabinet_plan = plan;
     cabinetFlags(Q);
     return cab;

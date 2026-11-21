@@ -1095,3 +1095,18 @@ test('advisers: factions warming bring offers; turning hostile takes their peopl
   assert.strictEqual(Q.adv_lastra, 0);
   assert.strictEqual(Q.adv_can_elorza, 0);
 });
+
+test('cabinet: only a Deputy PM holds two posts; 2016 names fit the year', () => {
+  for (const [y, parties] of [[2016, ['psoe', 'up']], [2020, ['psoe', 'up']], [2016, ['pp']], [2019, ['pp', 'vox']]]) {
+    const Q = { no_mood: 1 };
+    G.newGame(Q, 0); Q.year = y; Q.pm = 'X'; Q.govt_parties = parties;
+    Q.congress = { psoe: 120, up: 35, pp: 100, vox: 52 };
+    G.allocateCabinet(Q, 'standard');
+    const posts = {};
+    Object.keys(Q.cabinet).forEach(k => { const n = Q.cabinet[k].name; (posts[n] = posts[n] || []).push(k); });
+    Object.keys(posts).forEach(n => {
+      if (posts[n].length > 1) { assert.strictEqual(posts[n].length, 2, n); assert.ok(posts[n].includes('deputy'), n); }
+    });
+    if (y === 2016 && parties[0] === 'psoe') { assert.notStrictEqual(Q.cabinet.finance.name, 'María Jesús Montero'); }
+  }
+});

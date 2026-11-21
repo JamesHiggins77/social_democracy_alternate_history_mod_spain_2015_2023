@@ -703,3 +703,13 @@ Every election result now has a poll-of-polls chart above the poll-change table.
 - **Regional calendar:** the real early elections are now scheduled: Andalusia on 22 March 2015 and 2 December 2018, Catalonia on 27 September 2015, Galicia and the Basque Country on 25 September 2016. Before, Andalusia's 2015 election was dated 2012, so the game held a spurious 2016 vote.
 - **Andalusia, December 2018:** the swing of that election is applied to Andalusian regional votes only: PSOE ×0.66, Cs ×1.75, PP ×1.3, Vox ×0.9. In the historical replay the result is PP 25, PSOE 33, Cs 23, Vox 10, AA 18, and Juanma Moreno forms a PP–Cs government with Vox's support. Cs may join regional cabinets from 2018.
 - **Race charts:** hover anywhere over the chart to see that poll's figures, with the pollster where known. A dashed line now joins each party's last poll to its result.
+
+### 7.38 Coalition share before the vote; ministers by year
+
+- **The share comes before the vote:** signing a government agreement with Podemos now leads to "The share of the government" before the investiture. The player chooses one of three options:
+  - in proportion to seats, with a Deputy PM;
+  - Podemos's terms: a Deputy PM and two more ministries (the barons and institutionalists object);
+  - a hard bargain: no Deputy PM and nothing economic. Podemos may walk out and end the pact, as in July 2019.
+- **Names come after:** they are filled in after the vote. The coalition-agreement scene then only confirms the share, without re-dealing it.
+- **Ministers by year:** before 2018, the PSOE and Podemos use plausible 2015–16 names: Sánchez's team (Sevilla, Escudero, Batet, Robles…) and Iglesias's February 2016 proposal (Iglesias as Deputy PM, Julio Rodríguez, Domènech, Bescansa, Errejón, Garzón…).
+- **One post per person:** only a Deputy Prime Minister may hold a second ministry. Anyone else named twice is replaced by an unused real figure from the same party.

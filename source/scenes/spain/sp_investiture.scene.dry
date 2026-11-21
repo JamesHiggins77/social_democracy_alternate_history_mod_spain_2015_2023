@@ -34,7 +34,38 @@ subtitle: Podemos will vote yes; Ciudadanos will vote no.
 choose-if: up_talks >= 2 and pact_up = 0 and pact_cs = 0
 unavailable-subtitle: [? if pact_cs = 1 : Podemos will not support a government built on a deal with Ciudadanos. ?][? if pact_cs = 0 and up_talks < 2 : The talks with Podemos are not far enough advanced. ?]
 on-arrival: {! Q.pact_up = 1; Q.rel_up += 10; Q.rel_cs -= 15; Q.progressives_dissent -= 10; Q.regional_leaders_dissent += 12 + 8 * (Q.barons_veto || 0); Q.institutionalists_dissent += 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {cs: 0.6, pp: 0.4}, {pensioners: 1.5, self_employed: 1.5, homemakers: 1}); window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1.5, unemployed: 1}); } !}
+go-to: share_posts
+
+@share_posts
+title: The share of the government
+new-page: true
+
+= The share of the government
+
+The programme is agreed, but Podemos will not vote for you until it knows what it gets: how many ministries, and whether [? if year < 2018 : Pablo Iglesias ?][? if year >= 2018 : its leader ?] is Deputy Prime Minister. The names can wait until after the vote; the share cannot. In July 2019 exactly this question sank an investiture.
+
+- @share_standard: A Deputy Prime Minister and ministries in proportion to seats
+- @share_generous: Their terms: a Deputy Prime Minister and two more ministries
+- @share_hard: Ministries, but no Deputy Prime Minister and nothing economic
+
+@share_standard
+title: In proportion
+on-arrival: {! Q.cab_share = 'standard'; Q.cab_share_set = 1; !}
 go-to: sp_investiture
+
+@share_generous
+title: Their terms
+on-arrival: {! Q.cab_share = 'generous'; Q.cab_share_set = 1; Q.rel_up += 8; Q.regional_leaders_dissent += 6; Q.institutionalists_dissent += 4; !}
+
+Podemos is delighted. The barons ask how a party with fewer seats ends up with a vice-presidency and the ministries it wanted.
+
+- @root: Continue
+
+@share_hard
+title: A hard bargain
+on-arrival: {! Q.cab_share = 'hard'; Q.cab_share_set = 1; Q.share_walkout = (Math.random() * 100 > 20 + (Q.rel_up || 40) / 2) ? 1 : 0; if (Q.share_walkout) { Q.pact_up = 0; Q.rel_up -= 15; Q.cab_share = ''; Q.cab_share_set = 0; } else { Q.rel_up -= 8; Q.sanchez_authority += 3; } !}
+
+[? if share_walkout = 1 : Podemos calls it humiliating and breaks off the talks. Its deputies will not vote for you. The agreement is dead; you will have to start again. ?][? if share_walkout = 0 : Podemos accepts through gritted teeth. You keep every lever of economic power. ?]
 
 @referendum
 title: Offer the Catalan parties talks on their demands
