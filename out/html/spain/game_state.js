@@ -3093,6 +3093,22 @@
       '<p class="sp-map-legend">Independents and local lists: ' + Q.local_seats.ind.toLocaleString('en-GB') + ' councillors. About ' + LOCAL_COUNCILLORS.toLocaleString('en-GB') + ' in all.</p>';
   }
 
+  // Wikipedia-style representation bars, in the party's colour.
+  function renderRepresentation(Q, id) {
+    var out = el(id);
+    if (!out) { return; }
+    var colour = UI.partyColor(Q.player_party || 'psoe');
+    var rows = [['Congress of Deputies', Q.rep_congress, 350], ['Senate', Q.rep_senate, Q.senate_total],
+      ['European Parliament', Q.rep_ep, Q.ep_total], ['Regional parliaments', Q.rep_regional, Q.rep_regional_total],
+      ['Regional governments', Q.rep_presidencies, Q.rep_regions], ['Local government', Q.rep_local, Q.rep_local_total]];
+    out.innerHTML = '<table class="sp-rep">' + rows.filter(function (r) { return r[2] > 0; }).map(function (r) {
+      var v = r[1] || 0, pct = Math.min(100, 100 * v / r[2]);
+      return '<tr><th>' + r[0] + '</th><td><div class="sp-rep-num">' + v.toLocaleString('en-GB') + ' / ' + r[2].toLocaleString('en-GB') +
+        '</div><div class="sp-rep-bar"><span style="width:' + pct.toFixed(1) + '%;background:' + colour + '"></span></div></td></tr>';
+    }).join('') + '</table>' +
+      (Q.rep_in_regional_govt ? '<p class="sp-map-legend">In government in ' + Q.rep_in_regional_govt + ' regions.</p>' : '');
+  }
+
   function renderPrimary(Q, id) {
     var out = el(id);
     if (!out || !Q.pv_rows) { return; }
@@ -3996,7 +4012,7 @@
     membersDrift: membersDrift,
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
-    renderEndorsements: renderEndorsements, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

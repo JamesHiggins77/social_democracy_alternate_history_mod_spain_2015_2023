@@ -4,6 +4,7 @@ is-special: true
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
     window.SpainGame.renderCongress(Q, 'sp-side-congress', true);
+    window.SpainGame.renderRepresentation(Q, 'sp-side-rep');
 }
 !}
 
@@ -53,17 +54,7 @@ Stability: **[+ chaos_word +]**
 
 [? if exiled = 1 : [+ my_party_cap +] ?][? if exiled = 0 : The PSOE ?] holds:
 
-Congress of Deputies: **[+ rep_congress +] / 350**
-
-Senate: **[+ rep_senate +] / [+ senate_total +]**
-
-European Parliament: **[+ rep_ep +] / [+ ep_total +]**
-
-Regional parliaments: **[+ rep_regional +] / [+ rep_regional_total +]**
-
-Regional presidencies: **[+ rep_presidencies +] / [+ rep_regions +]** (in government in [+ rep_in_regional_govt +])
-
-[? if rep_local_total > 0 : Local councillors: **[+ rep_local +] / [+ rep_local_total +]** ?]
+{!<div id="sp-side-rep"></div>!}
 
 
 @politics

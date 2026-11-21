@@ -604,3 +604,10 @@ a.sp-ent { text-decoration: none; }
 .sp-ent-plogo { flex: none; height: 28px; max-width: 64px; object-fit: contain; background: #fff; border-radius: 3px; padding: 2px; }
 .sp-ent-emblem { display: block; height: 36px; max-width: 90px; object-fit: contain; margin-bottom: 6px; }
 .sp-event-img { display: block; width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin: 4px 0 12px; }
+
+.sp-rep { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+.sp-rep th { text-align: left; font-weight: 600; padding: 4px 6px 4px 0; vertical-align: top; width: 42%; }
+.sp-rep td { padding: 4px 0; }
+.sp-rep-num { font-variant-numeric: tabular-nums; }
+.sp-rep-bar { height: 12px; border: 1px solid #999; background: #fff; margin-top: 2px; }
+.sp-rep-bar span { display: block; height: 100%; }
