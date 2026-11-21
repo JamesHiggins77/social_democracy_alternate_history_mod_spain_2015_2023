@@ -610,3 +610,7 @@ Real polling averages swung far more than the game's: the PP went from about 33%
 - **Opposition:** "A popular bill" lets the PSOE dare the government to vote it down; a small gain either way, larger if it passes.
 - **Budget negotiations deck** (opens 2 months before a budget is due): one card per party with seats, each naming a price (Basque investment, Catalan dialogue, minimum wage, tax cuts). Paying signs a deal; that party votes yes on the next budget. Deals reset after the vote.
 - A lost budget is a major humiliation: −1.2 support across classes and −6 authority, on top of the existing card penalty.
+
+### 7.29 Primary polls lean to the establishment
+
+Polls appear when Díaz enters (for the endorsements) and after the endorsements (for the vote). They sample office-holders and older members, so they overrate Díaz by about 7–9 points on signatures and 9–10 points on the vote, and underrate Sánchez.

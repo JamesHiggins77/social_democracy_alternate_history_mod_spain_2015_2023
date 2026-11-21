@@ -2990,6 +2990,22 @@
     Q.av_leader = CANDIDATES[Q.av_rows[0].id][0];
     Q.endorsements_done = 1;
   }
+  // Published polls of the race: the pollsters sample the apparatus and the
+  // older, loyal members, so they overrate the establishment candidate.
+  // stage 'signatures' polls the endorsements, 'vote' the ballot.
+  function primaryPoll(Q, stage) {
+    var t = primaryTargets(Q), est = 'c_diaz';
+    var bias = stage === 'signatures' ? 22 : 9;
+    var p = {}, sum = 0;
+    Object.keys(t).forEach(function (c) {
+      var v = t[c] * (1 + 0.08 * gaussian());
+      if (c === est) { v += bias; } else if (c === 'c_sanchez') { v -= bias * 0.6; } else { v -= bias * 0.2; }
+      p[c] = Math.max(1, v); sum += p[c];
+    });
+    var rows = Object.keys(p).map(function (c) { return [c, Math.round(1000 * p[c] / sum) / 10]; }).sort(function (a, b) { return b[1] - a[1]; });
+    Q['ppoll_' + stage] = rows.map(function (r) { return CANDIDATES[r[0]][0] + ' ' + r[1].toFixed(1) + '%'; }).join(', ');
+    return rows;
+  }
   // National vote targets for the primary, before endorsements.
   function primaryTargets(Q) {
     // one draw of the members' mood per race: the endorsements and the vote share it
@@ -4152,7 +4168,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

@@ -1611,11 +1611,13 @@ new-page: true
 tags: sp_event
 view-if: leadership_exception_open = 1 and lopez_decided = 1 and diaz_entered = 0 and time >= lopez_announce_time + 2 and retired = 0
 max-visits: 1
-on-arrival: diaz_entered = 1
+on-arrival: {! Q.diaz_entered = 1; if (window.SpainGame) { window.SpainGame.primaryPoll(Q, 'signatures'); } !}
 
 = Susana Díaz enters the race
 
 On 12 March, in a packed pavilion in Madrid, Susana Díaz finally announces her candidacy. Felipe González, Zapatero and Alfonso Guerra are in the front row, with almost every regional baron. "I want to win," she says, "and I want to win for the PSOE." The old guard has its candidate.
+
+The first polls of the endorsement race, taken among the party's office-holders and long-standing members: [+ ppoll_signatures +]. The pollsters reach the apparatus far more easily than the new members.
 
 @endorsements
 title: The endorsements
@@ -1623,7 +1625,7 @@ new-page: true
 tags: sp_event
 view-if: leadership_exception_open = 1 and diaz_entered = 1 and endorsements_done = 0 and ((year = 2017 and month >= 4) or year >= 2018)
 max-visits: 1
-on-arrival: {! if (window.SpainGame) { window.SpainGame.primaryEndorsements(Q); } else { Q.endorsements_done = 1; } !}
+on-arrival: {! if (window.SpainGame) { window.SpainGame.primaryEndorsements(Q); window.SpainGame.primaryPoll(Q, 'vote'); } else { Q.endorsements_done = 1; } !}
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderEndorsements(Q, 'sp-avales'); }
 !}
@@ -1635,6 +1637,8 @@ From 20 April to 4 May the candidates collect the signed endorsements of the mem
 {!<div id="sp-avales"></div>!}
 
 [+ av_leader +] wins the endorsements. [? if tapias_out = 1 : José Antonio Pérez Tapias falls short and is off the ballot. ?] Endorsements are not votes: in the secrecy of the ballot box, members can sign for one candidate and vote for another.
+
+The polls for the vote on 21 May: [+ ppoll_vote +]. They have underrated insurgents before.
 
 @iglesias_leaves
 title: Pablo Iglesias leaves
