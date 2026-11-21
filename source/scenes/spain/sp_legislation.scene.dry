@@ -256,12 +256,17 @@ title: The bill passes
 
 = [+ law_name +]: passed
 
-Yes [+ law_yes +], no [+ law_no +], abstentions [+ law_abstain +]. The vote is carried.[? if law_partner_split = 1 : A coalition partner voted against, and the cracks are on every front page. ?]
+Yes [+ law_yes +], no [+ law_no +], abstentions [+ law_abstain +]. The vote is carried.[? if law_senate_delay = 1 : The government has no majority in the Senate, which vetoes the bill: Congress can lift the veto only in two months, and the law takes effect then. ?]
+
+{!<div class="sp-last-vote"></div>!}
+[? if law_partner_split = 1 : A coalition partner voted against, and the cracks are on every front page. ?]
 
 @law_lost
 title: The bill falls
 
 = [+ law_name +]: defeated
+
+{!<div class="sp-last-vote"></div>!}
 
 Yes [+ law_yes +], no [+ law_no +], abstentions [+ law_abstain +]. The government loses a vote in its own Congress. It is not fatal, but it is noted.[? if law_partner_split = 1 : A coalition partner voted against, and the cracks are on every front page. ?]
 

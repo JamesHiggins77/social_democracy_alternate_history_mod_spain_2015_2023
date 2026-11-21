@@ -18,7 +18,7 @@
     ['mxme', 'Més per Menorca', '#9FBF1F', 'MxMe'], ['cha', 'Chunta Aragonesista', '#3A8A3A', 'CHA'],
     ['aa', 'Adelante Andalucía', '#2E8B57', 'AA'],
     ['bng', 'BNG', '#7FB3E0', 'BNG'], ['geroa', 'Geroa Bai', '#F75E42', 'Geroa'],
-    ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['ps', 'Pedro Sánchez List', '#F0648C', 'PSL'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
+    ['psc', 'PSC', '#ED2E38', 'PSC'], ['psoe', 'PSOE', '#E1001A', 'PSOE'], ['ps', 'Pedro Sánchez List', '#F0648C', 'PSL'], ['pacma', 'PACMA', '#9BC400', 'PACMA'],
     ['te', 'Teruel Existe', '#037252', 'TE'], ['foro', 'Foro Asturias', '#2E73B8', 'Foro'],
     ['prc', 'PRC', '#C2CE0C', 'PRC'], ['nc', 'Nueva Canarias', '#9ACD32', 'NC'],
     ['cc', 'Coalición Canaria', '#FFD700', 'CC'], ['asg', 'Agrupación Socialista Gomera', '#E3242B', 'ASG'],

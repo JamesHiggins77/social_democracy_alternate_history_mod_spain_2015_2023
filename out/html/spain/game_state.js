@@ -13,6 +13,7 @@
   var VoteModel = lib('SpainVoteModel', 'vote_model.js');
   var RegionalModel = lib('SpainRegionalModel', 'regional_model.js');
   var Parliament = lib('SpainParliament', 'parliament.js');
+  var Electoral = lib('SpainElectoral', 'electoral_engine.js');
   var UI = lib('SpainUI', 'spain_ui.js');
   var DATA = lib('SPAIN_ELECTION_DATA', 'election_data.js');
   var POLL_HISTORY = lib('SPAIN_POLL_HISTORY', 'poll_history_data.js');
@@ -438,6 +439,7 @@
   function recalculate(Q) {
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
+    installHooks(Q);
     lawFlags(Q);
     roleFlags(Q);
     catalanCrisisState(Q, false);
@@ -649,7 +651,7 @@
 
   // The vote model's true national result (not shown to the player).
   function trueVote(Q) {
-    return VoteModel.runGeneralElection(Q.vm, base(), DATA, Q.year, Q.month);
+    return generalResult(Q, Q.vm);
   }
 
   // ------------------------------------------------------------------
@@ -711,7 +713,7 @@
 
   function finalCampaignPoll(Q) {
     var me = Q.player_party || 'psoe';
-    var r = VoteModel.runGeneralElection(withEday(Q), base(), DATA, Q.year, Q.month);
+    var r = generalResult(Q, withEday(Q));
     Q.eday_poll = Math.round((r.voteShares[me] || 0) * 10) / 10;
     Q.eday_seats = r.totals[me] || 0;
     Q.eday_base_poll = Math.round(((Q.true_poll && Q.true_poll[me]) || 0) * 10) / 10;
@@ -881,7 +883,7 @@
         polled.partyFactor[p] = (polled.partyFactor[p] === undefined ? 1 : polled.partyFactor[p]) * f;
       }
     });
-    var r = VoteModel.runGeneralElection(polled, base(), DATA, Q.year, Q.month);
+    var r = generalResult(Q, polled);
     Q.poll = r.voteShares;
     Q.poll_seats = r.totals;
     Q.poll_psoe = Math.round(r.voteShares.psoe || 0);
@@ -2038,7 +2040,9 @@
 
   // Motion of no confidence with Sánchez as candidate.
   function holdCensure(Q) {
+    Q.vote_kind = 'censure';
     var v = Parliament.count(Q.congress, Parliament.stancesForCensure(Q));
+    saveVote(Q, 'Motion of no confidence', v);
     Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
     Q.censure_passed = v.yes >= Parliament.MAJORITY ? 1 : 0;
     if (Q.censure_passed) {
@@ -2066,7 +2070,10 @@
 
   // Budget vote for a PSOE government.
   function holdBudget(Q) {
+    Q.vote_kind = 'budget';
     var v = Parliament.count(Q.congress, Parliament.stancesForBudget(Q));
+    saveVote(Q, 'The budget', v);
+    if (v.yes > v.no && !govSenateMajority(Q) && v.yes < 176) { Q.budget_senate_delay = 1; } else { Q.budget_senate_delay = 0; }
     Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
     Q.budget_passed = v.yes > v.no ? 1 : 0;
     if (!Q.budget_passed) {
@@ -2192,6 +2199,8 @@
     positionDrift(Q);
     lineDrift(Q);
     rightRealignment(Q);
+    senateQueue(Q);
+    splitChecks(Q);
     if (Q.pm === 'Pedro Sánchez') { Q.pm_months = (Q.pm_months || 0) + 1; }
     incumbencyWear(Q);
     moodShocks(Q);
@@ -2341,7 +2350,10 @@
   // Holds the vote. Starts the two-month clock on the first vote of a
   // legislature. Returns the tally.
   function holdInvestiture(Q, candidate) {
+    Q.vote_kind = 'investiture_' + candidate;
     var v = projectedVote(Q, candidate);
+    saveVote(Q, 'Investiture of ' + (candidate === 'sanchez' ? leaderOf(Q, 'psoe') : candidate === 'pp' ? (Q.pp_leader || 'the PP candidate') : UI.partyName(candidate) + "'s candidate"), v);
+    Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
     if (Q.government_status !== 'acting') {
       return v;   // there is a government: no investiture to hold
     }
@@ -2644,7 +2656,7 @@
 
   function runGeneralElection(Q) {
     Q.prev_poll = Q.poll ? JSON.parse(JSON.stringify(Q.poll)) : null;
-    var r = VoteModel.runGeneralElection(Q.eday ? withEday(Q) : Q.vm, base(), DATA, Q.year, Q.month);
+    var r = generalResult(Q, Q.eday ? withEday(Q) : Q.vm);
     Q.last_eday_spent = Q.eday ? (Q.eday_spent || 0) : 0;
     settleFinalCampaign(Q);
     Q.final_campaign_round = (Q.elections_held || 0) + 1;
@@ -2670,6 +2682,8 @@
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
     Q.senate_elected = senateElected(r.ballots);
+    Q.psoe_cat_seats = 0;
+    CAT_PROVINCES.forEach(function (pr) { var ds = r.districts && r.districts[pr]; if (ds) { Q.psoe_cat_seats += ds.psoe || 0; } });
     Q.prov_base = {};
     Object.keys(r.ballots).forEach(function (pr) {
       var o = {}, sum = 0;
@@ -2916,6 +2930,7 @@
       }
       var ballots = RegionalModel.regionalBallots(Q.vm, base(), REGIONAL, region, date);
       if (saved) { Q.vm.regionalMod[region] = saved; }
+      if (region === 'Cataluña') { pscBallots(Q, ballots); }
       var r = lib('SpainRegionalRules', 'regional_rules.js').electRegion(region, ballots, date,
         REGIONAL.regions[region]);
       var flat = {};
@@ -3500,14 +3515,39 @@
   // kind: 'pass' | 'expand' | 'repeal'. Returns the tally.
   function voteLaw(Q, id, kind) {
     var L = LAWS[id];
+    Q.vote_kind = id;
     var v = Parliament.count(Q.congress, lawStances(Q, id, kind === 'repeal'));
+    saveVote(Q, (kind === 'repeal' ? 'Repeal of the ' : (kind === 'expand' ? 'Expansion of the ' : '')) + L.name, v);
     var passes = L.organic && kind !== 'repeal' ? v.yes >= 176 : v.yes > v.no;
+    // the Senate: without a majority there, an ordinary bill is vetoed and
+    // Congress needs two months to lift the veto by simple majority (an
+    // absolute majority of 176 lifts it at once)
+    Q.law_senate_delay = passes && !govSenateMajority(Q) && v.yes < 176 ? 1 : 0;
     Q.law_yes = v.yes; Q.law_no = v.no; Q.law_abstain = v.abstain; Q.law_name = L.name; Q.law_passed_now = passes ? 1 : 0;
     Q.law_partner_split = 0;
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
     var f = kind === 'expand' ? 0.6 : (kind === 'repeal' ? -1 : 1);
     if (passes) {
       Q['law_' + id] = kind === 'repeal' ? -1 : (kind === 'expand' ? 2 : 1);
+      Q.laws_passed = (Q.laws_passed || 0) + (kind === 'pass' ? 1 : 0);
+      if (Q.law_senate_delay) {
+        Q.pending_laws = (Q.pending_laws || []).concat([{ id: id, kind: kind, due: (Q.time || 0) + 2 }]);
+      } else {
+        lawEffects(Q, id, kind);
+      }
+    } else {
+      // a lost vote: a small embarrassment for the government
+      Q.laws_failed = (Q.laws_failed || 0) + 1;
+      campaign(Q, 'psoe', all(-0.25));
+      Q.sanchez_authority -= 2;
+    }
+    lawAftermath(Q, id, kind, L);
+    return v;
+  }
+  function lawEffects(Q, id, kind) {
+    var L = LAWS[id];
+    var f = kind === 'expand' ? 0.6 : (kind === 'repeal' ? -1 : 1);
+    {
       var eff = {};
       Object.keys(L.effect).forEach(function (c) { eff[c] = L.effect[c] * f; });
       campaign(Q, 'psoe', eff);
@@ -3518,13 +3558,10 @@
       if (L.cat) { Q.cat_dialogue = (Q.cat_dialogue || 0) + L.cat * f; }
       if (L.vox && f > 0) { voxFlow(Q, L.vox * 0.3); }
       if (L.split) { Q[L.split + '_dissent'] += 4 * f; }
-      Q.laws_passed = (Q.laws_passed || 0) + (kind === 'pass' ? 1 : 0);
-    } else {
-      // a lost vote: a small embarrassment for the government
-      Q.laws_failed = (Q.laws_failed || 0) + 1;
-      campaign(Q, 'psoe', all(-0.25));
-      Q.sanchez_authority -= 2;
     }
+    recalculate(Q);
+  }
+  function lawAftermath(Q, id, kind, L) {
     // partners who were overruled or who voted against show the cracks
     (Q.govt_parties || []).forEach(function (p) {
       if (p !== 'psoe' && (L.partnerHate || []).indexOf(p) !== -1 && kind !== 'repeal') {
@@ -3533,8 +3570,261 @@
     });
     Q.law_timer = 2;
     recalculate(Q);
-    return v;
   }
+
+  // ------------------------------------------------------------------
+  // Votes in Congress: rebels, the party-by-party record, the Senate.
+  // ------------------------------------------------------------------
+  var CUR_Q = null;   // the state the Parliament hooks read
+  function saveVote(Q, title, v) {
+    Q.last_vote = { title: title, yes: v.yes, no: v.no, abstain: v.abstain, passes: v.passes ? 1 : 0, rows: v.rows || [], date: Q.year + '-' + Q.month };
+    Q.last_vote_rebels = (v.rows || []).reduce(function (a, r) { return a + (r.rebels || 0); }, 0);
+    Q.vote_kind = '';
+  }
+  // Does the government control the Senate (its parties hold a majority)?
+  function govSenateMajority(Q) {
+    var sen = Q.senate || {}, tot = Q.senate_total || 266, mine = 0;
+    (Q.govt_parties || [Q.pm_party]).forEach(function (p) { mine += sen[p] || 0; });
+    return mine > tot / 2;
+  }
+  // Rebels: deputies who break with their party's line.
+  function rebelsFor(Q, seats, st) {
+    var out = {}, kind = Q.vote_kind || '';
+    var ppLed = st.pp === 'yes' && (st.psoe === 'yes' || st.psoe === 'abstain');
+    // the PSOE's left (and, before a split, the PSC) when the party lets the
+    // PP govern or votes with it: fifteen deputies and the PSC in October 2016
+    if (ppLed && seats.psoe) {
+      var n = Math.round(seats.psoe * (0.03 + (Q.progressives_dissent || 20) / 500)) + (Q.psc_split ? 0 : Math.round((Q.psoe_cat_seats || 0) * 0.9));
+      out.psoe = { n: n, to: 'no' };
+    }
+    // the PSOE's unionist barons' deputies on concessions to the independence parties
+    if (seats.psoe && st.psoe === 'yes' && (kind === 'amnesty' || (Q.depends_on_catalans && /^investiture_sanchez/.test(kind)))) {
+      var u = Math.max(0, Math.round(((Q.regional_leaders_dissent || 10) - 30) / 15));
+      if (u) { out.psoe = { n: u, to: 'abstain' }; }
+    }
+    // Podemos's anticapitalist current when Podemos props up a centrist
+    // deal or votes with the PP
+    if (seats.up && st.up === 'yes' && (ppLed || st.cs === 'yes' || ((Q.econ_left || 0) <= -2 && kind === 'budget'))) {
+      out.up = { n: Math.max(1, Math.round(seats.up * 0.08)), to: 'abstain' };
+    }
+    // PP deputies against helping a PSOE-led government
+    if (seats.pp && st.pp === 'yes' && st.psoe === 'yes' && !ppLed) {
+      out.pp = { n: Math.round(seats.pp * 0.06), to: 'no' };
+    }
+    // Ciudadanos's social democrats (Garicano's wing) when Cs props up the PP with Vox
+    if (seats.cs && st.cs === 'yes' && st.vox === 'yes' && st.pp === 'yes') {
+      out.cs = { n: Math.round(seats.cs * 0.05), to: 'abstain' };
+    }
+    return out;
+  }
+  // Stances for parties the stance tables do not know: the PSC after it
+  // leaves the PSOE votes with it when allied, otherwise against the PP.
+  function fillStances(Q, st, seats) {
+    if (!seats || !seats.psc || st.psc) { return st; }
+    var o = Object.assign({}, st);
+    var rel = Q.rel_psc === undefined ? 40 : Q.rel_psc;
+    if (st.pp === 'yes' && st.psoe !== 'yes') { o.psc = 'no'; }
+    else if (st.psoe === 'yes') { o.psc = rel >= 55 ? 'yes' : (rel >= 30 ? 'abstain' : 'no'); }
+    else { o.psc = st.psoe || 'no'; }
+    return o;
+  }
+  function installHooks(Q) {
+    CUR_Q = Q;
+    Parliament.hooks.rebels = function (seats, st) { return CUR_Q ? rebelsFor(CUR_Q, seats, st) : {}; };
+    Parliament.hooks.fill = function (st, seats) { return CUR_Q ? fillStances(CUR_Q, st, seats) : st; };
+  }
+  // Laws held up by the Senate take effect when the veto is lifted.
+  function senateQueue(Q) {
+    var due = [], keep = [];
+    (Q.pending_laws || []).forEach(function (pl) { ((Q.time || 0) >= pl.due ? due : keep).push(pl); });
+    Q.pending_laws = keep;
+    due.forEach(function (pl) { lawEffects(Q, pl.id, pl.kind); });
+    if (due.length) { Q.senate_lifted = LAWS[due[0].id].name; Q.senate_lifted_due = 1; }
+    if (Q.pending_budget && (Q.time || 0) >= Q.pending_budget) {
+      Q.pending_budget = 0;
+      Q.fiscal_adj += 0.2; econ(Q, 0.2, -0.1); social(Q, 1);
+      campaign(Q, 'psoe', { pensioners: 1, workers: 1, unemployed: 1 });
+      Q.senate_lifted = 'budget'; Q.senate_lifted_due = 1;
+    }
+  }
+  var STANCE_WORD = { yes: 'Yes', no: 'No', abstain: 'Abstain' };
+  function renderLastVote(Q, out) {
+    var v = Q.last_vote;
+    if (!out || !v || !v.rows) { return; }
+    var groups = { yes: [], no: [], abstain: [] };
+    v.rows.filter(function (r) { return r.seats > 0; }).sort(function (a, b) { return b.seats - a.seats; }).forEach(function (r) {
+      groups[r.stance].push({ id: r.id, n: r.seats - r.rebels, rebel: false });
+      if (r.rebels) { groups[r.rebelStance].push({ id: r.id, n: r.rebels, rebel: true }); }
+    });
+    var cell = function (list) {
+      return list.length ? list.map(function (x) {
+        return '<span class="sp-vote-chip" style="border-color:' + UI.partyColor(x.id) + '"><span class="sp-swatch" style="background:' + UI.partyColor(x.id) + '"></span>' +
+          UI.shortName(x.id) + ' ' + x.n + (x.rebel ? ' <em>(rebels)</em>' : '') + '</span>';
+      }).join(' ') : '<span class="sp-map-legend">none</span>';
+    };
+    out.innerHTML = '<table class="sp-results sp-vote-table"><thead><tr><th colspan="2">' + v.title + ': ' + (v.passes ? 'carried' : 'defeated') + '</th></tr></thead><tbody>' +
+      ['yes', 'no', 'abstain'].map(function (k) {
+        return '<tr><td><b>' + STANCE_WORD[k] + ' ' + v[k] + '</b></td><td>' + cell(groups[k]) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+  function fillVoteBoxes() {
+    if (typeof document === 'undefined') { return; }
+    var Q = root.dendryUI && root.dendryUI.dendryEngine && root.dendryUI.dendryEngine.state && root.dendryUI.dendryEngine.state.qualities;
+    if (!Q) { return; }
+    Array.prototype.forEach.call(document.querySelectorAll('.sp-last-vote:not([data-done])'), function (box) {
+      box.setAttribute('data-done', '1');
+      renderLastVote(Q, box);
+    });
+  }
+  if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
+    var startObs = function () {
+      if (!document.body) { return; }
+      new MutationObserver(fillVoteBoxes).observe(document.body, { childList: true, subtree: true });
+    };
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', startObs); } else { startObs(); }
+  }
+
+  // ------------------------------------------------------------------
+  // Splits: the PSC, and the Socialist Left.
+  // ------------------------------------------------------------------
+  var CAT_PROVINCES = ['Barcelona', 'Girona', 'Lleida', 'Tarragona'];
+  // Move a share of a party's seats in every body (Congress, Senate,
+  // European Parliament, regional parliaments, councils) to other parties.
+  // to: {party: fraction}; regional: limit to one region (or null).
+  function moveSeats(Q, from, frac, to, region) {
+    var move = function (obj) {
+      if (!obj || !obj[from]) { return 0; }
+      var n = Math.round(obj[from] * frac), done = 0;
+      Object.keys(to).forEach(function (p, i, arr) {
+        var k = i === arr.length - 1 ? n - done : Math.round(n * to[p]);
+        obj[p] = (obj[p] || 0) + k; done += k;
+      });
+      obj[from] -= n;
+      return n;
+    };
+    var r = {};
+    if (region) {
+      if (Q.regions && Q.regions[region]) { r.regional = move(Q.regions[region].seats); }
+      return r;
+    }
+    r.congress = move(Q.congress);
+    if (Q.senate_elected) { r.senate = move(Q.senate_elected); }
+    if (Q.ep_seats) { r.ep = move(Q.ep_seats); }
+    r.regional = 0;
+    Object.keys(Q.regions || {}).forEach(function (rg) { r.regional += move(Q.regions[rg].seats) || 0; });
+    if (Q.local_seats) { r.local = move(Q.local_seats); }
+    return r;
+  }
+  // The PSC leaves the PSOE. Its deputies, senators, MEP(s), its Catalan
+  // parliament group and its councillors go with it.
+  function pscSplit(Q) {
+    if (Q.psc_split) { return; }
+    Q.psc_split = 1;
+    Q.psc_split_year = Q.year;
+    var cat = Math.max(1, Q.psoe_cat_seats || Math.round((Q.congress.psoe || 0) * 0.12));
+    var catFrac = Math.min(1, cat / Math.max(1, Q.congress.psoe || 1));
+    var r = {};
+    r.congress = cat; Q.congress.psoe -= cat; Q.congress.psc = (Q.congress.psc || 0) + cat;
+    if (Q.senate_elected && Q.senate_elected.psoe) { var sn = Math.round(Q.senate_elected.psoe * catFrac); Q.senate_elected.psoe -= sn; Q.senate_elected.psc = (Q.senate_elected.psc || 0) + sn; r.senate = sn; }
+    if (Q.ep_seats && Q.ep_seats.psoe >= 6) { Q.ep_seats.psoe -= 1; Q.ep_seats.psc = (Q.ep_seats.psc || 0) + 1; r.ep = 1; }
+    if (Q.regions && Q.regions['Cataluña']) {
+      var cs = Q.regions['Cataluña'].seats; r.regional = cs.psoe || 0; cs.psc = (cs.psc || 0) + (cs.psoe || 0); cs.psoe = 0;
+      var g = Q.regions['Cataluña'].government; if (g && g.party === 'psoe') { g.party = 'psc'; }
+    }
+    if (Q.local_seats && Q.local_seats.psoe) { var ln = Math.round(Q.local_seats.psoe * 0.11); Q.local_seats.psoe -= ln; Q.local_seats.psc = (Q.local_seats.psc || 0) + ln; r.local = ln; }
+    Q.psc_moved = r; Q.psc_moved_congress = r.congress || 0;
+    Q.rel_psc = 25;
+    Q.psc_due = 1;
+    if (Q.vm) {
+      // the PSOE's own Catalan vote now belongs to the PSC
+      Q.vm.regionalMod['Cataluña'] = Q.vm.regionalMod['Cataluña'] || {};
+      Q.psc_cat_factor = 0.2;
+      Q.vm.regionalMod['Cataluña'].psoe = (Q.vm.regionalMod['Cataluña'].psoe === undefined ? 1 : Q.vm.regionalMod['Cataluña'].psoe) * 0.2;
+    }
+    recalculate(Q);
+  }
+  // The PSOE decides whether to run its own candidates in Catalonia.
+  // run = 1: PSOE-Cat lists fight the PSC (a fifth of the old vote, mostly
+  // unionist); run = 0: a pact, the PSC runs alone and votes with the PSOE.
+  function pscChoice(Q, run) {
+    Q.psoe_runs_cat = run ? 1 : 0;
+    if (run) { Q.rel_psc = 10; } else { Q.rel_psc = 60; }
+    recalculate(Q);
+  }
+  // With the PSC split, the socialist vote in the Catalan provinces is
+  // divided before seats are shared: the PSC keeps it all, or four fifths
+  // if the PSOE runs its own lists (PSOE-Cat) against it.
+  function pscBallots(Q, ballots) {
+    if (!Q.psc_split) { return ballots; }
+    CAT_PROVINCES.forEach(function (pr) {
+      var b = ballots[pr];
+      if (!b) { return; }
+      var out = [], socialist = 0;
+      b.lists.forEach(function (l) {
+        var id = Array.isArray(l) ? l[0] : l.id, v = Array.isArray(l) ? l[2] : l.votes;
+        if (id === 'psoe') { socialist += v; } else { out.push(l); }
+      });
+      // undo the cut made at the split: the whole socialist electorate
+      var full = socialist / (Q.psc_cat_factor || 1);
+      var mine = Q.psoe_runs_cat ? Math.round(0.2 * full) : 0;
+      var arr = Array.isArray(b.lists[0]);
+      var mk = function (id, name, v) { return arr ? [id, name, v] : { id: id, name: name, votes: v }; };
+      out.push(mk('psc', 'PSC', Math.round(full - mine)));
+      if (mine > 0) { out.push(mk('psoe', 'PSOE', mine)); }
+      b.lists = out;
+    });
+    return ballots;
+  }
+  function generalResult(Q, state) {
+    var ballots = pscBallots(Q, VoteModel.provinceBallots(state, base()));
+    var result = Electoral.electCongress(ballots, VoteModel.apportionmentFor(DATA, Q.year, Q.month));
+    result.voteShares = VoteModel.nationalShares(ballots);
+    result.ballots = ballots;
+    return result;
+  }
+  // The Socialist Left walks out: a handful of deputies, a known figure, a
+  // share of senators, regional deputies and councillors. Most join
+  // Podemos, some IU. It can cost a government its majority.
+  function leftSplit(Q) {
+    if (Q.left_split) { return; }
+    Q.left_split = 1;
+    Q.left_split_year = Q.year;
+    var frac = Math.min(0.12, 0.03 + (Q.progressives_strength || 15) / 300);
+    var r = moveSeats(Q, 'psoe', frac, { up: 0.75, iu: 0.25 }, null);
+    Q.left_moved = r;
+    Q.left_split_deputies = r.congress || 0;
+    Q.left_split_leader = 'José Antonio Pérez Tapias';
+    if (Q.adv_tapias) { Q.adv_tapias = 0; Q.adv_offer_tapias = 0; }
+    Q.progressives_strength = Math.max(3, (Q.progressives_strength || 15) * 0.5);
+    Q.progressives_dissent = 15;
+    Q.member_morale -= 8;
+    if (Q.vm) { transfer(Q, 'psoe', { up: 0.75, iu: 0.25 }, { students: 1.5, workers: 1.2, unemployed: 1, professionals: 0.5 }); }
+    // a government that needed those votes may have lost its majority
+    var govSeats = 0; (Q.govt_parties || []).forEach(function (p) { govSeats += Q.congress[p] || 0; });
+    Q.left_split_cost_majority = Q.psoe_in_government && !Q.acting && govSeats < 176 && govSeats + (r.congress || 0) >= 176 ? 1 : 0;
+    Q.left_split_due = 1;
+    recalculate(Q);
+  }
+  // Monthly checks for the splits.
+  function splitChecks(Q) {
+    var supportsPP = Q.grand_coalition || Q.gestora_invested || (Q.pm_party === 'pp' && Q.psoe_supply);
+    var unionist = (Q.const_line_eff || 0) <= -2.5;
+    if (!Q.psc_split && Q.year >= 2016 && ((supportsPP && (Q.rel_erc || 40) >= 0) || unionist)) {
+      Q.psc_tension = (Q.psc_tension || 0) + (supportsPP ? 6 : 0) + (unionist ? 5 : 0) + ((Q.cat_hard_line || 0) >= 2 ? 3 : 0);
+    } else {
+      Q.psc_tension = Math.max(0, (Q.psc_tension || 0) - 3);
+    }
+    if (!Q.psc_split && Q.psc_tension >= 30) { pscSplit(Q); }
+    var left = (Q.grand_coalition ? 3 : 0) + (supportsPP ? 2 : 0) + Math.max(0, -1 - (Q.econ_left || 0)) +
+      Math.max(0, (Q.progressives_dissent || 20) - 50) / 10;
+    if (!Q.left_split && Q.year >= 2016 && left >= 3 && (Q.progressives_dissent || 0) >= 55) {
+      Q.left_tension = (Q.left_tension || 0) + left;
+    } else {
+      Q.left_tension = Math.max(0, (Q.left_tension || 0) - 2);
+    }
+    if (!Q.left_split && Q.left_tension >= 30) { leftSplit(Q); }
+  }
+
   // In opposition: dare the government to vote down a popular bill.
   function dareBill(Q) {
     var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
@@ -4717,7 +5007,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

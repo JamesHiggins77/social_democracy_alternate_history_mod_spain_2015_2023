@@ -615,3 +615,6 @@ a.sp-ent { text-decoration: none; }
 .sp-hover-col { fill: transparent; pointer-events: all; }
 .sp-hover-col:hover { fill: rgba(0,0,0,0.06); }
 .sp-rep-next { font-size: 0.78em; color: #6b6b6b; margin-top: 2px; }
+.sp-vote-table td { vertical-align: top; }
+.sp-vote-chip { display: inline-block; white-space: nowrap; margin: 1px 6px 1px 0; }
+.sp-vote-chip em { color: #8a2a2a; font-size: 0.9em; }

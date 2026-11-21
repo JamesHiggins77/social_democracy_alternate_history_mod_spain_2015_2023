@@ -215,13 +215,24 @@
 
   // Count a vote. seats: {party: n}. stances: {party: 'yes'|'abstain'|'no'}.
   // Parties without a stance vote no.
+  // hooks (set by the game): fill(stances) adds stances for parties the
+  // stance tables do not know (the PSC after a split); rebels(seats,
+  // stances) returns {party: {n: deputies, to: 'no'|'abstain'|'yes'}};
+  // record(rows) receives the party-by-party breakdown of each count.
+  var hooks = {};
   function count(seats, stances) {
-    var tally = { yes: 0, no: 0, abstain: 0, detail: {} };
+    var tally = { yes: 0, no: 0, abstain: 0, detail: {}, rows: [] };
+    stances = hooks.fill ? hooks.fill(stances, seats) : stances;
+    var reb = hooks.rebels ? (hooks.rebels(seats, stances) || {}) : {};
     Object.keys(seats).forEach(function (id) {
       var s = stances[id] || 'no';
-      tally[s] += seats[id];
+      var r = reb[id] && reb[id].n > 0 && reb[id].to !== s ? Math.min(seats[id], reb[id].n) : 0;
+      tally[s] += seats[id] - r;
+      if (r) { tally[reb[id].to] += r; }
       tally.detail[id] = s;
+      tally.rows.push({ id: id, seats: seats[id], stance: s, rebels: r, rebelStance: r ? reb[id].to : '' });
     });
+    if (hooks.record) { hooks.record(tally.rows); }
     tally.firstBallot = tally.yes >= MAJORITY;
     tally.secondBallot = tally.yes > tally.no;
     tally.passes = tally.firstBallot || tally.secondBallot;
@@ -247,6 +258,7 @@
   }
 
   var api = {
+    hooks: hooks,
     MAJORITY: MAJORITY,
     stancesForSanchez: stancesForSanchez,
     stancesForPP: stancesForPP,

@@ -1133,3 +1133,30 @@ test('a PM relying on the independence parties is easier to plot against than on
   assert.ok(run(1, 0) < run(1, 1));
   assert.ok(run(1, 1) <= run(0, 0) + 15);
 });
+
+test('PSOE rebels vote no when the party abstains for a PP investiture (October 2016)', () => {
+  const P = require('../out/html/spain/parliament.js');
+  const Q = newQ(); Q.year = 2016; Q.month = 10; Q.psoe_cat_seats = 7; Q.progressives_dissent = 40; G.recalculate(Q);
+  Q.vote_kind = 'investiture_pp';
+  const v = P.count({ pp: 137, psoe: 85, up: 71, cs: 32, erc: 9, junts: 8, pnv: 5, bildu: 2, cc: 1 },
+    { pp: 'yes', cs: 'yes', cc: 'yes', psoe: 'abstain', up: 'no', erc: 'no', junts: 'no', pnv: 'no', bildu: 'no' });
+  const r = v.rows.find(x => x.id === 'psoe');
+  assert.ok(r.rebels >= 10 && r.rebels <= 20, String(r.rebels));
+  assert.strictEqual(v.yes, 170);
+});
+
+test('the PSC split moves seats in every body; the left split costs the PSOE deputies', () => {
+  const Q = newQ(); Q.year = 2019; G.recalculate(Q);
+  Q.congress = { psoe: 120, pp: 66, up: 42, cs: 57, vox: 24, erc: 15 }; Q.psoe_cat_seats = 12;
+  G.pscSplit(Q);
+  assert.strictEqual(Q.congress.psc, 12); assert.strictEqual(Q.congress.psoe, 108);
+  G.leftSplit(Q);
+  assert.ok(Q.congress.psoe < 108 && Q.congress.up > 42);
+});
+
+test('without a Senate majority a law takes effect two months later', () => {
+  const Q = newQ(); Q.year = 2021; Q.player_in_government = 1; Q.pm_party = 'psoe'; Q.govt_parties = ['psoe'];
+  Q.congress = { psoe: 120, pp: 89, vox: 52, up: 35, erc: 13, cs: 10, junts: 8, pnv: 6, bildu: 5, mp: 3 };
+  G.recalculate(Q); Q.senate = { pp: 150, psoe: 100 }; Q.senate_total = 266;
+  assert.strictEqual(G.govSenateMajority(Q), false);
+});

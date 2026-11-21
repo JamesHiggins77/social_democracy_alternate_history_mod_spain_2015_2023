@@ -751,3 +751,25 @@ Over a year from a plot of 40, the plot ends near 55 in opposition, near 30 for 
 | Any government | Don't let the right undo it (once Vox has broken through) |
 
 Opposition-only attacks are now hidden while the PSOE governs: the debate's "question the Prime Minister's decency" and the rally's "end the PP's corruption". In government, the debate offers "Defend the government's record", which weakens with time in office.
+
+### 7.41 Splits, rebels, vote records, the Senate
+
+- **The PSC split** (`pscSplit`):
+  - **Trigger:** `psc_tension` builds while the PSOE supports a PP government or a grand coalition, takes a hard-unionist line, or keeps a hard line on Catalonia. The split happens at 30.
+  - **What moves:** the PSC takes the PSOE's Catalan deputies, about the same share of its senators, an MEP (if the PSOE has 6 or more), its Catalan parliament group, Catalan governments it leads, and about 11% of the PSOE's councillors.
+  - **Not ERC:** the PSC stays a party of its own. It is federalist, so it does not join ERC.
+  - **The PSOE's choice:** it either founds PSOE-Cat and runs against the PSC (taking 20% of the socialist vote in the Catalan provinces, with PSC relations at 10), or makes a pact and stays out of Catalonia (PSC relations at 60).
+  - **Later elections:** general and Catalan elections divide the socialist vote in the four Catalan provinces before seats are shared.
+  - **In votes:** the PSC votes with the PSOE when relations are 55 or more, abstains from 30, and votes no below that. It always votes against PP-led votes the PSOE doesn't back.
+- **The Socialist Left split** (`leftSplit`):
+  - **Trigger:** `left_tension` builds under a grand coalition or support for a PP government, a Neoliberal line, or Socialist Left dissent of 55 or more. The split happens at 30.
+  - **What moves:** 3–12% of the PSOE's seats in every body (Congress, Senate, European Parliament, regional parliaments, councils), three quarters to Podemos and a quarter to IU, plus voters.
+  - **Consequences:** Pérez Tapias leaves (and the adviser card goes with him). The game reports if the government loses its majority.
+- **Rebels:** counted in every vote through `Parliament.hooks`.
+  - **PSOE left:** when the PSOE abstains for, or votes with, the PP, its left votes no, and so does the PSC before any split. Model for October 2016: 170–110–70; real: 170–111–68.
+  - **PSOE unionists:** abstain on the amnesty, or on an investiture that depends on the independence parties, when the barons are angry.
+  - **Podemos's anticapitalists:** abstain when Podemos votes with Cs or the PP, or for a Neoliberal budget.
+  - **PP:** about 6% vote no on PSOE-led votes.
+  - **Cs:** about 5% abstain on PP+Vox votes.
+- **Vote record:** after every law, budget, investiture and no-confidence vote, the result shows which parties voted yes, no or abstained, with rebels marked.
+- **Senate:** if the government's parties lack a Senate majority and a bill passed with fewer than 176 votes, the Senate vetoes it. The law (or a budget's spending) takes effect two months later, when Congress lifts the veto. An event announces it.

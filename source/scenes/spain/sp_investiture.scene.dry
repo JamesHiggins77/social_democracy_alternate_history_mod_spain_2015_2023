@@ -113,6 +113,8 @@ on-arrival: sanchez_authority += 15; member_morale += 10; sanchismo += 10; feder
 
 = Prime Minister
 
+{!<div class="sp-last-vote"></div>!}
+
 Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. Pedro Sánchez is invested President of the Government.
 
 @lost
@@ -123,6 +125,8 @@ if (Q.inv_yes >= 130) { Q.sanchez_authority += 2; } else { Q.sanchez_authority -
 !}
 
 = Defeated
+
+{!<div class="sp-last-vote"></div>!}
 
 Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. The chamber rejects your candidacy in both ballots.
 

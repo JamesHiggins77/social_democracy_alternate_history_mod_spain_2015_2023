@@ -258,12 +258,16 @@ title: Prime Minister
 {!<img class="sp-event-img" src="img/spain/Spain/Events/Mariano_Rajoy_felicita_al_nuevo_presidente_del_Gobierno_Pedro_S%C3%A1nchez_%282018-06-01%29-%20No%20Confidence.jpg" alt="">!}
 
 
+{!<div class="sp-last-vote"></div>!}
+
 Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. For the first time in Spanish democracy, a motion of no confidence succeeds. Pedro Sánchez is President of the Government.
 
 @censure_lost
 title: The motion fails
 
 = The motion fails
+
+{!<div class="sp-last-vote"></div>!}
 
 Yes [+ inv_yes +], no [+ inv_no +], abstentions [+ inv_abstain +]. The government survives, and its ministers thank you for the show of strength.
 

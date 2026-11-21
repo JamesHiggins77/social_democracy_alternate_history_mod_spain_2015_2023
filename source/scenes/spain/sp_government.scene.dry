@@ -23,8 +23,9 @@ on-arrival: {!
 Q.month_actions += 1; Q.budget_timer = 12;
 if (window.SpainGame) { window.SpainGame.holdBudget(Q); }
 if (Q.budget_passed) {
-    Q.sanchez_authority += 8; Q.budget_year = Q.year; Q.fiscal_adj += 0.2; if (window.SpainGame) { window.SpainGame.econ(Q, 0.2, -0.1); window.SpainGame.social(Q, 1); }
-    if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, workers: 1, unemployed: 1}); }
+    Q.sanchez_authority += 8; Q.budget_year = Q.year;
+    if (Q.budget_senate_delay) { Q.pending_budget = (Q.time || 0) + 2; }
+    else { Q.fiscal_adj += 0.2; if (window.SpainGame) { window.SpainGame.econ(Q, 0.2, -0.1); window.SpainGame.social(Q, 1); window.SpainGame.campaign(Q, 'psoe', {pensioners: 1, workers: 1, unemployed: 1}); } }
 } else {
     Q.sanchez_authority -= 6;
 }
@@ -36,12 +37,16 @@ title: Budget approved
 
 = Budget approved
 
-Yes [+ inv_yes +], no [+ inv_no +]. The government has its own budget: higher pensions, more for dependency care, more for science.
+{!<div class="sp-last-vote"></div>!}
+
+Yes [+ inv_yes +], no [+ inv_no +]. The government has its own budget: higher pensions, more for dependency care, more for science.[? if budget_senate_delay = 1 : But the Senate is not yours: it vetoes the budget, and the new spending only starts when Congress lifts the veto in two months. ?]
 
 @budget_failed
 title: Budget defeated
 
 = Budget defeated
+
+{!<div class="sp-last-vote"></div>!}
 
 Yes [+ inv_yes +], no [+ inv_no +]. Congress throws out your budget. Governing on rolled-over accounts is possible, but every week of it is a week your opponents call you a Prime Minister without a majority.
 

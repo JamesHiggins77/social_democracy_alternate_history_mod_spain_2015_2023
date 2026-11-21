@@ -1462,6 +1462,8 @@ on-arrival: {! Q.censure_budget_seen = 1; if (window.SpainGame) { window.SpainGa
 
 A government born of a motion of no confidence has to pass a budget of its own, or admit it cannot govern. María Jesús Montero presents the accounts; the Catalan independence parties, with their leaders on trial, decide their fate.
 
+{!<div class="sp-last-vote"></div>!}
+
 Yes [+ inv_yes +], no [+ inv_no +]. [? if budget_passed = 1 : The budget passes. The legislature can run its course. ?][? if budget_passed = 0 : The budget is defeated. ERC and Junts have voted with the PP, Ciudadanos and Vox. ?]
 
 - @cb_snap: Call an early general election [? if budget_passed = 0 : (the voters can give you the majority this Congress will not) ?]
@@ -2068,3 +2070,57 @@ title: Holding on
 on-arrival: {! Q.sanchez_authority -= 3; !}
 
 You will govern until the last possible day.
+
+@psc_breaks
+title: The PSC breaks with the PSOE
+new-page: true
+tags: sp_event
+view-if: psc_due = 1
+on-arrival: psc_due = 0
+
+= The PSC breaks with the PSOE
+
+[? if grand_coalition = 1 : A grand coalition with the PP ?][? if grand_coalition = 0 : The PSOE's line on Catalonia ?] was too much for Catalonia's socialists. The National Council of the PSC votes to end the 1978 protocol that bound it to the PSOE. Its [+ psc_moved_congress +] deputies form their own group in Congress, its senators and its MEP follow, and its deputies in the Parliament of Catalonia and its town councillors now answer only to the PSC.
+
+The PSC will not merge with ERC: it is federalist, not independentist, and its voters in the industrial belt of Barcelona are the least nationalist in Catalonia. It stays a party of its own, closer to the Comuns than to anyone in Madrid.
+
+The PSOE must now decide whether to run its own candidates in Catalonia.
+
+- @psc_run: Found PSOE-Cat and run against the PSC
+- @psc_pact: No lists in Catalonia: a pact with the PSC
+
+@psc_run
+title: PSOE-Cat
+on-arrival: {! if (window.SpainGame) { window.SpainGame.pscChoice(Q, 1); } Q.regional_leaders_dissent -= 5; Q.progressives_dissent += 5; !}
+
+The PSOE founds its own federation in Catalonia. It will win some unionist voters the PSC has lost, but every seat it takes comes from the PSC, and the PSC's deputies will not vote for you lightly.
+
+@psc_pact
+title: A pact with the PSC
+on-arrival: {! if (window.SpainGame) { window.SpainGame.pscChoice(Q, 0); } Q.regional_leaders_dissent += 3; !}
+
+The PSOE leaves Catalonia to the PSC. In return, the PSC's deputies will usually vote with you in Congress, as a separate group.
+
+@left_walks_out
+title: The Socialist Left walks out
+new-page: true
+tags: sp_event
+view-if: left_split_due = 1
+on-arrival: left_split_due = 0
+
+= The Socialist Left walks out
+
+[+ left_split_leader +] announces that he and the Izquierda Socialista current are leaving the PSOE. "This is no longer the party of Pablo Iglesias Posse." [+ left_split_deputies +] deputies go with him: most join Podemos's group, the rest go to Izquierda Unida. Senators, regional deputies and councillors follow across the country, and Podemos claims them as proof that it is the real left.
+
+[? if left_split_cost_majority = 1 : **The government has lost its majority in Congress.** Every vote from now on needs new partners. ?]
+
+@senate_lifts
+title: The Senate veto is lifted
+new-page: true
+tags: sp_event
+view-if: senate_lifted_due = 1
+on-arrival: senate_lifted_due = 0
+
+= The Senate veto is lifted
+
+Two months after the Senate vetoed it, Congress lifts the veto on the [+ senate_lifted +]. It finally comes into force.
