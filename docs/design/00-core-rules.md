@@ -683,7 +683,7 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
   - European elections (from the last European result; 2014 shares are built in);
   - municipal elections (national polls since the last municipal elections);
   - the 2017 endorsements and primary vote (from the poll at the start of the race).
+- **2014 opening primary:** done, from the PSOE-voter polls on Wikipedia (Metroscopia 16–17 June at the start, Sigma Dos 8–10 July at the end; candidates only, undecided excluded).
 - **Not covered:**
-  - The 2014 opening primary is still to do: its poll figures need checking first.
   - Regional elections have no regional polls in the model.
   - The non-primary leadership contests have no polls.

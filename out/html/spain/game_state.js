@@ -3325,8 +3325,18 @@
     if (!out) { return; }
     if (!Q.r14_rows) { race2014(Q); }
     mode = mode || 'province';
+    // polls of PSOE voters (Wikipedia, "2014 PSOE leadership election"),
+    // shares among the three candidates, undecided excluded: the first
+    // Metroscopia poll with the final field (16-17 Jun) and the last poll
+    // (Sigma Dos, 8-10 Jul)
+    var norm = function (m, s, t) { var k = m + s + t; return { c_madina: 100 * m / k, c_sanchez: 100 * s / k, c_tapias: 100 * t / k }; };
+    var p0 = norm(43.0, 24.0, 6.0), p1 = norm(34.8, 31.5, 10.6), res = { c_sanchez: 48.3, c_madina: 36.0, c_tapias: 15.0 };
+    var pc = pollChangeTable(['c_sanchez', 'c_madina', 'c_tapias'].map(function (c) {
+      return { name: CANDIDATES[c][0], colour: CANDIDATES[c][2], start: p0[c], end: p1[c], result: res[c] };
+    }), 'Start of the race', 'How the polls moved during the race') +
+      '<p class="sp-map-legend">Polls of PSOE voters, not members, as shares of those naming one of the three candidates. Start: Metroscopia/El País, 16–17 June (sample 159). Final: Sigma Dos/El Mundo, 8–10 July (sample 500). Nearly every poll of the campaign had Madina ahead; only one Sigma Dos poll (30 June–3 July) put Sánchez first.</p>';
     out.innerHTML = raceTable(Q.r14_rows, 'votes', 'Votes') +
-      '<p class="sp-map-legend">198,123 members registered; 132,850 voted (67.1%). Ratified by the Extraordinary Congress, 26–27 July.</p>' +
+      '<p class="sp-map-legend">198,123 members registered; 132,850 voted (67.1%). Ratified by the Extraordinary Congress, 26–27 July.</p>' + pc +
       '<p class="sp-map-legend"><label><input type="radio" name="' + id + '-mode" value="province"' + (mode === 'province' ? ' checked' : '') + '> Province results map</label> ' +
       '<label><input type="radio" name="' + id + '-mode" value="region"' + (mode === 'region' ? ' checked' : '') + '> Autonomous community results map</label></p>' +
       '<div id="' + id + '-map"></div>';
