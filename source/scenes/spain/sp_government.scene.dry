@@ -294,7 +294,7 @@ if (typeof window !== 'undefined' && window.SpainGame) {
 
 = The coalition agreement
 
-The government's programme is agreed. Now the ministries must be shared with [+ cabinet_partner_name +]. Whoever holds a ministry decides its policy: only the party that holds Finance can write budgets and tax reforms, only Labour can touch the minimum wage and the labour reform, and so on. This is the draft on the table:
+The government's programme is agreed. Now the ministries must be shared with [+ cabinet_partner_name +]. Whoever holds a ministry decides its policy: only the party that holds Finance can write budgets and tax reforms, only the Minister of Labour can touch the minimum wage and the labour reform, and so on. This is the draft on the table:
 
 {!<div id="sp-cabinet-draft"></div>!}
 
