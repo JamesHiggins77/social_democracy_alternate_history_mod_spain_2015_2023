@@ -563,13 +563,40 @@ title: After the Catalan election
 new-page: true
 tags: sp_event
 view-if: catalan_crisis = 1 and cat_crisis_stage = 3 and cat_election_held = 1
-on-arrival: catalan_crisis = 0; cat_crisis_stage = 4
+on-arrival: {! Q.cat_crisis_stage = 4; if (window.SpainGame) { window.SpainGame.catalanCrisisState(Q, false); } !}
 
 = After the Catalan election
 
 Catalonia has voted. The direct rule of Article 155 ends with the new government, but the crisis has changed Spanish politics: Ciudadanos rode it in Catalonia, and a small party called Vox has made itself known as a private prosecutor in the courts against the independence leaders.
 
-The Catalan crisis deck is closed for now. The questions it raised are not.
+[? if cat_gov_moderate = 0 : The new government in the Palau de la Generalitat is led by the hard-line independentists. The crisis is not over: it has only changed form. ?][? if cat_gov_moderate = 1 : The new Catalan government is ready to talk. If the streets calm down, the crisis may finally end. ?] On the streets: [+ cat_protest_word +].
+
+The crisis ends only with a Catalan government that is not hard-line independentist, after direct rule, once the protests have died down.
+
+@cat_crisis_over
+title: The end of the procés
+new-page: true
+tags: sp_event
+view-if: catalan_crisis = 1 and cat_can_end = 1
+max-visits: 1
+on-arrival: {! Q.catalan_crisis = 0; Q.cat_crisis_stage = 5; Q.cat_crisis_ended = Q.year; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { workers: 0.3, professionals: 0.3 }); } !}
+
+= The end of the procés
+
+The Generalitat is led by people who want to negotiate rather than to break away. Direct rule is a memory, the prisoners' cases are on their way through the courts and the Constitutional Court, and the great marches of the Diada are half their old size. Nobody declares the crisis over; it simply stops being the first item on the news.
+
+The Catalan crisis deck is closed. Catalonia will vote again, but on schools, hospitals and trains.
+
+@cat_repeat_event
+title: Catalonia votes again
+new-page: true
+tags: sp_event
+view-if: cat_repeat_due = 1
+on-arrival: cat_repeat_due = 0
+
+= Catalonia votes again
+
+No candidate can be invested in the Parliament of Catalonia, and a repeat election is called. [? if cat_repeats <= 1 : Unionist voters are tired of the deadlock and turn to Ciudadanos, the party that won the last election there. ?][? if cat_repeats >= 2 : This is repeat number [+ cat_repeats +]. Unionist voters who once trusted Ciudadanos now listen to Vox, which promises to suspend the autonomy for good. ?]
 
 @vox_vistalegre
 title: Vox fills Vistalegre

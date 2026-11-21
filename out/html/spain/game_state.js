@@ -429,6 +429,7 @@
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
     lawFlags(Q);
+    catalanCrisisState(Q, false);
     var brand = podemosBrand(Q);
     if (Q.up_brand !== brand[0]) {
       Q.up_brand = brand[0];
@@ -1129,6 +1130,7 @@
     }
     Q.migration = (Q.migration || 0) * 0.96;
     Q.cat_tension = (Q.cat_tension || 0) * 0.95;
+    catalanCrisisState(Q, true);
     Q.social_policy = (Q.social_policy || 0) * 0.995;
     deriveWorld(Q);
     // social cohesion moves a tenth of the way to its target each month
@@ -1852,6 +1854,48 @@
 
   // Multiply a statewide party's strength in one region (e.g. Cs in
   // Catalonia during the crisis).
+
+  // The Catalan crisis ends only when three things hold: direct rule from
+  // Madrid has been applied (Article 155), Catalonia has a government that
+  // is not hard-line independentist (not led by Junts, without the CUP),
+  // and the street protests have died down.
+  function catalanCrisisState(Q, monthly) {
+    if (!Q.catalan_crisis) { Q.cat_can_end = 0; return; }
+    if (Q.cat_protest === undefined || (!Q.cat_protest_init)) { Q.cat_protest = 70; Q.cat_protest_init = 1; }
+    if (monthly) {
+      Q.cat_protest *= 0.93;
+      // the Supreme Court sentence, October 2019: Tsunami Democràtic
+      if (Q.year === 2019 && Q.month === 10 && !Q.cat_sentence_seen) { Q.cat_sentence_seen = 1; Q.cat_protest += 35; Q.cat_tension = (Q.cat_tension || 0) + 8; }
+      // dialogue and pardons calm the street; a hard line inflames it
+      Q.cat_protest += 0.6 * (Q.cat_hard_line || 0) - 0.8 * Math.min(3, Q.cat_dialogue || 0) - (Q.pardons_granted ? 1.5 : 0);
+      Q.cat_protest = clamp(Q.cat_protest, 0, 100);
+    }
+    if ((Q.cat_crisis_stage || 0) >= 3) { Q.direct_rule = 1; }
+    var g = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
+    var cab = g ? (g.cabinet || [g.party]) : ['junts'];
+    var hard = !g || g.party === 'junts' || g.party === 'jxsi' || cab.indexOf('cup') !== -1;
+    Q.cat_gov_moderate = hard ? 0 : 1;
+    Q.cat_protest_word = Q.cat_protest >= 50 ? 'mass mobilisation' : (Q.cat_protest >= 25 ? 'regular protests' : (Q.cat_protest >= 12 ? 'occasional protests' : 'quiet'));
+    Q.cat_can_end = Q.direct_rule && Q.cat_gov_moderate && Q.cat_protest < 12 && (Q.cat_crisis_stage || 0) >= 4 ? 1 : 0;
+  }
+  // A Catalan election that produces no government: the first repeat helps
+  // Ciudadanos on the unionist side; if it keeps happening, Vox gains.
+  function catalanRepeat(Q) {
+    Q.cat_repeats = (Q.cat_repeats || 0) + 1; Q.cat_repeat_due = 1;
+    Q.cat_protest = (Q.cat_protest || 0) + 10;
+    Q.cat_tension = (Q.cat_tension || 0) + 4;
+    if (!Q.vm) { return; }
+    if (Q.cat_repeats <= 1) {
+      regionalMod(Q, 'Cataluña', 'cs', 1.12);
+      transfer(Q, 'pp', { cs: 1 }, { professionals: 0.4, self_employed: 0.3 });
+    } else {
+      regionalMod(Q, 'Cataluña', 'vox', 1.25);
+      regionalMod(Q, 'Cataluña', 'cs', 0.95);
+      transfer(Q, 'cs', { vox: 0.7, pp: 0.3 }, { pensioners: 0.4, self_employed: 0.4, workers: 0.2 });
+      voxFlow(Q, 0.5 * Q.cat_repeats);
+    }
+  }
+
   function regionalMod(Q, region, party, factor) {
     Q.vm.regionalMod[region] = Q.vm.regionalMod[region] || {};
     var cur = Q.vm.regionalMod[region][party] === undefined ? 1 : Q.vm.regionalMod[region][party];
@@ -2766,6 +2810,7 @@
         reg.lastWasSnap = true;
         Q.regional_deadlock = region;
         Q.regional_deadlock_due = 1;
+        if (region === 'Cataluña' && Q.catalan_crisis) { catalanRepeat(Q); }
       }
       var dw = {};
       var byDistrict = provinceWinners(ballots);
@@ -4307,7 +4352,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
