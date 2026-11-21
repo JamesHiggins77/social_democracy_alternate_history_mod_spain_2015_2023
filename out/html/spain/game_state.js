@@ -4562,6 +4562,17 @@
     UI.drawHemicycle('#' + id + '-svg', Q.congress);
   }
 
+  // The Senate: elected and appointed senators together.
+  function renderSenateSide(Q, id) {
+    var out = el(id);
+    if (!out || !Q.senate) { return; }
+    out.innerHTML = '<svg id="' + id + '-svg" class="sp-hemicycle"></svg>' + UI.resultsTable(Q.senate, null, { compact: true }) +
+      '<p class="sp-map-legend">' + Q.senate_total + ' senators; majority ' + (Math.floor(Q.senate_total / 2) + 1) + '. ' +
+      (Q.senate_majority ? UI.shortName(Q.senate_majority) + ' holds an absolute majority.' : 'No absolute majority.') +
+      (Q.player_in_government && !Q.acting ? (govSenateMajority(Q) ? ' The government controls the Senate.' : ' The government does not control the Senate: its ordinary laws can be delayed two months.') : '') + '</p>';
+    UI.drawHemicycle('#' + id + '-svg', Q.senate);
+  }
+
   // Polls compared with the last election.
   function renderPolls(Q, id) {
     var out = el(id);
@@ -5007,7 +5018,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
