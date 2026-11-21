@@ -277,7 +277,7 @@
         back = d > 22 && d < 35;
       }
       var nm = m;
-      if (!Q.fmood_init) { Q['fmood_' + f] = warm ? 1 : (cold ? -1 : 0); Q['fmood_' + f + '_word'] = warm ? 'warm to you' : 'wary'; return; }
+      if (!Q.fmood_init) { Q['fmood_' + f] = warm ? 1 : (cold ? -1 : 0); if (warm) { Object.keys(ADVISERS).forEach(function (a) { if (ADVISERS[a][1] === f && ADVISERS[a][2](Q)) { Q['adv_offer_' + a] = 1; } }); } Q['fmood_' + f + '_word'] = warm ? 'warm to you' : 'wary'; return; }
       if (m !== 1 && warm) { nm = 1; } else if (m !== -1 && cold) { nm = -1; } else if (m !== 0 && back) { nm = 0; }
       if (nm !== m) {
         Q['fmood_' + f] = nm;
