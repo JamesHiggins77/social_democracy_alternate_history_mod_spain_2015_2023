@@ -713,3 +713,17 @@ Every election result now has a poll-of-polls chart above the poll-change table.
 - **Names come after:** they are filled in after the vote. The coalition-agreement scene then only confirms the share, without re-dealing it.
 - **Ministers by year:** before 2018, the PSOE and Podemos use plausible 2015–16 names: Sánchez's team (Sevilla, Escudero, Batet, Robles…) and Iglesias's February 2016 proposal (Iglesias as Deputy PM, Julio Rodríguez, Domènech, Bescansa, Errejón, Garzón…).
 - **One post per person:** only a Deputy Prime Minister may hold a second ministry. Anyone else named twice is replaced by an unused real figure from the same party.
+
+### 7.39 A coup against a sitting Prime Minister
+
+- **Slower plots:** when Sánchez is Prime Minister, the barons' plot grows at 40% of its usual rate and fades by 1 point a month, because the PM holds the State's patronage. The coup needs plot 75, not 60.
+- **The event:** the coup is described as unprecedented against a sitting PM.
+  - Fighting in the Federal Committee gets +20, since the ministers, the group and most members back the government.
+  - A members' primary gets +8.
+- **New option, only as PM:** threaten an early general election. The barons back down, unless the plot is 85 or more, in which case they may call the bluff half the time and the Cortes are dissolved.
+- **If he loses the party:** a PM ousted as Secretary-General stays in Moncloa, because Congress invested him, not Ferraz. The next month, "A Prime Minister without a party" asks him to step aside for the new leader or dissolve the Cortes and let the voters decide.
+- **Representation panel:** each row now shows the next election:
+  - Congress and Senate: the scheduled date, or the legislature's four-year limit;
+  - European: May 2019, June 2024;
+  - regional: the next region due;
+  - municipal: May 2019, 2023, 2027.

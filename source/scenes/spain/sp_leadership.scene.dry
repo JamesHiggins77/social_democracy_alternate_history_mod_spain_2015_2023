@@ -301,13 +301,14 @@ on-arrival: rebellion_used = 1
 
 = The rebellion
 
-It happens on a Wednesday afternoon. [? if congress_called = 1 : The critics' aim is to stop your primaries and your congress before they can happen. ?][? if congress_called = 0 : The critics' aim is to remove you before you can lead the party into a third election. ?] In Ferraz, Antonio Pradas reads out the resignations of seventeen members of the Federal Executive, enough to force it to dissolve: among them the party's President, Micaela Navarro, Emiliano García-Page, Ximo Puig, Carme Chacón and Tomás Gómez, and seven Andalusians close to Susana Díaz. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional barons: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?]
+[? if sanchez_pm = 1 : Nobody in the PSOE has ever tried this against a sitting Prime Minister. On a Wednesday afternoon, a group of members of the Federal Executive resign together to force it to dissolve, and the regional barons demand that the Federal Committee choose a new leadership. Behind them stand [+ challenger +] and the federations that have never accepted you. But you hold Moncloa: the ministers are yours, the parliamentary group owes you its seats, and the barons know that a party at war with its own government loses the next election. ?][? if sanchez_pm = 0 : It happens on a Wednesday afternoon. [? if congress_called = 1 : The critics' aim is to stop your primaries and your congress before they can happen. ?][? if congress_called = 0 : The critics' aim is to remove you before you can lead the party into a third election. ?] In Ferraz, Antonio Pradas reads out the resignations of seventeen members of the Federal Executive, enough to force it to dissolve: among them the party's President, Micaela Navarro, Emiliano García-Page, Ximo Puig, Carme Chacón and Tomás Gómez, and seven Andalusians close to Susana Díaz. Verónica Pérez, President of the Federal Committee and Susana Díaz's closest ally in Seville, tells the cameras outside Ferraz that she is now "the only authority in the party". Behind her stand the regional barons: Susana Díaz, Emiliano García-Page, Javier Lambán, Guillermo Fernández Vara. They say the PSOE cannot go on losing elections under Pedro Sánchez. [? if acting = 1 : They also want the PSOE to stop blocking a government. ?] ?]
 
 [? if loyalist_posts >= 4 : Your own people hold enough posts in Ferraz and in the federations to put up a fight. ?][? if loyalist_posts < 4 : You have few loyalists in the party's structures; the apparatus belongs to them. ?]
 
 - @coup_refuse: Refuse to recognise the resignations: the Executive continues "in functions"
 - @coup_fight: Go straight to the Federal Committee and fight it out
 - @coup_members: Appeal over their heads: call a primary of the members now
+- @coup_dissolve: Threaten them with an early general election
 - @coup_resign: Resign rather than split the party
 
 @coup_refuse
@@ -319,6 +320,13 @@ César Luena, your Secretary of Organisation, tells the press that you remain th
 on-arrival: {! window.SpainGame.baronsCoup(Q, 'fight'); Q.lead_confronted = 1; !}
 
 [? if coup_survived = 1 : After eleven hours of shouting behind closed doors, the vote goes your way. The plotters retreat to their federations, humiliated, and the party knows who is in charge. ?][? if coup_survived = 0 : After eleven hours behind closed doors, you lose the vote. You resign as Secretary-General. A caretaker committee under [+ psoe_leader +] takes over Ferraz. [? if acting = 1 : [? if gestora_abstains = 1 : Its first decision will be to let the PP govern. ?] ?] ?]
+
+@coup_dissolve
+view-if: sanchez_pm = 1
+subtitle: Only a Prime Minister can do this. The barons may call your bluff.
+on-arrival: {! window.SpainGame.baronsCoup(Q, 'dissolve'); !}
+
+[? if bluff_called = 0 : You let it be known that if the Federal Committee moves against you, you will dissolve the Cortes the same night. The barons, whose own regional governments would be dragged into a campaign fought by a divided party, back down one by one. ?][? if bluff_called = 1 : The barons call your bluff. You sign the dissolution decree: the general election will settle who leads the PSOE. ?]
 
 @coup_members
 on-arrival: {! window.SpainGame.baronsCoup(Q, 'members'); Q.populism += 1; !}
@@ -556,3 +564,29 @@ subtitle: Ends the blockade and the plot against you; the members, the youth and
 on-arrival: {! Q.psoe_stance_pp = 'abstain'; Q.abstained_for_pp = 1; Q.plot = Math.min(Q.plot || 0, 20); Q.member_morale -= 20; Q.sanchismo -= 18; Q.progressives_dissent += 25; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 15; Q.institutionalists_dissent -= 10; Q.sanchez_authority -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 4, students: 5, unemployed: 3.5, professionals: 2.5, pensioners: 1 }); } !}
 
 The Federal Committee approves your proposal by a large majority. Susana Díaz praises your "sense of State". Outside Ferraz, the crowd that chanted your name now chants "No es no" at you. Rajoy will be invested; the barons have nothing left to remove you for, for now.
+
+@bicephaly
+title: A Prime Minister without a party
+new-page: true
+tags: sp_event
+view-if: bicephaly = 1 and time >= bicephaly_since + 1
+on-arrival: bicephaly = 0
+
+= A Prime Minister without a party
+
+You are still Prime Minister: Congress invested you, and only Congress can remove you. But Ferraz now belongs to [+ psoe_leader +], the parliamentary group takes its instructions from the new leadership, and the barons say a government cannot be led from outside its own party. Every vote in Congress is now in doubt.
+
+- @bic_step: Step aside and let the party's new leader take over the government
+- @bic_vote: Dissolve the Cortes and let the voters decide
+
+@bic_step
+title: Stepping aside
+on-arrival: {! Q.pm = Q.psoe_next_leader || Q.psoe_leader; Q.sanchez_authority -= 10; Q.sanchismo += 5; if (window.SpainGame) { window.SpainGame.recalculate(Q); } !}
+
+You resign as Prime Minister. Congress will invest the new leader, and you return to the backbenches.
+
+@bic_vote
+title: An early election
+on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); } Q.sanchismo += 8; Q.member_morale -= 5; Q.regional_leaders_dissent += 10; !}
+
+You call an early general election, as Prime Minister, against your own party's new leadership. The members are split down the middle.

@@ -1075,6 +1075,9 @@
       0.5 * (Q.loyalist_posts || 0) + leftDrift(Q) +
       // a losing streak: under 100 seats and out of government
       ((Q.congress.psoe || 0) < 100 && !Q.psoe_in_government && Q.elections_held >= 1 ? 1.5 : 0);
+    // a Prime Minister holds the patronage of the State (ministries, the
+    // BOE, the lists): plots grow slowly and fade fast
+    if (Q.sanchez_pm) { d = (d > 0 ? 0.4 * d : d) - 1; }
     Q.plot = clamp((Q.plot || 0) * 0.98 + d, 0, 100);
   }
 
@@ -1161,13 +1164,23 @@
   function baronsCoup(Q, defend) {
     Q.coup_cooldown = Q.time + 6;
     var attack = coupAttack(Q);
+    // against a sitting Prime Minister the plotters are weaker: the
+    // ministers, the group and most members stand with the government
+    var pmBonus = Q.sanchez_pm ? 20 : 0;
     if (defend === 'resign') {
       oust(Q, false);
       Q.coup_survived = 0;
+    } else if (defend === 'dissolve') {
+      // only a Prime Minister can threaten the barons with an early general
+      // election, which would put their own regional power at risk
+      Q.coup_survived = 1;
+      Q.bluff_called = (Q.plot || 0) >= 85 && Math.random() < 0.5 ? 1 : 0;
+      if (Q.bluff_called) { callElection(Q); Q.sanchez_authority -= 4; }
+      else { Q.sanchez_authority -= 3; Q.regional_leaders_dissent += 4; }
     } else if (defend === 'members') {
-      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2);
+      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? 8 : 0));
     } else {
-      var defence = coupDefence(Q) + 16 * (Math.random() - 0.5);
+      var defence = coupDefence(Q) + pmBonus + 16 * (Math.random() - 0.5);
       Q.coup_survived = defence >= attack ? 1 : 0;
       if (!Q.coup_survived) {
         oust(Q, false);
@@ -3041,7 +3054,8 @@
     }
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
     Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
-    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= 60 && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= (Q.sanchez_pm ? 75 : 60) && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    Q.coup_vs_pm = Q.coup_due && Q.sanchez_pm ? 1 : (Q.coup_vs_pm && Q.rebellion_used ? Q.coup_vs_pm : 0);
     // a caretaker committee hands over to an elected leader after eight months
     if (!Q.sanchez_leader && Q.psoe_interim && Q.time - (Q.interim_since || Q.time) >= 8) {
       Q.psoe_interim = 0;
@@ -3409,13 +3423,25 @@
     var out = el(id);
     if (!out) { return; }
     var colour = UI.partyColor(Q.player_party || 'psoe');
+    var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var fmt = function (y, m) { return MON[m - 1] + ' ' + y; };
+    var gen = Q.election_year ? 'Next election: ' + fmt(Q.election_year, Q.election_month)
+      : 'Next election: on or before ' + fmt((Q.legislature_start_year || 2011) + 4, Q.legislature_start_month || 12);
+    var epNext = [[2014, 5], [2019, 5], [2024, 6], [2029, 6]].filter(function (d) { return d[0] * 100 + d[1] >= Q.year * 100 + Q.month; })[0];
+    var regNext = null, regName = '';
+    Object.keys(Q.regions || {}).forEach(function (r) { var d = Q.regions[r].nextElection; if (d && (!regNext || d < regNext)) { regNext = d; regName = r; } });
+    var reg = regNext ? 'Next: ' + regName + ', on or before ' + fmt(+regNext.slice(0, 4), +regNext.slice(5, 7)) : '';
+    var locY = [2015, 2019, 2023, 2027].filter(function (y) { return y * 100 + 5 >= Q.year * 100 + Q.month; })[0];
+    var nexts = [gen, gen, epNext ? 'Next election: ' + fmt(epNext[0], epNext[1]) : '', reg, reg, locY ? 'Next elections: ' + fmt(locY, 5) : ''];
     var rows = [['Congress of Deputies', Q.rep_congress, 350], ['Senate', Q.rep_senate, Q.senate_total],
       ['European Parliament', Q.rep_ep, Q.ep_total, ' (Spain\'s seats)'], ['Regional parliaments', Q.rep_regional, Q.rep_regional_total],
       ['Regional governments', Q.rep_presidencies, Q.rep_regions], ['Local government', Q.rep_local, Q.rep_local_total]];
+    rows.forEach(function (r, i) { r[4] = nexts[i]; });
     out.innerHTML = '<table class="sp-rep">' + rows.filter(function (r) { return r[2] > 0; }).map(function (r) {
       var v = r[1] || 0, pct = Math.min(100, 100 * v / r[2]);
       return '<tr><th>' + r[0] + (r[3] ? '<span class="sp-rep-sub">' + r[3] + '</span>' : '') + '</th><td><div class="sp-rep-num">' + v.toLocaleString('en-GB') + ' / ' + r[2].toLocaleString('en-GB') +
-        '</div><div class="sp-rep-bar"><span style="width:' + pct.toFixed(1) + '%;background:' + colour + '"></span></div></td></tr>';
+        '</div><div class="sp-rep-bar"><span style="width:' + pct.toFixed(1) + '%;background:' + colour + '"></span></div>' +
+        (r[4] ? '<div class="sp-rep-next sp-no-ent">' + r[4] + '</div>' : '') + '</td></tr>';
     }).join('') + '</table>' +
       (Q.rep_in_regional_govt ? '<p class="sp-map-legend">In government in ' + Q.rep_in_regional_govt + ' regions.</p>' : '');
   }
@@ -3601,7 +3627,14 @@
     Q.psoe_leader = Q.year <= 2018 ? 'Javier Fernández' : 'a caretaker committee';
     // a Prime Minister who loses his party hands the government to its
     // next leader (the PSOE's group backs its new candidate)
-    if (Q.pm === 'Pedro Sánchez' && Q.pm_party === 'psoe') {
+    if (Q.pm === 'Pedro Sánchez' && Q.pm_party === 'psoe' && !Q.acting) {
+      // the Prime Minister is invested by Congress, not by the party: he
+      // stays in Moncloa while Ferraz has another leadership, until he
+      // steps aside or takes the question to the voters
+      Q.pm_lost_party = 1;
+      Q.bicephaly = 1;
+      Q.bicephaly_since = Q.time;
+    } else if (Q.pm === 'Pedro Sánchez' && Q.pm_party === 'psoe') {
       Q.pm = Q.psoe_next_leader;
       Q.pm_lost_party = 1;
     }
@@ -4655,7 +4688,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

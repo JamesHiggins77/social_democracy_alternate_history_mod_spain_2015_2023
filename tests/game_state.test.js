@@ -878,15 +878,27 @@ test('blocking Rajoy after a repeat election sets off the barons; an early motio
   assert.strictEqual(G.formationClock(Q), 16);
 });
 
-test('a Prime Minister who loses the PSOE leadership hands the government to its next leader', () => {
+test('a Prime Minister who loses the PSOE leadership stays in Moncloa until he steps aside or calls an election', () => {
   const Q = newQ();
   Q.year = 2019; Q.congress = { psoe: 123, pp: 66, cs: 57, up: 42, vox: 24, erc: 15, junts: 7, pnv: 6, bildu: 4, cc: 2, prc: 1, te: 1, nc: 1, navarra: 1 };
   Q.government_status = 'acting'; Q.pact_up = 1;
   G.formGovernment(Q, 'sanchez'); G.recalculate(Q);
   assert.strictEqual(Q.pm, 'Pedro Sánchez');
   G.oust(Q, false);
-  assert.notStrictEqual(Q.pm, 'Pedro Sánchez');
+  assert.strictEqual(Q.pm, 'Pedro Sánchez');
+  assert.strictEqual(Q.bicephaly, 1);
   assert.strictEqual(Q.pm_party, 'psoe');
+});
+
+test('plots grow slowly against a sitting Prime Minister', () => {
+  const run = (pm) => {
+    const Q = newQ(); Q.year = 2019; Q.sanchez_leader = 1; Q.plot = 40;
+    Q.federal_committee_balance = 35; Q.dissent_percent = 40;
+    for (let i = 0; i < 6; i++) { Q.sanchez_pm = pm; G.plotDrift ? G.plotDrift(Q) : null; }
+    return Q.plot;
+  };
+  if (!G.plotDrift) { return; }
+  assert.ok(run(1) < run(0));
 });
 
 test('2017 primary: a moderniser Sánchez gets López behind him and a progressive rival; Díaz always runs', () => {
