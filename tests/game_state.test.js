@@ -1083,3 +1083,15 @@ test('legislation: a bill passes once, then can be expanded or repealed; budget 
   G.holdBudget(Q);
   assert.deepStrictEqual(Q.budget_deals, {});
 });
+
+test('advisers: factions warming bring offers; turning hostile takes their people away', () => {
+  const Q = { no_mood: 1 };
+  G.newGame(Q, 0); G.recalculate(Q);
+  Q.progressives_dissent = 5; Q.econ_left = 4; G.recalculate(Q);
+  assert.strictEqual(Q.fevent_progressives, 1);
+  assert.strictEqual(Q.adv_offer_elorza, 1);
+  Q.adv_lastra = 1; Q.progressives_dissent = 70; G.recalculate(Q);
+  assert.strictEqual(Q.fevent_progressives, -1);
+  assert.strictEqual(Q.adv_lastra, 0);
+  assert.strictEqual(Q.adv_can_elorza, 0);
+});

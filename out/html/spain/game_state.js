@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'offer', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -257,6 +257,60 @@
     lamban: ['Javier Lambán', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)) && (Q.econ_left || 0) <= 3 && !Q.pact_up; }, 'President of Aragón'],
     armengol: ['Francina Armengol', 'regional_leaders', function (Q) { return (Q.year > 2015 || (Q.year === 2015 && Q.month >= 7)); }, 'President of the Balearic Islands']
   };
+
+  // Faction moods: each faction warms to Sánchez or turns on him as its
+  // dissent crosses a threshold (with hysteresis). Warming brings offers
+  // of service; turning cold withdraws them and takes its people away.
+  var FACTION_KEYS = ['institutionalists', 'modernisers', 'progressives', 'sanchistas', 'trade_unionists', 'regional_leaders'];
+  function factionMoods(Q) {
+    if (!Q.sanchez_leader) { return; }
+    FACTION_KEYS.forEach(function (f) {
+      var m = Q['fmood_' + f] || 0, d = Q[f + '_dissent'] || 0, warm, cold, back;
+      if (f === 'sanchistas') { warm = (Q.sanchismo || 0) >= 40; cold = (Q.sanchismo || 0) <= 8; back = (Q.sanchismo || 0) > 15 && (Q.sanchismo || 0) < 35; }
+      else {
+        warm = d <= 12;
+        if (f === 'progressives') { warm = warm && (Q.econ_left || 0) >= 2; }
+        if (f === 'modernisers') { warm = warm && (Q.econ_left || 0) <= 4; }
+        cold = d >= 45 || (f === 'regional_leaders' && (Q.plot || 0) >= 70);
+        back = d > 22 && d < 35;
+      }
+      var nm = m;
+      if (!Q.fmood_init) { Q['fmood_' + f] = warm ? 1 : (cold ? -1 : 0); Q['fmood_' + f + '_word'] = warm ? 'warm to you' : 'wary'; return; }
+      if (m !== 1 && warm) { nm = 1; } else if (m !== -1 && cold) { nm = -1; } else if (m !== 0 && back) { nm = 0; }
+      if (nm !== m) {
+        Q['fmood_' + f] = nm;
+        if (nm === 1) {
+          var names = [];
+          Object.keys(ADVISERS).forEach(function (a) {
+            if (ADVISERS[a][1] === f && ADVISERS[a][2](Q) && !Q['adv_' + a]) { Q['adv_offer_' + a] = 1; names.push(ADVISERS[a][0]); }
+          });
+          Q['fwarm_names_' + f] = names.length ? names.join(', ') : 'nobody new, for now';
+          Q['fevent_' + f] = 1;
+        } else if (nm === -1) {
+          Q['fcold_left_' + f] = 0;
+          Object.keys(ADVISERS).forEach(function (a) {
+            if (ADVISERS[a][1] === f) { Q['adv_offer_' + a] = 0; if (Q['adv_' + a]) { Q['adv_' + a] = 0; Q['fcold_left_' + f] = 1; } }
+          });
+          Q['fevent_' + f] = -1;
+        }
+      }
+      Q['fmood_' + f + '_word'] = Q['fmood_' + f] === 1 ? 'warm to you' : (Q['fmood_' + f] === -1 ? 'hostile' : 'wary');
+    });
+    Q.fmood_init = 1;
+  }
+  // One adviser at a time may come forward on their own, every few months,
+  // if their own conditions hold and their faction is not hostile.
+  function individualOffer(Q) {
+    if (!Q.sanchez_leader || Q.offer_pending || (Q.offer_timer || 0) > 0) { return; }
+    var cands = Object.keys(ADVISERS).filter(function (a) {
+      var f = ADVISERS[a][1];
+      return !Q['adv_offer_' + a] && !Q['adv_' + a] && ADVISERS[a][2](Q) && (Q['fmood_' + f] || 0) >= 0 &&
+        (f === 'sanchistas' ? (Q.sanchismo || 0) >= 25 : (Q[f + '_dissent'] || 0) < 28);
+    });
+    if (!cands.length) { return; }
+    var a = cands[((Q.year || 2015) * 12 + (Q.month || 1)) % cands.length];
+    Q['adv_offer_' + a] = 1; Q.offer_id = a; Q.offer_name = ADVISERS[a][0]; Q.offer_pending = 1; Q.offer_timer = 4;
+  }
   var ADVISER_MAX = 3;
   function advCount(Q) {
     return Object.keys(ADVISERS).filter(function (a) { return Q['adv_' + a]; }).length;
@@ -281,10 +335,19 @@
   // posts that come with their own adviser card (not counted in the three).
   function adviserFlags(Q) {
     Q.adv_count = advCount(Q);
+    factionMoods(Q);
     Object.keys(ADVISERS).forEach(function (a) {
       if (Q['adv_' + a] && !ADVISERS[a][2](Q)) { Q['adv_' + a] = 0; Q['adv_left_' + a] = 1; }
-      Q['adv_can_' + a] = !Q['adv_' + a] && Q.adv_count < ADVISER_MAX && ADVISERS[a][2](Q) ? 1 : 0;
+      // conditions are hidden: an adviser who no longer fits withdraws the offer
+      if (!ADVISERS[a][2](Q) || Q['fmood_' + ADVISERS[a][1]] === -1) { Q['adv_offer_' + a] = 0; }
+      Q['adv_can_' + a] = !Q['adv_' + a] && Q['adv_offer_' + a] && Q.adv_count < ADVISER_MAX && ADVISERS[a][2](Q) ? 1 : 0;
     });
+    FACTION_KEYS.forEach(function (f) {
+      Q['fac_offers_' + f] = Object.keys(ADVISERS).some(function (a) { return ADVISERS[a][1] === f && Q['adv_offer_' + a]; }) ? 1 : 0;
+    });
+    individualOffer(Q);
+    Q.in_coalition = (Q.govt_parties || []).filter(function (p) { return p !== Q.player_party; }).length > 0 && Q.player_in_government && !Q.acting ? 1 : 0;
+    Q.hard_unionist = (Q.const_line || 0) <= -1.5 ? 1 : 0;
     var inGov = Q.player_in_government && !Q.acting;
     var leads = inGov && Q.pm_party === Q.player_party;
     Q.adv_pm = inGov && !leads ? 1 : 0;
@@ -333,6 +396,8 @@
       seats[p] = Math.round(LOCAL_COUNCILLORS * (1 - LOCAL_INDEPENDENTS) * raw[p] / sum);
     });
     seats.ind = Math.round(LOCAL_COUNCILLORS * LOCAL_INDEPENDENTS);
+    Q.local_shares = JSON.parse(JSON.stringify(poll));
+    if (Q.local_shares.vox) { Q.local_shares.vox *= (Q.year >= 2023 ? 0.15 : 0.05) / 0.55; }
     var prev = Q.local_seats || null;
     Q.local_prev = prev;
     Q.local_seats = seats;
@@ -361,7 +426,7 @@
   }
 
   function recalculate(Q) {
-    if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; }
+    if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
     lawFlags(Q);
     var brand = podemosBrand(Q);
@@ -1642,6 +1707,10 @@
     Q.senate_total = Object.keys(senate).reduce(function (a, k) { return a + senate[k]; }, 0);
     Q.rep_congress = Q.congress[me] || 0;
     Q.rep_senate = senate[me] || 0;
+    Q.senate_majority = '';
+    Object.keys(senate).forEach(function (k) { if (senate[k] > Q.senate_total / 2) { Q.senate_majority = k; } });
+    Q.senate_pp_majority = Q.senate_majority === 'pp' ? 1 : 0;
+    Q.senate_psoe = senate.psoe || 0; Q.senate_pp = senate.pp || 0;
     Q.ep_seats = Q.ep_seats || EP_2014;
     if (Q.year * 100 + Q.month >= 202002 && Q.ep_shares && !Q.ep_brexit) {
       Q.ep_seats = dhondtSeats(Q.ep_shares, 59);
@@ -2421,6 +2490,13 @@
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
     Q.senate_elected = senateElected(r.ballots);
+    Q.prov_base = {};
+    Object.keys(r.ballots).forEach(function (pr) {
+      var o = {}, sum = 0;
+      r.ballots[pr].lists.forEach(function (l) { var id = Array.isArray(l) ? l[0] : l.id, v = Array.isArray(l) ? l[2] : l.votes; if (!/^x:/.test(id)) { o[id] = (o[id] || 0) + v; sum += v; } });
+      Object.keys(o).forEach(function (k) { o[k] = Math.round(1000 * o[k] / sum) / 10; });
+      Q.prov_base[pr] = o;
+    });
     // the result itself replaces that month's poll; then a new polling
     // error for the next cycle
     Q.poll = r.voteShares;
@@ -4017,6 +4093,69 @@
     }
   }
 
+
+  // Region vote-share map for national-constituency or local votes:
+  // last general election's province results, swung to today's national
+  // shares (factor: local implantation), aggregated by autonomous community.
+  function regionVoteMap(Q, national, factor) {
+    var D = DATA, base = Q.prov_base;
+    if (!base) {
+      var y = Q.year >= 2019 ? '2016' : '2015';
+      base = {};
+      Object.keys(D.elections[y].provinces).forEach(function (pr) {
+        var b = D.elections[y].provinces[pr], o = {}, sum = 0;
+        b.lists.forEach(function (l) { var id = Array.isArray(l) ? l[0] : l.id, v = Array.isArray(l) ? l[2] : l.votes; if (!/^x:/.test(id)) { o[id] = (o[id] || 0) + v; sum += v; } });
+        Object.keys(o).forEach(function (k) { o[k] = 100 * o[k] / sum; });
+        base[pr] = o;
+      });
+    }
+    // national base average, for the swing ratio
+    var natBase = {}, n = 0;
+    Object.keys(base).forEach(function (pr) { n += 1; Object.keys(base[pr]).forEach(function (k) { natBase[k] = (natBase[k] || 0) + base[pr][k]; }); });
+    Object.keys(natBase).forEach(function (k) { natBase[k] /= n; });
+    var winners = {}, shares = {};
+    Object.keys(D.regions).forEach(function (r) {
+      var agg = {}, provs = D.regions[r], sum = 0;
+      provs.forEach(function (pr) {
+        var b = base[pr] || {};
+        Object.keys(national).forEach(function (k) {
+          if (/^x:/.test(k) || !(national[k] > 0.3)) { return; }
+          var nb = natBase[k] || 0.5, pb = b[k] !== undefined ? b[k] : (nb > 1 ? 0.3 * nb : 0.5);
+          var v = pb * national[k] / Math.max(0.5, nb) * (factor ? (factor[k] === undefined ? 0.8 : factor[k]) : 1);
+          agg[k] = (agg[k] || 0) + v / provs.length;
+        });
+      });
+      Object.keys(agg).forEach(function (k) { sum += agg[k]; });
+      var list = Object.keys(agg).map(function (k) { return [k, Math.round(1000 * agg[k] / sum) / 10]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
+      provs.forEach(function (pr) { winners[pr] = list[0][0]; shares[pr] = list; });
+    });
+    return { winners: winners, shares: shares };
+  }
+  function renderSenate(Q, id) {
+    var out = el(id);
+    if (!out || !Q.senate) { return; }
+    var appointed = senateAppointed(Q);
+    var rows = Object.keys(Q.senate).filter(function (k) { return Q.senate[k] > 0; }).sort(function (a, b) { return Q.senate[b] - Q.senate[a]; });
+    out.innerHTML = '<table class="sp-results"><thead><tr><th>Party</th><th class="sp-num">Elected</th><th class="sp-num">Appointed</th><th class="sp-num">Total</th></tr></thead><tbody>' +
+      rows.map(function (k) {
+        return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(k) + '"></span>' + UI.partyName(k) + '</td><td class="sp-num">' +
+          ((Q.senate_elected || {})[k] || 0) + '</td><td class="sp-num">' + (appointed[k] || 0) + '</td><td class="sp-num"><b>' + Q.senate[k] + '</b></td></tr>';
+      }).join('') + '</tbody></table><p class="sp-map-legend">' + Q.senate_total + ' senators: 208 elected by limited vote in the provinces, the rest appointed by the regional parliaments. A Senate majority is ' + (Math.floor(Q.senate_total / 2) + 1) + '. ' +
+      (Q.senate_majority ? UI.partyName(Q.senate_majority) + ' holds an absolute majority, and can delay every bill by two months.' : 'No party has an absolute majority.') + '</p>';
+  }
+  function renderEuroMap(Q, id) {
+    var out = el(id);
+    if (!out || !Q.ep_shares) { return; }
+    var m = regionVoteMap(Q, Q.ep_shares, null);
+    UI.drawMap(out, m.winners, 'European elections: first party by autonomous community (hover for vote shares)', { shares: m.shares, outlines: 'bold' });
+  }
+  function renderLocalMap(Q, id) {
+    var out = el(id);
+    if (!out || !Q.local_shares) { return; }
+    var m = regionVoteMap(Q, Q.local_shares, LOCAL_FACTOR);
+    UI.drawMap(out, m.winners, 'Municipal elections: first party by autonomous community (hover for vote shares)', { shares: m.shares, outlines: 'bold' });
+  }
+
   function renderArrangements(Q, id) {
     var out = el(id);
     if (out && Q.congress) {
@@ -4168,7 +4307,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

@@ -614,3 +614,15 @@ Real polling averages swung far more than the game's: the PP went from about 33%
 ### 7.29 Primary polls lean to the establishment
 
 Polls appear when Díaz enters (for the endorsements) and after the endorsements (for the vote). They sample office-holders and older members, so they overrate Díaz by about 7–9 points on signatures and 9–10 points on the vote, and underrate Sánchez.
+
+### 7.30 Senate, region maps, advisers rework
+
+- **Senate:** each general-election result now shows the Senate: senators elected by province plus those appointed by the regional parliaments (D'Hondt on their groups). Regional results report the new Senate balance. `senate_majority` and `senate_pp_majority` are tracked.
+- **Region maps:** the European and municipal results now include a map by autonomous community. It takes the last general election's province shares, swings them to today's national shares (municipal votes are weighted by local implantation) and aggregates them by region. Hover shows the vote shares.
+- **Advisers:**
+  - Hiring conditions are hidden. The team card lists only people who have offered their services.
+  - Each faction has a mood: wary, warm or hostile, with hysteresis on dissent; the Sanchistas' mood follows sanchismo.
+  - When a faction turns warm, an event fires ("The Left Warms to Sánchez", "The Regional Barons See Sánchez as One of Their Own", "The Liberals Back Sánchez", and so on) and its eligible people offer their services.
+  - When a faction turns hostile ("The Regional Barons Side with Díaz", "Sánchez Makes an Enemy of the Socialist Left", "Sánchez Alienates the Modernisers", and so on), its offers are withdrawn and its people leave your team.
+  - Every 4 months, one adviser whose own conditions hold may come forward alone ("X offers their service").
+  - Each of the 24 advisers has 3–4 abilities of their own (75 in total). Some are gated: only in government, only in opposition, only in coalition, during government formation, or during the Catalan crisis with a Sánchez who is not a hard-line unionist. Populist campaigning (Lastra, Tapias, Méndez, Álvarez, Puente) works at half strength in government.
