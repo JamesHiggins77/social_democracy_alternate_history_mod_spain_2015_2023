@@ -109,7 +109,7 @@
     Q.month_actions = 0;
     Q.advisor_action_timer = 0;
     Q.last_advisor_action = 0;
-    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'offer', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
+    Q.timers = ['advisor_action', 'dark', 'bb_spend', 'law', 'offer', 'terr', 'eurol', 'foreign', 'pes', 'bb_interview', 'bb_team', 'bb_money', 'bb_vote', 'bb_baron', 'bb_programme', 'bb_social', 'bb_debate', 'bb_intl', 'low_profile', 'ex_rally', 'ex_line', 'ex_scandal', 'appoint', 'dues', 'intl_net', 'exile_org', 'exile_tour', 'exile_book', 'exile_bridge', 'exile_funds', 'exile_bid', 'negotiations', 'barons', 'media', 'membership', 'rally',
                 'debate', 'scandal', 'federal_exec', 'ugt', 'juventudes', 'programme', 'podemos_talks',
                 'cs_talks', 'small_parties', 'catalans', 'budget', 'wage', 'memory', 'pensions',
                 'labour', 'reshuffle', 'cat_155', 'cat_dialogue', 'cat_psc', 'cat_federal', 'censure',
@@ -347,7 +347,6 @@
     });
     individualOffer(Q);
     Q.in_coalition = (Q.govt_parties || []).filter(function (p) { return p !== Q.player_party; }).length > 0 && Q.player_in_government && !Q.acting ? 1 : 0;
-    Q.hard_unionist = (Q.const_line || 0) <= -1.5 ? 1 : 0;
     var inGov = Q.player_in_government && !Q.acting;
     var leads = inGov && Q.pm_party === Q.player_party;
     Q.adv_pm = inGov && !leads ? 1 : 0;
@@ -550,7 +549,8 @@
     Q.committee_word = UI.word('committee', Q.federal_committee_balance);
     Q.sanchismo_word = UI.word('sanchismo', Q.sanchismo);
     var e = Q.econ_left || 0, so = Q.social_prog || 0;
-    Q.econ_word = e <= -1 ? 'Centrist' : (e <= 2 ? 'Centre-left' : (e <= 5 ? 'Left' : (e <= 8 ? 'Hard left' : 'Socialist')));
+    Q.econ_word = e <= -3 ? 'Neoliberal' : (e <= -1 ? 'Moderate' : (e <= 1.5 ? 'Social Liberal' : (e <= 6 ? 'Social Democratic' : 'Anti-Capitalist')));
+    ideologyLines(Q);
     Q.social_word = so <= -1 ? 'Traditional' : (so <= 2 ? 'Moderate' : (so <= 5 ? 'Progressive' : 'Radical'));
     Q.finance_crisis_year = Q.finance_crisis_year || 0;
     Q.congress_text = congressText(Q.congress);
@@ -922,6 +922,78 @@
     Q.social_prog = Math.max(-5, Math.min(12, (Q.social_prog || 0) + (social || 0)));
   }
 
+
+  // The constitutional and European lines. Each has a base the player moves
+  // directly (const_line, eu_line) and an effective value that also reads
+  // what the PSOE does: dialogue and pardons move it towards federalism, a
+  // hard line towards unionism; warm EU relations towards integration.
+  var CONST_WORDS = ['Centralist Unionist', 'Unionist', 'Moderate', 'Federalist', 'Plurinational Federalist'];
+  var EU_WORDS = ['Eurosceptic', 'Euro-realist', 'Moderate', 'Pro-EU', 'European Integration'];
+  function lineWord(words, v) { return words[v <= -3 ? 0 : (v <= -1 ? 1 : (v < 1 ? 2 : (v < 3 ? 3 : 4)))]; }
+  function ideologyLines(Q) {
+    if (Q.const_line === undefined) { Q.const_line = 0.6; }
+    if (Q.eu_line === undefined) { Q.eu_line = 1.2; }
+    Q.const_line_eff = clamp(Q.const_line + 0.4 * Math.min(4, Q.cat_dialogue || 0) - 0.6 * (Q.cat_hard_line || 0) + (Q.pardons_granted ? 0.6 : 0) + (Q.law_amnesty > 0 ? 1 : 0), -5, 5);
+    Q.eu_line_eff = clamp(Q.eu_line + ((Q.intl && Q.intl.eu !== undefined ? Q.intl.eu : 55) - 55) / 15, -5, 5);
+    Q.const_word = lineWord(CONST_WORDS, Q.const_line_eff);
+    Q.eu_word = lineWord(EU_WORDS, Q.eu_line_eff);
+    Q.hard_unionist = Q.const_line_eff <= -1.5 ? 1 : 0;
+    // the attack lines the other parties use against the PSOE
+    var e = Q.econ_left || 0, so = Q.social_prog || 0, c = Q.const_line_eff, u = Q.eu_line_eff;
+    var vox = [], up = [], pp = [];
+    if (e > 6) { vox.push('"communists in the government"'); pp.push('"they will ruin the economy"'); }
+    if (so > 3) { vox.push('"woke ideology in our schools"'); }
+    if (u >= 3) { vox.push('"Brussels\'s servants"'); }
+    if (c >= 3) { vox.push('"they are breaking Spain"'); pp.push('"hostages of the separatists"'); }
+    else if (c >= 1) { pp.push('"soft on the separatists"'); }
+    if (e <= -3) { up.push('"the party of the IBEX 35"'); }
+    else if (e <= -1) { up.push('"the old party of the regime"'); }
+    if (c <= -3) { up.push('"the PP\'s partners on Catalonia"'); }
+    if (so <= -1) { up.push('"no different from the right on rights"'); }
+    if (u <= -1) { pp.push('"isolated in Europe"'); }
+    Q.vox_attack = vox.length ? vox.join(', ') : 'nothing that sticks';
+    Q.up_attack = up.length ? up.join(', ') : 'nothing that sticks';
+    Q.pp_attack = pp.length ? pp.join(', ') : '"an unreliable partner"';
+  }
+  // Monthly effects of the lines on voters.
+  function lineDrift(Q) {
+    var e = Q.econ_left || 0, so = Q.social_prog || 0, c = Q.const_line_eff || 0, u = Q.eu_line_eff || 0;
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
+    // Vox gains most from Anti-Capitalist, Progressive, European Integration, Plurinational Federalist
+    var v = Math.max(0, e - 6) * 0.08 + Math.max(0, so - 3) * 0.05 + Math.max(0, u - 3) * 0.12 + Math.max(0, c - 3) * 0.18;
+    if (v > 0 && voxOn(Q)) { voxFlow(Q, v * voxRoom(Q)); }
+    // Podemos gains most from Neoliberal, Centralist Unionist and socially moderate positions
+    var p = Math.max(0, -3 - e) * 0.15 + Math.max(0, -3 - c) * 0.15 + Math.max(0, -so) * 0.08;
+    if (p > 0) { transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { students: p, workers: 0.7 * p, unemployed: 0.7 * p, professionals: 0.4 * p }); }
+    // federalism costs unionist voters in the interior; unionism costs the PSC
+    if (c >= 2.5) { transfer(Q, 'psoe', { pp: 0.6, cs: 0.4 }, { pensioners: 0.04 * (c - 2), self_employed: 0.03 * (c - 2) }); }
+    if (c <= -1 && Q.vm) { Q.vm.regionalMod['Cataluña'] = Q.vm.regionalMod['Cataluña'] || {}; var m = Q.vm.regionalMod['Cataluña'].psoe; Q.vm.regionalMod['Cataluña'].psoe = (m === undefined ? 1 : m) * (1 + 0.003 * c); }
+    // pro-European professionals reward integration; Euroscepticism costs them
+    if (u >= 3) { campaign(Q, 'psoe', { professionals: 0.05, students: 0.05 }); }
+    if (u <= -1) { transfer(Q, 'psoe', { cs: 1 }, { professionals: 0.05 * -u, students: 0.03 * -u }); }
+    Q.const_line = (Q.const_line || 0) * 0.995;
+    if (Q.catalan_crisis) { Q.cat_crisis_months = (Q.cat_crisis_months || 0) + 1; }
+  }
+  // Realignment of the right: if Ciudadanos outpolls the PP for two years,
+  // PP voters follow it and it becomes the main party of the right; the
+  // same can happen to Vox if it grows very large.
+  function rightRealignment(Q) {
+    if (Q.right_dominant) { return; }
+    var t = Q.true_poll || {};
+    var pp = t.pp || 0, cs = t.cs || 0, vox = t.vox || 0;
+    Q.cs_lead_months = cs > pp ? (Q.cs_lead_months || 0) + 1 : Math.max(0, (Q.cs_lead_months || 0) - 2);
+    Q.vox_lead_months = vox > pp && vox >= 20 ? (Q.vox_lead_months || 0) + 1 : Math.max(0, (Q.vox_lead_months || 0) - 2);
+    var who = Q.cs_lead_months >= 24 ? 'cs' : (Q.vox_lead_months >= 18 ? 'vox' : '');
+    if (!who) { return; }
+    Q.right_dominant = who;
+    Q.realign_due = 1;
+    Q.realign_name = UI.partyName(who); Q.realign_cs = who === 'cs' ? 1 : 0;
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
+    // a third of the PP's remaining voters follow the new leader of the right
+    transfer(Q, 'pp', who === 'cs' ? { cs: 0.85, vox: 0.15 } : { vox: 0.8, cs: 0.2 }, share(Q, 'pp', 0.35));
+    recalculate(Q);
+  }
+
   // Monthly cost of the PSOE's position: beyond a threshold, moderates leave.
   var POSITION_THRESHOLD = 3;
   function positionDrift(Q) {
@@ -1168,8 +1240,8 @@
       voxFlow(Q, VOX_NATIONAL_RATE * nationalQuestion(Q) * voxRoom(Q));
     }
     // above its ceiling, Vox's newest voters drift back to the PP
-    if (voxNow > (Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING)) {
-      var over = (voxNow - VOX_CEILING) / voxNow;
+    if (voxNow > voxCeiling(Q)) {
+      var over = (voxNow - voxCeiling(Q)) / voxNow;
       transfer(Q, 'vox', { pp: 0.8, cs: 0.1, psoe: 0.1 }, share(Q, 'vox', Math.min(0.15, 0.3 * over)));
     }
     // Podemos too, to a smaller extent
@@ -1254,9 +1326,21 @@
   var VOX_CEILING = 21;
   var VOX_CHAOS_RATE = 0.5;
   var VOX_CEILING_GRAND = 34;
+  // Vox's room grows beyond history under: a hard-left PSOE in power or a
+  // grand coalition, years of chaos in Catalonia, an ultraprogressive
+  // social course, a PSOE of European integration or plurinational
+  // federalism. If it becomes the main party of the right, the sky opens.
+  function voxCeiling(Q) {
+    if (Q.right_dominant === 'vox') { return 42; }
+    var leftGov = Q.psoe_in_government && !Q.acting && !Q.grand_coalition;
+    var c = Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING;
+    c += (leftGov && (Q.econ_left || 0) > 6 ? 5 : 0) + Math.min(5, (Q.cat_crisis_months || 0) / 8) +
+      (leftGov && (Q.social_prog || 0) > 5 ? 3 : 0) + ((Q.eu_line_eff || 0) >= 3 ? 2.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 3 : 0);
+    return c;
+  }
   function voxRoom(Q) {
     var now = (Q.true_poll && Q.true_poll.vox) || 0;
-    return Math.max(0, 1 - now / (Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING));
+    return Math.max(0, 1 - now / voxCeiling(Q));
   }
 
   // Move `x` (support points in a fully reached class) to Vox: mostly from
@@ -1291,7 +1375,11 @@
     // the Danish lesson (Frederiksen) takes some of the migration issue from Vox
     var migration = Math.max(0, yearOf(MIGRATION_BY_YEAR, Q.year) + (Q.migration || 0) - 3) / 4 *
       (1 - 0.2 * Math.min(1.5, Q.migration_learned || 0));
-    return catalan + separatists + dialogue + progressive + migration;
+    var hardLeft = leftGov && (Q.econ_left || 0) > 6 ? 0.8 : 0;
+    var grand = Q.grand_coalition && !Q.acting ? 1 : 0;
+    var longCrisis = Math.min(1.2, (Q.cat_crisis_months || 0) / 20);
+    var lines = ((Q.eu_line_eff || 0) >= 3 ? 0.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 0.7 : 0);
+    return catalan + separatists + dialogue + progressive + migration + hardLeft + grand + longCrisis + lines;
   }
 
   // Vox fills Vistalegre (October 2018). The surge feeds on the Catalan
@@ -2065,6 +2153,8 @@
     });
     Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
     positionDrift(Q);
+    lineDrift(Q);
+    rightRealignment(Q);
     incumbencyWear(Q);
     moodShocks(Q);
     monthlyWorld(Q);
@@ -4352,7 +4442,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

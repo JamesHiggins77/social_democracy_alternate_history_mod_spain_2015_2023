@@ -1860,3 +1860,16 @@ Spain elects its town and city councils. [+ local_winner +] wins the most counci
 {!<div id="sp-local-map"></div>!}
 
 [? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it loses [+ local_psoe_change +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]
+
+@realignment
+title: The realignment of the right
+new-page: true
+tags: sp_event
+view-if: realign_due = 1
+on-arrival: realign_due = 0
+
+= The realignment of the right
+
+[? if realign_cs = 1 : For two years Ciudadanos has polled ahead of the PP. Now the PP's own voters, its donors and half its mayors follow: Albert Rivera is the leader of the Spanish centre-right, and Génova is a party of the past. ?][? if realign_cs = 0 : Vox has outpolled the PP for a year and a half. The PP's voters stop pretending: Santiago Abascal is now the leader of the Spanish right, and the PP is reduced to its old provincial strongholds. ?]
+
+[+ realign_name +] is now the main party of the right.

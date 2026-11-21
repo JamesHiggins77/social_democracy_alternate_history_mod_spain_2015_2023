@@ -518,3 +518,95 @@ on-arrival: {! if (window.SpainGame) { window.SpainGame.darkArts(Q, 'sabotage', 
 on-arrival: dark_timer = 2
 
 You leave the dark arts to others.
+
+@territorial_line
+title: The territorial model
+new-page: true
+is-card: true
+tags: sp_party
+view-if: sanchez_leader = 1 and terr_timer <= 0
+on-arrival: terr_timer = 6
+
+= The territorial model
+
+The PSOE's line on Spain's territorial model is **[+ const_word +]**. Granada in 2013 committed the party to a federal reform; the barons of the south want no part of anything that sounds like a concession to the independence movement.
+
+- @terr_central: Recentralise: one Spain, equal everywhere
+- @terr_union: Firmly unionist, inside the current Constitution
+- @terr_fed: A federal reform of the Constitution
+- @terr_pluri: Spain as a nation of nations
+- @root: Leave the line where it is
+
+@terr_central
+title: Recentralise
+subtitle: Unionist voters approve; the PSC suffers, Podemos gains.
+on-arrival: {! Q.const_line -= 2; Q.regional_leaders_dissent -= 4; Q.progressives_dissent += 5; Q.rel_erc -= 8; Q.rel_pnv -= 6; Q.rel_cs += 5; !}
+
+The PSOE proposes to recover powers for the State. In Barcelona, the PSC hears about it on the radio.
+
+@terr_union
+title: Firmly unionist
+subtitle: The barons approve; nationalist partners cool.
+on-arrival: {! Q.const_line -= 1; Q.regional_leaders_dissent -= 3; Q.rel_erc -= 4; Q.rel_pnv -= 2; !}
+
+The Constitution, all of it, and nothing but.
+
+@terr_fed
+title: A federal reform
+subtitle: The Socialist Left and the PSC approve; the barons grumble.
+on-arrival: {! Q.const_line += 1; Q.progressives_dissent -= 3; Q.regional_leaders_dissent += 3; Q.rel_erc += 3; Q.rel_pnv += 3; !}
+
+The Granada declaration, dusted off and turned into a draft.
+
+@terr_pluri
+title: A nation of nations
+subtitle: Nationalist partners warm sharply; Vox and the PP have a new attack line.
+on-arrival: {! Q.const_line += 2; Q.progressives_dissent -= 4; Q.regional_leaders_dissent += 8; Q.institutionalists_dissent += 4; Q.rel_erc += 6; Q.rel_pnv += 6; Q.rel_bildu = (Q.rel_bildu || 40) + 5; !}
+
+The PSOE accepts that Spain contains several nations. Page says it is the end of the party he knew.
+
+@europe_line
+title: The PSOE and Europe
+new-page: true
+is-card: true
+tags: sp_party
+view-if: sanchez_leader = 1 and eurol_timer <= 0
+on-arrival: eurol_timer = 6
+
+= The PSOE and Europe
+
+The PSOE's European line is **[+ eu_word +]**. Spain is among the most pro-European countries in the Union, but Brussels was also the troika and the austerity of 2010-12.
+
+- @eu_skeptic: Stand up to Brussels on austerity
+- @eu_realist: Pro-European, with conditions
+- @eu_pro: Spain at the heart of Europe
+- @eu_fed: A federal Europe: eurobonds, a common budget, a common army
+- @root: Leave the line where it is
+
+@eu_skeptic
+title: Stand up to Brussels
+subtitle: Workers and Podemos voters listen; Brussels and liberal voters frown.
+on-arrival: {! Q.eu_line -= 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', -6); window.SpainGame.campaign(Q, 'psoe', { workers: 0.4, unemployed: 0.4, professionals: -0.4 }); } Q.modernisers_dissent += 5; !}
+
+No more cuts dictated from abroad, says Sánchez.
+
+@eu_realist
+title: Pro-European, with conditions
+subtitle: A balanced line.
+on-arrival: {! Q.eu_line -= 0.8; Q.modernisers_dissent += 1; Q.progressives_dissent -= 1; !}
+
+Europe, yes; this Europe, not entirely.
+
+@eu_pro
+title: Spain at the heart of Europe
+subtitle: Brussels warms; professionals approve.
+on-arrival: {! Q.eu_line += 0.8; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 4); window.SpainGame.campaign(Q, 'psoe', { professionals: 0.3 }); } Q.modernisers_dissent -= 2; !}
+
+Spain will be where Europe is decided.
+
+@eu_fed
+title: A federal Europe
+subtitle: Brussels is delighted; Vox calls you Brussels's servant.
+on-arrival: {! Q.eu_line += 2; if (window.SpainGame) { window.SpainGame.intl(Q, 'eu', 8); window.SpainGame.campaign(Q, 'psoe', { professionals: 0.4, students: 0.3 }); } Q.modernisers_dissent -= 3; Q.trade_unionists_dissent += 2; !}
+
+Eurobonds, a common budget, a European army: the PSOE signs up for all of it.

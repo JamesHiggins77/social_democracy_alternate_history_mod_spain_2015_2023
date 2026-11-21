@@ -75,6 +75,12 @@ Economic line: **[+ econ_word +]**
 
 Social line: **[+ social_word +]**
 
+Constitutional line: **[+ const_word +]**
+
+European line: **[+ eu_word +]**
+
+Attack lines against the PSOE: PP [+ pp_attack +]; Vox [+ vox_attack +]; Podemos [+ up_attack +]
+
 Sanchismo: **[+ sanchismo_word +]**
 
 [? if sanchez_leader = 1 : Barons' plotting: **[+ plot_word +]**; loyalists in key posts: **[+ loyalist_posts_text +]** ?]

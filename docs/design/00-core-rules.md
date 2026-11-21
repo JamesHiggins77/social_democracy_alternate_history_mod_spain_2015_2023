@@ -626,3 +626,24 @@ Polls appear when Díaz enters (for the endorsements) and after the endorsements
   - When a faction turns hostile ("The Regional Barons Side with Díaz", "Sánchez Makes an Enemy of the Socialist Left", "Sánchez Alienates the Modernisers", and so on), its offers are withdrawn and its people leave your team.
   - Every 4 months, one adviser whose own conditions hold may come forward alone ("X offers their service").
   - Each of the 24 advisers has 3–4 abilities of their own (75 in total). Some are gated: only in government, only in opposition, only in coalition, during government formation, or during the Catalan crisis with a Sánchez who is not a hard-line unionist. Populist campaigning (Lastra, Tapias, Méndez, Álvarez, Puente) works at half strength in government.
+
+### 7.31 Catalan crisis end, repeat elections
+
+- **When the crisis ends:** only when direct rule has been applied (Article 155), the Generalitat is not hard-line independentist (not led by Junts and without the CUP), and the protests have died down (`cat_protest` < 12).
+- **Protests:** start at 70 and fade by 7% a month. The October 2019 sentence adds 35. A hard line inflames them; dialogue and pardons calm them.
+- **Repeat Catalan elections:** the first repeat helps Cs on the unionist side. Later repeats feed Vox.
+
+### 7.32 Ideological lines, attack lines, realignment
+
+- **Economic axis:** Neoliberal / Moderate / Social Liberal / Social Democratic / Anti-Capitalist.
+- **New lines:**
+  - Constitutional: Centralist Unionist … Plurinational Federalist.
+  - European: Eurosceptic … European Integration.
+  - Each has a base the player sets with the "Territorial model" and "PSOE and Europe" cards. The effective value also reads dialogue, pardons, the amnesty and EU relations.
+- **Voter effects:**
+  - Vox gains from Anti-Capitalist, Progressive, European Integration and Plurinational Federalist positions.
+  - Podemos gains from Neoliberal, Centralist Unionist and socially moderate positions.
+  - Strong federalism costs unionist voters; unionism costs the PSC.
+- **Attack lines:** each rival's attack line is shown in the PSOE panel.
+- **Vox's ceiling rises** under a hard-left PSOE government, a grand coalition, a long Catalan crisis, an ultraprogressive social line, European integration or plurinational federalism.
+- **Realignment:** if Cs outpolls the PP for 24 months, or Vox polls 20%+ and above the PP for 18 months, a third of the PP's remaining voters follow the new leader of the right. With Vox dominant, its ceiling is 42.
