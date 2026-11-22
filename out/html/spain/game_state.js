@@ -2436,6 +2436,14 @@
     return parts[parts.length - 1];
   }
 
+  // Does a radical party that is the larger partner put up a more moderate
+  // candidate? More likely the closer the two are; decided once per
+  // legislature so the same result repeats on reloads.
+  function kingmakerRoll(Q, party, ratio) {
+    var key = 'km_' + party + '_' + (Q.legislature_start_year || Q.year);
+    if (Q[key] === undefined) { Q[key] = Math.random() < Math.max(0.15, 0.85 - 0.9 * (ratio - 1)) ? 1 : 0; }
+    return Q[key] === 1;
+  }
   function formGovernment(Q, candidate) {
     // a PP government (by majority or with Cs) while Sánchez's leadership
     // has never been confirmed in a primary of his own: the critics move
@@ -2480,6 +2488,21 @@
         Q.depends_on_catalans = 1;
         Q.government_type += ', relying on the Catalan and Basque nationalists';
       }
+    } else if (candidate === 'up' && Q.psoe_backs_iglesias === 'coalition' && (Q.congress.up || 0) < 176 &&
+               (Q.congress.up || 0) / Math.max(1, Q.congress.psoe || 0) < 1.4 &&
+               kingmakerRoll(Q, 'up', (Q.congress.up || 0) / Math.max(1, Q.congress.psoe || 0))) {
+      // Podemos is larger, but puts up the PSOE's leader to win the centre's
+      // tolerance, taking the Deputy premiership and the key ministries
+      Q.pm = leaderOf(Q, 'psoe');
+      Q.pm_party = 'psoe';
+      Q.psoe_in_government = 1;
+      Q.govt_parties = ['psoe', 'up'];
+      Q.cab_share = 'kingmaker';
+      Q.up_backs_psoe = 1;
+      Q.government_type = 'PSOE–Podemos coalition government (Podemos the larger party)';
+      if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForUP(Q))) {
+        Q.depends_on_catalans = 1;
+      }
     } else if (candidate === 'up') {
       Q.pm = leaderOf(Q, 'up');
       Q.pm_party = 'up';
@@ -2505,7 +2528,18 @@
       var csJoins = (Q.player_party === 'cs' && Q.player_line_right === 'coalition') ||
         (Q.pact_pp_cs && Parliament.between(Q, 'cs', 'pp') >= 65);
       Q.cs_supports_pp = Q.pact_pp_cs && !csJoins ? 1 : 0;
-      if (vox > (Q.congress.pp || 0)) {
+      // Vox is the larger party of the right. Unless it is far ahead (or has
+      // a majority of its own), it may prefer to put up the PP's leader, a
+      // more acceptable Prime Minister, in exchange for the key ministries.
+      var vk = vox / Math.max(1, Q.congress.pp || 0);
+      Q.vox_backs_pp = vox > (Q.congress.pp || 0) && vox < 176 && vk < 1.5 && kingmakerRoll(Q, 'vox', vk) ? 1 : 0;
+      if (Q.vox_backs_pp) {
+        Q.govt_parties = ['pp', 'vox'];
+        Q.cab_share = 'kingmaker';
+        Q.government_type = 'PP–Vox coalition government (Vox the larger party)';
+        Q.loss_reason = 'The PP and Vox form a coalition government with a majority in Congress. ' +
+          'There is no route back to government for the left before the end of the period.';
+      } else if (vox > (Q.congress.pp || 0)) {
         // Vox is the larger party of the right: Abascal leads the government
         Q.pm = 'Santiago Abascal';
         Q.pm_party = 'vox';
@@ -2527,6 +2561,7 @@
     }
     Q.legislature_end_year = Q.legislature_start_year + 4;
     allocateCabinet(Q, Q.cab_share && (Q.govt_parties || []).length > 1 ? Q.cab_share : 'standard');
+    if (Q.cab_share === 'kingmaker') { Q.cab_share = ''; }
     // a coalition with the player's party in it: the agreement is negotiated
     Q.cabinet_pending = ((Q.govt_parties || []).length > 1 &&
       (Q.govt_parties || []).indexOf(Q.player_party || 'psoe') !== -1 && (Q.sanchez_leader || Q.exiled)) ? 1 : 0;
@@ -2887,9 +2922,20 @@
         }
       }
     }
+    // a radical party that leads its bloc may still put up a candidate from
+    // the moderate party (Vox behind the PP, Podemos behind the PSOE) and
+    // take key regional ministries instead
+    var kingmaker = null;
+    var moderate = { vox: 'pp', up: 'psoe' }[party];
+    if (moderate && seats[moderate] && seats[party] < majority && seats[party] / seats[moderate] < 1.5 &&
+        Math.random() < Math.max(0.15, 0.85 - 0.9 * (seats[party] / seats[moderate] - 1))) {
+      kingmaker = party;
+      party = moderate;
+    }
     var cabinet = [party];
+    if (kingmaker) { cabinet.push(kingmaker); }
     var support = [];
-    var count = seats[party] || 0;
+    var count = (seats[party] || 0) + (kingmaker ? seats[kingmaker] || 0 : 0);
     // Ciudadanos stayed out of regional cabinets until 2019, Podemos until 2017
     var willing = (COALITION_PARTNERS[party] || []).filter(function (id) {
       if (id === 'cs' && year && year < 2018) { return false; }
@@ -2902,7 +2948,7 @@
     // add partners, largest first, until a majority is reached
     var indepLed = INDEP.indexOf(party) !== -1;
     bySize(bloc.concat(party === 'pp' ? ['vox'] : [])).forEach(function (id) {
-      if (id === party || count >= majority) {
+      if (id === party || cabinet.indexOf(id) !== -1 || count >= majority) {
         return;
       }
       // unionist and independence parties do not prop each other up
@@ -2928,6 +2974,7 @@
     } else {
       type = 'Minority';
     }
+    if (kingmaker) { type += ': ' + UI.shortName(kingmaker) + ', the larger party, backs a ' + UI.shortName(party) + ' president and holds key departments'; }
     var president = previous && previous.party === party ? previous.president
       : UI.partyName(party) + ' president';
     var cupNeeded = indepLed && support.indexOf('cup') !== -1;
@@ -4267,7 +4314,12 @@
     var share = Math.max(2, Math.round(keys.length * pSeats / (sSeats + pSeats)));
     var prefs = (PARTNER_PREFS[partner] || []).slice();
     var partnerGets = [];
-    if (plan === 'generous') {
+    if (plan === 'kingmaker') {
+      // the larger party lets its partner take Moncloa, and takes more than
+      // its share: the Deputy premiership and the ministries it wants first
+      share = Math.max(share, Math.round(keys.length * pSeats / (sSeats + pSeats)) + 2);
+      partnerGets.push('deputy');
+    } else if (plan === 'generous') {
       share += 2;
       partnerGets.push('deputy');
     } else if (plan === 'hard') {

@@ -782,3 +782,10 @@ Opposition-only attacks are now hidden while the PSOE governs: the debate's "que
 - **Radical left:** Podemos and IU. A challenger takes over after 18 months ahead.
 
 The switch is no longer a one-off transfer. Each month for up to three years, while the old leader still polls above two thirds of the new one, 1.5% of the old leader's support moves away. 80% goes to the new leader and 20% to the camp's third party, so the PP bleeds to Cs and a little to Vox, or to Vox and a little to Cs. A tested case: the PP falls from 19.7 to 17.2 in a year while Cs rises from 20.7 to 22.3. Each switch fires an event.
+
+### 7.43 Kingmakers: the larger radical party backs a moderate head of government
+
+- **Who it applies to:** Vox, when it outseats the PP, and Podemos, when it outseats the PSOE in a coalition the PSOE has agreed to join. Neither is guaranteed the top job.
+- **The chance:** about 85% when the two are level, falling to 15% when the radical party has 1.5 times the seats. It is decided once per legislature. It never applies when the radical party has a majority of its own, or nationally when it has 1.4 or more times the moderate party's seats.
+- **National:** the moderate leader becomes Prime Minister. The larger party takes the Deputy premiership and two ministries more than its seat share, starting with the posts it wants most (for Vox: Interior, Defence, Justice). The government is labelled "(Vox the larger party)" or "(Podemos the larger party)".
+- **Regional:** the same rule applies. The moderate party's leader becomes president with the larger party in the cabinet, and the government type says so.
