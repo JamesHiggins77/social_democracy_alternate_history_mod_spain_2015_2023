@@ -1008,8 +1008,8 @@
   //   left: Podemos or IU over the PSOE for 24 months
   //   radical left: IU over Podemos for 18 months
   var REALIGN = [
-    { key: 'right', camp: ['pp', 'cs', 'vox'], months: 30, min: { vox: 24 } },
-    { key: 'left', camp: ['psoe', 'up', 'iu'], months: 30, min: {} },
+    { key: 'right', camp: ['pp', 'cs', 'vox'], months: 36, min: { vox: 24 } },
+    { key: 'left', camp: ['psoe', 'up', 'iu'], months: 36, min: {} },
     { key: 'radical', camp: ['up', 'iu'], months: 18, min: {} }
   ];
   function rightRealignment(Q) {
@@ -1021,7 +1021,7 @@
       R.camp.forEach(function (p) {
         if (p === st.leader) { return; }
         // a clear lead, not a dead heat: 3 points (4 for Vox)
-        var ahead = (t[p] || 0) > (t[st.leader] || 0) + (p === 'vox' ? 4 : 3) && (t[p] || 0) >= (R.min[p] || 0);
+        var ahead = (t[p] || 0) > (t[st.leader] || 0) + (p === 'vox' || st.leader === 'psoe' ? 4 : 3) && (t[p] || 0) >= (R.min[p] || 0);
         st.lead[p] = ahead ? (st.lead[p] || 0) + 1 : Math.max(0, (st.lead[p] || 0) - 2);
         if (st.lead[p] >= R.months) {
           st.old = st.leader; st.leader = p; st.lead = {}; st.bleed = 36;
@@ -1225,9 +1225,11 @@
       if (Q.bluff_called) { callElection(Q); Q.sanchez_authority -= 4; }
       else { Q.sanchez_authority -= 3; Q.regional_leaders_dissent += 4; }
     } else if (defend === 'members') {
-      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? (Q.depends_on_catalans ? 4 : 8) : 0));
+      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? (Q.depends_on_catalans ? 4 : 8) : 0) +
+        0.3 * Math.max(0, (Q.sanchismo || 0) - 25) + 0.2 * Math.max(0, (Q.member_morale || 0) - 50));
     } else {
-      var defence = coupDefence(Q) + pmBonus + 16 * (Math.random() - 0.5);
+      // the members' mood presses on the Committee too (2016's 'No es no' crowds)
+      var defence = coupDefence(Q) + pmBonus + 0.2 * Math.max(0, (Q.sanchismo || 0) - 30) + 16 * (Math.random() - 0.5);
       Q.coup_survived = defence >= attack ? 1 : 0;
       if (!Q.coup_survived) {
         oust(Q, false);
@@ -1396,8 +1398,8 @@
   // Vox's growth slows as it nears its ceiling: about a fifth of the vote
   // normally, a third while a grand coalition leaves it as the only
   // opposition on the right.
-  var VOX_CEILING = 21;
-  var VOX_CHAOS_RATE = 0.5;
+  var VOX_CEILING = 16;
+  var VOX_CHAOS_RATE = 0.38;
   var VOX_CEILING_GRAND = 34;
   // Vox's room grows beyond history under: a hard-left PSOE in power or a
   // grand coalition, years of chaos in Catalonia, an ultraprogressive
@@ -1409,7 +1411,7 @@
     var c = Q.grand_coalition && !Q.acting ? VOX_CEILING_GRAND : VOX_CEILING;
     var extra = (leftGov && (Q.econ_left || 0) > 6 ? 3 : 0) + Math.min(3, Math.max(0, (Q.cat_crisis_months || 0) - 24) / 12) +
       (leftGov && (Q.social_prog || 0) > 5 ? 2 : 0) + ((Q.eu_line_eff || 0) >= 3 ? 1.5 : 0) + ((Q.const_line_eff || 0) >= 3 ? 2 : 0);
-    return c + Math.min(8, extra);
+    return c + Math.min(5, extra);
   }
   function voxRoom(Q) {
     var now = (Q.true_poll && Q.true_poll.vox) || 0;
@@ -1433,7 +1435,7 @@
   // The national question, in rough monthly units: the Catalan conflict, a
   // left-wing government that relies on the independence parties, dialogue
   // and pardons, a progressive social course in government, and migration.
-  var VOX_NATIONAL_RATE = 0.12;
+  var VOX_NATIONAL_RATE = 0.095;
   // Below this level of chaos Vox's protest voters drift back to the PP
   // (VOX_CALM_RATE of its vote a month for every ten points of calm).
   var VOX_CALM = 25;
@@ -1551,7 +1553,7 @@
         transfer(Q, 'up', 'psoe', all(0.1));
         transfer(Q, 'cs', 'psoe', all(0.05));
       }
-      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.06));
+      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.04));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
       // a governing PP is worn down faster the more its corruption is in the news
       transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15 + 0.05 * Math.min(4, Q.pp_scandal || 0)));
@@ -3985,8 +3987,9 @@
   }
   // Monthly checks for the splits.
   function splitChecks(Q) {
-    var supportsPP = Q.grand_coalition || Q.gestora_invested || (Q.pm_party === 'pp' && Q.psoe_supply);
-    var unionist = (Q.const_line_eff || 0) <= -2.5;
+    // only while that PP government stands: the 2016 abstention does not count for ever
+    var supportsPP = Q.grand_coalition || ((Q.gestora_invested || Q.psoe_supply) && Q.pm_party === 'pp' && !Q.acting && (Q.time || 0) - (Q.gestora_time || Q.time || 0) < 24);
+    var unionist = (Q.const_line_eff || 0) <= -3.5;
     // the PSC broke discipline in 2016 but did not leave: one abstention is
     // not enough, it takes a sustained course (a grand coalition, or a
     // hard-unionist PSOE) for a year or more
@@ -3995,7 +3998,7 @@
     } else {
       Q.psc_tension = Math.max(0, (Q.psc_tension || 0) - 3);
     }
-    if (!Q.psc_split && Q.psc_tension >= 60) { pscSplit(Q); }
+    if (!Q.psc_split && Q.psc_tension >= 90) { pscSplit(Q); }
     var left = (Q.grand_coalition ? 3 : 0) + (supportsPP ? 2 : 0) + Math.max(0, -1 - (Q.econ_left || 0)) +
       Math.max(0, (Q.progressives_dissent || 20) - 50) / 10;
     if (!Q.left_split && Q.year >= 2016 && left >= 3 && (Q.progressives_dissent || 0) >= 55) {
@@ -4664,7 +4667,7 @@
         Q.auto_formed = 1;
         if (Q.psoe_interim && (tried[i] === 'pp' || tried[i] === 'cs')) {
           // the caretaker PSOE abstained: the group splits, as in October 2016
-          Q.gestora_invested = 1;
+          Q.gestora_invested = 1; Q.gestora_time = Q.time;
           Q.psoe_rebels = Math.max(5, Math.round((Q.congress.psoe || 85) * (0.08 + (Q.sanchismo || 20) / 600)));
           Q.psoe_abstainers = (Q.congress.psoe || 0) - Q.psoe_rebels;
         }

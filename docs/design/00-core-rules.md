@@ -830,3 +830,30 @@ The start menu now offers two modes.
   - **Realignments:** take 30 months on the right and the left, and need a clear lead (3 points, 4 for Vox).
   - **Result:** in 6 ahistorical games, the PSOE kept the left in 5 and the PP kept the right in 4; Vox ended near 13%.
   - **Historical replay:** unchanged (PSOE 119 against 121 in 2023).
+
+### 7.46 Balance pass (100 simulated games per round)
+
+These changes came from 20 bad (random), 40 OK (`--smart`) and 40 good (`--good`) playthroughs.
+- **Vox:**
+  - the base ceiling falls from 21 to 16, and the extra room from its drivers is capped at 5;
+  - growth from chaos drops from 0.5 to 0.38, and from the national question from 0.12 to 0.095.
+- **Fighting the barons:** a members' primary to defeat a coup gains +0.3 per point of sanchismo above 25 and +0.2 per point of morale above 50. The Federal Committee defence gains +0.2 per point of sanchismo above 30.
+- **PSC split:**
+  - the threshold rises from 30 (first pass) to 90;
+  - "unionist" now means a constitutional line of −3.5 or below;
+  - supporting the PP only counts while that PP government stands, for up to 24 months. Previously the 2016 abstention counted for the rest of the game.
+- **Realignments:** the right needs 36 months, the left 36 months and a 4-point lead over the PSOE.
+- **Government wear:** a PSOE government loses support at 0.04 a month instead of 0.06.
+
+| | Before (bad / OK / good) | After |
+|---|---|---|
+| Games lost | 30 / 28 / 48% | 30 / 35 / 40% |
+| Vox seats in elections from 2019 | 82 / 80 / 82 | 66 / 61 (final OK run) / 70 |
+| PSC split | 25 / 40 / 15% | 20 / 18 / 20% |
+| Cs or Vox takes the right | 45 / 30 / 20% | 10 / 10 / 5% |
+| Podemos takes the left | 25 / 30 / 10% | 20 / 12 / 2.5% |
+| Best run as PM (months) | 63 / 80 / 76 | 23 / 77 / 74 (up to 99 in an intermediate round) |
+
+Historical replay: November 2019 PSOE 118 (real 120), Vox 47 (52); July 2023 PSOE 125 (121), PP 134 (137), Vox 26 (33).
+
+Still open: the automated "good" player is crude. It plays cards at random and keeps choosing to confront the barons, so it loses more often than a human would. No run reached the 102-month goal.
