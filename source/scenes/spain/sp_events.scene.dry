@@ -462,7 +462,7 @@ if (window.SpainGame) {
 
 = The referendum laws
 
-In two chaotic sessions, the Parliament of Catalonia passes a law calling a referendum on independence for 1 October and a "transitional law" for a new republic. The opposition walks out. The Constitutional Court suspends both laws within days. [? if psoe_in_government = 1 : As Prime Minister, the response is yours to lead. ?][? if psoe_in_government = 0 : Rajoy's government asks the PSOE for unity in defence of the Constitution. ?]
+In two chaotic sessions, the Parliament of Catalonia passes a law calling a referendum on independence for 1 October and a "transitional law" for a new republic. The opposition walks out. The Constitutional Court suspends both laws within days. [? if psoe_in_government = 1 : As Prime Minister, the response is yours to lead. ?][? if psoe_in_government = 0 : [+ pm +]'s government asks the PSOE for unity in defence of the Constitution. ?]
 
 A new deck of cards is available: **Catalan crisis**.
 
@@ -705,7 +705,7 @@ You act within hours. Some veterans think you threw old comrades to the wolves; 
 @anticorruption
 on-arrival: {! Q.rel_cs += 4; Q.rel_pp -= 2; Q.institutionalists_dissent -= 2; if (window.SpainGame) { window.SpainGame.target(Q, 'psoe', 'middle', 1); window.SpainGame.recalculate(Q); } !}
 
-A serious proposal. Rajoy ignores it; the new parties call it too little, too late.
+A serious proposal. [+ pm +] ignores it; the new parties call it too little, too late.
 
 @attack_pp
 on-arrival: {! Q.rel_pp -= 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {students: 1, workers: 0.5}); } !}
@@ -1736,7 +1736,7 @@ The municipal elections have gone badly for the PSOE, and the PP is ready to gov
 subtitle: The left mobilises behind the PSOE and the right has no time to settle; but you face the voters early
 on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); window.SpainGame.transferRaw(Q, 'up', 'psoe', { students: 1.5, workers: 1.5, professionals: 1.2, unemployed: 1, pensioners: 0.8, homemakers: 0.8 }); window.SpainGame.campaign(Q, 'psoe', { pensioners: 1.2, workers: 1, professionals: 0.8, homemakers: 0.8, self_employed: 0.4 }); } Q.sanchismo += 6; Q.member_morale += 6; !}
 
-The morning after the regional elections, you appear in the Moncloa and announce the dissolution of the Cortes. The PP, which expected six months to prepare, scrambles. On the left, everyone understands the question: you, or Feijóo and Abascal.
+The morning after the regional elections, you appear in the Moncloa and announce the dissolution of the Cortes. The PP, which expected six months to prepare, scrambles. On the left, everyone understands the question: you, or [+ pp_leader +] and Abascal.
 
 @bluff_wait
 on-arrival: {! Q.sanchez_authority -= 2; !}
@@ -2124,3 +2124,14 @@ on-arrival: senate_lifted_due = 0
 = The Senate veto is lifted
 
 Two months after the Senate vetoed it, Congress lifts the veto on the [+ senate_lifted +]. It finally comes into force.
+
+@alt_history
+title: History takes another turn
+new-page: true
+tags: sp_event
+view-if: alt_due = 1
+on-arrival: alt_due = 0
+
+= [? if alt_errejon = 1 : Errejón wins Vistalegre II ?][? if alt_vox_ortega = 1 : Ortega Smith takes over Vox ?][? if alt_vox_espinosa = 1 : Espinosa de los Monteros takes over Vox ?][? if alt_cat_talks = 1 : Rajoy sits down with Puigdemont ?][? if alt_iceta = 1 : Iceta's surge ?]
+
+[? if alt_errejon = 1 : At Podemos's second assembly, Íñigo Errejón's line beats Pablo Iglesias's. Podemos will seek transversal voters and talk to the PSOE rather than try to replace it. Iglesias stays as a deputy; his supporters drift towards Izquierda Unida. ?][? if alt_vox_ortega = 1 : Santiago Abascal steps back and Javier Ortega Smith takes over Vox: harder, more confrontational, aimed at working-class neighbourhoods rather than at disappointed PP voters. ?][? if alt_vox_espinosa = 1 : Iván Espinosa de los Monteros takes over Vox and turns it towards economic liberalism: low taxes, less state. It wins over business-minded Ciudadanos voters and loses some workers. ?][? if alt_cat_talks = 1 : Instead of Article 155, Mariano Rajoy opens secret talks with the Generalitat through the Basque nationalists. There is no direct rule, no declaration of independence, and no prison for the Catalan leaders. The right calls it surrender; Vox grows on it. ?][? if alt_iceta = 1 : Miquel Iceta's campaign catches fire: dancing on stage, promising pardons and a federal Spain, he wins the unionist vote that in history went to Ciudadanos. ?]

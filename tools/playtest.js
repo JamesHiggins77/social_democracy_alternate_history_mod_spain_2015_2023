@@ -15,6 +15,8 @@ const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
 const GAMES = Number(args.find(a => /^\d+$/.test(a)) || 20);
 const FORCE_GRAND = args.includes('--grand');
+const SMART = args.includes('--smart');
+const AHIST = args.includes('--ahist');
 const AS_JSON = args.includes('--json');
 
 // the browser globals the scenes expect
@@ -108,7 +110,13 @@ async function playOne(game) {
     let ok = all.map((c, i) => [c, i]).filter(([c]) => c.canChoose !== false && !c.unavailable);
     // from the start menu, always start a campaign (not the lab or credits)
     const start = ok.filter(([c]) => /new campaign/i.test(c.title || ''));
-    if (start.length) { ok = start; }
+    if (start.length) { ok = start.filter(([c]) => (AHIST ? /ahistorical/i : /: historical/i).test(c.title || '')); if (!ok.length) { ok = start; } }
+    // --smart: a sensible player avoids the extreme and self-destructive options
+    if (SMART && ok.length > 1) {
+      const BAD = /nation of nations|federal Europe|Recentralise|Stand up to Brussels|hard bargain|Resign|Repeal|Anti-Capitalist|dark arts|Rig|sabotage|Leave politics|Call it what it is|refuse/i;
+      const good = ok.filter(([c]) => !BAD.test(c.title || ''));
+      if (good.length) { ok = good; }
+    }
     if (!ok.length) { break; }
     let choice = pick(ok);
     if (FORCE_GRAND) {
@@ -121,6 +129,10 @@ async function playOne(game) {
   const q = Q();
   return { elections, grand, end: q.year + '-' + q.month, pm: q.pm, government: q.government_type,
            flags: { cat_crisis: q.cat_crisis_seen || 0, vistalegre: q.vox_rise_seen || 0, breakthrough: q.vox_breakthrough || 0 },
+           pm_months: q.pm_months || 0, psc: q.psc_split || 0, left: q.left_split || 0, coup: q.rebellion_used || 0,
+           right: (q.realign && q.realign.right && q.realign.right.leader) || 'pp', leftLead: (q.realign && q.realign.left && q.realign.left.leader) || 'psoe',
+           vox_final: Math.round(10 * ((q.true_poll || {}).vox || 0)) / 10, pp_final: Math.round(10 * ((q.true_poll || {}).pp || 0)) / 10,
+           psoe_final: Math.round(10 * ((q.true_poll || {}).psoe || 0)) / 10,
            lost: q.loss_text || '', steps };
 }
 
@@ -154,6 +166,10 @@ async function playOne(game) {
   console.log('Games without the Vistalegre surge:', noRise.length, '/', runs.length,
     noRise.length ? ' mean Vox seats at their elections from 2019: ' + mean(noRise.flatMap(r => r.elections.filter(el => el.date >= '2019-01')).map(el => el.seats.vox || 0)) : '');
   console.log('Games lost:', runs.filter(r => r.lost).length, '/', runs.length);
+  console.log('Months as PM: mean', mean(runs.map(r => r.pm_months)), ' max', Math.max(...runs.map(r => r.pm_months)), ' reached 102:', runs.filter(r => r.pm_months >= 102).length);
+  console.log('Final polls: PSOE', mean(runs.map(r => r.psoe_final)), ' PP', mean(runs.map(r => r.pp_final)), ' Vox', mean(runs.map(r => r.vox_final)));
+  console.log('PSC splits', runs.filter(r => r.psc).length, ' left splits', runs.filter(r => r.left).length, ' coups', runs.filter(r => r.coup).length,
+    ' right led by', runs.map(r => r.right).join(','), ' left led by', runs.map(r => r.leftLead).join(','));
   const errs = Object.keys(errors);
   console.log('Script errors:', errs.length ? '' : 'none');
   errs.forEach(k => console.log(`  ${errors[k]}x ${k}`));

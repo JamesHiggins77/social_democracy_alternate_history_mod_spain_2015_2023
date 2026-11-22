@@ -835,7 +835,7 @@ on-arrival: {! Q.colon_seen = 1; if (window.SpainGame) { window.SpainGame.transf
 
 = The photo of Colón
 
-Pablo Casado, Albert Rivera and Santiago Abascal share a stage in Madrid's Plaza de Colón, under a giant flag, to demand your resignation over the talks with Catalonia. The photograph is everywhere by the evening. For many voters on the left, and some in the centre, it is the first time the possibility of a government with Vox in it looks real.
+[+ pp_leader +], [+ cs_leader_name +] and [+ vox_leader_name +] share a stage in Madrid's Plaza de Colón, under a giant flag, to demand your resignation over the talks with Catalonia. The photograph is everywhere by the evening. For many voters on the left, and some in the centre, it is the first time the possibility of a government with Vox in it looks real.
 
 - @colon_three: Make it the campaign: "the three rights" against a government of progress
 - @colon_centre: Speak to the moderates: "this is not the Spain of the Constitution"

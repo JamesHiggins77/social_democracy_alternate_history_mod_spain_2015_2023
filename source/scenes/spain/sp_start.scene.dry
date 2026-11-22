@@ -7,6 +7,7 @@ this.state.visits = {};
 this.state.gameOver = false;
 if (typeof window !== 'undefined' && window.SpainGame) {
     window.SpainGame.newGame(Q, 0);
+    Q.ahistorical = window.spAhistorical ? 1 : 0;
 }
 !}
 on-display: {!

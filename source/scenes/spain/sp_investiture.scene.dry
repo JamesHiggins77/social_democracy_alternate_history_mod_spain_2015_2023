@@ -23,8 +23,8 @@ You need 176 yes votes in the first ballot, or more yes than no votes in the sec
 @sign_cs
 title: Sign a government agreement with Ciudadanos
 subtitle: Ciudadanos will vote yes; Podemos will vote no.
-choose-if: cs_talks >= 2 and pact_cs = 0 and pact_up = 0
-unavailable-subtitle: [? if pact_up = 1 : Ciudadanos will not join an agreement that includes Podemos. ?][? if pact_up = 0 and cs_talks < 2 : The talks with Ciudadanos are not far enough advanced. ?]
+choose-if: cs_talks >= 2 and pact_cs = 0 and pact_up = 0 and cs_veto_sanchez = 0
+unavailable-subtitle: [? if cs_veto_sanchez = 1 : Albert Rivera has ruled out any agreement with Pedro Sánchez. ?][? if pact_up = 1 : Ciudadanos will not join an agreement that includes Podemos. ?][? if pact_up = 0 and cs_talks < 2 and cs_veto_sanchez = 0 : The talks with Ciudadanos are not far enough advanced. ?]
 on-arrival: {! Q.pact_cs = 1; Q.rel_cs += 10; Q.rel_up -= 15; Q.modernisers_dissent -= 5; Q.institutionalists_dissent -= 3; Q.progressives_dissent += 10; Q.trade_unionists_dissent += 5; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', {workers: 1.5, students: 1.5, unemployed: 1}); window.SpainGame.campaign(Q, 'psoe', {professionals: 1.5, self_employed: 0.5}); } !}
 go-to: sp_investiture
 

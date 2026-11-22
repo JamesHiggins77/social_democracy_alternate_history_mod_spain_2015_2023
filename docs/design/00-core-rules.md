@@ -796,3 +796,37 @@ The switch is no longer a one-off transfer. Each month for up to three years, wh
 - Santiago Abascal ×1.
 
 The draw is redone if the leader changes. Tested with Podemos on 110 seats and the PSOE on 100: the PSOE leads 43% of the time under Iglesias and 98% under Díaz.
+
+### 7.44 Historical and ahistorical modes; alternative paths
+
+The start menu now offers two modes.
+- **Historical:** what happened happens, unless the player's own actions change its preconditions. The PP picks Casado (2018) and then Feijóo (2022). Rivera's 2019 veto on Sánchez holds until he resigns.
+- **Ahistorical:** forks are rolled once each, at their date, with no input from the player (`fork`):
+  - Errejón wins Vistalegre II (Feb 2017, 35%): a cooperative Podemos, and Iglesias's supporters drift to IU.
+  - Vox under Ortega Smith (harder) or Espinosa de los Monteros (liberal) (Jan 2019, 30%).
+  - Rivera open to a deal with Sánchez (2019, 40%): lifts the veto.
+  - Rajoy negotiates instead of applying Article 155 (Sep 2017, 20%): no direct rule, and talks count as the end condition instead. Vox grows on it.
+  - Iceta's PSC wins the unionist vote in December 2017 (25%).
+  - The PNV sticks with Rajoy in the 2018 censure (35%): the motion fails unless relations with the PNV are 75 or more.
+  - Open PP successions: an early Feijóo (2018) or Ayuso (2022) become possible.
+
+  An event announces each fork that fires.
+- **Player-driven paths in both modes:**
+  - a PSOE–Cs deal;
+  - Iglesias's coalition in July 2019, through the share-of-government scene;
+  - Díaz winning the 2017 primary;
+  - pandemic choices;
+  - a negotiated Catalonia.
+- **Leaders:** `leaderOf` now knows Vox (Abascal by default) and alternative leaders.
+
+### 7.45 Coalition panel, saves, PP leader names, the corruption line, balance
+
+- **The government panel:** the Politics tab now shows the government's parties and seats against 176, Senate control, partner relations, coalition strain, its record in Congress (laws passed and defeated, budget), whether it depends on the nationalists, laws held up in the Senate, and the last vote, including rebels.
+- **Saves:** `migrate` gives fields added since older saves a default value.
+- **PP leader names:** events that hard-coded "Rajoy", "Casado" or "Feijóo" now use the current PP leader or Prime Minister. The 2018 censure photo only appears if Rajoy was the PP leader.
+- **The corruption attack line:** `corr_k` is 1 or more while the PP governs (rising with its scandals). Once the PP is out of office it fades to 0.15 over three years. Once the PSOE governs, each PSOE scandal (the Koldo case) takes 0.6 off, so the line can backfire. The rally speech and the debate attack use it, and the rally option says how well the message is landing.
+- **Balance, from playtests with the new sensible-player option** (`node tools/playtest.js N --smart [--ahist]`):
+  - **PSC split:** now needs a sustained course (a grand coalition, or a hard-unionist PSOE) for over a year. The threshold rose from 30 to 60.
+  - **Realignments:** take 30 months on the right and the left, and need a clear lead (3 points, 4 for Vox).
+  - **Result:** in 6 ahistorical games, the PSOE kept the left in 5 and the PP kept the right in 4; Vox ended near 13%.
+  - **Historical replay:** unchanged (PSOE 119 against 121 in 2023).

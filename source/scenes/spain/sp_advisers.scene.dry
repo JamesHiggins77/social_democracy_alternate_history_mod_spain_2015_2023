@@ -664,7 +664,7 @@ choose-if: advisor_action_timer = 0 and acting = 1
 unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?] Only while a government is being formed.
 on-arrival: {! Q.rel_pp -= 5; Q.member_morale += 4; Q.sanchismo += 3; Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
 
-Puente replies to Feijóo from the PSOE benches. The members love it.
+Puente replies to [+ pp_leader +] from the PSOE benches. The members love it.
 
 @bolanos_adv
 title: Félix Bolaños
@@ -785,7 +785,7 @@ choose-if: advisor_action_timer = 0 and player_in_government = 0
 unavailable-subtitle: [? if advisor_action_timer > 0 : [+ advisor_action_timer +] month(s) before the next adviser action. ?] Only in opposition.
 on-arrival: {! var k = Q.player_in_government ? 0.5 : 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 1 * k, unemployed: 0.6 * k}); } Q.advisor_action_timer = 2; Q.month_actions += 1; Q.last_advisor_action = 1; !}
 
-Méndez reminds Rajoy of 2012.
+Méndez reminds [+ pm +] of the 2012 general strike.
 
 @cm_pens
 title: Defend the pensions

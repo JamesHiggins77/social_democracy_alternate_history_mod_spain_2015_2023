@@ -69,6 +69,7 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
     window.SpainGame.renderFactions(Q, 'sp-side-factions');
     window.SpainGame.renderRelations(Q, 'sp-side-relations');
     window.SpainGame.renderCabinet(Q, 'sp-side-cabinet');
+    window.SpainGame.renderCoalition(Q, 'sp-side-coalition');
 }
 !}
 
@@ -93,6 +94,10 @@ Sanchismo: **[+ sanchismo_word +]**
 Style: **[+ style_word +]**
 
 Fed. Committee: **[+ committee_word +]**
+
+= The government
+
+{!<div id="sp-side-coalition"></div>!}
 
 = Cabinet
 

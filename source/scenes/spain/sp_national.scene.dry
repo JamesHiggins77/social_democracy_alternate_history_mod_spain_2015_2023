@@ -67,13 +67,12 @@ on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q
 Classic social democracy, and still the PSOE's strongest ground.
 
 @corruption_speech
-view-if: role_in_gov = 0
-subtitle: Costs 1 in party funds.
 choose-if: funds >= 1
 unavailable-subtitle: Not enough party funds.
-on-arrival: {! Q.funds -= 1; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2, students: 1, workers: 1}); window.SpainGame.campaign(Q, 'pp', {professionals: -1, self_employed: -0.5}); } Q.rel_pp -= 4; !}
+subtitle: Costs 1 in party funds. The message [+ corr_word +].
+on-arrival: {! Q.funds -= 1; var k = Q.corr_k === undefined ? 1 : Q.corr_k; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {professionals: 2 * k, students: 1 * k, workers: 1 * k}); if (k > 0) { window.SpainGame.campaign(Q, 'pp', {professionals: -1 * k, self_employed: -0.5 * k}); } } Q.rel_pp -= 4; !}
 
-The audience chants about Bárcenas. [? if pp_scandal >= 2 : With the PP in the dock, the message lands harder. ?]
+[? if corr_k >= 0.9 : The audience chants about Bárcenas. ?][? if corr_k < 0.9 and corr_backfire = 0 : The lines about Bárcenas get polite applause: the PP's scandals feel like old news. ?][? if corr_backfire = 1 : "And what about Koldo?" someone shouts. The cameras turn to the heckler, and the speech is remembered for him. ?]
 
 @spain
 subtitle: Costs 1 in party funds.
@@ -107,8 +106,8 @@ The cameras are on. Your opponent is across the table. How do you play it?
 - @easy_discard
 
 @aggressive
-view-if: role_in_gov = 0
-on-arrival: {! if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2, students: 2, unemployed: 2, pensioners: -1}); } Q.rel_pp -= 12; Q.member_morale += 6; Q.institutionalists_dissent += 3; !}
+view-if: role_in_gov = 0 and pm_is_pp = 1
+on-arrival: {! var k = Q.corr_k === undefined ? 1 : Q.corr_k; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', {workers: 2 * k, students: 2 * k, unemployed: 2 * k, pensioners: -1}); } Q.rel_pp -= 12; Q.member_morale += 6; Q.institutionalists_dissent += 3; !}
 
 "You are not a decent man," you tell him. The clip is everywhere by midnight. The members love it; the commentators are split.
 
@@ -255,7 +254,7 @@ title: Prime Minister
 
 = Prime Minister
 
-{!<img class="sp-event-img" src="img/spain/Spain/Events/Mariano_Rajoy_felicita_al_nuevo_presidente_del_Gobierno_Pedro_S%C3%A1nchez_%282018-06-01%29-%20No%20Confidence.jpg" alt="">!}
+[? if pp_leader_rajoy = 1 : {!<img class="sp-event-img" src="img/spain/Spain/Events/Mariano_Rajoy_felicita_al_nuevo_presidente_del_Gobierno_Pedro_S%C3%A1nchez_%282018-06-01%29-%20No%20Confidence.jpg" alt="">!} ?]
 
 
 {!<div class="sp-last-vote"></div>!}

@@ -440,6 +440,16 @@
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
     installHooks(Q);
+    migrate(Q);
+    Q.pp_leader = Q.pp_leader || 'Mariano Rajoy';
+    Q.pp_leader_rajoy = Q.pp_leader === 'Mariano Rajoy' ? 1 : 0;
+    Q.cs_leader_name = leaderOf(Q, 'cs');
+    corruptionLine(Q);
+    Q.vox_leader_name = leaderOf(Q, 'vox');
+    // February 2019: Rivera's veto on Sánchez (historically kept until he resigned in November)
+    Q.cs_veto_sanchez = Q.year === 2019 && !Q.rivera_resigns_seen && !Q.rivera_open && !Q.cs_collapsed ? 1 : 0;
+    Q.alt_k = Q.alt_event || '';
+    ['errejon', 'vox_ortega', 'vox_espinosa', 'cat_talks', 'iceta'].forEach(function (k) { Q['alt_' + k] = Q.alt_event === k ? 1 : 0; });
     lawFlags(Q);
     roleFlags(Q);
     catalanCrisisState(Q, false);
@@ -998,8 +1008,8 @@
   //   left: Podemos or IU over the PSOE for 24 months
   //   radical left: IU over Podemos for 18 months
   var REALIGN = [
-    { key: 'right', camp: ['pp', 'cs', 'vox'], months: 24, min: { vox: 22 } },
-    { key: 'left', camp: ['psoe', 'up', 'iu'], months: 24, min: {} },
+    { key: 'right', camp: ['pp', 'cs', 'vox'], months: 30, min: { vox: 24 } },
+    { key: 'left', camp: ['psoe', 'up', 'iu'], months: 30, min: {} },
     { key: 'radical', camp: ['up', 'iu'], months: 18, min: {} }
   ];
   function rightRealignment(Q) {
@@ -1010,7 +1020,8 @@
       // who is ahead of the current leader, and for how long
       R.camp.forEach(function (p) {
         if (p === st.leader) { return; }
-        var ahead = (t[p] || 0) > (t[st.leader] || 0) + (p === 'vox' ? 3 : 0) && (t[p] || 0) >= (R.min[p] || 0);
+        // a clear lead, not a dead heat: 3 points (4 for Vox)
+        var ahead = (t[p] || 0) > (t[st.leader] || 0) + (p === 'vox' ? 4 : 3) && (t[p] || 0) >= (R.min[p] || 0);
         st.lead[p] = ahead ? (st.lead[p] || 0) + 1 : Math.max(0, (st.lead[p] || 0) - 2);
         if (st.lead[p] >= R.months) {
           st.old = st.leader; st.leader = p; st.lead = {}; st.bleed = 36;
@@ -2030,13 +2041,13 @@
       Q.cat_protest += 0.6 * (Q.cat_hard_line || 0) - 0.8 * Math.min(3, Q.cat_dialogue || 0) - (Q.pardons_granted ? 1.5 : 0);
       Q.cat_protest = clamp(Q.cat_protest, 0, 100);
     }
-    if ((Q.cat_crisis_stage || 0) >= 3) { Q.direct_rule = 1; }
+    if ((Q.cat_crisis_stage || 0) >= 3 && !Q.cat_negotiated) { Q.direct_rule = 1; }
     var g = Q.regions && Q.regions['Cataluña'] && Q.regions['Cataluña'].government;
     var cab = g ? (g.cabinet || [g.party]) : ['junts'];
     var hard = !g || g.party === 'junts' || g.party === 'jxsi' || cab.indexOf('cup') !== -1;
     Q.cat_gov_moderate = hard ? 0 : 1;
     Q.cat_protest_word = Q.cat_protest >= 50 ? 'mass mobilisation' : (Q.cat_protest >= 25 ? 'regular protests' : (Q.cat_protest >= 12 ? 'occasional protests' : 'quiet'));
-    Q.cat_can_end = Q.direct_rule && Q.cat_gov_moderate && Q.cat_protest < 12 && (Q.cat_crisis_stage || 0) >= 4 ? 1 : 0;
+    Q.cat_can_end = (Q.direct_rule || Q.cat_negotiated) && Q.cat_gov_moderate && Q.cat_protest < 12 && (Q.cat_crisis_stage || 0) >= 4 ? 1 : 0;
   }
   // A Catalan election that produces no government: the first repeat helps
   // Ciudadanos on the unionist side; if it keeps happening, Vox gains.
@@ -2231,6 +2242,7 @@
     Q.campaign_fatigue = (Q.campaign_fatigue || 0) * 0.75;
     positionDrift(Q);
     lineDrift(Q);
+    ahistoricalTick(Q);
     rightRealignment(Q);
     senateQueue(Q);
     splitChecks(Q);
@@ -2410,6 +2422,12 @@
     if (Q.player_party === p && Q.player_leads) {
       return 'Pedro Sánchez';
     }
+    if (Q.lead_override && Q.lead_override[p]) {
+      return Q.lead_override[p];
+    }
+    if (p === 'vox') {
+      return 'Santiago Abascal';
+    }
     if (p === 'cs') {
       return Q.cs_collapsed || Q.rivera_resigns_seen ? 'Inés Arrimadas' : LEADERS.cs;
     }
@@ -2436,6 +2454,23 @@
     return parts[parts.length - 1];
   }
 
+
+  // Saves from older versions: give every field added since a default, so
+  // conditions in the scenes never compare against undefined.
+  var DEFAULTS = { cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
+    offer_pending: 0, psc_split: 0, psc_due: 0, left_split: 0, left_split_due: 0, senate_lifted_due: 0, realign_due: 0,
+    bicephaly: 0, cat_repeat_due: 0, pending_budget: 0, budget_senate_delay: 0, law_senate_delay: 0, ahistorical: 0,
+    alt_due: 0, rivera_open: 0, pm_months: 0, const_line: 0.6, eu_line: 1.2, laws_failed: 0, coalition_strain: 0 };
+  function migrate(Q) {
+    if (Q.migrated_v === 3) { return; }
+    Object.keys(DEFAULTS).forEach(function (k) { if (Q[k] === undefined) { Q[k] = DEFAULTS[k]; } });
+    Q.pending_laws = Q.pending_laws || [];
+    Q.budget_deals = Q.budget_deals || {};
+    Q.lead_override = Q.lead_override || {};
+    Q.realign = Q.realign || {};
+    Q.migrated_v = 3;
+  }
+
   // Does a radical party that is the larger partner put up a more moderate
   // candidate? More likely the closer the two are; decided once per
   // legislature so the same result repeats on reloads.
@@ -2452,6 +2487,58 @@
     if (Q[key] === undefined) { Q[key] = Math.random() < Math.min(0.95, Math.max(0.05, (0.85 - 0.9 * (ratio - 1)) * k)) ? 1 : 0; }
     return Q[key] === 1;
   }
+
+  // ------------------------------------------------------------------
+  // Historical and ahistorical modes. Historical: what happened happens,
+  // unless the player's own actions change its preconditions. Ahistorical:
+  // other parties' choices can go differently without the player's input.
+  // Each fork is rolled once, at its date.
+  // ------------------------------------------------------------------
+  function fork(Q, key, p) {
+    if (!Q.ahistorical) { return false; }
+    if (Q['fork_' + key] === undefined) { Q['fork_' + key] = Math.random() < p ? 1 : 0; }
+    return Q['fork_' + key] === 1;
+  }
+  function ym2(Q) { return Q.year * 100 + Q.month; }
+  function ahistoricalTick(Q) {
+    Q.lead_override = Q.lead_override || {};
+    if (!Q.ahistorical) { return; }
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    // Vistalegre II (February 2017): Errejón beats Iglesias
+    if (ym2(Q) === 201702 && fork(Q, 'errejon', 0.35)) {
+      Q.lead_override.up = 'Íñigo Errejón'; Q.alt_event = 'errejon'; Q.alt_due = 1;
+      Q.rel_up = (Q.rel_up || 40) + 12;
+      transfer(Q, 'up', 'iu', { students: 0.6, workers: 0.5 });
+      campaign(Q, 'up', { professionals: 0.6, homemakers: 0.4, pensioners: 0.3 });
+    }
+    // Vox chooses a different face (2019): Ortega Smith (harder) or Espinosa de los Monteros (liberal)
+    if (ym2(Q) === 201901 && fork(Q, 'voxlead', 0.3)) {
+      var hard = Math.random() < 0.5;
+      Q.lead_override.vox = hard ? 'Javier Ortega Smith' : 'Iván Espinosa de los Monteros';
+      Q.alt_event = hard ? 'vox_ortega' : 'vox_espinosa'; Q.alt_due = 1;
+      if (hard) { campaign(Q, 'vox', { workers: 0.6, unemployed: 0.4, professionals: -0.4 }); }
+      else { transfer(Q, 'cs', 'vox', { professionals: 0.5, self_employed: 0.6 }); campaign(Q, 'vox', { workers: -0.3 }); }
+    }
+    // Ciudadanos: Rivera open to a deal with Sánchez in 2019
+    if (ym2(Q) === 201904) { fork(Q, 'rivera_open', 0.4); Q.rivera_open = Q.fork_rivera_open || 0; }
+    // Catalonia, September 2017: Rajoy negotiates instead of using Article 155
+    if (ym2(Q) === 201709 && Q.catalan_crisis && Q.pm_party === 'pp' && fork(Q, 'cat_talks', 0.2)) {
+      Q.cat_negotiated = 1; Q.cat_dialogue = (Q.cat_dialogue || 0) + 2; Q.cat_crisis_stage = 4; Q.cat_tension = Math.max(0, (Q.cat_tension || 0) - 5);
+      Q.alt_event = 'cat_talks'; Q.alt_due = 1;
+      voxFlow(Q, 0.8);
+    }
+    // Catalonia, December 2017: Iceta's PSC wins the unionist vote instead of Cs
+    if (ym2(Q) === 201711 && fork(Q, 'iceta', 0.25)) {
+      Q.regional_only = Q.regional_only || {};
+      Q.regional_only['Cataluña'] = { psoe: 1.6, cs: 0.7 };
+      Q.alt_event = 'iceta'; Q.alt_due = 1;
+    }
+    // the censure of 2018: the PNV sticks with Rajoy after voting his budget
+    if (ym2(Q) === 201805) { fork(Q, 'pnv_rajoy', 0.35); }
+    // the pandemic: Spain's response could have gone differently in any mode
+    // (that choice is the player's, in the pandemic event)
+  }
+
   function formGovernment(Q, candidate) {
     // a PP government (by majority or with Cs) while Sánchez's leadership
     // has never been confirmed in a primary of his own: the critics move
@@ -3708,6 +3795,9 @@
   // Stances for parties the stance tables do not know: the PSC after it
   // leaves the PSOE votes with it when allied, otherwise against the PP.
   function fillStances(Q, st, seats) {
+    if (Q.vote_kind === 'censure' && Q.fork_pnv_rajoy === 1 && (Q.rel_pnv || 40) < 75 && st.pnv === 'yes') {
+      st = Object.assign({}, st); st.pnv = 'no';
+    }
     if (!seats || !seats.psc || st.psc) { return st; }
     var o = Object.assign({}, st);
     var rel = Q.rel_psc === undefined ? 40 : Q.rel_psc;
@@ -3897,12 +3987,15 @@
   function splitChecks(Q) {
     var supportsPP = Q.grand_coalition || Q.gestora_invested || (Q.pm_party === 'pp' && Q.psoe_supply);
     var unionist = (Q.const_line_eff || 0) <= -2.5;
-    if (!Q.psc_split && Q.year >= 2016 && ((supportsPP && (Q.rel_erc || 40) >= 0) || unionist)) {
-      Q.psc_tension = (Q.psc_tension || 0) + (supportsPP ? 6 : 0) + (unionist ? 5 : 0) + ((Q.cat_hard_line || 0) >= 2 ? 3 : 0);
+    // the PSC broke discipline in 2016 but did not leave: one abstention is
+    // not enough, it takes a sustained course (a grand coalition, or a
+    // hard-unionist PSOE) for a year or more
+    if (!Q.psc_split && Q.year >= 2016 && (Q.grand_coalition || unionist || (supportsPP && (Q.cat_hard_line || 0) >= 2))) {
+      Q.psc_tension = (Q.psc_tension || 0) + (Q.grand_coalition ? 4 : 0) + (unionist ? 4 : 0) + (supportsPP && !Q.grand_coalition ? 2 : 0);
     } else {
       Q.psc_tension = Math.max(0, (Q.psc_tension || 0) - 3);
     }
-    if (!Q.psc_split && Q.psc_tension >= 30) { pscSplit(Q); }
+    if (!Q.psc_split && Q.psc_tension >= 60) { pscSplit(Q); }
     var left = (Q.grand_coalition ? 3 : 0) + (supportsPP ? 2 : 0) + Math.max(0, -1 - (Q.econ_left || 0)) +
       Math.max(0, (Q.progressives_dissent || 20) - 50) / 10;
     if (!Q.left_split && Q.year >= 2016 && left >= 3 && (Q.progressives_dissent || 0) >= 55) {
@@ -4144,7 +4237,7 @@
     santamaria: { name: 'Soraya Sáenz de Santamaría', style: 'moderate', from: 2015, to: 2019 },
     casado: { name: 'Pablo Casado', style: 'hard', from: 2015, to: 2023 },
     cospedal: { name: 'María Dolores de Cospedal', style: 'establishment', from: 2015, to: 2018 },
-    feijoo: { name: 'Alberto Núñez Feijóo', style: 'moderate', from: 2019, to: 2023 },
+    feijoo: { name: 'Alberto Núñez Feijóo', style: 'moderate', from: 2018, to: 2023 },
     ayuso: { name: 'Isabel Díaz Ayuso', style: 'hard', from: 2021, to: 2023 }
   };
 
@@ -4166,6 +4259,11 @@
     }
     if (!pool.length) {
       pool = ['feijoo'];
+    }
+    // historical mode: the PP chooses as it did (Casado in 2018, Feijóo in 2022)
+    if (!Q.ahistorical) {
+      var hist = Q.year <= 2021 && used.indexOf('casado') === -1 ? 'casado' : 'feijoo';
+      if (used.indexOf(hist) === -1) { pool = [hist]; }
     }
     var weights = pool.map(function (id) {
       var st = PP_CANDIDATES[id].style;
@@ -4655,6 +4753,50 @@
     UI.drawHemicycle('#' + id + '-svg', Q.congress);
   }
 
+
+
+  // How much attacking the PP's corruption is worth. Strongest while the PP
+  // governs; it fades over three years once the PP is out of office, and
+  // after the PSOE's own scandals (the Koldo case) it can backfire.
+  function corruptionLine(Q) {
+    var ppGoverns = Q.pm_party === 'pp' && !Q.acting;
+    if (ppGoverns) { Q.pp_out_since = undefined; }
+    else if (Q.pp_out_since === undefined && Q.year >= 2018) { Q.pp_out_since = Q.time || 0; }
+    var out = Q.pp_out_since === undefined ? 0 : (Q.time || 0) - Q.pp_out_since;
+    var k = ppGoverns ? 1 + 0.1 * Math.min(4, Q.pp_scandal || 0) : Math.max(0.15, 1 - out / 36);
+    var own = (Q.koldo_seen ? 1 : 0) + (Q.psoe_scandal || 0);
+    if (own && Q.psoe_in_government) { k -= 0.6 * own; }
+    Q.corr_k = Math.round(k * 100) / 100;
+    Q.corr_backfire = Q.corr_k < 0 ? 1 : 0;
+    Q.corr_word = Q.corr_k >= 0.9 ? 'still lands hard' : (Q.corr_k >= 0.5 ? 'is wearing thin' : (Q.corr_k >= 0 ? 'barely registers' : 'backfires: the PSOE has its own scandals now'));
+  }
+
+  // The government's health: its seats, partners, strain and record.
+  function renderCoalition(Q, id) {
+    var out = el(id);
+    if (!out || !Q.congress) { return; }
+    var gov = Q.govt_parties || [Q.pm_party];
+    var seats = gov.reduce(function (a, p) { return a + (Q.congress[p] || 0); }, 0);
+    var rows = [];
+    rows.push(['Government', gov.map(function (p) { return UI.shortName(p); }).join(' + ') + (Q.acting ? ' (acting)' : '')]);
+    rows.push(['Seats in Congress', seats + ' / 350' + (seats >= 176 ? ' — a majority' : ' — ' + (176 - seats) + ' short of a majority')]);
+    rows.push(['Senate', govSenateMajority(Q) ? 'controlled by the government' : 'not controlled: ordinary laws can be delayed two months']);
+    if (Q.role_in_gov) {
+      gov.filter(function (p) { return p !== (Q.player_party || 'psoe'); }).forEach(function (p) {
+        rows.push(['Partner: ' + UI.shortName(p), UI.word('relation', Q['rel_' + p] === undefined ? 40 : Q['rel_' + p])]);
+      });
+      var strain = Q.coalition_strain || 0;
+      if (gov.length > 1) { rows.push(['Coalition strain', strain < 2 ? 'Solid' : (strain < 5 ? 'Tensions' : (strain < 9 ? 'Strained' : 'Near breaking'))]); }
+      rows.push(['Record in Congress', (Q.laws_passed || 0) + ' laws passed, ' + (Q.laws_failed || 0) + ' defeated' + (Q.budget_year ? '; budget ' + Q.budget_year : '; no budget of its own')]);
+      if (Q.depends_on_catalans) { rows.push(['Depends on', 'the Catalan and Basque nationalists']); }
+      if ((Q.pending_laws || []).length) { rows.push(['Held up in the Senate', Q.pending_laws.map(function (x) { return LAWS[x.id].name; }).join(', ')]); }
+    }
+    if (Q.last_vote) { rows.push(['Last vote', Q.last_vote.title + ': ' + (Q.last_vote.passes ? 'carried' : 'defeated') + ' ' + Q.last_vote.yes + '–' + Q.last_vote.no + (Q.last_vote_rebels ? ' (' + Q.last_vote_rebels + ' rebels)' : '')]); }
+    out.innerHTML = '<table class="sp-results sp-compact"><tbody>' + rows.map(function (r) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>';
+    }).join('') + '</tbody></table>';
+  }
+
   // The Senate: elected and appointed senators together.
   function renderSenateSide(Q, id) {
     var out = el(id);
@@ -5111,7 +5253,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

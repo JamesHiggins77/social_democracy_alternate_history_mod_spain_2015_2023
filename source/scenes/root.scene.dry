@@ -12,6 +12,19 @@ July 2014. Pedro Sánchez has just won the PSOE's first open primary. Ahead: the
 
 @start_menu_2
 
-- @sp_start: New campaign (July 2014)
+- @mode_hist: New campaign: historical
+- @mode_ahist: New campaign: ahistorical
 - @election_lab: Election lab
 - @credits: Credits
+
+@mode_hist
+title: Historical
+subtitle: What happened will happen, unless your own actions change it.
+on-arrival: {! if (typeof window !== 'undefined') { window.spAhistorical = 0; } !}
+go-to: sp_start
+
+@mode_ahist
+title: Ahistorical
+subtitle: Other parties' leaders and choices can go differently, without your input.
+on-arrival: {! if (typeof window !== 'undefined') { window.spAhistorical = 1; } !}
+go-to: sp_start

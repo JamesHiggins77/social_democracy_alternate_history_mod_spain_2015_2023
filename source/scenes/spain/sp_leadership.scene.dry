@@ -418,7 +418,7 @@ on-arrival: {! Q.felipe_seen = 1; !}
 
 = Felipe González speaks
 
-On morning radio, Felipe González, the PSOE's most famous former prime minister, says he feels "cheated": you told him privately, he says, that you would abstain to let Rajoy govern. The old guard rallies behind him.
+On morning radio, Felipe González, the PSOE's most famous former prime minister, says he feels "cheated": you told him privately, he says, that you would abstain to let [+ pp_leader +] govern. The old guard rallies behind him.
 
 - @felipe_deny: Deny it flatly, on air, the same morning
 - @felipe_silence: Say nothing: you will not fight Felipe in public
@@ -532,9 +532,9 @@ on-arrival: three_roads_due = 0
 
 = Three roads
 
-Two general elections, no government, and a third one at Christmas if nothing changes. On Sunday the PSOE has done badly in the Galician and Basque elections. The barons say the party is losing everywhere under you, and that it is time to let Rajoy govern. There are three roads, and the Federal Committee has to approve whichever you take.
+Two general elections, no government, and a third one at Christmas if nothing changes. On Sunday the PSOE has done badly in the Galician and Basque elections. The barons say the party is losing everywhere under you, and that it is time to let [+ pp_leader +] govern. There are three roads, and the Federal Committee has to approve whichever you take.
 
-**A government of change**, with Podemos and the nationalist parties: your own preference, but it has nowhere near a majority in the Federal Committee. **Abstain** and let Rajoy govern: what the critics want, and what you have promised the members you will never do. **Keep saying no**, at the risk of a third election: the only road that needs no change in the party's position.
+**A government of change**, with Podemos and the nationalist parties: your own preference, but it has nowhere near a majority in the Federal Committee. **Abstain** and let [+ pp_leader +] govern: what the critics want, and what you have promised the members you will never do. **Keep saying no**, at the risk of a third election: the only road that needs no change in the party's position.
 
 - @roads_congress: Keep saying no, and call primaries and an extraordinary congress to settle the party's line
 - @roads_change: Open talks for a government of change with Podemos and the nationalists
@@ -563,7 +563,7 @@ on-arrival: {! Q.plot = Math.max(Q.plot || 0, 74); Q.member_morale += 2; !}
 subtitle: Ends the blockade and the plot against you; the members, the youth and the left of the party will not forgive it
 on-arrival: {! Q.psoe_stance_pp = 'abstain'; Q.abstained_for_pp = 1; Q.plot = Math.min(Q.plot || 0, 20); Q.member_morale -= 20; Q.sanchismo -= 18; Q.progressives_dissent += 25; Q.trade_unionists_dissent += 10; Q.regional_leaders_dissent -= 15; Q.institutionalists_dissent -= 10; Q.sanchez_authority -= 10; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', { up: 0.85, iu: 0.15 }, { workers: 4, students: 5, unemployed: 3.5, professionals: 2.5, pensioners: 1 }); } !}
 
-The Federal Committee approves your proposal by a large majority. Susana Díaz praises your "sense of State". Outside Ferraz, the crowd that chanted your name now chants "No es no" at you. Rajoy will be invested; the barons have nothing left to remove you for, for now.
+The Federal Committee approves your proposal by a large majority. Susana Díaz praises your "sense of State". Outside Ferraz, the crowd that chanted your name now chants "No es no" at you. [+ pp_leader +] will be invested; the barons have nothing left to remove you for, for now.
 
 @bicephaly
 title: A Prime Minister without a party
