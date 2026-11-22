@@ -2440,8 +2440,16 @@
   // candidate? More likely the closer the two are; decided once per
   // legislature so the same result repeats on reloads.
   function kingmakerRoll(Q, party, ratio) {
-    var key = 'km_' + party + '_' + (Q.legislature_start_year || Q.year);
-    if (Q[key] === undefined) { Q[key] = Math.random() < Math.max(0.15, 0.85 - 0.9 * (ratio - 1)) ? 1 : 0; }
+    // the radical party's leader matters: Iglesias wanted Moncloa for
+    // himself (he demanded the vice-presidency in 2016 and 2019); Yolanda
+    // Díaz built Sumar as a junior partner of the PSOE; Abascal has
+    // always deferred to the PP in the regions
+    var LEADER_K = { 'Pablo Iglesias': 0.55, 'Irene Montero': 0.7, 'Ione Belarra': 0.75, 'Yolanda Díaz': 1.3,
+                     'Íñigo Errejón': 1.25, 'Santiago Abascal': 1 };
+    var lead = leaderOf(Q, party);
+    var k = LEADER_K[lead] === undefined ? 1 : LEADER_K[lead];
+    var key = 'km_' + party + '_' + (Q.legislature_start_year || Q.year) + '_' + (lead || '').replace(/\W/g, '');
+    if (Q[key] === undefined) { Q[key] = Math.random() < Math.min(0.95, Math.max(0.05, (0.85 - 0.9 * (ratio - 1)) * k)) ? 1 : 0; }
     return Q[key] === 1;
   }
   function formGovernment(Q, candidate) {

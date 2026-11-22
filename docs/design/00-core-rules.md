@@ -789,3 +789,10 @@ The switch is no longer a one-off transfer. Each month for up to three years, wh
 - **The chance:** about 85% when the two are level, falling to 15% when the radical party has 1.5 times the seats. It is decided once per legislature. It never applies when the radical party has a majority of its own, or nationally when it has 1.4 or more times the moderate party's seats.
 - **National:** the moderate leader becomes Prime Minister. The larger party takes the Deputy premiership and two ministries more than its seat share, starting with the posts it wants most (for Vox: Interior, Defence, Justice). The government is labelled "(Vox the larger party)" or "(Podemos the larger party)".
 - **Regional:** the same rule applies. The moderate party's leader becomes president with the larger party in the cabinet, and the government type says so.
+
+**Leaders (7.43 addendum):** the chance that the radical party backs the moderate leader is multiplied by a factor for its own leader, capped between 5% and 95%:
+- Pablo Iglesias ×0.55, Irene Montero ×0.7, Ione Belarra ×0.75: they want the top job.
+- Yolanda Díaz ×1.3 and Íñigo Errejón ×1.25: they see their party as the PSOE's junior partner.
+- Santiago Abascal ×1.
+
+The draw is redone if the leader changes. Tested with Podemos on 110 seats and the PSOE on 100: the PSOE leads 43% of the time under Iglesias and 98% under Díaz.

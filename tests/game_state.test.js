@@ -1165,7 +1165,7 @@ test('a larger Vox or Podemos may back a moderate head of government and take ke
   let pp = 0;
   for (let i = 0; i < 300; i++) { if (G.regionalGovernment({ vox: 30, pp: 25, psoe: 20, up: 5 }, null, 70, 2022).party === 'pp') pp++; }
   assert.ok(pp > 60 && pp < 280, String(pp));
-  const Q = newQ(); Q.year = 2024; Q.legislature_start_year = 2024; Q.km_vox_2024 = 1;
+  const Q = newQ(); Q.year = 2024; Q.legislature_start_year = 2024; Q.km_vox_2024_SantiagoAbascal = 1;
   Q.congress = { vox: 110, pp: 90, psoe: 100, up: 30, erc: 10, junts: 5, pnv: 5 }; Q.government_status = 'acting';
   G.formGovernment(Q, 'pp');
   assert.strictEqual(Q.pm_party, 'pp');
