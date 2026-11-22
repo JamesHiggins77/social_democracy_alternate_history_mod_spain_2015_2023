@@ -15,7 +15,8 @@ const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
 const GAMES = Number(args.find(a => /^\d+$/.test(a)) || 20);
 const FORCE_GRAND = args.includes('--grand');
-const SMART = args.includes('--smart');
+const GOOD = args.includes('--good');
+const SMART = args.includes('--smart') || GOOD;
 const AHIST = args.includes('--ahist');
 const AS_JSON = args.includes('--json');
 
@@ -116,6 +117,13 @@ async function playOne(game) {
       const BAD = /nation of nations|federal Europe|Recentralise|Stand up to Brussels|hard bargain|Resign|Repeal|Anti-Capitalist|dark arts|Rig|sabotage|Leave politics|Call it what it is|refuse/i;
       const good = ok.filter(([c]) => !BAD.test(c.title || ''));
       if (good.length) { ok = good; }
+    }
+    // --good: a strong player also prefers the moves that build a majority
+    // and keep the party and partners on side
+    if (GOOD && ok.length > 1) {
+      const PREF = /agreement with Podemos|In proportion|Pay the price|Present the budget|Present the|Seek investiture|Go to the debate|primary of the members|Fight it out|Federal Committee|Defend the government|Four more years|Stop the right|government in waiting|Time for a change|Sign the draft|Accept the draft|Bring them in|minimum wage|pensions|welfare|Decent jobs|federal reform|Spain at the heart|Pro-European|Firmly unionist|dialogue|Look presidential|Keep the party together|stays|Hold the parliamentary group/i;
+      const pref = ok.filter(([c]) => PREF.test(c.title || ''));
+      if (pref.length && Math.random() < 0.8) { ok = pref; }
     }
     if (!ok.length) { break; }
     let choice = pick(ok);
