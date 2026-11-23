@@ -959,3 +959,13 @@ Municipal results, and the Regions tab, now list Madrid, Barcelona, Valencia, Se
   - the seat diagram sits in a fixed 300px frame instead of being clipped;
   - the text is smaller;
   - city headings no longer contain links, so clicking a party name expands the city instead of opening Wikipedia.
+
+### 7.52 Time-aware cards
+
+Every person's card now shows only what is true at the game's current date (`BIO` in `entities.js`; 201 people):
+- **Posts the game decides come from game state:** the premiership, ministries (from the cabinet), party leaderships (`leaderOf`), regional presidencies (only while that person's party governs the region in the game, from the real start date), and the Madrid and Barcelona mayoralties.
+- **Other posts use real dates:** they are hidden before they begin and become "Former …" after they end (e.g. Ábalos as Secretary of Organisation from June 2017; Puigdemont "in exile" from October 2017).
+- **"Former" game posts:** `trackHeld` remembers every post someone has held in this game, so the card says "Former minister of Labour" once they leave it.
+- **Base description:** each card ends with a date-neutral description ("Labour lawyer from Galicia; PCE"). Foreign figures with no current post show their party.
+
+Yolanda Díaz, for example, shows no ministry or leadership until the game gives her one.

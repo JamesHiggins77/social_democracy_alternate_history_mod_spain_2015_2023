@@ -121,3 +121,16 @@ test('regional affiliates: the PSC in Catalonia, PSOE-A in Andalusia, the Comuns
   assert.strictEqual(U.regionalShort('vox', 'Madrid', 2019), U.shortName('vox'));
   assert.ok(/PSC/.test(U.resultsTable({ psoe: 17, cs: 36 }, null, { compact: true, region: 'Cataluña', year: 2017 })));
 });
+
+test('people cards never mention posts the game has not reached', () => {
+  const E = require('../out/html/spain/entities.js');
+  const G = require('../out/html/spain/game_state.js');
+  const Q = { no_mood: 1 }; G.newGame(Q, 0); Q.year = 2014; Q.month = 7; G.recalculate(Q);
+  global.SpainGame = G;
+  const yd = E.currentPosts(Q, 'Yolanda Díaz', 'up').role;
+  assert.ok(!/Minister|Leader/.test(yd), yd);
+  assert.ok(!/Secretary of Organisation/.test(E.currentPosts(Q, 'José Luis Ábalos', 'psoe').role));
+  Q.year = 2018; Q.month = 1;
+  assert.ok(/Secretary of Organisation/.test(E.currentPosts(Q, 'José Luis Ábalos', 'psoe').role));
+  assert.ok(/Former president of Catalonia/.test(E.currentPosts(Q, 'Carles Puigdemont', 'junts').role));
+});

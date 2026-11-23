@@ -457,6 +457,7 @@
     adviserFlags(Q);
     installHooks(Q);
     migrate(Q);
+    trackHeld(Q);
     Q.pp_leader = Q.pp_leader || 'Mariano Rajoy';
     Q.pp_leader_rajoy = Q.pp_leader === 'Mariano Rajoy' ? 1 : 0;
     Q.cs_leader_name = leaderOf(Q, 'cs');
@@ -2477,6 +2478,19 @@
     return parts[parts.length - 1];
   }
 
+
+
+  // Remember every post each person has held in this game, so cards can
+  // say "Former ..." once they leave it.
+  function trackHeld(Q) {
+    Q.held = Q.held || {};
+    var add = function (n, label) { if (!n) { return; } n = String(n).replace(/ \(independent\)/, ''); Q.held[n] = Q.held[n] || {}; Q.held[n][label] = 1; };
+    if (Q.pm && !Q.acting) { add(Q.pm, 'Prime Minister'); }
+    var cab = Q.cabinet || {};
+    MINISTRIES.forEach(function (m) { if (cab[m[0]] && !Q.acting) { add(cab[m[0]].name, m[0] === 'deputy' ? 'Deputy Prime Minister' : 'Minister of ' + m[1]); } });
+    var LEAD = { psoe: 'Secretary-General of the PSOE', pp: 'Leader of the PP', up: Q.year >= 2023 && Q.sumar_merged ? 'Leader of Sumar' : 'Leader of Podemos', cs: 'Leader of Ciudadanos', vox: 'Leader of Vox', pod: 'Leader of Podemos' };
+    Object.keys(LEAD).forEach(function (p) { if (p === 'pod' && !Q.pod_split) { return; } if (p === 'psoe' && !Q.sanchez_leader && !Q.psoe_leader) { return; } add(leaderOf(Q, p), LEAD[p]); });
+  }
 
   // Saves from older versions: give every field added since a default, so
   // conditions in the scenes never compare against undefined.
@@ -5605,7 +5619,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,
