@@ -264,12 +264,12 @@ Congress invests [+ pm +]. Spain has a [+ government_type +]. [? if player_in_go
 title: The PP changes leader
 new-page: true
 tags: sp_event
-view-if: pp_leader_falls_due = 1 and election_year = 0
-on-arrival: {! window.SpainGame.choosePPLeader(Q); !}
+view-if: pp_leader_falls_due = 1 and election_year = 0 and (pp_wait_formation = 0 or acting = 0)
+on-arrival: {! Q.pp_waited = Q.pp_wait_formation || 0; Q.pp_wait_formation = 0; window.SpainGame.choosePPLeader(Q); !}
 
 = The PP changes leader
 
-[+ pp_old_leader +] has lost [? if pm_is_pp = 0 : the government ?][? if pm_is_pp = 1 : the party's confidence ?], and the PP will not forgive it. After weeks of pressure from the regional barons, [+ pp_old_leader +] resigns. The party congress chooses [+ pp_leader +].
+[+ pp_old_leader +] has lost [? if pm_is_pp = 0 : the government ?][? if pm_is_pp = 1 : the party's confidence ?], and the PP will not forgive it. [? if pp_waited = 1 : [+ pp_old_leader +] held on through the negotiations to form a government, so as not to leave the party headless at the table. Now that a government is in place, the regional barons collect the debt, and [+ pp_old_leader +] resigns. ?][? if pp_waited = 0 : After weeks of pressure from the regional barons, [+ pp_old_leader +] resigns. ?] The party congress chooses [+ pp_leader +].
 
 [? if pp_style_hard = 1 : The new leader promises to recover the voters who left for Vox: a harder line on Catalonia, on taxes and on immigration. Vox's leaders smile; the PNV stops returning calls. ?][? if pp_style_moderate = 1 : The new leader promises a calmer, more centrist PP, open to State pacts. Ciudadanos's voters start coming home; Vox calls it the "cowardly right". ?]
 

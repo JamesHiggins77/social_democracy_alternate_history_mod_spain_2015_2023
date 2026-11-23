@@ -4701,6 +4701,10 @@
     var chance = Q.pp_pressure >= 3 ? 1 : (Q.pp_pressure === 2 ? 0.6 : 0.25);
     if (Math.random() < chance) {
       Q.pp_leader_falls_due = 1;
+      // after a poor election the leader usually stays on through the
+      // government formation (and any investiture bid of his own), and
+      // goes once a government is in place
+      Q.pp_wait_formation = Q.acting && Math.random() < 0.75 ? 1 : 0;
     }
   }
 
