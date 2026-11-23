@@ -455,6 +455,7 @@
   function recalculate(Q) {
     if (Q.adv_lastra === undefined) { Q.adv_hernando = 1; Q.adv_luena = 1; Q.adv_lastra = 1; Q.adv_offer_hernando = 1; Q.adv_offer_luena = 1; Q.adv_offer_lastra = 1; }
     adviserFlags(Q);
+    syncParty(Q);
     installHooks(Q);
     migrate(Q);
     trackHeld(Q);
@@ -1163,6 +1164,9 @@
     var f = 1 / (1 + n);
     Q.loyalist_ok = 1;
     if (where === 'executive') {
+      syncParty(Q); var crit = largestCritics(Q); var ex0 = Q.exec_seats;
+      var mv = Math.min(ex0[crit] || 0, Math.round(5 * f)); ex0[crit] -= mv; ex0.Sanchismo = (ex0.Sanchismo || 0) + mv;
+      Q.funds -= 1;
       Q.loyalist_posts = (Q.loyalist_posts || 0) + 2 * f; Q.federal_committee_balance += 5 * f;
       Q.institutionalists_dissent += 5; Q.plot -= 8 * f;
     } else if (where === 'federations') {
@@ -1189,7 +1193,10 @@
   // enmity, a left-wing course and, in a deadlock with a weak PSOE, the
   // argument that Spain needs a government.
   function coupAttack(Q) {
-    return 0.6 * (Q.plot || 0) + 0.5 * (Q.regional_leaders_strength || 30) +
+    // without a majority in the Executive the critics cannot dissolve it by
+    // resigning; a hostile chair of the Federal Committee helps them
+    return (Q.exec_can_fall === 0 ? -12 : 0) + (Q.fcpres_hostile ? 5 : 0) - 1.5 * (Q.posts_loyal || 0) +
+      0.6 * (Q.plot || 0) + 0.5 * (Q.regional_leaders_strength || 30) +
       (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) + 2 * leftDrift(Q) +
       (Q.acting && (Q.congress.psoe || 0) < 100 ? 10 : 0);
   }
@@ -5797,81 +5804,175 @@
     'País Vasco': [['2014-09', 'Idoia Mendia', 'Modernisers'], ['2021-12', 'Eneko Andueza', 'Sanchismo']],
     'La Rioja': [['2015-01', 'Francisco Ocón', 'Regional Barons (Susanismo)'], ['2021-10', 'Concha Andreu', 'Sanchismo']]
   };
+  // ---- Party posts and the Federal Executive are game state ----------
+  var EXEC_FACTIONS = ['Sanchismo', 'Regional Barons', 'Institutionalists', 'Modernisers', 'Socialist Left'];
+  var POST_LABELS = { deputy: 'Deputy Secretary-General', org: 'Secretary of Organisation', president: 'President of the party',
+    spokes: 'Spokesperson in Congress', fcpres: 'President of the Federal Committee' };
+  // candidates for each post: [name, faction]
+  var POST_CANDIDATES = {
+    org: [['César Luena', 'Sanchismo'], ['José Luis Ábalos', 'Sanchismo'], ['Óscar López', 'Modernisers'], ['Antonio Pradas', 'Regional Barons']],
+    deputy: [['Adriana Lastra', 'Socialist Left'], ['Patxi López', 'Modernisers'], ['María Jesús Montero', 'Regional Barons']],
+    spokes: [['Antonio Hernando', 'Institutionalists'], ['Margarita Robles', 'Sanchismo'], ['Adriana Lastra', 'Socialist Left']],
+    president: [['Micaela Navarro', 'Institutionalists'], ['Cristina Narbona', 'Sanchismo']],
+    fcpres: [['Verónica Pérez', 'Regional Barons'], ['Susana Sumelzo', 'Sanchismo']]
+  };
+  function syncParty(Q) {
+    if (!Q.party_posts) {
+      Q.party_posts = { deputy: null, org: ['César Luena', 'Sanchismo'], president: ['Micaela Navarro', 'Institutionalists'],
+        spokes: ['Antonio Hernando', 'Institutionalists'], fcpres: ['Verónica Pérez', 'Regional Barons'] };
+      Q.exec_seats = { Sanchismo: 17, 'Regional Barons': 10, Institutionalists: 5, Modernisers: 2, 'Socialist Left': 1 };
+    }
+    // a new mandate from the members brings a congress and a new Executive
+    if (Q.sanchez_leader && !Q.psoe_interim && Q.primary_won && !Q.congress_renewed) {
+      Q.congress_renewed = 1;
+      Q.party_posts = { deputy: ['Adriana Lastra', 'Socialist Left'], org: ['José Luis Ábalos', 'Sanchismo'], president: ['Cristina Narbona', 'Sanchismo'],
+        spokes: ['Margarita Robles', 'Sanchismo'], fcpres: ['Cristina Narbona', 'Sanchismo'] };
+      Q.exec_seats = { Sanchismo: 38, 'Socialist Left': 5, Modernisers: 3, 'Regional Barons': 2, Institutionalists: 1 };
+    }
+    // the leader falls: the posts and the Executive go to the victors
+    if ((!Q.sanchez_leader || Q.psoe_interim) && Q.party_posts_owner !== (Q.psoe_interim ? 'interim' : Q.psoe_leader)) {
+      Q.party_posts_owner = Q.psoe_interim ? 'interim' : Q.psoe_leader;
+      Q.party_posts = { deputy: null, org: Q.psoe_interim ? ['Mario Jiménez (caretaker spokesman)', 'Regional Barons'] : ['Antonio Pradas', 'Regional Barons'],
+        president: Q.psoe_interim ? null : ['Micaela Navarro', 'Institutionalists'], spokes: ['Antonio Hernando', 'Institutionalists'], fcpres: ['Verónica Pérez', 'Regional Barons'] };
+      Q.exec_seats = Q.psoe_interim ? { 'Regional Barons': 6, Institutionalists: 3, Modernisers: 1 } :
+        { 'Regional Barons': 20, Institutionalists: 9, Modernisers: 4, Sanchismo: 2, 'Socialist Left': 0 };
+      Q.congress_renewed = 0;
+    }
+    if (Q.sanchez_leader && !Q.psoe_interim) { Q.party_posts_owner = 'Pedro Sánchez'; }
+    var ex = Q.exec_seats, tot = 0;
+    EXEC_FACTIONS.forEach(function (f) { tot += ex[f] || 0; });
+    Q.exec_total = tot;
+    Q.exec_sanchistas = ex.Sanchismo || 0;
+    Q.exec_can_fall = (tot - (ex.Sanchismo || 0) - Math.round(0.7 * (ex['Socialist Left'] || 0))) >= Math.floor(tot / 2) + 1 ? 1 : 0;
+    Q.posts_loyal = ['deputy', 'org', 'president', 'spokes', 'fcpres'].filter(function (k) {
+      var p = Q.party_posts[k]; return p && (p[1] === 'Sanchismo' || p[1] === 'Socialist Left');
+    }).length;
+    Q.fcpres_hostile = Q.party_posts.fcpres && Q.party_posts.fcpres[1] === 'Regional Barons' ? 1 : 0;
+    Q.crisis_begun = (Q.coup_sparks || 0) > 0 || Q.rebellion_used || (Q.plot || 0) >= 60 ? 1 : 0;
+  }
+  var POST_EFFECTS = {
+    'Sanchismo': function (Q) { Q.loyalist_posts = Math.min(10, (Q.loyalist_posts || 0) + 1); Q.sanchismo += 2; Q.regional_leaders_dissent += 3; Q.institutionalists_dissent += 3; },
+    'Socialist Left': function (Q) { Q.loyalist_posts = Math.min(10, (Q.loyalist_posts || 0) + 1); Q.progressives_dissent -= 6; Q.regional_leaders_dissent += 4; },
+    'Modernisers': function (Q) { Q.plot -= 4; Q.modernisers_dissent = (Q.modernisers_dissent || 0) - 6; },
+    'Institutionalists': function (Q) { Q.plot -= 5; Q.institutionalists_dissent -= 6; Q.sanchismo -= 1; },
+    'Regional Barons': function (Q) { Q.plot -= 10; Q.regional_leaders_dissent -= 8; Q.sanchismo -= 4; Q.loyalist_posts = Math.max(0, (Q.loyalist_posts || 0) - 1); }
+  };
+  // Appoint someone to a party post. Removing a holder angers their faction;
+  // the President of the Federal Committee is elected by the Committee.
+  function appointPost(Q, post, idx) {
+    syncParty(Q);
+    var c = POST_CANDIDATES[post][idx], old = Q.party_posts[post];
+    Q.appoint_ok = 1;
+    if (post === 'fcpres' || post === 'president') {
+      var chance = clamp(((Q.federal_committee_balance || 50) - 35) / 40, 0.05, 0.95);
+      Q.appoint_ok = Math.random() < chance ? 1 : 0;
+      if (!Q.appoint_ok) { Q.sanchez_authority -= 4; Q.plot += 4; recalculate(Q); return 0; }
+    }
+    if (old && old[0] === c[0]) { return 1; }
+    if (old) {
+      var hurt = { 'Regional Barons': 'regional_leaders_dissent', Institutionalists: 'institutionalists_dissent', 'Socialist Left': 'progressives_dissent', Modernisers: 'modernisers_dissent' }[old[1]];
+      if (hurt) { Q[hurt] = (Q[hurt] || 0) + 5; }
+      if (old[1] === 'Regional Barons' || old[1] === 'Institutionalists') { Q.plot += 3; }
+    }
+    Q.party_posts[post] = c;
+    POST_EFFECTS[c[1]](Q);
+    Q.appointed_name = c[0]; Q.appointed_post = POST_LABELS[post];
+    recalculate(Q);
+    return 1;
+  }
+  // Reshape the Federal Executive between congresses (co-opting members,
+  // forcing out critics): n seats from one faction to another.
+  function shiftExecutive(Q, from, to, n) {
+    syncParty(Q);
+    var ex = Q.exec_seats;
+    var k = Math.min(n, ex[from] || 0);
+    ex[from] -= k; ex[to] = (ex[to] || 0) + k;
+    Q.exec_moved = k;
+    recalculate(Q);
+    return k;
+  }
+  function largestCritics(Q) {
+    var ex = Q.exec_seats, best = 'Regional Barons';
+    ['Regional Barons', 'Institutionalists', 'Modernisers'].forEach(function (f) { if ((ex[f] || 0) > (ex[best] || 0)) { best = f; } });
+    return best;
+  }
   function partyOfficers(Q) {
-    var ym = ymNow(Q), rows = [];
-    var leader = Q.psoe_leader || 'Pedro Sánchez';
-    var sanchez = leader === 'Pedro Sánchez' && !Q.psoe_interim;
-    var renewed = sanchez && ym >= '2017-06' && (Q.mandate_renewed || Q.rebellion_used || ym >= '2017-06');
-    if (Q.psoe_interim) {
-      rows.push(['Caretaker committee', 'Javier Fernández (chair)']);
-    } else {
-      rows.push(['Secretary-General', leader]);
-    }
-    if (renewed) {
-      rows.push(['Deputy Secretary-General', ym >= '2021-10' ? 'María Jesús Montero' : 'Adriana Lastra']);
-      rows.push(['Secretary of Organisation', ym >= '2025-07' ? 'Rebeca Torró' : (ym >= '2021-07' ? 'Santos Cerdán' : 'José Luis Ábalos')]);
-      rows.push(['President of the party', 'Cristina Narbona']);
-      rows.push(['Spokesperson in Congress', ym >= '2022-01' ? 'Patxi López' : (ym >= '2021-07' ? 'Héctor Gómez' : (ym >= '2018-06' ? 'Adriana Lastra' : 'Margarita Robles'))]);
-    } else if (sanchez) {
-      rows.push(['Deputy Secretary-General', 'None (post vacant since 2014)']);
-      rows.push(['Secretary of Organisation', 'César Luena']);
-      rows.push(['President of the party', Q.rebellion_used ? 'Vacant (resigned)' : 'Micaela Navarro']);
-      rows.push(['Spokesperson in Congress', 'Antonio Hernando']);
-    } else {
-      rows.push(['Deputy Secretary-General', 'Appointed by ' + leader]);
-      rows.push(['Secretary of Organisation', Q.psoe_interim ? 'Mario Jiménez (caretaker spokesman)' : 'A ' + leader.split(' ').slice(-1)[0] + ' loyalist']);
-      rows.push(['President of the party', Q.psoe_interim ? 'Vacant' : 'Micaela Navarro']);
-      rows.push(['Spokesperson in Congress', 'Antonio Hernando']);
-    }
-    rows.push(['President of the Federal Committee', ym >= '2017-06' && renewed ? 'Cristina Narbona' : 'Verónica Pérez']);
+    syncParty(Q);
+    var rows = [[Q.psoe_interim ? 'Caretaker committee' : 'Secretary-General', Q.psoe_interim ? 'Javier Fernández (chair)' : (Q.psoe_leader || 'Pedro Sánchez'), Q.psoe_interim ? 'Institutionalists' : (Q.sanchez_leader ? 'Sanchismo' : 'Regional Barons')]];
+    ['deputy', 'org', 'president', 'spokes', 'fcpres'].forEach(function (k) {
+      var p = Q.party_posts[k];
+      rows.push([POST_LABELS[k], p ? p[0] : 'Vacant', p ? p[1] : '']);
+    });
     return rows;
   }
-  // The Federal Executive by camp. 35 sitting members until the 2017
-  // congress (17 resigned on 28 September 2016); 49 after it.
-  function executiveSplit(Q) {
-    var ym = ymNow(Q);
-    var big = ym >= '2017-06' && Q.psoe_leader === 'Pedro Sánchez' && !Q.psoe_interim;
-    var base = big ? { Sanchismo: 38, 'Socialist Left': 5, Modernisers: 3, 'Regional Barons': 2, Institutionalists: 1 }
-      : { Sanchismo: 17, 'Regional Barons': 10, Institutionalists: 5, Modernisers: 2, 'Socialist Left': 1 };
-    if (Q.psoe_leader !== 'Pedro Sánchez' || Q.psoe_interim) {
-      base = Q.psoe_interim ? { 'Caretaker committee': 10 } : { 'Regional Barons': 20, Institutionalists: 9, Modernisers: 4, Sanchismo: 2, 'Socialist Left': 0 };
-    } else {
-      // loyalists placed in key posts are taken from the barons' share
-      var shift = Math.min(base['Regional Barons'] - 1, Math.round((Q.loyalist_posts || 0) / 2));
-      base.Sanchismo += shift; base['Regional Barons'] -= shift;
-    }
-    return base;
+  // Faction members by camp once the leadership fight has begun.
+  var CAMP_OF = {
+    Sanchismo: { Sanchismo: 1 }, 'Regional Barons': { Susanismo: 1 }, Institutionalists: { Susanismo: 0.7, 'Neutral / others': 0.3 },
+    Modernisers: { 'Neutral / others': 0.5, Susanismo: 0.3, Sanchismo: 0.2 }, 'Socialist Left': { Sanchismo: 0.7, 'Neutral / others': 0.3 }
+  };
+  function toCamps(byFaction) {
+    var out = { Sanchismo: 0, Susanismo: 0, 'Neutral / others': 0 };
+    Object.keys(byFaction).forEach(function (f) {
+      var m = CAMP_OF[f] || { 'Neutral / others': 1 };
+      Object.keys(m).forEach(function (c) { out[c] += byFaction[f] * m[c]; });
+    });
+    var tot = 0, sum = 0; Object.keys(byFaction).forEach(function (f) { tot += byFaction[f]; });
+    Object.keys(out).forEach(function (c) { out[c] = Math.round(out[c]); sum += out[c]; });
+    out.Sanchismo += tot - sum;
+    return out;
+  }
+  function executiveSplit(Q) { syncParty(Q); return Q.exec_seats; }
+  function committeeSplit(Q) {
+    var tot = Q.congress_renewed ? 290 : 295, bal = (Q.federal_committee_balance || 50) / 100;
+    var leader = Q.sanchez_leader && !Q.psoe_interim;
+    var forL = Math.round(tot * (leader ? bal : 1 - bal));
+    var rest = tot - forL;
+    return leader ? { Sanchismo: Math.round(forL * 0.82), 'Socialist Left': forL - Math.round(forL * 0.82), 'Regional Barons': Math.round(rest * 0.6), Institutionalists: Math.round(rest * 0.25), Modernisers: rest - Math.round(rest * 0.6) - Math.round(rest * 0.25) }
+      : { 'Regional Barons': Math.round(rest * 0.6), Institutionalists: Math.round(rest * 0.25), Modernisers: rest - Math.round(rest * 0.6) - Math.round(rest * 0.25), Sanchismo: Math.round(forL * 0.82), 'Socialist Left': forL - Math.round(forL * 0.82) };
+  }
+  var BLOC_COL = { Sanchismo: '#E30613', 'Regional Barons': '#F28C00', Institutionalists: '#8B5A2B', Modernisers: '#6A5ACD', 'Socialist Left': '#B0004A',
+    Susanismo: '#F28C00', 'Neutral / others': '#9A9A9A' };
+  function blocBlock(title, split, note) {
+    var keys = Object.keys(split).filter(function (k) { return split[k] > 0; }).sort(function (a, b) { return split[b] - split[a]; });
+    var total = 0; keys.forEach(function (k) { total += split[k]; });
+    return '<h4>' + title + ' (' + total + ')</h4><div style="display:flex;height:14px;border-radius:3px;overflow:hidden">' + keys.map(function (k) {
+      return '<div title="' + k + ': ' + split[k] + '" style="width:' + (100 * split[k] / total) + '%;background:' + BLOC_COL[k] + '"></div>';
+    }).join('') + '</div><table class="sp-results sp-compact"><tbody>' + keys.map(function (k) {
+      return '<tr><td><span class="sp-swatch" style="background:' + BLOC_COL[k] + '"></span>' + k + '</td><td class="sp-num">' + split[k] + '</td></tr>';
+    }).join('') + '</tbody></table>' + (note ? '<p class="sp-map-legend">' + note + '</p>' : '');
   }
   function renderParty(Q, id) {
     var out = el(id);
     if (!out) { return; }
+    syncParty(Q);
     var E = root.SpainEntities;
     var ent = function (n) { return E && E.lookup && E.lookup(n) ? '<span class="sp-ent" tabindex="0" data-ent="' + n + '">' + n + '</span>' : n; };
+    var camps = Q.crisis_begun && root.spPartyView === 'camps';
     var html = '<table class="sp-results sp-compact"><tbody>' + partyOfficers(Q).map(function (r) {
-      return '<tr><td>' + r[0] + '</td><td>' + r[1].replace(/^([A-ZÁÉÍÓÚ][^(]*?)( \(|$)/, function (m, a, b) { return ent(a) + b; }) + '</td></tr>';
+      var nm = r[1].replace(/^([^(]+?)( \(.*)?$/, function (m, a, b2) { return ent(a) + (b2 || ''); });
+      var tag = r[2] ? (camps ? Object.keys(CAMP_OF[r[2]] || {})[0] : r[2]) : '';
+      return '<tr><td>' + r[0] + '</td><td>' + nm + (tag ? '<br><span class="sp-faction-leader" style="color:' + (BLOC_COL[tag] || '#888') + '">' + tag + '</span>' : '') + '</td></tr>';
     }).join('') + '</tbody></table>';
-    var ex = executiveSplit(Q), total = 0;
-    Object.keys(ex).forEach(function (k) { total += ex[k]; });
-    var col = { Sanchismo: '#E30613', 'Regional Barons': '#F28C00', Institutionalists: '#8B5A2B', Modernisers: '#6A5ACD', 'Socialist Left': '#B0004A', 'Caretaker committee': '#999' };
-    html += '<h4>Federal Executive (' + total + ')</h4><div class="sp-rep-bar" style="display:flex;height:14px">' + Object.keys(ex).filter(function (k) { return ex[k] > 0; }).map(function (k) {
-      return '<div title="' + k + ': ' + ex[k] + '" style="width:' + (100 * ex[k] / total) + '%;background:' + col[k] + '"></div>';
-    }).join('') + '</div><table class="sp-results sp-compact"><tbody>' + Object.keys(ex).filter(function (k) { return ex[k] > 0; }).map(function (k) {
-      return '<tr><td><span class="sp-swatch" style="background:' + col[k] + '"></span>' + k + '</td><td class="sp-num">' + ex[k] + '</td></tr>';
-    }).join('') + '</tbody></table>';
-    if (Q.sanchez_leader && !Q.psoe_interim) {
-      var need = Math.floor(total / 2) + 1, against = total - ex.Sanchismo;
-      html += '<p class="sp-map-legend">If half the Executive resigns, it is dissolved and the Secretary-General falls with it: ' + need + ' resignations needed; ' + against + ' members are outside your camp.</p>';
+    if (Q.crisis_begun) {
+      html += '<p><button class="sp-select" id="' + id + '-toggle">' + (camps ? 'Show by faction' : 'Show by camp: Sanchismo / Susanismo') + '</button></p>';
     }
-    var fcTotal = Q.year >= 2017 && Q.year * 100 + Q.month >= 201706 ? 290 : 295;
-    var fcFor = Math.round(fcTotal * (Q.federal_committee_balance || 50) / 100);
-    html += '<h4>Federal Committee</h4><p class="sp-map-legend">' + fcTotal + ' members: the barons\' delegations, the Executive and the parliamentary leaders. Roughly <b>' + fcFor + '</b> would back the leadership, <b>' + (fcTotal - fcFor) + '</b> would not' + (Q.year === 2016 ? ' (on 1 October 2016 Sánchez lost 107–132)' : '') + '.</p>';
+    var ex = executiveSplit(Q), fc = committeeSplit(Q);
+    var need = Math.floor(Q.exec_total / 2) + 1;
+    html += blocBlock('Federal Executive', camps ? toCamps(ex) : ex,
+      Q.sanchez_leader && !Q.psoe_interim ? 'If ' + need + ' members resign, the Executive is dissolved and the Secretary-General falls with it. ' +
+        (Q.exec_can_fall ? 'Your critics have the numbers to do it.' : 'Your critics no longer have the numbers: they would have to go through the Federal Committee.') : '');
+    html += blocBlock('Federal Committee', camps ? toCamps(fc) : fc, 'The party\'s parliament between congresses: the federations\' delegations, the Executive and the parliamentary leaders.' + (Q.year === 2016 ? ' On 1 October 2016 Sánchez lost it 107–132.' : ''));
     var ym = ymNow(Q);
-    html += '<h4>Regional federations</h4><table class="sp-results sp-compact"><thead><tr><th>Federation</th><th>Secretary-General</th><th>Camp</th></tr></thead><tbody>' +
+    html += '<h4>Regional federations</h4><table class="sp-results sp-compact"><thead><tr><th>Federation</th><th>Secretary-General</th><th>' + (camps ? 'Camp' : 'Faction') + '</th></tr></thead><tbody>' +
       Object.keys(FEDERATIONS).map(function (r) {
         var f = pick(FEDERATIONS[r], ym) || FEDERATIONS[r][0];
-        return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td>' + ent(f[1]) + '</td><td>' + f[2] + '</td></tr>';
+        var lab = f[2];
+        if (camps) { lab = /Susanismo|Regional Barons|Institutionalists/.test(lab) ? 'Susanismo' : (/Sanchismo/.test(lab) ? 'Sanchismo' : 'Neutral / others'); }
+        return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td>' + ent(f[1]) + '</td><td>' + lab + '</td></tr>';
       }).join('') + '</tbody></table>';
     out.innerHTML = html;
+    var t = el(id + '-toggle');
+    if (t) { t.onclick = function () { root.spPartyView = camps ? 'factions' : 'camps'; renderParty(Q, id); }; }
   }
   function renderFactions(Q, id) {
     var out = el(id);
@@ -5970,7 +6071,7 @@
     renderPolls: renderPolls,
     renderRegions: renderRegions,
     renderRegionalResults: renderRegionalResults,
-    renderFactions: renderFactions, renderParty: renderParty,
+    renderFactions: renderFactions, renderParty: renderParty, appointPost: appointPost, shiftExecutive: shiftExecutive, largestCritics: largestCritics,
     campaign: function (Q, party, changes) { return campaign(Q, me(Q, party), changes); },
     transfer: function (Q, from, to, changes) { return transfer(Q, me(Q, from), meTo(Q, to), changes); },
     partyRel: partyRel,

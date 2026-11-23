@@ -423,17 +423,178 @@ on-arrival: appoint_timer = 4
 
 The plotters are only as strong as the posts they hold. Your Secretary of Organisation brings a list of positions that could go to people loyal to you. Barons' plotting: **[+ plot_word +]**. Loyalists in key posts: [+ loyalist_posts_text +].
 
-- @app_exec: Fill the Federal Executive with sanchistas
+- @app_posts: Fill one of the party's top posts
+- @app_exec: Force critics out of the Federal Executive and co-opt sanchistas
+- @app_cooptbarons: Bring the barons into the Federal Executive
 - @app_fed: Back loyalist candidates against the barons in the regional federations
 - @app_group: Replace the parliamentary group's leadership
 - @app_statutes: Rewrite the statutes: members, not the Federal Committee, choose and remove the leader
 - @root: Not now
 
 @app_exec
-subtitle: Calms the plot and secures the Executive; angers the institutionalists
+subtitle: Costs party funds; secures the Executive so the critics cannot dissolve it by resigning; angers the faction you push out
 on-arrival: {! Q.month_actions += 1; window.SpainGame.placeLoyalists(Q, 'executive'); !}
 
-Ábalos, Lastra and your inner circle take the Executive's key portfolios. The old guard calls it a purge.
+Ábalos, Lastra and your inner circle take the Executive's key portfolios, and critics are eased out with posts elsewhere. The old guard calls it a purge.
+
+@app_posts
+title: The party's top posts
+subtitle: Each post you hold with a loyalist makes you harder to remove; each critic you sack has friends
+
+= The party's top posts
+
+Who holds each post is on the Party tab.
+
+- @post_org: Secretary of Organisation
+- @post_deputy: Deputy Secretary-General
+- @post_spokes: Spokesperson in Congress
+- @post_president: President of the party
+- @post_fcpres: President of the Federal Committee
+- @root: Back
+
+@post_org
+title: Secretary of Organisation
+
+= Secretary of Organisation
+
+Runs the party machine: the census, the lists, the federations.
+
+- @post_org_0: César Luena
+- @post_org_1: José Luis Ábalos
+- @post_org_2: Óscar López
+- @post_org_3: Antonio Pradas
+
+@post_org_0
+subtitle: Your loyal organiser; no change if he holds it
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'org', 0); !}
+
+[? if appoint_ok = 1 : César Luena is the new Secretary of Organisation. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_org_1
+subtitle: A hard-nosed sanchista operator: more loyalists, angrier barons
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'org', 1); !}
+
+[? if appoint_ok = 1 : José Luis Ábalos is the new Secretary of Organisation. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_org_2
+subtitle: A moderniser bridge to the critics: calms the plot a little
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'org', 2); !}
+
+[? if appoint_ok = 1 : Óscar López is the new Secretary of Organisation. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_org_3
+subtitle: A Díaz man: buys peace with the barons, costs you control of the machine
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'org', 3); !}
+
+[? if appoint_ok = 1 : Antonio Pradas is the new Secretary of Organisation. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_deputy
+title: Deputy Secretary-General
+
+= Deputy Secretary-General
+
+Vacant since 2014. Whoever fills it speaks for the party when you cannot.
+
+- @post_deputy_0: Adriana Lastra
+- @post_deputy_1: Patxi López
+- @post_deputy_2: María Jesús Montero
+
+@post_deputy_0
+subtitle: A loyalist from the Socialist Left: wins the left, annoys the barons
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'deputy', 0); !}
+
+[? if appoint_ok = 1 : Adriana Lastra is the new Deputy Secretary-General. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_deputy_1
+subtitle: A Basque moderniser and a unifier
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'deputy', 1); !}
+
+[? if appoint_ok = 1 : Patxi López is the new Deputy Secretary-General. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_deputy_2
+subtitle: An Andalusian close to Díaz: a peace offering to Seville
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'deputy', 2); !}
+
+[? if appoint_ok = 1 : María Jesús Montero is the new Deputy Secretary-General. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_spokes
+title: Spokesperson in Congress
+
+= Spokesperson in Congress
+
+The party's voice in the chamber, and the whip of the parliamentary group.
+
+- @post_spokes_0: Antonio Hernando
+- @post_spokes_1: Margarita Robles
+- @post_spokes_2: Adriana Lastra
+
+@post_spokes_0
+subtitle: An institutionalist who follows the apparatus
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'spokes', 0); !}
+
+[? if appoint_ok = 1 : Antonio Hernando is the new Spokesperson in Congress. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_spokes_1
+subtitle: An independent judge loyal to you: the institutionalists grumble
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'spokes', 1); !}
+
+[? if appoint_ok = 1 : Margarita Robles is the new Spokesperson in Congress. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_spokes_2
+subtitle: A loyalist from the Socialist Left
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'spokes', 2); !}
+
+[? if appoint_ok = 1 : Adriana Lastra is the new Spokesperson in Congress. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_president
+title: President of the party
+
+= President of the party
+
+Chairs the Federal Congress; elected by the Federal Committee, so it may refuse.
+
+- @post_president_0: Micaela Navarro
+- @post_president_1: Cristina Narbona
+
+@post_president_0
+subtitle: The incumbent, an institutionalist
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'president', 0); !}
+
+[? if appoint_ok = 1 : Micaela Navarro is the new President of the party. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_president_1
+subtitle: A veteran environmentalist close to you: the Committee must agree
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'president', 1); !}
+
+[? if appoint_ok = 1 : Cristina Narbona is the new President of the party. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_fcpres
+title: President of the Federal Committee
+
+= President of the Federal Committee
+
+Chairs the Committee that can remove you; elected by it, so it may refuse.
+
+- @post_fcpres_0: Verónica Pérez
+- @post_fcpres_1: Susana Sumelzo
+
+@post_fcpres_0
+subtitle: Díaz's ally from Seville, the incumbent
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'fcpres', 0); !}
+
+[? if appoint_ok = 1 : Verónica Pérez is the new President of the Federal Committee. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@post_fcpres_1
+subtitle: An Aragonese loyalist: the Committee must agree
+on-arrival: {! Q.month_actions += 1; window.SpainGame.appointPost(Q, 'fcpres', 1); !}
+
+[? if appoint_ok = 1 : Susana Sumelzo is the new President of the Federal Committee. ?][? if appoint_ok = 0 : The Federal Committee votes your nominee down. The barons count it as a win. ?]
+
+@app_cooptbarons
+subtitle: Gives up seats in the Executive; the plot cools and the barons feel heard
+on-arrival: {! Q.month_actions += 1; window.SpainGame.shiftExecutive(Q, 'Sanchismo', 'Regional Barons', 3); Q.plot -= 10; Q.regional_leaders_dissent -= 8; Q.sanchismo -= 3; !}
+
+Three seats in the Executive go to people named by the regional presidents. It buys calm. It also brings the critics closer to the number they would need to bring the Executive down.
 
 @app_fed
 subtitle: A gamble: success breaks the barons' hold, failure makes them stronger
