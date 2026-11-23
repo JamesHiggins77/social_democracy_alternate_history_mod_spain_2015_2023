@@ -136,7 +136,7 @@ async function playOne(game) {
   console.log = log;
   const q = Q();
   return { elections, grand, end: q.year + '-' + q.month, pm: q.pm, government: q.government_type,
-           flags: { cat_crisis: q.cat_crisis_seen || 0, vistalegre: q.vox_rise_seen || 0, breakthrough: q.vox_breakthrough || 0 },
+           flags: { cdate: q.congress_date_seen || 0, seat: q.seat_seen || 0, iceta: q.iceta_seen || 0, recupera: q.recupera_seen || 0, crowd: q.crowdfund_seen || 0, heredia: q.heredia_seen || 0, chacon: q.chacon_seen || 0, demand: q.demand_seen || 0, cat_crisis: q.cat_crisis_seen || 0, vistalegre: q.vox_rise_seen || 0, breakthrough: q.vox_breakthrough || 0 },
            pm_months: q.pm_months || 0, psc: q.psc_split || 0, left: q.left_split || 0, coup: q.rebellion_used || 0,
            right: (q.realign && q.realign.right && q.realign.right.leader) || 'pp', leftLead: (q.realign && q.realign.left && q.realign.left.leader) || 'psoe',
            vox_final: Math.round(10 * ((q.true_poll || {}).vox || 0)) / 10, pp_final: Math.round(10 * ((q.true_poll || {}).pp || 0)) / 10,
@@ -157,7 +157,7 @@ async function playOne(game) {
   const mean = a => a.length ? Math.round(10 * a.reduce((x, y) => x + y, 0) / a.length) / 10 : NaN;
   runs.forEach((r, i) => {
     console.log(`#${i + 1} ends ${r.end} ${r.government || ''}${r.lost ? ' [LOST]' : ''}${r.grand ? ' grand coalition from ' + r.grand : ''}` +
-      `  {crisis ${r.flags.cat_crisis} vistalegre ${r.flags.vistalegre} breakthrough ${r.flags.breakthrough}}`);
+      `  {cdate ${r.flags.cdate} seat ${r.flags.seat} iceta ${r.flags.iceta} rec ${r.flags.recupera} crowd ${r.flags.crowd} her ${r.flags.heredia} chacon ${r.flags.chacon} demand ${r.flags.demand} crisis ${r.flags.cat_crisis} vistalegre ${r.flags.vistalegre} breakthrough ${r.flags.breakthrough}}`);
     r.elections.forEach(el => console.log(`    ${el.date}  PP ${el.seats.pp || 0}  PSOE ${el.seats.psoe || 0}  UP ${el.seats.up || 0}  Cs ${el.seats.cs || 0}  Vox ${el.seats.vox || 0} (${el.vox_share}%)${el.grand ? '  [after grand coalition]' : ''}`));
   });
   const after2019 = runs.flatMap(r => r.elections.filter(el => el.date >= '2019-01'));

@@ -3333,7 +3333,7 @@
       // a heavy fall in a federation loyal to the leader
       var psNow = (shares.psoe || 0), psPrev = ((reg.prevShares || {}).psoe || psNow);
       var overtaken = (shares.up || 0) > psNow && ((reg.prevShares || {}).up || 0) <= psPrev;
-      if (Q.sanchez_leader && !Q.sanchez_pm && (overtaken || psPrev - psNow >= 3)) {
+      if (Q.sanchez_leader && !Q.sanchez_pm && !Q.rebellion_used && (overtaken || psPrev - psNow >= 3) && (Q.time || 0) >= (Q.coup_spark_until || -99) + 4) {
         Q.coup_sparks = (Q.coup_sparks || 0) + 1;
         Q.coup_spark_until = (Q.time || 0) + 2;
         Q.plot = clamp((Q.plot || 0) + 6, 0, 100);

@@ -264,17 +264,17 @@
       var names = a.yesIds.map(function (id) { return shortName(id); }).join(' + ');
       var abst = a.abstIds.length ? ', ' + a.abstIds.map(function (id) { return shortName(id); }).join(' and ') + ' abstaining' : '';
       var verdict = a.first ? '<span class="sp-arr-ok">absolute majority</span>'
-        : (a.second ? '<span class="sp-arr-mid">second ballot only (' + a.yes + ' yes vs ' + a.no + ' no)</span>'
+        : (a.second ? '<span class="sp-arr-mid">second ballot only</span>'
           : '<span class="sp-arr-no">short by ' + (MAJORITY - a.yes) + '</span>');
       var swatches = a.yesIds.map(function (id) {
         return '<span class="sp-swatch" style="background:' + partyColor(id) + '"></span>';
       }).join('');
       return '<tr><td>' + swatches + ' ' + (a.label ? a.label + ': ' : '') + escapeHtml(names) + escapeHtml(abst) +
-        '</td><td class="sp-num"><b>' + a.yes + '</b> / ' + MAJORITY + '</td><td>' + verdict + '</td></tr>';
+        '</td><td class="sp-num" style="white-space:nowrap"><b>' + a.yes + '</b>–' + a.no + '–' + a.abstain + '</td><td>' + verdict + '</td></tr>';
     }).join('');
     return '<h4>Paths to a majority</h4><p>An investiture needs <b>' + MAJORITY + '</b> yes votes on the first ballot, ' +
       'or more yes than no votes on the second.</p><table class="sp-results sp-arrangements"><thead><tr><th>Arrangement</th>' +
-      '<th class="sp-num">Yes</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      '<th class="sp-num" style="white-space:nowrap">Yes–No–Abst.</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   // Change marker: green up triangle, red down triangle, (-) if unchanged.

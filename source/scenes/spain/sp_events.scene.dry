@@ -2254,3 +2254,228 @@ on-arrival: vox_primary_seen = 1
 = Abascal, Vox's candidate
 
 27 June 2015. Vox's members choose Santiago Abascal as their candidate for the general election, with 83.84% against 15.56% for Carmelo González. He promises to recover the "real" PP voter. The polls give Vox well under 1%.
+
+@congress_date_2016
+title: When to hold the congress
+new-page: true
+tags: sp_event
+view-if: sanchez_leader = 1 and rebellion_used = 0 and year = 2016 and month <= 3 and congress_date_seen = 0
+max-visits: 1
+on-arrival: congress_date_seen = 1
+
+= When to hold the congress
+
+You have said you will stand for re-election at the next Federal Congress. Susana Díaz now wants that congress, and its primary, held in March or April, while you are still bargaining over a government and the barons can blame you for it. You want June. Ferraz suggests splitting the difference: a primary on 8 May and a congress on 21–22 May.
+
+- @cd_june: Insist on June: a government first, the party later
+- @cd_may: Accept the compromise: primary on 8 May
+- @cd_early: Give Díaz her spring congress
+
+@cd_june
+subtitle: The barons say you are hiding behind the negotiations
+on-arrival: {! Q.plot += 6; Q.sanchismo += 2; Q.regional_leaders_dissent += 4; !}
+
+The Federal Committee grumbles, then goes along. Díaz lets it be known that she will remember.
+
+@cd_may
+subtitle: Avoids a clash now; the date may not survive a repeat election
+on-arrival: {! Q.plot -= 4; Q.congress_2016_may = 1; !}
+
+The compromise holds, for now. If the talks fail and there is a new election, the race will be postponed until there is a government.
+
+@cd_early
+subtitle: Calms the barons; a primary in the middle of the talks
+on-arrival: {! Q.plot -= 8; Q.sanchez_authority -= 5; Q.member_morale -= 2; Q.diaz_relation = (Q.diaz_relation || 50) + 6; !}
+
+Díaz thanks you. Your negotiators wonder what they are negotiating for if the party might change leader in April.
+
+@congress_postponed
+title: The leadership race is postponed
+new-page: true
+tags: sp_event
+view-if: congress_2016_may = 1 and acting = 1 and investiture_votes >= 1 and postponed_seen = 0 and sanchez_leader = 1
+max-visits: 1
+on-arrival: {! Q.postponed_seen = 1; Q.plot -= 3; !}
+
+= The leadership race is postponed
+
+On 28 March the PSOE postpones its primary and congress indefinitely: no leadership race until Spain has a government. With a repeat election looking likely, nobody wants to fight one inside the party at the same time. The barons agree. They are in no hurry; a second defeat would make their case for them.
+
+@seat_question
+title: Your seat in Congress
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and gestora_abstains = 1 and seat_seen = 0 and retired = 0
+max-visits: 1
+on-arrival: seat_seen = 1
+
+= Your seat in Congress
+
+The caretaker committee has ordered all 84 Socialist deputies to abstain so that Mariano Rajoy can be invested. You promised the voters you would never do it. Fifteen deputies, the PSC among them, are going to vote no anyway, and Ferraz threatens them with expulsion.
+
+You are still the deputy for Madrid.
+
+- @seat_resign: Resign your seat before the vote
+- @seat_no: Vote no with the rebels
+- @seat_abstain: Abstain: the Federal Committee has decided
+
+@seat_resign
+subtitle: Keeps your word and your standing as a loyal member; you lose your platform in Congress
+on-arrival: {! Q.sanchismo += 6; Q.member_morale += 3; Q.network = (Q.network || 0) + 3; Q.media_platform_lost = 1; !}
+
+In a tearful press conference you hand back your seat: you cannot abstain, and a former leader should not break the party's discipline. "I am going to get in my car and travel every corner of Spain to listen to the members." It is a resignation and an announcement.
+
+@seat_no
+subtitle: The rebels' hero; Ferraz opens disciplinary proceedings
+on-arrival: {! Q.sanchismo += 8; Q.rel_leadership = (Q.rel_leadership || 40) - 15; Q.regional_leaders_dissent += 6; Q.institutionalists_dissent += 8; !}
+
+You stand up and say no. The caretaker committee fines you 600 euros and calls it a betrayal. For the members who chanted "No es no" outside Ferraz, it is the opposite.
+
+@seat_abstain
+subtitle: The apparatus approves; your followers feel betrayed
+on-arrival: {! Q.sanchismo -= 12; Q.member_morale -= 4; Q.rel_leadership = (Q.rel_leadership || 40) + 12; !}
+
+You abstain. The cameras catch it. "No es no" turns out to have had conditions after all, your critics in the street say.
+
+@iceta_neutral
+title: The PSC goes neutral
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and iceta_seen = 0 and ((year = 2016 and month >= 12) or year >= 2017)
+max-visits: 1
+on-arrival: iceta_seen = 1
+
+= The PSC goes neutral
+
+Susana Díaz meets Miquel Iceta. The PSC defied the caretaker committee on Rajoy, and there is talk in Ferraz of expelling it. Díaz offers a deal: no rupture, and in return the Catalan socialists stay neutral in the leadership race. The PSC, your staunchest defender in October, accepts.
+
+- @iceta_call: Call Iceta: the Catalan members are yours whatever their leaders say
+- @iceta_accept: Let it go: the members will decide
+
+@iceta_call
+subtitle: Iceta stays neutral; his members may not
+on-arrival: {! Q.network = (Q.network || 0) + 4; Q.baron_allies = (Q.baron_allies || 0) + (Math.random() < 0.4 ? 1 : 0); !}
+
+Iceta is warm and noncommittal. Below him, in Terrassa, Sabadell and L'Hospitalet, the local branches start organising for you.
+
+@iceta_accept
+on-arrival: {! Q.member_morale -= 1; !}
+
+The PSC's neutrality is one more photograph for Díaz's album.
+
+@recupera_psoe
+title: Recupera PSOE
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and recupera_seen = 0 and ((year = 2016 and month >= 12) or year >= 2017)
+max-visits: 1
+on-arrival: recupera_seen = 1
+
+= Recupera PSOE
+
+Members who never accepted your removal open an unauthorised office five hundred metres from Ferraz, under the name "Recupera PSOE", to sign up new members before the primary. The caretaker committee announces legal action for usurping the party's name and symbols. Meanwhile your own meetings in Xirivella and El Entrego draw more than a thousand people each.
+
+- @rec_embrace: Embrace them: these are your members
+- @rec_distance: Keep your distance: your campaign plays by the rules
+
+@rec_embrace
+subtitle: More members for the primary; a legal fight with the caretaker committee
+on-arrival: {! Q.network = (Q.network || 0) + 6; Q.sanchismo += 3; Q.rel_leadership = (Q.rel_leadership || 40) - 8; !}
+
+New members sign up by the hundred. Ferraz's lawyers send letters.
+
+@rec_distance
+on-arrival: {! Q.network = (Q.network || 0) + 2; Q.rel_leadership = (Q.rel_leadership || 40) + 3; !}
+
+The office stays open without you. Many of its volunteers will vote for you anyway.
+
+@leon_boos
+title: "No es no" in León
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and calendar_seen = 1 and leon_seen = 0 and year >= 2017
+max-visits: 1
+on-arrival: {! Q.leon_seen = 1; if (Q.pr_base) { Q.pr_base[0] += 1; Q.pr_base[1] -= 1; } !}
+
+= "No es no" in León
+
+Susana Díaz tours the federations least friendly to her, starting with Castilla y León. In León she is booed: "No es no!", "You handed power to the most corrupt party in Europe!" She and Patxi López both call for unity and a campaign without a "fratricidal battle". Everyone knows whom they mean.
+
+@crowdfunding
+title: Who pays for the campaign
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and diaz_entered = 1 and crowdfund_seen = 0 and retired = 0 and sanchez_backs_lopez = 0
+max-visits: 1
+on-arrival: crowdfund_seen = 1
+
+= Who pays for the campaign
+
+Without the federations' apparatus you have no money. A crowdfunding appeal raises 38,000 euros in its first week, far beyond anything your team expected. The caretaker committee objects: donations for an internal race fall under the law on party financing, and all candidates must use an account controlled by the party.
+
+- @cf_defy: Refuse: the money is the members' and it stays with the campaign
+- @cf_comply: Move the money into the party's account
+
+@cf_defy
+subtitle: The money keeps coming, unless the Court of Auditors rules against you
+on-arrival: {! Q.cf_ruled = Math.random() < 0.75 ? 1 : 0; if (Q.cf_ruled) { Q.war_chest = (Q.war_chest || 0) + 0.5; Q.sanchismo += 1; } else { Q.war_chest = (Q.war_chest || 0) + 2; Q.sanchismo += 3; } !}
+
+[? if cf_ruled = 1 : On 28 March the Court of Auditors sides with the party. You shut the crowdfunding down; your supporters say the rules were written for Díaz. ?][? if cf_ruled = 0 : The Court of Auditors declines to intervene. The small donations keep arriving. ?]
+
+@cf_comply
+on-arrival: {! Q.war_chest = (Q.war_chest || 0) + 1; Q.rel_leadership = (Q.rel_leadership || 40) + 3; !}
+
+The money goes into the party's account, where the party can see every name on the list.
+
+@heredia_tape
+title: The Heredia recording
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and diaz_entered = 1 and endorsements_done = 0 and heredia_seen = 0 and year = 2017
+max-visits: 1
+on-arrival: heredia_seen = 1
+
+= The Heredia recording
+
+A recording leaks of Miguel Ángel Heredia, the parliamentary group's secretary-general and one of Díaz's closest aides. He calls Pablo Iglesias an enemy, insults Margarita Robles in the crudest terms, says the PSC should be dissolved, and justifies the coup by a secret government deal between you, Podemos and ERC that he says CCOO told him about. CCOO's leader denies any such thing. Díaz says she disagrees with "that kind of assessment" but does not ask him to resign.
+
+- @her_resign: Demand his resignation
+- @her_above: Stay above it: "this is not who we are"
+
+@her_resign
+subtitle: Your supporters love it; it looks like revenge
+on-arrival: {! Q.sanchismo += 3; if (Q.pr_base) { Q.pr_base[0] += 1.5; Q.pr_base[1] -= 1.5; } !}
+
+Your deputies demand his head. He apologises and stays.
+
+@her_above
+subtitle: Lets the recording speak for itself
+on-arrival: {! if (Q.pr_base) { Q.pr_base[0] += 2; Q.pr_base[1] -= 2; } Q.member_morale += 1; !}
+
+You say nothing about Heredia. The members can listen to the tape themselves.
+
+@chacon_dies
+title: Carme Chacón
+new-page: true
+tags: sp_event
+view-if: leadership_exception_open = 1 and diaz_entered = 1 and chacon_seen = 0 and year = 2017 and month >= 4
+max-visits: 1
+on-arrival: chacon_seen = 1
+
+= Carme Chacón
+
+On 9 April Carme Chacón, the first woman to be Spain's Minister of Defence and a candidate for the leadership herself in 2012, dies suddenly at 46. She had stood with Díaz in this race. All three candidates suspend their campaigns.
+
+- @ch_suspend: Suspend the campaign and go to Barcelona
+- @ch_quiet: Suspend in public, keep collecting endorsements in private
+
+@ch_suspend
+on-arrival: {! Q.member_morale += 1; Q.rel_leadership = (Q.rel_leadership || 40) + 2; !}
+
+You stand with the other candidates at the funeral. For a few days the party is one family again.
+
+@ch_quiet
+subtitle: A few more signatures; if it leaks, it will look terrible
+on-arrival: {! Q.ch_leak = Math.random() < 0.35 ? 1 : 0; Q.network = (Q.network || 0) + 2; if (Q.ch_leak) { Q.sanchismo -= 4; Q.member_morale -= 3; } !}
+
+[? if ch_leak = 1 : It leaks. Even some of your own volunteers are appalled. ?][? if ch_leak = 0 : Nobody notices. You are not sure you are proud of it. ?]
