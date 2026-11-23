@@ -1225,6 +1225,52 @@
   // The barons move: the Federal Executive resigns en masse. defend:
   // 'fight' (in the Federal Committee), 'members' (a snap primary) or
   // 'resign'. Returns 1 if Sánchez survives.
+  // Can the apparatus stop a primary the leader calls against it? It
+  // controls the census, the federations' committees and the calendar.
+  function snapPrimaryBlocked(Q, attack) {
+    var force = 0.08 + 0.06 * (Q.loyalist_posts || 0) +
+      (Q.sanchez_pm ? (Q.depends_on_catalans ? 0.12 : 0.3) : 0) +
+      0.004 * Math.max(0, (Q.sanchismo || 0) - 30) -
+      0.005 * Math.max(0, (attack || coupAttack(Q)) - coupDefence(Q));
+    Q.snap_force_pct = Math.round(100 * clamp(force, 0.05, 0.65));
+    return Math.random() < clamp(force, 0.05, 0.65) ? 0 : 1;
+  }
+  // A real primary: endorsements, then the vote, against the barons' candidate.
+  function startSnapPrimary(Q) {
+    Q.snap_primary = 1; Q.snap_stage = 0; Q.snap_called = 0;
+    delete Q.pr_base; Q.av_out = []; Q.sanchez_backs_lopez = 0; Q.lopez_won = 0;
+    var rival = Q.year >= 2021 || Q.diaz_retired ? 'Emiliano García-Page' : 'Susana Díaz';
+    CANDIDATES.c_diaz[0] = rival; CANDIDATES.c_diaz[1] = rival.split(' ').slice(-1)[0];
+    UI.addMeta('c_diaz', CANDIDATES.c_diaz[0], CANDIDATES.c_diaz[1], CANDIDATES.c_diaz[2]);
+    Q.snap_rival = rival;
+    primaryTargets(Q);
+    // the apparatus mobilises every federation; a sitting PM has the
+    // members' loyalty, less so when he governs with the independentists
+    var shift = -0.08 * Math.max(0, (Q.plot || 0) - 40) + (Q.sanchez_pm ? (Q.depends_on_catalans ? 3 : 6) : 0);
+    Q.pr_base[0] = clamp(Q.pr_base[0] + shift, 10, 80);
+    Q.pr_base[1] = Math.max(5, 100 - Q.pr_base[0] - Q.pr_base[2] - Q.pr_base[3]);
+    primaryPoll(Q, 'signatures');
+  }
+  function snapEndorsements(Q) {
+    primaryEndorsements(Q);
+    primaryPoll(Q, 'vote');
+    Q.snap_stage = 1;
+  }
+  function snapPrimaryVote(Q) {
+    primaryVote(Q);
+    Q.snap_primary = 0; Q.snap_stage = 2;
+    if (Q.primary_won) {
+      Q.plot = 10; Q.sanchez_authority = Math.max(Q.sanchez_authority, 65); Q.sanchismo += 8;
+      Q.member_morale += 6; Q.regional_leaders_dissent -= 10; Q.institutionalists_dissent -= 6;
+      Q.federal_committee_balance = Math.max(Q.federal_committee_balance, 58);
+      Q.mandate_renewed = 1; Q.coup_survived = 1;
+    } else {
+      oust(Q, false);
+      Q.psoe_leader = Q.pv_winner_name; Q.psoe_interim = 0; Q.coup_survived = 0;
+    }
+    recalculate(Q);
+    return Q.primary_won;
+  }
   function baronsCoup(Q, defend) {
     Q.coup_cooldown = Q.time + 6;
     var attack = coupAttack(Q);
@@ -1242,8 +1288,21 @@
       if (Q.bluff_called) { callElection(Q); Q.sanchez_authority -= 4; }
       else { Q.sanchez_authority -= 3; Q.regional_leaders_dissent += 4; }
     } else if (defend === 'members') {
-      Q.coup_survived = leadershipElection(Q, 3 + 2 * (Q.loyalist_posts || 0) / 2 + (Q.sanchez_pm ? (Q.depends_on_catalans ? 4 : 8) : 0) +
-        0.3 * Math.max(0, (Q.sanchismo || 0) - 25) + 0.2 * Math.max(0, (Q.member_morale || 0) - 50));
+      // The plotters resigned precisely to stop a primary. Whether one is
+      // held depends on who controls the machinery that would organise it.
+      Q.snap_blocked = snapPrimaryBlocked(Q, attack);
+      if (Q.snap_blocked) {
+        // the Committee rules the primary out of order and votes anyway;
+        // defying the statutes costs the leader votes in the room
+        var d2 = coupDefence(Q) + pmBonus - 10 + 16 * (Math.random() - 0.5);
+        Q.coup_survived = d2 >= attack ? 1 : 0;
+        if (!Q.coup_survived) { oust(Q, false); }
+      } else {
+        startSnapPrimary(Q);
+        Q.coup_survived = 1;
+        recalculate(Q);
+        return 1;
+      }
     } else {
       // the members' mood presses on the Committee too (2016's 'No es no' crowds)
       var defence = coupDefence(Q) + pmBonus + 0.2 * Math.max(0, (Q.sanchismo || 0) - 30) + 16 * (Math.random() - 0.5);
@@ -5759,7 +5818,8 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, settleCity: settleCity, cityArrangement: cityArrangement, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw,
+    startSnapPrimary: startSnapPrimary, snapEndorsements: snapEndorsements, snapPrimaryVote: snapPrimaryVote, settleCity: settleCity, cityArrangement: cityArrangement, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

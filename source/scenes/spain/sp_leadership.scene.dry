@@ -329,9 +329,10 @@ on-arrival: {! window.SpainGame.baronsCoup(Q, 'dissolve'); !}
 [? if bluff_called = 0 : You let it be known that if the Federal Committee moves against you, you will dissolve the Cortes the same night. The barons, whose own regional governments would be dragged into a campaign fought by a divided party, back down one by one. ?][? if bluff_called = 1 : The barons call your bluff. You sign the dissolution decree: the general election will settle who leads the PSOE. ?]
 
 @coup_members
+subtitle: The plotters resigned precisely to stop a primary; they control the census and the federations
 on-arrival: {! window.SpainGame.baronsCoup(Q, 'members'); Q.populism += 1; !}
 
-[? if coup_survived = 1 : The members answer you, not the barons. With a fresh mandate, the plot collapses. ?][? if coup_survived = 0 : The members do not save you. A caretaker committee under [+ psoe_leader +] takes over. ?]
+[? if snap_blocked = 1 : The rebels' answer comes within hours: the Executive has been dissolved, so a Secretary-General without one cannot call anything. The federations refuse to open their census, the Guarantees Commission rules the primary out of order, and the Federal Committee meets anyway. [? if coup_survived = 1 : Your people in the room hold the line, narrowly. You survive, but the members never got their say. ?][? if coup_survived = 0 : You lose the vote. A caretaker committee under [+ psoe_leader +] takes over Ferraz, and the primary you called never happens. ?] ?][? if snap_blocked = 0 : Your loyalists hold enough of the machinery to force it through: the census is opened and the primary is called. The barons put up [+ snap_rival +]. First, the endorsements. ?]
 
 @coup_resign
 on-arrival: {! window.SpainGame.baronsCoup(Q, 'resign'); !}
@@ -395,7 +396,7 @@ Emiliano García-Page, President of Castilla-La Mancha, accuses you of treating 
 - @page_ignore: Ignore him
 
 @page_primaries
-on-arrival: {! Q.primaries_called = 1; Q.plot += 12; Q.sanchismo += 4; Q.populism += 1; !}
+on-arrival: {! Q.primaries_called = 1; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; Q.plot += 12; Q.sanchismo += 4; Q.populism += 1; !}
 
 You announce primaries within a month, followed by a Federal Congress. It is a direct appeal to the members before the deadlock can be resolved without you, and the barons see it as a declaration of war. They start discussing mass resignations from the Executive to stop it.
 
@@ -543,7 +544,7 @@ Two general elections, no government, and a third one at Christmas if nothing ch
 
 @roads_congress
 subtitle: The members decide, not the barons; it forces the barons to move now
-on-arrival: {! Q.plot = Math.max(Q.plot || 0, 80); Q.fc_bonus = (Q.fc_bonus || 0) + 2; Q.sanchismo += 4; Q.congress_called = 1; !}
+on-arrival: {! Q.plot = Math.max(Q.plot || 0, 80); Q.fc_bonus = (Q.fc_bonus || 0) + 2; Q.sanchismo += 4; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; !}
 
 You announce primaries for the leadership on 23 October and an extraordinary congress in December. The members will decide. Within forty-eight hours, the barons answer.
 
@@ -590,3 +591,49 @@ title: An early election
 on-arrival: {! if (window.SpainGame) { window.SpainGame.callElection(Q); } Q.sanchismo += 8; Q.member_morale -= 5; Q.regional_leaders_dissent += 10; !}
 
 You call an early general election, as Prime Minister, against your own party's new leadership. The members are split down the middle.
+
+
+@snap_start
+title: The primary goes ahead
+new-page: true
+tags: sp_event
+view-if: snap_called = 1 and snap_primary = 0 and sanchez_leader = 1 and coup_due = 0 and time >= snap_called_time + 2
+on-arrival: {! if (window.SpainGame) { window.SpainGame.startSnapPrimary(Q); } else { Q.snap_called = 0; } !}
+
+= The primary goes ahead
+
+The barons did not move in time. The primary you called is going ahead, and [+ snap_rival +] stands against you with the federations behind them. First, the endorsements.
+
+@snap_endorsements
+title: The endorsements
+new-page: true
+tags: sp_event
+view-if: snap_primary = 1 and snap_stage = 0
+on-arrival: {! if (window.SpainGame) { window.SpainGame.snapEndorsements(Q); } else { Q.snap_stage = 1; } !}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderEndorsements(Q, 'sp-snap-avales'); }
+!}
+
+= The endorsements
+
+Each candidate needs the signed endorsements of 5% of the membership. The federations' apparatus is good at collecting them, and it is working for [+ snap_rival +].
+
+{!<div id="sp-snap-avales"></div>!}
+
+[+ av_leader +] wins the endorsements. Endorsements are not votes: in the secrecy of the ballot box, members can sign for one candidate and vote for another. The polls for the vote: [+ ppoll_vote +].
+
+@snap_vote
+title: The members vote
+new-page: true
+tags: sp_event
+view-if: snap_primary = 1 and snap_stage = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.snapPrimaryVote(Q); } else { Q.snap_primary = 0; Q.primary_won = 1; } !}
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderPrimary(Q, 'sp-snap-result'); }
+!}
+
+= The members vote
+
+{!<div id="sp-snap-result"></div>!}
+
+[? if primary_won = 1 : The members back you against the apparatus. The plot collapses, and the barons will have to wait for another chance. ?][? if primary_won = 0 : The members choose [+ pv_winner_name +]. You are no longer Secretary-General. ?]
