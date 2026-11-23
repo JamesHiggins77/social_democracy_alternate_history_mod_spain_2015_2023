@@ -1010,3 +1010,12 @@ Figures come from the text the user supplied, taken from Spanish Wikipedia.
   - the ministries (no names of future ministers);
   - the Senate (Article 155 "never yet used" until October 2017) and the European Parliament (59 seats only after Brexit).
 - **Faction lines:** those that hinted at the future ("later turned right", "backed Susana Díaz in 2017") are now neutral.
+
+### 7.56 More cards: early Vox figures, ETA, the regions
+
+- **People:** cards for Ludovico López Cadé, Carmelo González, Nieves Ciprés, Raül Romeva and Rosa Díez. Their roles are date-aware.
+- **ETA:**
+  - ended its violence in 2011 but had not yet disarmed;
+  - handed over its arms from April 2017;
+  - dissolved itself from May 2018.
+- **The regions:** every autonomous community, plus Ceuta and Melilla, has a card under its English and Spanish names. Each gives its capital, size and seats in its parliament, with a line on who governs it now in the game. The region names in the Regions tab table open these cards; bare "Madrid", "Valencia" and "Murcia" elsewhere still mean the cities.

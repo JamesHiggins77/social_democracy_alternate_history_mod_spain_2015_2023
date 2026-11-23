@@ -5281,6 +5281,11 @@
     return parts[parts.length - 1];
   }
 
+  // the card name for each region (an unambiguous name; "Madrid" alone is the city)
+  var REGION_KEY = { 'Andalucía': 'Andalucía', 'Aragón': 'Aragón', 'Asturias': 'Asturias', 'Baleares': 'Baleares', 'Canarias': 'Canarias',
+    'Cantabria': 'Cantabria', 'Castilla y León': 'Castilla y León', 'Castilla-La Mancha': 'Castilla-La Mancha', 'Cataluña': 'Cataluña',
+    'Comunidad Valenciana': 'Comunidad Valenciana', 'Extremadura': 'Extremadura', 'Galicia': 'Galicia', 'La Rioja': 'La Rioja',
+    'Madrid': 'Comunidad de Madrid', 'Navarra': 'Navarra', 'País Vasco': 'País Vasco', 'Región de Murcia': 'Región de Murcia', 'Ceuta': 'Ceuta', 'Melilla': 'Melilla' };
   var REGION_SHORT = {
     'Castilla-La Mancha': 'C.-La Mancha', 'Castilla y León': 'C. y León',
     'Comunidad Valenciana': 'Valencia', 'Región de Murcia': 'Murcia', 'País Vasco': 'Basque C.'
@@ -5313,7 +5318,7 @@
       var reg = Q.regions[r];
       var g = reg.government;
       return '<tr class="sp-reg-row' + (r === selected ? ' sp-reg-selected' : '') + '" data-reg="' + r +
-        '" tabindex="0"><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
+        '" tabindex="0"><td><span class="sp-ent sp-topic" data-ent="' + REGION_KEY[r] + '">' + (REGION_SHORT[r] || r) + '</span></td><td><span class="sp-swatch" style="background:' +
         UI.partyColor(g.party) + '"></span>' + presidentHtml(g) + '</td><td class="sp-num">' +
         reg.nextElection.slice(0, 4) + '</td></tr>';
     });
