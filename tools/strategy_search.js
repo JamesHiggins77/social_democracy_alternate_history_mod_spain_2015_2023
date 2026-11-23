@@ -135,7 +135,7 @@ async function playOne(game) {
   const meanSeats = seats.length ? seats.reduce((a, b) => a + b.psoe, 0) / seats.length : 0;
   return { score: meanSeats + 3 * meanPoll, meanSeats, meanPoll, maxPoll: Math.max(...polls), finalPoll: q.true_poll ? q.true_poll.psoe : 0, seats,
            pm_months: q.pm_months || 0, advisers, econ: q.econ_word, social: q.social_word, constit: q.const_word, eu: q.eu_word, style: q.style_word,
-           sanchismo: q.sanchismo, coup: q.rebellion_used || 0, leader: q.psoe_leader, taken: Object.keys(taken) };
+           cat_on: q.catalan_crisis || 0, cat_months: q.cat_crisis_months || 0, cat_ended: q.cat_crisis_ended || 0, est_bounce: q.est_defeated_bounce || 0, sanchismo: q.sanchismo, coup: q.rebellion_used || 0, leader: q.psoe_leader, taken: Object.keys(taken) };
 }
 
 (async function main() {

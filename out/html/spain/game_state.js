@@ -1194,7 +1194,7 @@
   function coupAttack(Q) {
     // without a majority in the Executive the critics cannot dissolve it by
     // resigning; a hostile chair of the Federal Committee helps them
-    return (Q.exec_can_fall === 0 ? -12 : 0) + (Q.fcpres_hostile ? 5 : 0) + (Q.congress_renewed ? 0 : 2) - 1.5 * (Q.posts_loyal || 0) +
+    return (Q.exec_can_fall === 0 ? -18 : 0) + (Q.fcpres_hostile ? 5 : 0) + (Q.congress_renewed ? 0 : 2) - 2.5 * (Q.posts_loyal || 0) +
       0.6 * (Q.plot || 0) + 0.5 * (Q.regional_leaders_strength || 30) +
       (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) + 2 * leftDrift(Q) +
       (Q.acting && (Q.congress.psoe || 0) < 100 ? 10 : 0);
@@ -1270,6 +1270,7 @@
       Q.member_morale += 6; Q.regional_leaders_dissent -= 10; Q.institutionalists_dissent -= 6;
       Q.federal_committee_balance = Math.max(Q.federal_committee_balance, 58);
       Q.mandate_renewed = 1; Q.coup_survived = 1;
+      establishmentDefeated(Q, false);
     } else {
       oust(Q, false);
       Q.psoe_leader = Q.pv_winner_name; Q.psoe_interim = 0; Q.coup_survived = 0;
@@ -1635,7 +1636,9 @@
         transfer(Q, 'up', 'psoe', all(0.1));
         transfer(Q, 'cs', 'psoe', all(0.05));
       }
-      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.04));
+      // wear bites on the soft vote; the core (about 20%) stays
+      var pp = (Q.true_poll && Q.true_poll.psoe) || 25;
+      transfer(Q, 'psoe', { pp: 0.4, up: 0.25, cs: 0.15, vox: 0.2 }, all(0.04 * clamp((pp - 19) / 8, 0, 1.2)));
     } else if (Q.pm_party === 'pp' && !Q.acting) {
       // a governing PP is worn down faster the more its corruption is in the news
       transfer(Q, 'pp', { psoe: 0.35, cs: 0.3, vox: 0.25, up: 0.1 }, all(0.15 + 0.05 * Math.min(4, Q.pp_scandal || 0)));
@@ -2167,7 +2170,12 @@
       // the Supreme Court sentence, October 2019: Tsunami Democràtic
       if (Q.year === 2019 && Q.month === 10 && !Q.cat_sentence_seen) { Q.cat_sentence_seen = 1; Q.cat_protest += 35; Q.cat_tension = (Q.cat_tension || 0) + 8; }
       // dialogue and pardons calm the street; a hard line inflames it
-      Q.cat_protest += 0.6 * (Q.cat_hard_line || 0) - 0.8 * Math.min(3, Q.cat_dialogue || 0) - (Q.pardons_granted ? 1.5 : 0);
+      // a hard line's effect fades as the measures become routine; and after
+      // years of mobilisation the movement tires, whoever governs in Madrid
+      Q.cat_hard_line = (Q.cat_hard_line || 0) * 0.97;
+      var months = Q.cat_crisis_months || 0;
+      var tired = months > 30 ? Math.min(2.5, (months - 30) / 12) : 0;
+      Q.cat_protest += 0.6 * Q.cat_hard_line - 0.8 * Math.min(3, Q.cat_dialogue || 0) - (Q.pardons_granted ? 1.5 : 0) - tired;
       Q.cat_protest = clamp(Q.cat_protest, 0, 100);
     }
     if ((Q.cat_crisis_stage || 0) >= 3 && !Q.cat_negotiated) { Q.direct_rule = 1; }
@@ -2176,7 +2184,11 @@
     var hard = !g || g.party === 'junts' || g.party === 'jxsi' || cab.indexOf('cup') !== -1;
     Q.cat_gov_moderate = hard ? 0 : 1;
     Q.cat_protest_word = Q.cat_protest >= 50 ? 'mass mobilisation' : (Q.cat_protest >= 25 ? 'regular protests' : (Q.cat_protest >= 12 ? 'occasional protests' : 'quiet'));
-    Q.cat_can_end = (Q.direct_rule || Q.cat_negotiated) && Q.cat_gov_moderate && Q.cat_protest < 12 && (Q.cat_crisis_stage || 0) >= 4 ? 1 : 0;
+    // after four years even a Junts-led Generalitat governs pragmatically
+    // (the 2020-22 drift from confrontation to management)
+    var longRun = (Q.cat_crisis_months || 0) >= 48;
+    Q.cat_can_end = (Q.direct_rule || Q.cat_negotiated) && (Q.cat_gov_moderate || longRun) &&
+      Q.cat_protest < (longRun ? 20 : 12) && (Q.cat_crisis_stage || 0) >= 4 ? 1 : 0;
   }
   // A Catalan election that produces no government: the first repeat helps
   // Ciudadanos on the unionist side; if it keeps happening, Vox gains.
@@ -3692,7 +3704,7 @@
     Q.primary_lopez = t.c_lopez ? Math.round(1000 * t.c_lopez / sum) / 10 : 0;
     Q.primary_tapias = t.c_tapias ? Math.round(1000 * t.c_tapias / sum) / 10 : 0;
     Q.primary_won = Q.pv_winner === 'c_sanchez' ? 1 : 0;
-    if (Q.primary_won) { leadershipBounce(Q, Q.primary_sanchez); }
+    if (Q.primary_won) { leadershipBounce(Q, Q.primary_sanchez); if (Q.rebellion_used) { establishmentDefeated(Q, true); } }
     Q.lopez_won = Q.pv_winner === 'c_lopez' ? 1 : 0;
     return Q.primary_won;
   }
@@ -4514,6 +4526,22 @@
     Q.leadership_bounce = Math.round(b * 10) / 10;
   }
 
+  // Beating the establishment in a members' vote: left voters who had gone
+  // to Podemos and disillusioned socialists come home (May 2017: the PSOE
+  // rose from about 18% to 24-25% within weeks). Bigger after an ouster
+  // (the comeback) than after a coup survived in office.
+  function establishmentDefeated(Q, comeback) {
+    if (Q.est_defeated_bounce) { return; }
+    Q.est_defeated_bounce = 1;
+    var k = comeback ? 1 : 0.7;
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    transfer(Q, 'up', 'psoe', all(2.1 * k));
+    transfer(Q, 'cs', 'psoe', all(0.4 * k));
+    campaign(Q, 'psoe', all(1.2 * k));
+    Q.member_morale += 8; Q.sanchismo += 6; Q.plot = Math.min(Q.plot || 0, 5);
+    Q.regional_leaders_strength = (Q.regional_leaders_strength || 30) - 6;
+    recalculate(Q);
+  }
   function leadershipElection(Q, bonus) {
     var score = 0.45 * Q.member_morale + 0.35 * Q.sanchismo + 0.2 * Math.max(0, Q.sanchez_authority) + (Q.rig_bonus || 0) - (Q.three_losses ? 10 : 0) - 0.8 * ((Q.members_lost || 0) - 6.5) +
       (bonus || 0) + 6 * gaussian() -
@@ -4523,6 +4551,8 @@
     var won = score >= 50 ? 1 : 0;
     Q.primary_won = won;
     if (won) { Q.mandate_renewed = 1; leadershipBounce(Q, clamp(40 + (score - 50) * 0.8, 40, 75)); }
+    // a primary won against the apparatus (a challenge, a coup, or from the backbench)
+    if (won && (Q.rebellion_used || Q.backbench || (Q.lead_stage || 0) >= 2 || (Q.plot || 0) >= 50)) { establishmentDefeated(Q, !!Q.backbench || !!Q.rebellion_used); }
     if (won) {
       Q.sanchez_leader = 1;
       if (Q.pm_party === 'psoe' && !Q.acting) { Q.pm = 'Pedro Sánchez'; }
