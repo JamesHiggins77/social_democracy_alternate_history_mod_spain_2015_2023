@@ -1487,11 +1487,110 @@
     if (Q.npc_budget_election) { callElection(Q); }
     recalculate(Q);
   }
+  // ------------------------------------------------------------------
+  // The final grade, F to A+, out of 100:
+  //   power (40): months as Prime Minister against the real Sánchez's
+  //     ~102, plus half credit for months as a junior partner in government;
+  //   legislation (25): laws passed and the share that passed;
+  //   budgets (15): budgets of your own approved;
+  //   elections (20): the party's mean seats across general elections.
+  // ------------------------------------------------------------------
+  function finalGrade(Q) {
+    var pm = Q.pm_months || 0, junior = Q.junior_months || 0;
+    var power = 40 * Math.min(1, (pm + 0.5 * junior) / 102);
+    var lp = Q.laws_passed || 0, lf = Q.laws_failed || 0;
+    var laws = 15 * lp / (lp + lf + 2) + Math.min(10, lp);
+    var budgets = Math.min(15, 4 * (Q.budgets_passed || 0)) - Math.min(5, 1.5 * (Q.budgets_failed || 0));
+    var me = Q.player_party || 'psoe';
+    var recs = (Q.election_records || []).filter(function (r) { return r.seats; });
+    var mean = recs.length ? recs.reduce(function (a, r) { return a + (r.seats[me] || r.seats.psoe || 0); }, 0) / recs.length : 0;
+    var elections = 20 * clamp((mean - 70) / 70, 0, 1);
+    var total = Math.round(clamp(power + laws + Math.max(0, budgets) + elections, 0, 100));
+    var g = total >= 90 ? 'A+' : total >= 80 ? 'A' : total >= 68 ? 'B' : total >= 55 ? 'C' : total >= 42 ? 'D' : total >= 30 ? 'E' : 'F';
+    Q.grade = g; Q.grade_score = total;
+    Q.grade_power = Math.round(power); Q.grade_laws = Math.round(laws); Q.grade_budgets = Math.round(Math.max(0, budgets)); Q.grade_elections = Math.round(elections);
+    Q.grade_mean_seats = Math.round(mean);
+    Q.grade_budget_n = Q.budgets_passed || 0;
+    Q.grade_word = { 'A+': 'a historic premiership', A: 'an outstanding record', B: 'a solid record', C: 'a mixed record', D: 'a disappointing record', E: 'a poor record', F: 'a failure' }[g];
+    return g;
+  }
+  // ------------------------------------------------------------------
+  // Custom election lab: set each party's national vote and run the same
+  // general election the game runs (provinces, D'Hondt, the 3% threshold,
+  // the Senate's limited vote and island seats, plus the senators the
+  // regional parliaments appoint).
+  // ------------------------------------------------------------------
+  var LAB_PARTIES = [['psoe', 'PSOE'], ['pp', 'PP'], ['up', 'Podemos / Sumar'], ['cs', 'Ciudadanos'], ['vox', 'Vox'], ['iu', 'IU'], ['mp', 'Más País'], ['pod', 'Podemos (after a split)'], ['pacma', 'PACMA']];
+  var LAB_YEARS = { 2015: [2015, 12], 2019: [2019, 11], 2023: [2023, 7] };
+  function labRun(targets, year) {
+    var Q = {};
+    newGame(Q);
+    var d = LAB_YEARS[year] || LAB_YEARS[2015];
+    Q.year = d[0]; Q.month = d[1];
+    var state = JSON.parse(JSON.stringify(Q.vm));
+    state.partyFactor = state.partyFactor || {};
+    state.notStanding = state.notStanding || {};
+    Object.keys(targets).forEach(function (p) { if (!(targets[p] > 0)) { state.notStanding[p] = true; } else { delete state.notStanding[p]; } });
+    if (d[0] >= 2019) { state.notStanding.upyd = true; }
+    var r;
+    for (var it = 0; it < 6; it++) {
+      r = generalResult(Q, state);
+      Object.keys(targets).forEach(function (p) {
+        var have = r.voteShares[p] || 0, want = targets[p];
+        if (want > 0) {
+          if (have < 0.05) {
+            // seed a party that has no base in this year's model
+            VoteModel.CLASSES.forEach(function (c) { state.classSupport[c][p] = (state.classSupport[c][p] || 0) + want / 2; });
+          } else {
+            state.partyFactor[p] = (state.partyFactor[p] === undefined ? 1 : state.partyFactor[p]) * want / have;
+          }
+        }
+      });
+    }
+    r = generalResult(Q, state);
+    var senate = senateElected(r.ballots), appointed = senateAppointed(Q), total = {};
+    [senate, appointed].forEach(function (o) { Object.keys(o).forEach(function (k) { total[k] = (total[k] || 0) + o[k]; }); });
+    Q.congress = r.totals;
+    Q.map_winners = provinceWinners(r.ballots);
+    Q.map_shares = districtShares(r.ballots, 5, r.districts);
+    Q.map_magnitude = districtMagnitudes(r.districts);
+    Q.map_scope = {}; Q.map_kind = 'general';
+    return { Q: Q, congress: r.totals, shares: r.voteShares, senateElected: senate, senate: total };
+  }
+  function renderLabCustom(id) {
+    var out = el(id);
+    if (!out) { return; }
+    var defaults = { psoe: 22.0, pp: 28.7, up: 20.7, cs: 13.9, vox: 0.2, iu: 3.7, mp: 0, pod: 0, pacma: 0.9 };
+    var saved = root.spLabTargets || defaults, year = root.spLabYear || 2015;
+    out.innerHTML = '<p>Set each party\'s national vote (%). Regional parties (ERC, Junts, PNV, Bildu and others) keep their own vote, about 10%; if your figures leave less room than that, every party is scaled down to fit.</p><table class="sp-results sp-compact"><tbody>' +
+      LAB_PARTIES.map(function (p) {
+        return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(p[0]) + '"></span>' + p[1] + '</td><td class="sp-num"><input type="number" step="0.1" min="0" max="80" style="width:5em" id="' + id + '-' + p[0] + '" value="' + (saved[p[0]] || 0) + '"></td></tr>';
+      }).join('') + '</tbody></table><p>Seats per province as in <select class="sp-select" id="' + id + '-year">' +
+      Object.keys(LAB_YEARS).map(function (y) { return '<option value="' + y + '"' + (String(y) === String(year) ? ' selected' : '') + '>' + y + '</option>'; }).join('') +
+      '</select> <button class="sp-select" id="' + id + '-run">Run the election</button></p><div id="' + id + '-out"></div>';
+    el(id + '-run').onclick = function () {
+      var t = {};
+      LAB_PARTIES.forEach(function (p) { t[p[0]] = Number(el(id + '-' + p[0]).value) || 0; });
+      root.spLabTargets = t; root.spLabYear = Number(el(id + '-year').value);
+      var r = labRun(t, root.spLabYear);
+      var o = el(id + '-out');
+      o.innerHTML = '<h4>Congress of Deputies</h4><svg id="' + id + '-hc" class="sp-hemicycle"></svg>' + UI.resultsTable(r.congress, r.shares) +
+        UI.arrangementsHtml(r.congress) +
+        '<h4>Senate</h4><svg id="' + id + '-sc" class="sp-hemicycle"></svg>' + UI.resultsTable(r.senate, null, { compact: true }) +
+        '<p class="sp-map-legend">208 elected by limited vote (' + Object.keys(r.senateElected).map(function (k) { return UI.shortName(k) + ' ' + r.senateElected[k]; }).join(', ') +
+        '), plus the senators appointed by the regional parliaments as they stood in 2015.</p>' +
+        '<h4>By province</h4><div id="' + id + '-map"></div>';
+      UI.drawHemicycle('#' + id + '-hc', r.congress);
+      UI.drawHemicycle('#' + id + '-sc', r.senate);
+      renderMap(r.Q, id + '-map');
+    };
+  }
   function monthlyWorld(Q) {
     var t = Q.year * 12 + Q.month;
     plotDrift(Q);
     grandCoalitionWear(Q);
     coalitionMonthly(Q);
+    if (Q.player_in_government && !Q.acting && Q.pm_party !== (Q.player_party || 'psoe')) { Q.junior_months = (Q.junior_months || 0) + 1; }
     if (Q.month === 5 && (Q.year === 2015 || Q.year === 2019 || Q.year === 2023) && Q.local_done !== Q.year) {
       Q.local_done = Q.year;
       localElections(Q);
@@ -2424,6 +2523,7 @@
     if (v.yes > v.no && !govSenateMajority(Q) && v.yes < 176) { Q.budget_senate_delay = 1; } else { Q.budget_senate_delay = 0; }
     Q.inv_yes = v.yes; Q.inv_no = v.no; Q.inv_abstain = v.abstain;
     Q.budget_passed = v.yes > v.no ? 1 : 0;
+    if (Q.budget_passed) { Q.budgets_passed = (Q.budgets_passed || 0) + 1; } else { Q.budgets_failed = (Q.budgets_failed || 0) + 1; }
     if (!Q.budget_passed) {
       // losing the budget is a major humiliation for any government
       var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
@@ -6390,6 +6490,8 @@
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
     voteLaw: voteLaw,
+    labRun: labRun, renderLabCustom: renderLabCustom,
+    finalGrade: finalGrade,
     courtFaction: courtFaction, coalitionBreak: coalitionBreak, npcBudget: npcBudget, triCheck: triCheck,
     startSnapPrimary: startSnapPrimary, snapEndorsements: snapEndorsements, snapPrimaryVote: snapPrimaryVote, settleCity: settleCity, cityArrangement: cityArrangement, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,

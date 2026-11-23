@@ -1,6 +1,6 @@
 title: Game over
 new-page: true
-on-arrival: game_over = 1
+on-arrival: {! Q.game_over = 1; if (window.SpainGame) { window.SpainGame.finalGrade(Q); } !}
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderCortesHistory(Q, 'sp-cortes-history'); }
 !}
@@ -13,6 +13,15 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 
 **Time as Prime Minister: [+ pm_years_text +] years.** The real Pedro Sánchez governed from June 2018 to the end of 2026, about 8.5 years. [? if beat_history = 1 : You have matched or beaten him. ?][? if beat_history = 0 : You fell short of his record. ?]
 
+## Final grade: [+ grade +]
+
+**[+ grade_score +]/100: [+ grade_word +].**
+
+* Holding power: [+ grade_power +]/40 ([+ pm_years_text +] years as Prime Minister)
+* Legislation: [+ grade_laws +]/25 ([+ laws_passed +] laws passed, [+ laws_failed +] defeated)
+* Budgets: [+ grade_budgets +]/15 ([+ grade_budget_n +] budgets approved)
+* Elections: [+ grade_elections +]/20 (mean of [+ grade_mean_seats +] seats per general election)
+
 ## The Cortes, election by election
 
 {!<div id="sp-cortes-history"></div>!}
@@ -23,7 +32,7 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 @survived
 title: The end of 2026
 new-page: true
-on-arrival: game_over = 1
+on-arrival: {! Q.game_over = 1; if (window.SpainGame) { window.SpainGame.finalGrade(Q); } !}
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderCortesHistory(Q, 'sp-cortes-history'); }
 !}
@@ -35,6 +44,15 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 [? if sanchez_pm = 1 : He is Prime Minister: [+ government_type +]. ?][? if sanchez_pm = 0 : [? if player_in_government = 1 : His party is in government under [+ pm +]: [+ government_type +]. ?][? if player_in_government = 0 : The Prime Minister is [+ pm +]. ?] ?]
 
 [? if sanchez_leader = 1 : Sánchez's authority: [+ sanchez_authority +]/100. PSOE unity: [+ psoe_unity +]/100. ?]
+
+## Final grade: [+ grade +]
+
+**[+ grade_score +]/100: [+ grade_word +].**
+
+* Holding power: [+ grade_power +]/40 ([+ pm_years_text +] years as Prime Minister)
+* Legislation: [+ grade_laws +]/25 ([+ laws_passed +] laws passed, [+ laws_failed +] defeated)
+* Budgets: [+ grade_budgets +]/15 ([+ grade_budget_n +] budgets approved)
+* Elections: [+ grade_elections +]/20 (mean of [+ grade_mean_seats +] seats per general election)
 
 ## The Cortes, election by election
 

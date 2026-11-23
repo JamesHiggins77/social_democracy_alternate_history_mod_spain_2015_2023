@@ -7,6 +7,7 @@ This page runs the Spanish electoral engine that the campaign will use. Votes ar
 
 Fed the official vote counts, the engine reproduces every Congress from 2015 to 2023. The scenarios below are illustrations of the model, not historical results.
 
+- @lab_custom: Custom: set every party's national vote yourself
 - @lab_baseline: December 2015, no change
 - @lab_up_merger: Unidos Podemos and a PP recovery
 - @lab_vox: Vox breaks through as Ciudadanos collapses
@@ -44,4 +45,20 @@ if (typeof window !== 'undefined' && window.SpainUI) {
 {!<div id="sp-lab"></div>!}
 
 - @election_lab: Try another scenario
+- @root.start_menu: Back to the main menu
+
+@lab_custom
+title: Custom election
+new-page: true
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.renderLabCustom('sp-lab-custom'); }
+!}
+
+= Custom election
+
+The same general election the campaign runs: each province's vote, D'Hondt and the 3% threshold for Congress; the limited vote and the island constituencies for the Senate.
+
+{!<div id="sp-lab-custom"></div>!}
+
+- @election_lab: Back to the scenarios
 - @root.start_menu: Back to the main menu
