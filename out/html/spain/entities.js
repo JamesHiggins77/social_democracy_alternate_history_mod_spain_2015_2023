@@ -411,10 +411,66 @@
     [['PSOE-M'], 'Partido Socialista Obrero Español de la Comunidad de Madrid', 'Madrid', 'The PSOE in the Madrid region, out of power there since 1995.', 'es:Partido Socialista de Madrid']
   ];
 
+
+  // Alliances, joint lists and smaller parties: their own card, in the
+  // colour of the party they belong to or are counted with.
+  // [names], party id (colour), full name, kind, note, Wikipedia title
+  var ORGS = [
+    // Podemos's alliances
+    [['Unidos Podemos'], 'up', 'Unidos Podemos', 'Electoral alliance, 2016', 'Podemos\'s joint list with Izquierda Unida and Equo for the June 2016 general election, led by Pablo Iglesias with Alberto Garzón. It won 71 seats, the same as Podemos and IU separately in 2015, and failed to overtake the PSOE.', 'Unidos Podemos'],
+    [['Unidas Podemos'], 'up', 'Unidas Podemos', 'Electoral alliance, 2019', 'The same alliance of Podemos, IU and Equo renamed for 2019. It entered the coalition government with the PSOE in January 2020.', 'Unidas Podemos'],
+    [['Sumar'], 'up', 'Sumar', 'Electoral alliance, 2023', 'Yolanda Díaz\'s platform, joined by Podemos, IU, Más País, Compromís, the Comuns and others for the July 2023 election. Podemos left it in December 2023.', 'Sumar (electoral platform)'],
+    [['En Comú Podem'], 'up', 'En Comú Podem', 'Catalan alliance', 'The Catalan alliance of Podemos with ICV, EUiA and Barcelona en Comú, led by Xavier Domènech: first in Catalonia in the 2015 and 2016 general elections.', 'En Comú Podem'],
+    [['Catalunya en Comú', 'Comuns'], 'up', 'Catalunya en Comú', 'Catalan party', 'Ada Colau\'s party (2017), heir of ICV and Barcelona en Comú; allied with Podemos in Catalunya en Comú–Podem.', 'Catalunya en Comú'],
+    [['Catalunya Sí que es Pot'], 'up', 'Catalunya Sí que es Pot', 'Catalan alliance, 2015', 'The alliance of Podemos, ICV and EUiA for the September 2015 Catalan election. It won 11 seats, below expectations.', 'Catalunya Sí que es Pot'],
+    [['En Marea'], 'up', 'En Marea', 'Galician alliance', 'The Galician alliance of Podemos, Anova, Esquerda Unida and the city "mareas": second in Galicia in the 2015 and 2016 general elections.', 'En Marea'],
+    [['Elkarrekin Podemos'], 'up', 'Elkarrekin Podemos', 'Basque alliance', 'Podemos with Ezker Anitza-IU and Equo in the Basque Country (2016 onwards).', 'Elkarrekin Podemos'],
+    [['Adelante Andalucía'], 'aa', 'Adelante Andalucía', 'Andalusian alliance, 2018', 'Podemos Andalucía (Teresa Rodríguez) and IU (Antonio Maíllo) together for the December 2018 Andalusian election: 17 seats. Rodríguez later took the name for her own party.', 'Adelante Andalucía'],
+    [['Compromís–Podemos', 'És el moment', 'A la valenciana'], 'up', 'Compromís–Podemos–És el moment', 'Valencian alliance', 'Compromís and Podemos together in the Valencian Community for the 2015 and 2016 general elections.', 'Compromís–Podemos–És el moment'],
+    [['Ahora Madrid'], 'up', 'Ahora Madrid', 'Municipal alliance (Madrid)', 'Manuela Carmena\'s platform for the 2015 Madrid city election, built by Podemos with Ganemos Madrid and parts of IU and Equo. Mayor 2015–19; it became Más Madrid in 2019.', 'Ahora Madrid'],
+    [['Barcelona en Comú'], 'up', 'Barcelona en Comú', 'Municipal alliance (Barcelona)', 'Ada Colau\'s platform (2015), with ICV-EUiA, Podemos, Equo and Procés Constituent. Mayor 2015–23.', 'Barcelona en Comú'],
+    [['Zaragoza en Común'], 'up', 'Zaragoza en Común', 'Municipal alliance (Zaragoza)', 'Pedro Santisteve\'s platform (2015), with Podemos, IU, Equo and others. Mayor 2015–19.', 'es:Zaragoza en Común'],
+    [['València en Comú'], 'up', 'València en Comú', 'Municipal alliance (Valencia)', 'The Podemos-backed list in Valencia in 2015 (3 seats); it backed Joan Ribó of Compromís as mayor.', 'es:València en Comú'],
+    [['Participa Sevilla'], 'up', 'Participa Sevilla', 'Municipal alliance (Seville)', 'The Podemos-backed list in Seville in 2015 (3 seats); it backed the socialist Juan Espadas as mayor.', 'es:Participa Sevilla'],
+    [['Málaga Ahora'], 'up', 'Málaga Ahora', 'Municipal alliance (Málaga)', 'The Podemos-backed list in Málaga in 2015 (4 seats).', 'es:Málaga Ahora'],
+    [['Som Palma'], 'up', 'Som Palma', 'Municipal alliance (Palma)', 'The Podemos-backed list in Palma in 2015 (5 seats); part of the left-wing pact that governed the city.', 'es:Som Palma'],
+    [['Guanyar Alacant'], 'up', 'Guanyar Alacant', 'Municipal alliance (Alicante)', 'The Podemos-backed list in Alicante in 2015 (6 seats), with EU; part of the "tripartito" that governed until 2018.', 'es:Guanyar Alacant'],
+    [['Cambiemos Murcia'], 'iu', 'Cambiemos Murcia', 'Municipal alliance (Murcia)', 'The list of IU, Equo and citizen groups in Murcia in 2015 (3 seats).', 'es:Cambiemos Murcia'],
+    [['Ahora Murcia'], 'up', 'Ahora Murcia', 'Municipal alliance (Murcia)', 'Podemos\'s list in Murcia in 2015 (3 seats).', 'es:Ahora Murcia'],
+    [['Las Palmas de Gran Canaria Puede', 'LPGC Puede'], 'up', 'Las Palmas de Gran Canaria Puede', 'Municipal alliance (Las Palmas)', 'The Podemos-backed list in Las Palmas in 2015 (6 seats); part of the city\'s left-wing government.', 'es:Las Palmas de Gran Canaria Puede'],
+    [['Málaga para la Gente'], 'iu', 'Málaga para la Gente', 'Municipal list (Málaga)', 'Izquierda Unida\'s list in Málaga (2 seats in 2015).', 'es:Málaga para la Gente'],
+    [['Más Madrid'], 'mp', 'Más Madrid', 'Party (Madrid)', 'Íñigo Errejón and Manuela Carmena\'s platform (2019), born from Ahora Madrid without Podemos. First in Madrid city in 2019.', 'Más Madrid'],
+    [['Más País'], 'mp', 'Más País', 'Party', 'Errejón\'s national party for the November 2019 election, a split from Podemos; later part of Sumar.', 'Más País'],
+    // the 2015 Catalan independence list
+    [['Junts pel Sí', 'JxSí'], 'jxsi', 'Junts pel Sí', 'Joint list, 2015–17', 'A temporary merger for the plebiscitary Catalan election of 27 September 2015: Artur Mas\'s Convergència and Oriol Junqueras\'s ERC ran together, with Demòcrates and MES, behind the independent Raül Romeva. It won 62 seats and governed with the CUP\'s support. The two parties ran separately again in December 2017 (Junts per Catalunya and ERC).', 'Junts pel Sí'],
+    // smaller and regional parties that can win seats
+    [['Coalición Canaria', 'CC'], 'cc', 'Coalición Canaria', 'Canarian nationalist party', 'The Canarian nationalist centre party, in the Canary Islands government almost continuously since 1993; one or two deputies in Congress, often decisive in investitures.', 'Canarian Coalition'],
+    [['Nueva Canarias', 'NC'], 'nc', 'Nueva Canarias', 'Canarian party', 'A centre-left Canarian nationalist split from CC (2005), strong in Gran Canaria; allied with the PSOE in 2019.', 'New Canaries'],
+    [['Unidos por Gran Canaria'], 'cc', 'Unidos por Gran Canaria', 'Island party', 'A centre-right Gran Canaria party, allied with CC.', 'es:Unidos por Gran Canaria'],
+    [['Agrupación Socialista Gomera', 'ASG'], 'asg', 'Agrupación Socialista Gomera', 'Island party', 'Casimiro Curbelo\'s party on La Gomera, a 2012 split from the PSOE; kingmaker in the Canarian parliament.', 'Gomera Socialist Group'],
+    [['Agrupación Herreña', 'AHI'], 'ahi', 'Agrupación Herreña Independiente', 'Island party', 'The independent party of El Hierro, allied with CC.', 'es:Agrupación Herreña Independiente'],
+    [['Foro Asturias', 'Foro'], 'foro', 'Foro Asturias', 'Asturian party', 'Francisco Álvarez-Cascos\'s 2011 split from the PP in Asturias; one deputy in Congress in 2015–16, in alliance with the PP.', 'Asturias Forum'],
+    [['Geroa Bai', 'Geroa'], 'geroa', 'Geroa Bai', 'Navarrese party', 'Uxue Barkos\'s Basque nationalist coalition in Navarre, around the PNV; President of Navarre 2015–19, then in government with the PSN.', 'Geroa Bai'],
+    [['UPN', 'NA+', 'Navarra Suma'], 'upn', 'Unión del Pueblo Navarro / Navarra Suma', 'Navarrese party', 'The Navarrese centre-right regionalist party, the PP\'s ally in Navarre; ran with the PP and Cs as Navarra Suma (NA+) in 2019.', 'Navarrese People\'s Union'],
+    [['Partido Aragonés', 'PAR'], 'par', 'Partido Aragonés', 'Aragonese party', 'The centre-right Aragonese regionalist party, kingmaker in the Cortes de Aragón for decades.', 'Aragonese Party'],
+    [['Chunta Aragonesista', 'CHA'], 'cha', 'Chunta Aragonesista', 'Aragonese party', 'The left-wing Aragonese nationalist party; allied with the PSOE and in the Aragonese government 2019–23.', 'Chunta Aragonesista'],
+    [['Teruel Existe', 'TE'], 'te', 'Teruel Existe', 'Provincial platform', 'The citizens\' platform of "empty Spain" in Teruel; one deputy from 2019, whose vote invested Sánchez in January 2020.', 'Teruel Existe'],
+    [['Soria ¡Ya!', 'Soria Ya'], 'sy', 'Soria ¡Ya!', 'Provincial platform', 'The Soria platform modelled on Teruel Existe: three seats in the Cortes of Castilla y León in 2022.', 'Soria ¡Ya!'],
+    [['Unión del Pueblo Leonés', 'UPL'], 'upl', 'Unión del Pueblo Leonés', 'Leonese party', 'The party for a separate León region within Castilla y León.', 'Leonese People\'s Union'],
+    [['Por Ávila', 'XAV'], 'xav', 'Por Ávila', 'Provincial party', 'A provincial party in Ávila, a split from the PP.', 'es:Por Ávila'],
+    [['Més per Mallorca', 'MÉS per Mallorca', 'MÉS per Palma', 'Més'], 'mes', 'Més per Mallorca', 'Majorcan party', 'The left-wing Majorcan nationalist party; partner of the PSIB in the Balearic governments of 2015–23.', 'Més per Mallorca'],
+    [['Més per Menorca', 'MxMe'], 'mxme', 'Més per Menorca', 'Menorcan party', 'The left-wing nationalist party of Menorca, allied with Més per Mallorca.', 'Més per Menorca'],
+    [['El Pi'], 'elpi', 'El Pi – Proposta per les Illes', 'Balearic party', 'A centre-right Balearic regionalist party (2013).', 'El Pi'],
+    [['PACMA'], 'pacma', 'PACMA', 'Animal rights party', 'The Animalist Party Against Mistreatment of Animals: a steady 1% nationally, never a deputy.', 'PACMA'],
+    [['Pedro Sánchez List', 'PSL'], 'ps', 'Pedro Sánchez List', 'Party (game only)', 'The party Sánchez founds in this game if he leaves the PSOE. It never existed.', null],
+    [['Podemos (2023)'], 'pod', 'Podemos', 'Party', 'Podemos after its break with Sumar in December 2023, led by Ione Belarra.', 'Podemos (Spanish political party)'],
+    [['CiU', 'Convergència', 'DL'], 'junts', 'Convergència i Unió / Democràcia i Llibertat', 'Catalan party', 'Artur Mas\'s centre-right Catalan nationalist federation; CiU broke up in 2015, Convergència ran as Democràcia i Llibertat in December 2015, became the PDeCAT in 2016 and Junts per Catalunya in 2017.', 'Convergence and Union']
+  ];
+
   // party names as they appear in the text
   var PARTY_NAMES = [
     [['PSOE'], 'psoe'], [['PP', "People's Party", 'Partido Popular', 'PPC', 'PPdeG'], 'pp'],
-    [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar', 'En Comú Podem', 'Catalunya en Comú', 'En Marea', 'Elkarrekin Podemos', 'Comuns'], 'up'], [['Ciudadanos', 'Cs'], 'cs'], [['Vox'], 'vox'],
+    [['Podemos', 'Unidas Podemos', 'Unidos Podemos', 'Sumar', 'En Comú Podem', 'Catalunya en Comú', 'En Marea', 'Elkarrekin Podemos', 'Comuns'], 'up'], [['Ciudadanos', 'Cs', 'Ciutadans'], 'cs'], [['Vox'], 'vox'],
     [['IU', 'Izquierda Unida'], 'iu'], [['ERC'], 'erc'], [['Junts', 'JxCat', 'Convergència', 'CiU'], 'junts'],
     [['PNV'], 'pnv'], [['EH Bildu', 'Bildu'], 'bildu'], [['CUP'], 'cup'], [['Coalición Canaria'], 'cc'],
     [['Más País'], 'mp'], [['Compromís'], 'compromis'], [['UPN'], 'upn'], [['PRC'], 'prc'], [['BNG'], 'bng'],
@@ -659,9 +715,38 @@
   AFFILIATES.forEach(function (a, i) {
     a[0].forEach(function (n) { INDEX[n] = { kind: 'affiliate', i: i }; names.push(n); });
   });
+  ORGS.forEach(function (o, i) {
+    o[0].forEach(function (n) { if (!INDEX[n]) { names.push(n); } INDEX[n] = { kind: 'org', i: i }; });
+  });
   TOPICS.forEach(function (t, i) {
     t[0].forEach(function (n) { if (!INDEX[n]) { INDEX[n] = { kind: 'topic', i: i }; names.push(n); } });
   });
+
+  // Any other party that has won seats in a regional parliament in the
+  // data gets a plain card: its name, and where it sits.
+  var SEAT_PARTIES = {};
+  (function () {
+    var R = null;
+    try { R = (typeof module !== 'undefined' && module.exports) ? require('./regional_data.js') : root.SPAIN_REGIONAL_DATA; } catch (e) { R = null; }
+    var UI = root.SpainUI || ((typeof module !== 'undefined' && module.exports) ? require('./spain_ui.js') : null);
+    if (!R || !R.regions || !UI) { return; }
+    Object.keys(R.regions).forEach(function (reg) {
+      Object.keys(R.regions[reg]).forEach(function (date) {
+        var e = R.regions[reg][date], tot = {}, all = 0;
+        Object.keys(e.districts || {}).forEach(function (d) {
+          e.districts[d].lists.forEach(function (l) { tot[l[0]] = (tot[l[0]] || 0) + l[2]; all += l[2]; });
+        });
+        Object.keys(tot).forEach(function (id) {
+          if (tot[id] / all >= 0.025 && !SEAT_PARTIES[id]) { SEAT_PARTIES[id] = reg; }
+        });
+      });
+    });
+    Object.keys(SEAT_PARTIES).forEach(function (id) {
+      [UI.partyName(id), UI.shortName(id)].forEach(function (n) {
+        if (n && n.length > 1 && !INDEX[n]) { INDEX[n] = { kind: 'seatparty', id: id }; names.push(n); }
+      });
+    });
+  })();
   names.sort(function (a, b) { return b.length - a.length; });
   var esc = function (s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
   var RE = null;
@@ -682,6 +767,13 @@
       var fk = FACTION_OF[p[0][0]], fl = fk && FACTION_LABEL[p[1]] ? FACTION_LABEL[p[1]][fk] : (FACTION_NOTE[p[0][0]] || '');
       var wing = fl ? 'Faction: ' + fl + (p[3] ? ' — ' + p[3] : '') : p[3];
       return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: wing, wiki: title, img: imgUrl(PERSON_IMG[p[0][0]]) };
+    }
+    if (hit.kind === 'seatparty') {
+      return { kind: 'org', party: hit.id, name: (root.SpainUI || require('./spain_ui.js')).partyName(hit.id), sub: 'Regional party (' + SEAT_PARTIES[hit.id] + ')', note: 'Has won seats in the regional parliament of ' + SEAT_PARTIES[hit.id] + '.', wiki: null };
+    }
+    if (hit.kind === 'org') {
+      var og = ORGS[hit.i];
+      return { kind: 'org', party: og[1], name: og[2], sub: og[3], note: og[4], wiki: og[5] };
     }
     if (hit.kind === 'affiliate') {
       var af = AFFILIATES[hit.i];
@@ -808,6 +900,10 @@
     if (info.kind === 'person') {
       return '<div class="sp-ent-head">' + (info.img ? '<img class="sp-ent-photo" src="' + info.img + '" alt="">' : '') + badge + '<div><strong>' + info.name + '</strong><br>' + pi.name +
         '</div></div><div>' + info.role + '</div>' + (info.wing ? '<div class="sp-ent-wing">' + info.wing + '</div>' : '') + more;
+    }
+    if (info.kind === 'org') {
+      var lg = PARTY_IMG[info.party] ? '<img class="sp-ent-plogo" src="' + imgUrl(PARTY_IMG[info.party]) + '" alt="">' : '<span class="sp-ent-logo" style="background:' + pi.color + '">' + pi.short + '</span>';
+      return '<div class="sp-ent-head">' + lg + '<div><strong>' + info.name + '</strong><br>' + info.sub + '</div></div><div class="sp-ent-desc">' + info.note + '</div>' + more;
     }
     if (info.kind === 'affiliate') {
       return '<div class="sp-ent-head">' + badge + '<div><strong>' + info.name + '</strong><br>Regional federation of the PSOE: ' + info.region +

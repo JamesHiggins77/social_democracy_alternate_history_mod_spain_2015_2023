@@ -623,4 +623,8 @@ a.sp-ent { text-decoration: none; }
 .sp-swing-bar.down { background: #b42318; }
 details.sp-city { border-bottom: 1px solid #ddd; padding: 4px 0; }
 details.sp-city summary { cursor: pointer; }
-details.sp-city .sp-hemicycle { max-width: 360px; display: block; margin: 6px auto; }
+details.sp-city { font-size: 0.85em; }
+details.sp-city summary { font-size: 0.95em; }
+details.sp-city .sp-city-chart { width: 300px; max-width: 100%; margin: 6px auto; overflow: hidden; }
+details.sp-city .sp-hemicycle { width: 100%; display: block; }
+details.sp-city table { font-size: 0.95em; }

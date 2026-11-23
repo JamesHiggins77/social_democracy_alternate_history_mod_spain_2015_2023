@@ -3759,8 +3759,8 @@
       var won = c.lists.filter(function (x) { return x.seats > 0; });
       var pm = {}; (c.prev || []).forEach(function (p) { pm[p[0]] = p[1]; });
       var summary = won.slice(0, 4).map(function (x) { return '<span class="sp-vote-chip"><span class="sp-swatch" style="background:' + UI.partyColor(x.party) + '"></span>' + x.label + ' ' + x.seats + '</span>'; }).join(' ');
-      html += '<details class="sp-city"><summary><b>' + name + '</b> ' + summary + '</summary>' +
-        '<svg id="' + id + '-c' + i + '" class="sp-hemicycle"></svg>' +
+      html += '<details class="sp-city"><summary class="sp-no-ent"><b>' + name + '</b> ' + summary + '</summary>' +
+        '<div class="sp-city-chart"><svg id="' + id + '-c' + i + '" class="sp-hemicycle"></svg></div>' +
         '<table class="sp-results sp-compact"><thead><tr><th>List</th><th class="sp-num">Votes</th><th class="sp-num">%</th><th class="sp-num">Seats</th>' + (c.prev ? '<th class="sp-num">±</th>' : '') + '</tr></thead><tbody>' +
         c.lists.map(function (x) {
           var d = c.prev ? (x.seats - (pm[x.label] || 0)) : null;

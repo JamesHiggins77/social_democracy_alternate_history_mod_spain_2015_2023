@@ -947,3 +947,15 @@ Municipal results, and the Regions tab, now list Madrid, Barcelona, Valencia, Se
     - Más Madrid stays too strong in 2023 (17 against 12). In the simulation it keeps the mayoralty in 2019 because the right falls one seat short.
     - Zaragoza en Común holds up better than it really did.
     - Las Palmas goes to the PP in 2023, where the PSOE really won.
+
+### 7.51 Cards for every party and alliance; city panel fixes
+
+- **Every party has a hover card:** every party that can win seats in Congress, the Senate or a regional parliament now has one. Before, the short names in the Congress table (CC, Foro, Geroa) had none.
+  - **Alliances** get their own card in Podemos's colour, saying how Podemos is part of them: Unidos and Unidas Podemos, Sumar, En Comú Podem, Catalunya en Comú, Catalunya Sí que es Pot, En Marea, Elkarrekin Podemos, Adelante Andalucía, Compromís–Podemos, and the municipal platforms (Ahora Madrid, Barcelona en Comú, Zaragoza en Común and others).
+  - **Junts pel Sí** has its own card explaining the 2015 merger of Convergència and ERC and their separation in 2017.
+  - **Small and regional parties** have their own cards: CC, NC, ASG, AHI, Foro, Geroa Bai, UPN/NA+, PAR, CHA, Teruel Existe, Soria ¡Ya!, UPL, Por Ávila, Més, El Pi, PACMA, CiU/DL.
+  - **Fallback:** any other list that has taken 2.5% or more in a regional election in the data gets a plain card naming its region.
+- **City panel:**
+  - the seat diagram sits in a fixed 300px frame instead of being clipped;
+  - the text is smaller;
+  - city headings no longer contain links, so clicking a party name expands the city instead of opening Wikipedia.
