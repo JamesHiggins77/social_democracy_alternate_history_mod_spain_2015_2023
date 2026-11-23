@@ -457,6 +457,8 @@
   // colour of the party they belong to or are counted with.
   // [names], party id (colour), full name, kind, note, Wikipedia title
   var ORGS = [
+    [['Derecha Navarra y Española'], 'vox', 'Derecha Navarra y Española', 'Navarrese party (to 2015)', 'A small Spanish-nationalist party of the Navarrese right, led by Nieves Ciprés, opposed to any Basque link for Navarre. It merged into Vox in February 2015.', 'es:Derecha Navarra y Española'],
+    [['Vox Navarra'], 'vox', 'Vox Navarra', 'Vox\'s branch in Navarre', 'Vox in Navarre, formed in February 2015 when Derecha Navarra y Española merged into the party; led by Nieves Ciprés.', 'es:Vox (partido político)'],
     // Podemos's alliances
     [['Unidos Podemos'], 'up', 'Unidos Podemos', 'Electoral alliance, 2016', 'Podemos\'s joint list with Izquierda Unida and Equo for the June 2016 general election, led by Pablo Iglesias with Alberto Garzón. It won 71 seats, the same as Podemos and IU separately in 2015, and failed to overtake the PSOE.', 'Unidos Podemos'],
     [['Unidas Podemos'], 'up', 'Unidas Podemos', 'Electoral alliance, 2019', 'The same alliance of Podemos, IU and Equo renamed for 2019. It entered the coalition government with the PSOE in January 2020.', 'Unidas Podemos'],
@@ -869,6 +871,7 @@
   // Notes that would reveal the future are swapped for the version true at
   // the game's date: {card name: [[from 'YYYY-MM', text], ...]}.
   var NOTE_T = {
+    'Derecha Navarra y Española': [['', 'A small Spanish-nationalist party of the Navarrese right, led by Nieves Ciprés, opposed to any Basque link for Navarre.'], ['2015-02', 'A small Spanish-nationalist party of the Navarrese right, led by Nieves Ciprés, opposed to any Basque link for Navarre. It merged into Vox in February 2015.']],
     'Constitutional Court of Spain': [['', 'The court that rules on whether laws comply with the Constitution.'], ['2017-09', 'The court that rules on whether laws comply with the Constitution; it suspended the Catalan referendum laws in 2017.']],
     'General Council of the Judiciary': [['', 'The judges\' governing body, chosen by the Cortes with a three-fifths majority.'], ['2019-01', 'The judges\' governing body, chosen by the Cortes with a three-fifths majority; its renewal has been blocked since 2018.']],
     'ERE case': [['', 'The Andalusian fraud over early-retirement funds under PSOE governments.'], ['2019-11', 'The Andalusian fraud over early-retirement funds under PSOE governments, which convicted Chaves and Griñán in 2019.']],
