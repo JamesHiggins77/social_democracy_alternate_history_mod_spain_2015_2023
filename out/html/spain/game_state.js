@@ -2887,6 +2887,7 @@
     Q.map_kind = 'general';
     Q.map_title = 'General election, ' + Q.month + '/' + Q.year;
     Q.election_records.push({ date: Q.year + '-' + Q.month, seats: r.totals });
+    Q.prev_senate_elected = JSON.parse(JSON.stringify(Q.senate_elected || { pp: 136, psoe: 54, iu: 1, junts: 9, pnv: 4, bildu: 3, cc: 1 }));
     Q.senate_elected = senateElected(r.ballots);
     Q.psoe_cat_seats = 0;
     CAT_PROVINCES.forEach(function (pr) { var ds = r.districts && r.districts[pr]; if (ds) { Q.psoe_cat_seats += ds.psoe || 0; } });
@@ -5432,12 +5433,19 @@
     var out = el(id);
     if (!out || !Q.senate) { return; }
     var appointed = senateAppointed(Q);
-    var rows = Object.keys(Q.senate).filter(function (k) { return Q.senate[k] > 0; }).sort(function (a, b) { return Q.senate[b] - Q.senate[a]; });
-    out.innerHTML = '<table class="sp-results"><thead><tr><th>Party</th><th class="sp-num">Elected</th><th class="sp-num">Appointed</th><th class="sp-num">Total</th></tr></thead><tbody>' +
+    var prev = Q.prev_senate_elected || null, el2 = Q.senate_elected || {};
+    var keys = Object.keys(Q.senate).filter(function (k) { return Q.senate[k] > 0; });
+    if (prev) { Object.keys(prev).forEach(function (k) { if (prev[k] > 0 && keys.indexOf(k) === -1) { keys.push(k); } }); }
+    var rows = keys.sort(function (a, b) { return (Q.senate[b] || 0) - (Q.senate[a] || 0); });
+    var chg = function (k) {
+      var d = (el2[k] || 0) - (prev[k] || 0);
+      return '<td class="sp-num">' + (d > 0 ? '<span class="sp-up">\u25b2' + d + '</span>' : (d < 0 ? '<span class="sp-down">\u25bc' + (-d) + '</span>' : '=')) + '</td>';
+    };
+    out.innerHTML = '<table class="sp-results"><thead><tr><th>Party</th><th class="sp-num">Elected</th>' + (prev ? '<th class="sp-num">\u00b1</th>' : '') + '<th class="sp-num">Appointed</th><th class="sp-num">Total</th></tr></thead><tbody>' +
       rows.map(function (k) {
         return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(k) + '"></span>' + UI.partyName(k) + '</td><td class="sp-num">' +
-          ((Q.senate_elected || {})[k] || 0) + '</td><td class="sp-num">' + (appointed[k] || 0) + '</td><td class="sp-num"><b>' + Q.senate[k] + '</b></td></tr>';
-      }).join('') + '</tbody></table><p class="sp-map-legend">' + Q.senate_total + ' senators: 208 elected by limited vote in the provinces, the rest appointed by the regional parliaments. A Senate majority is ' + (Math.floor(Q.senate_total / 2) + 1) + '. ' +
+          (el2[k] || 0) + '</td>' + (prev ? chg(k) : '') + '<td class="sp-num">' + (appointed[k] || 0) + '</td><td class="sp-num"><b>' + (Q.senate[k] || 0) + '</b></td></tr>';
+      }).join('') + '</tbody></table><p class="sp-map-legend">' + Q.senate_total + ' senators: 208 elected by limited vote in the provinces, the rest appointed by the regional parliaments. ' + (prev ? '\u00b1 compares elected senators with the previous general election. ' : '') + 'A Senate majority is ' + (Math.floor(Q.senate_total / 2) + 1) + '. ' +
       (Q.senate_majority ? UI.partyName(Q.senate_majority) + ' holds an absolute majority, and can delay every bill by two months.' : 'No party has an absolute majority.') + '</p>';
   }
   function renderEuroMap(Q, id) {
