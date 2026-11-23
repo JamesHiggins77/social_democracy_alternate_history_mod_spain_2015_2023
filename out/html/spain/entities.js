@@ -441,6 +441,7 @@
   // [names], full name, region, note, Wikipedia title
   var AFFILIATES = [
     [['PSOE-A'], 'Partido Socialista Obrero Español de Andalucía', 'Andalusia', 'The largest federation of the PSOE, with about a quarter of its members. It governed Andalusia without a break from 1982 to 2019, under Rodríguez de la Borbolla, Chaves, Griñán and Susana Díaz, and is the stronghold of susanismo.', 'es:Partido Socialista Obrero Español de Andalucía'],
+    [['PSC-PSOE', 'Partido Socialista de Cantabria'], 'Partido Socialista de Cantabria', 'Cantabria', 'The PSOE\'s federation in Cantabria (not the Catalan PSC). Junior partner to Miguel Ángel Revilla\'s PRC in the regional government from 2015.', 'Socialist Party of Cantabria'],
     [['PSC'], 'Partit dels Socialistes de Catalunya', 'Catalonia', 'A separate party federated with the PSOE since 1978, with its own group in the Catalan Parliament. Led by Miquel Iceta and then Salvador Illa, who won the 2021 Catalan election and became president in 2024.', 'Socialists\' Party of Catalonia'],
     [['PSPV'], 'Partit Socialista del País Valencià', 'Valencia', 'The PSOE in the Valencian Community. Under Ximo Puig it governed from 2015 to 2023 with Compromís and Podemos (the Botànic pact).', 'es:Partido Socialista del País Valenciano-PSOE'],
     [['PSdeG'], 'Partido dos Socialistas de Galicia', 'Galicia', 'The PSOE in Galicia, out of the Xunta since 2009 and overtaken by the BNG in 2020.', 'es:Partido dos Socialistas de Galicia-PSOE'],
@@ -960,6 +961,38 @@
     [['Melilla'], 'Melilla', 'Spanish autonomous city on the north coast of Africa, bordering Morocco.']
   ];
 
+
+  // Faction cards: 'Party: Faction' keys (never matched in prose; the
+  // faction tables link them directly). [party, title, ideology, outlook,
+  // [[member, from 'YYYY-MM'], ...]]
+  var FACTION_CARDS = {
+    'PSOE: Institutionalists': ['psoe', 'Institutionalists', 'Social democracy of government; the party\'s old guard and parliamentary professionals', 'Loyal to the party\'s institutions and its elders; wary of adventures with Podemos or the independence parties.', [['Felipe González', ''], ['Alfredo Pérez Rubalcaba', ''], ['Antonio Hernando', ''], ['Carmen Calvo', ''], ['Margarita Robles', '2016-01']]],
+    'PSOE: Regional Barons': ['psoe', 'Regional Barons', 'Centrist, unionist social democracy rooted in regional power', 'The presidents of the communities the PSOE governs: they want a moderate, Spanish-unity PSOE and resent Madrid\'s control.', [['Susana Díaz', ''], ['Emiliano García-Page', ''], ['Javier Lambán', '2015-07'], ['Guillermo Fernández Vara', '2015-07'], ['Ximo Puig', '2015-06'], ['Javier Fernández', '']]],
+    'PSOE: Socialist Left': ['psoe', 'Socialist Left (Izquierda Socialista)', 'Democratic socialism; federalism; closer to Podemos and IU', 'The party\'s organised left current: wants a left-wing programme and alliances to the left.', [['José Antonio Pérez Tapias', ''], ['Odón Elorza', ''], ['Adriana Lastra', ''], ['Zaida Cantera', '2016-01']]],
+    'PSOE: Modernisers': ['psoe', 'Modernisers', 'Social liberalism; fiscal responsibility; Europeanism', 'Reformers and economists who want a modern, centrist party of government.', [['Eduardo Madina', ''], ['Jordi Sevilla', ''], ['Manuel Escudero', ''], ['Iván Redondo', '2017-06']]],
+    'PSOE: Unionists': ['psoe', 'Trade Unionists', 'Labourist social democracy', 'The UGT\'s people in the PSOE: wages, pensions, labour rights.', [['Cándido Méndez', ''], ['Pepe Álvarez', '2016-03'], ['Toni Ferrer', ''], ['Magdalena Valerio', '']]],
+    'PP: Centrists': ['pp', 'Centrists', 'Christian democracy and liberal conservatism', 'No deals with Vox; open to Cs and a moderate PSOE; hold some progressive positions while remaining conservative; fish for centrist voters.', [['Soraya Sáenz de Santamaría', ''], ['Cristina Cifuentes', '2015-01'], ['Juanma Moreno', ''], ['Alfonso Alonso', ''], ['Ana Pastor', ''], ['Íñigo Méndez de Vigo', '']]],
+    'PP: Pragmatists': ['pp', 'Pragmatists', 'Mainstream conservatism', 'The apparatus and most regional barons: conservative, no friends of Vox, but they will govern with it to win power.', [['Mariano Rajoy', ''], ['María Dolores de Cospedal', ''], ['Cristóbal Montoro', ''], ['Fátima Báñez', ''], ['Alberto Núñez Feijóo', '2022-04']]],
+    'PP: National-populist right': ['pp', 'National-populist right', 'Spanish nationalism, economic liberalism, culture-war conservatism', 'Aznar\'s heirs: confrontational, comfortable with Vox, and keen to win back the voters it takes.', [['José María Aznar', ''], ['Esperanza Aguirre', ''], ['Pablo Casado', ''], ['Isabel Díaz Ayuso', '2019-01'], ['Jorge Fernández Díaz', '']]],
+    'Ciudadanos: Social liberals': ['cs', 'Social liberals', 'Social liberalism; the founding social-democratic strand', 'The founding Catalan current: open to deals with the PSOE.', [['Toni Roldán', ''], ['Francisco Igea', '']]],
+    'Ciudadanos: Liberals': ['cs', 'Liberals', 'Economic liberalism and institutional reform', 'Centrist reformers, willing to deal with either side.', [['Luis Garicano', ''], ['Begoña Villacís', ''], ['Edmundo Bal', '2019-04']]],
+    'Ciudadanos: National liberals': ['cs', 'National liberals', 'Spanish unity first; anti-nationalism', 'Rivera\'s turn of 2018–19: a veto on Sánchez and closeness to the PP.', [['Albert Rivera', ''], ['Juan Carlos Girauta', ''], ['José Manuel Villegas', ''], ['Inés Arrimadas', '']]],
+    'Podemos: Pragmatic left': ['up', 'Pragmatic left', 'Transversal left; reforms by negotiation', 'Aims at the centre of the electorate and at deals with the PSOE as a junior partner.', [['Íñigo Errejón', ''], ['Carolina Bescansa', ''], ['Pablo Bustinduy', ''], ['Yolanda Díaz', '2020-01']]],
+    'Podemos: Populist left': ['up', 'Populist left (pablistas)', 'Left populism', 'Iglesias\'s current: an alliance with IU and a harder line on the PSOE, later the choice to govern with it.', [['Pablo Iglesias', ''], ['Irene Montero', ''], ['Pablo Echenique', ''], ['Ione Belarra', '2015-01']]],
+    'Podemos: Anticapitalist left': ['up', 'Anticapitalist left', 'Revolutionary socialism; ecosocialism', 'Against governing with the PSOE; strongest in Andalusia.', [['Teresa Rodríguez', ''], ['Miguel Urbán', '']]],
+    'Vox: National conservatives': ['vox', 'National conservatives', 'Spanish nationalism, recentralisation, order and immigration control', 'The party line under Santiago Abascal.', [['Santiago Abascal', ''], ['Javier Ortega Smith', ''], ['Macarena Olona', '2019-04']]],
+    'Vox: Ultra-Catholic nationalists': ['vox', 'Ultra-Catholic nationalists', 'Catholic traditionalism and hard nationalism; "neo-falangist" according to critics', 'Hard on social questions and hostile to economic liberalism.', [['Jorge Buxadé', '']]],
+    'Vox: Liberal conservatives': ['vox', 'Liberal conservatives', 'Low taxes, a smaller state; conservative on the nation', 'The bridge to the PP and Ciudadanos.', [['Iván Espinosa de los Monteros', ''], ['Rocío Monasterio', '']]]
+  };
+  function factionCard(key) {
+    var f = FACTION_CARDS[key];
+    if (!f) { return null; }
+    var now = ymOf(gameQ());
+    var members = f[4].filter(function (m) { return !m[1] || now >= m[1]; }).map(function (m) { return m[0]; });
+    return { kind: 'org', party: f[0], name: f[1], sub: 'Faction of ' + ({psoe:'the PSOE', pp:'the PP', cs:'Ciudadanos', up:'Podemos', vox:'Vox'}[f[0]]),
+             note: '<b>Ideology:</b> ' + f[2] + '.<br>' + f[3] + (members.length ? '<br><b>Key members:</b> ' + members.join(', ') + '.' : ''), wiki: null };
+  }
+
   // Build one regex over every name, longest first, with letter boundaries.
   var INDEX = {};
   var names = [];
@@ -1017,6 +1050,7 @@
   }
 
   function lookup(text) {
+    if (FACTION_CARDS[text]) { return factionCard(text); }
     var hit = INDEX[text];
     if (!hit) {
       return null;

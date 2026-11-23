@@ -5201,10 +5201,12 @@
       var F = RIVAL_FACTIONS[p], cur = Q.rf[p];
       return '<p class="sp-fac-party"><b>' + (p === 'up' && Q.pod_split ? 'Sumar' : UI.partyName(p)) + '</b></p><table class="sp-results sp-compact"><tbody>' + F.map(function (f) {
         var v = cur[f[0]] || 0, lead = Q['rf_' + p + '_top'] === f[0];
-        return '<tr title="' + f[2].replace(/"/g, '&quot;') + '"><td>' + (lead ? '<b>' + f[1] + '</b>' : f[1]) + '</td><td class="sp-num">' + Math.round(v) +
+        var pname = {pp:'PP', cs:'Ciudadanos', up:'Podemos', pod:'Podemos', vox:'Vox'}[p];
+        var lab = '<span class="sp-ent sp-topic" tabindex="0" data-ent="' + pname + ': ' + f[1] + '">' + f[1] + '</span>';
+        return '<tr><td>' + (lead ? '<b>' + lab + '</b>' : lab) + '</td><td class="sp-num">' + Math.round(v) +
           '%</td><td style="width:40%"><div class="sp-rep-bar"><span style="width:' + v.toFixed(0) + '%;background:' + UI.partyColor(p) + '"></span></div></td></tr>';
       }).join('') + '</tbody></table>';
-    }).join('') + '<p class="sp-map-legend">Hover a faction for what it stands for. ' + (Q.ahistorical ? 'In this ahistorical run the balance can shift with events.' : 'In this historical run the balance follows what happened.') + '</p>';
+    }).join('') + '<p class="sp-map-legend">Hover a faction for its ideology and key members. ' + (Q.ahistorical ? 'In this ahistorical run the balance can shift with events.' : 'In this historical run the balance follows what happened.') + '</p>';
   }
 
   // The government's health: its seats, partners, strain and record.
@@ -5309,7 +5311,7 @@
     var regions = Object.keys(Q.regions).sort();
     var selected = root.spSelectedRegion && Q.regions[root.spSelectedRegion] ? root.spSelectedRegion : '';
     var mode = root.spRegionMapMode || 'presidency';
-    var voxOn = Q.year >= 2018 || Q.vox_breakthrough;
+    var voxOn = true; // Vox is registered from Dec 2013, so the view is always offered
     var modes = ['presidency', 'psoe', 'pp', 'up', 'cs'].concat(voxOn ? ['vox'] : []).concat(['iu', 'regionalist']);
     if (modes.indexOf(mode) === -1) {
       mode = 'presidency';
@@ -5645,7 +5647,7 @@
       progressives: 'Socialist Left', modernisers: 'Modernisers', trade_unionists: 'Unionists'
     };
     var rows = FACTIONS.map(function (f) {
-      return '<tr><td>' + short[f] + '<br><span class="sp-faction-leader">' + factionLeader(Q, f) + '</span></td><td>' +
+      return '<tr><td><span class="sp-ent sp-topic" tabindex="0" data-ent="PSOE: ' + short[f] + '">' + short[f] + '</span><br><span class="sp-faction-leader">' + factionLeader(Q, f) + '</span></td><td>' +
         UI.word('strength', Q[f + '_strength']) +
         '</td><td>' + UI.word('dissent', Q[f + '_dissent']) + '</td></tr>';
     });
