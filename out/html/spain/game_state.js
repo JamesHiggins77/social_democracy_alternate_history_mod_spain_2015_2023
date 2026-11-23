@@ -5819,22 +5819,25 @@
   // by faction at the start of the game. Sánchez was then Díaz's protégé:
   // "sanchismo" as a camp barely existed. The 17 who resigned on 28
   // September 2016 are the Andalusians, the barons' people and the old guard.
-  // [name, faction, side in Sept 2016: 'D' resigned (es.wikipedia, "Crisis
-  // del PSOE de 2016", after El Mundo 28/9/2016), 'S' named among the
-  // loyalists, '' not documented]. Factions are our reading.
+  // The Federal Executive (sitting members, 2016) and each member's side on
+  // 28 September 2016: 'D' resigned, 'S' stayed with Sánchez. Source:
+  // elDiario.es, "La lista de los 17 dimitidos de la Ejecutiva del PSOE y los
+  // 18 fieles a Sánchez" (28/9/2016). Vacant: Pedro Zerolo (died 2015),
+  // José Ramón Gómez Besteiro and Javier Abreu (resigned earlier).
+  // Factions are our reading of each member at the start of the game.
   var EXEC_2014 = [
-    ['Micaela Navarro', 'Institutionalists', 'D'], ['Antonio Pradas', 'Regional Barons', 'D'], ['María José Sánchez Rubio', 'Regional Barons', 'D'],
-    ['Estefanía Martín Palop', 'Regional Barons', 'D'], ['Noemí Cruz', 'Regional Barons', 'D'], ['Francisco Pizarro', 'Regional Barons', 'D'],
-    ['Juan Pablo Durán', 'Regional Barons', 'D'], ['Manuela Galiano', 'Regional Barons', 'D'], ['María Luz Rodríguez', 'Unionists', 'D'],
-    ['Emiliano García-Page', 'Regional Barons', 'D'], ['Ximo Puig', 'Regional Barons', 'D'], ['Tomás Gómez', 'Institutionalists', 'D'],
-    ['Eva Matarín', 'Institutionalists', 'D'], ['Carme Chacón', 'Institutionalists', 'D'], ['José Miguel Pérez', 'Regional Barons', 'D'],
-    ['Carlos Pérez Anadón', 'Regional Barons', 'D'], ['María Ascensión Murillo', 'Regional Barons', 'D'],
-    ['César Luena', 'Sanchismo', 'S'], ['Meritxell Batet', 'Modernisers', 'S'], ['Patxi López', 'Modernisers', 'S'],
-    ['Carmen Montón', 'Socialist Left', 'S'], ['Adriana Lastra', 'Socialist Left', 'S'], ['Manuel de la Rocha', 'Socialist Left', 'S'],
-    ['Susana Sumelzo', 'Sanchismo', ''], ['María González Veracruz', 'Sanchismo', ''], ['Hugo Morán', 'Modernisers', ''],
-    ['Eva Díaz Tezanos', 'Sanchismo', ''], ['José Ramón Gómez Besteiro', 'Modernisers', ''], ['Javier Abreu', 'Institutionalists', ''],
-    ['Sergio Gutiérrez', 'Socialist Left', ''], ['Iratxe García', 'Modernisers', ''], ['Luisa Carcedo', 'Institutionalists', ''],
-    ['Toni Ferrer', 'Unionists', ''], ['Rafael Simancas', 'Institutionalists', ''], ['Ignacio Sánchez Amor', 'Modernisers', '']
+    ['Micaela Navarro', 'Institutionalists', 'D'], ['Ximo Puig', 'Regional Barons', 'D'], ['Antonio Pradas', 'Regional Barons', 'D'],
+    ['María José Sánchez Rubio', 'Regional Barons', 'D'], ['María Luz Rodríguez', 'Unionists', 'D'], ['Estefanía Martín Palop', 'Regional Barons', 'D'],
+    ['Carme Chacón', 'Institutionalists', 'D'], ['José Miguel Pérez', 'Regional Barons', 'D'], ['Manuela Galiano', 'Regional Barons', 'D'],
+    ['Noemí Cruz', 'Regional Barons', 'D'], ['Eva Matarín', 'Institutionalists', 'D'], ['Francisco Pizarro', 'Regional Barons', 'D'],
+    ['Juan Pablo Durán', 'Regional Barons', 'D'], ['Tomás Gómez', 'Institutionalists', 'D'], ['Emiliano García-Page', 'Regional Barons', 'D'],
+    ['María Ascensión Murillo', 'Regional Barons', 'D'], ['Carlos Pérez Anadón', 'Regional Barons', 'D'],
+    ['César Luena', 'Sanchismo', 'S'], ['Carmen Montón', 'Socialist Left', 'S'], ['Adriana Lastra', 'Socialist Left', 'S'],
+    ['Manuel de la Rocha', 'Socialist Left', 'S'], ['Patxi López', 'Modernisers', 'S'], ['María González Veracruz', 'Sanchismo', 'S'],
+    ['Pilar Lucio', 'Institutionalists', 'S'], ['Meritxell Batet', 'Modernisers', 'S'], ['Susana Sumelzo', 'Sanchismo', 'S'],
+    ['Roberto Jiménez', 'Institutionalists', 'S'], ['Iratxe García', 'Modernisers', 'S'], ['María Luisa Faneca', 'Regional Barons', 'S'],
+    ['Luisa Carcedo', 'Institutionalists', 'S'], ['Iban García del Blanco', 'Modernisers', 'S'], ['Pere Navarro', 'Modernisers', 'S'],
+    ['Eva Díaz Tezanos', 'Sanchismo', 'S'], ['Francina Armengol', 'Socialist Left', 'S']
   ];
   function rosterSeats(roster) {
     var o = {};
@@ -5970,8 +5973,8 @@
   // a member's own record pulls them beyond their faction's average
   function memberShares(Q, m) {
     var c = campShares(Q, m[1]);
-    if (!m[2] || m[1] === 'Sanchismo' || m[1] === 'Regional Barons') { return c; }
-    var k = m[2] === 'D' ? 'Susanismo' : 'Sanchismo', pull = 0.4, out = {};
+    if (!m[2] || m[1] === 'Sanchismo') { return c; }
+    var k = m[2] === 'D' ? 'Susanismo' : 'Sanchismo', pull = 0.5, out = {};
     Object.keys(c).forEach(function (x) { out[x] = c[x] * (1 - pull); });
     out[k] = (out[k] || 0) + pull;
     return out;
