@@ -2273,6 +2273,17 @@
 
   // The Prime Minister calls an early general election (two months on).
   function callElection(Q) {
+    // A PSOE that calls a snap election once Vox polls above 10% mobilises
+    // voters the pollsters miss (July 2023): the polls understate the PSOE
+    // by a point or two and overstate Vox.
+    var tp = Q.true_poll || {};
+    if ((Q.player_party || 'psoe') === 'psoe' && (Q.psoe_in_government || Q.sanchez_leader) && (tp.vox || 0) >= 10) {
+      Q.poll_error = Q.poll_error || {};
+      var miss = 0.04 + 0.03 * Math.random();
+      Q.poll_error.psoe = Math.max(-0.6, (Q.poll_error.psoe || 0) - miss);
+      Q.poll_error.vox = Math.min(0.6, (Q.poll_error.vox || 0) + miss + 0.03);
+      Q.snap_vs_vox = 1;
+    }
     var d = addMonths(Q.year, Q.month, 2);
     Q.election_year = d[0];
     Q.election_month = d[1];
@@ -3030,7 +3041,7 @@
         Q.last_poll_miss[p] = Math.round((Q.prev_poll[p] - r.voteShares[p]) * 10) / 10;
       }
     });
-    drawPollError(Q, null);
+    drawPollError(Q, null); Q.snap_vs_vox = 0;
     Q.election_year = 0;
     Q.election_month = 0;
     Q.general_election_due = 0;
