@@ -180,6 +180,11 @@
     }
   }
 
+  // Recolour a party at runtime (Sumar's pink replaces Podemos's purple).
+  function setPartyColor(id, color) {
+    if (META[id]) { META[id].color = color; }
+  }
+
   function partyColor(id) {
     return META[id] ? META[id].color : '#A0A0A0';
   }
@@ -366,7 +371,7 @@
   // majority), 'president', 'junior' (coalition partner), 'supply'
   // (external support) or 'none' (opposition or absent).
   // ------------------------------------------------------------------
-  var STATEWIDE_IDS = ['psoe', 'pp', 'up', 'cs', 'vox', 'iu', 'mp', 'ps', 'upyd', 'pacma'];
+  var STATEWIDE_IDS = ['psoe', 'pp', 'up', 'pod', 'cs', 'vox', 'iu', 'mp', 'ps', 'upyd', 'pacma'];
   var BLOCS = {
     psoe: ['psoe'], pp: ['pp'], up: ['up'], cs: ['cs'], vox: ['vox'],
     iu: ['iu', 'x:I-E'],
@@ -908,6 +913,7 @@
   var api = {
     PARTIES: PARTIES,
     setPartyName: setPartyName,
+    setPartyColor: setPartyColor,
     addMeta: addMeta,
     regionalName: regionalName, regionalShort: regionalShort, affiliate: affiliate, AFFILIATES: AFFILIATES,
     prettyMinor: prettyMinor,

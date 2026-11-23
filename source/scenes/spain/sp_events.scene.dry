@@ -2479,3 +2479,38 @@ subtitle: A few more signatures; if it leaks, it will look terrible
 on-arrival: {! Q.ch_leak = Math.random() < 0.35 ? 1 : 0; Q.network = (Q.network || 0) + 2; if (Q.ch_leak) { Q.sanchismo -= 4; Q.member_morale -= 3; } !}
 
 [? if ch_leak = 1 : It leaks. Even some of your own volunteers are appalled. ?][? if ch_leak = 0 : Nobody notices. You are not sure you are proud of it. ?]
+
+@sumar_founded
+title: Sumar is born
+new-page: true
+tags: sp_event
+view-if: sumar_merged = 1 and sumar_seen = 0
+max-visits: 1
+on-arrival: sumar_seen = 1
+
+= Sumar is born
+
+In a pavilion in Madrid, Yolanda Díaz launches Sumar: a platform to "add up" the space to the left of the PSOE under one name and one list. Izquierda Unida joins, and with it the Communist Party: Alberto Garzón's federation gives up its own ballot line, as it did for Unidas Podemos, and its voters will now find it inside Sumar. Más País, Compromís, the Catalan comuns and a string of regional parties sign up too. Podemos holds out until the last day for registering coalitions, and then comes in on Díaz's terms, without Irene Montero on the lists.
+
+The space is united on paper. Underneath, Podemos and Díaz's people barely speak.
+
+- @sumar_welcome: Welcome Díaz: a partner you can govern with
+- @sumar_useful: Ask the left for the useful vote: only the PSOE can beat the right
+- @sumar_quiet: Say nothing
+
+@sumar_welcome
+subtitle: Better relations with Sumar; some of your left-wing voters feel free to vote for her
+on-arrival: {! Q.rel_up = (Q.rel_up || 40) + 8; Q.progressives_dissent -= 3; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', 'up', { students: 0.3, professionals: 0.2 }); } !}
+
+"Yolanda is a magnificent minister," you say, "and Sumar will be a magnificent partner." Díaz returns the compliment.
+
+@sumar_useful
+subtitle: Pulls left voters to the PSOE; Sumar resents it
+on-arrival: {! Q.rel_up = (Q.rel_up || 40) - 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'up', 'psoe', { students: 0.3, workers: 0.3, professionals: 0.2 }); } !}
+
+Your campaign team starts talking about the voto útil. Sumar's spokespeople complain that the PSOE always wants the left's votes and never its programme.
+
+@sumar_quiet
+on-arrival: {! Q.rel_up = (Q.rel_up || 40) + 2; !}
+
+You let the left sort itself out.

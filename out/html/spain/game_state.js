@@ -485,6 +485,8 @@
         });
       }
     }
+    // Sumar's colour is its pink; Podemos (and Podemos after a split) purple
+    UI.setPartyColor('up', Q.up_brand === 'Sumar' ? '#E51C55' : '#6B2E68');
     Q.up_brand_exists = 1;
     Q.up_leader_is_iglesias = leaderOf(Q, 'up') === 'Pablo Iglesias' || (!Q.iglesias_left && Q.year >= 2021) ? 1 : 0;
     var total = 0;
@@ -634,7 +636,7 @@
   // historical bias and spread (tools/build_poll_errors.py), plus a small
   // monthly variation between pollsters. Elections use the true vote.
   // ------------------------------------------------------------------
-  var POLLED_PARTIES = ['psoe', 'pp', 'cs', 'up', 'vox', 'mp', 'iu', 'ps'];
+  var POLLED_PARTIES = ['psoe', 'pp', 'cs', 'up', 'pod', 'vox', 'mp', 'iu', 'ps'];
 
   function gaussian() {
     var u = 1 - Math.random();
@@ -2495,7 +2497,7 @@
     checkLeadership(Q);
   }
 
-  var CHART_PARTIES = ['pp', 'psoe', 'up', 'cs', 'iu', 'vox', 'mp', 'upyd', 'ps'];
+  var CHART_PARTIES = ['pp', 'psoe', 'up', 'pod', 'cs', 'iu', 'vox', 'mp', 'upyd', 'ps'];
 
   function recordPoll(Q) {
     var row = { date: Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month };
