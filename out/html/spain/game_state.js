@@ -2245,6 +2245,7 @@
     positionDrift(Q);
     lineDrift(Q);
     ahistoricalTick(Q);
+    rivalFactions(Q);
     rightRealignment(Q);
     senateQueue(Q);
     splitChecks(Q);
@@ -2459,7 +2460,7 @@
 
   // Saves from older versions: give every field added since a default, so
   // conditions in the scenes never compare against undefined.
-  var DEFAULTS = { cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
+  var DEFAULTS = { rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
     offer_pending: 0, psc_split: 0, psc_due: 0, left_split: 0, left_split_due: 0, senate_lifted_due: 0, realign_due: 0,
     bicephaly: 0, cat_repeat_due: 0, pending_budget: 0, budget_senate_delay: 0, law_senate_delay: 0, ahistorical: 0,
     alt_due: 0, rivera_open: 0, pm_months: 0, const_line: 0.6, eu_line: 1.2, laws_failed: 0, coalition_strain: 0 };
@@ -4270,7 +4271,8 @@
     }
     var weights = pool.map(function (id) {
       var st = PP_CANDIDATES[id].style;
-      return st === 'hard' ? 1 + vox / 6 : (st === 'moderate' ? 1 + cs / 10 : 0.6);
+      var fw = (Q.pp_faction_w || {})[st] || 1;
+      return fw * (st === 'hard' ? 1 + vox / 6 : (st === 'moderate' ? 1 + cs / 10 : 0.6));
     });
     var total = weights.reduce(function (a, b) { return a + b; }, 0);
     var r = Math.random() * total;
@@ -4774,6 +4776,124 @@
     Q.corr_word = Q.corr_k >= 0.9 ? 'still lands hard' : (Q.corr_k >= 0.5 ? 'is wearing thin' : (Q.corr_k >= 0 ? 'barely registers' : 'backfires: the PSOE has its own scandals now'));
   }
 
+
+  // ------------------------------------------------------------------
+  // Factions inside the other parties. Each party has three currents whose
+  // strength (summing to 100) drifts with events; the strongest sets how the
+  // party behaves towards its neighbours and where it fishes for votes.
+  // Historical mode follows the real balance; ahistorical lets it wander.
+  // ------------------------------------------------------------------
+  var RIVAL_FACTIONS = {
+    pp: [
+      ['centrists', 'Centrists', 'Christian democrats and liberal conservatives (the sorayistas, later Feijóo\'s line): no deals with Vox, open to Cs and a moderate PSOE; fish for centrist voters.'],
+      ['pragmatists', 'Pragmatists', 'The party apparatus and the regional barons: conservative, no friends of Vox, but they will govern with it to win power.'],
+      ['right', 'National-populist right', 'Aznar\'s heirs and the ayusistas: confrontational, nationalist, comfortable with Vox; win back hard-right voters from it.']
+    ],
+    cs: [
+      ['progressives', 'Social liberals', 'The founding Catalan current that wanted to keep social democracy in the 2017 ideario: open to the PSOE.'],
+      ['liberals', 'Liberals', 'Economic liberals around Luis Garicano and Toni Roldán: centrist, reformist, willing to deal with either side.'],
+      ['national', 'National liberals', 'Rivera\'s 2018-19 turn (Girauta, Villegas): Spanish unity first, a veto on Sánchez, close to the PP.']
+    ],
+    up: [
+      ['errejonistas', 'Transversal populists', 'Íñigo Errejón\'s current: national-popular, aimed at the centre of the electorate, pragmatic with the PSOE.'],
+      ['pablistas', 'Left populists', 'Pablo Iglesias\'s current: an alliance with IU, a harder line on the PSOE, and from 2019 a coalition inside government.'],
+      ['anticapitalistas', 'Anticapitalists', 'Miguel Urbán and Teresa Rodríguez: the radical left, against governing with the PSOE; they left Podemos in 2020.']
+    ],
+    vox: [
+      ['national', 'National conservatives', 'Santiago Abascal\'s core: Spanish unity, immigration and order; the party line.'],
+      ['catholic', 'Ultra-Catholic nationalists', 'Jorge Buxadé\'s wing, called neo-falangist by its critics: hard on social questions, hostile to economic liberalism; won the 2023 power struggle.'],
+      ['liberals', 'Liberal conservatives', 'Iván Espinosa de los Monteros and Rocío Monasterio: low taxes and a smaller state; the bridge to the PP and Cs; purged in 2023.']
+    ]
+  };
+  // the historical balance, by year (strengths of the three factions)
+  var FACTION_HISTORY = {
+    pp: { 2014: [45, 40, 15], 2018: [25, 35, 40], 2022: [45, 35, 20], 2024: [40, 35, 25] },
+    cs: { 2014: [40, 35, 25], 2017: [20, 45, 35], 2018: [15, 35, 50], 2020: [30, 45, 25] },
+    up: { 2014: [40, 50, 10], 2017: [35, 55, 10], 2019: [20, 70, 10], 2021: [15, 80, 5] },
+    vox: { 2014: [60, 15, 25], 2019: [55, 15, 30], 2023: [55, 35, 10], 2024: [55, 40, 5] }
+  };
+  function factionsInit(Q) {
+    if (Q.rf) { return; }
+    Q.rf = {};
+    Object.keys(RIVAL_FACTIONS).forEach(function (p) {
+      var h = FACTION_HISTORY[p][2014];
+      Q.rf[p] = {}; RIVAL_FACTIONS[p].forEach(function (f, i) { Q.rf[p][f[0]] = h[i]; });
+    });
+  }
+  function rivalFactions(Q) {
+    factionsInit(Q);
+    var t = Q.true_poll || {};
+    Object.keys(RIVAL_FACTIONS).forEach(function (p) {
+      var F = RIVAL_FACTIONS[p], cur = Q.rf[p];
+      if (!Q.ahistorical) {
+        // follow the real balance
+        var yrs = Object.keys(FACTION_HISTORY[p]).map(Number).filter(function (y) { return y <= Q.year; });
+        var h = FACTION_HISTORY[p][Math.max.apply(null, yrs)];
+        F.forEach(function (f, i) { cur[f[0]] += (h[i] - cur[f[0]]) * 0.15; });
+      } else {
+        // pressures: Vox's growth feeds the PP's right, Cs's the PP's
+        // centrists; government pulls Podemos to pragmatism; electoral
+        // collapse empowers the hardliners
+        var push = {};
+        if (p === 'pp') { push.right = (t.vox || 0) / 10; push.centrists = (t.cs || 0) / 12; }
+        if (p === 'cs') { push.national = Q.catalan_crisis ? 1 : 0; push.progressives = (Q.rel_cs || 40) > 55 ? 0.6 : 0; }
+        if (p === 'up') { push.pablistas = (Q.govt_parties || []).indexOf('up') !== -1 ? 0.8 : 0; push.anticapitalistas = (Q.econ_left || 0) < 0 ? 0.6 : 0; push.errejonistas = (t.up || 0) < 12 ? 0.5 : 0; }
+        if (p === 'vox') { push.catholic = (Q.social_prog || 0) > 3 ? 0.8 : 0; push.liberals = (t.cs || 0) > 12 ? 0.5 : 0; }
+        F.forEach(function (f) { cur[f[0]] = Math.max(3, cur[f[0]] + (push[f[0]] || 0) + 1.2 * gaussian()); });
+      }
+      var tot = F.reduce(function (a, f) { return a + cur[f[0]]; }, 0);
+      var top = F[0][0];
+      F.forEach(function (f) { cur[f[0]] = 100 * cur[f[0]] / tot; if (cur[f[0]] > cur[top]) { top = f[0]; } });
+      var was = Q['rf_' + p + '_top'];
+      Q['rf_' + p + '_top'] = top;
+      if (was && was !== top && Q.ahistorical) {
+        Q.rf_change_due = 1; Q.rf_change_party = UI.partyName(p); Q.rf_change_faction = F.filter(function (f) { return f[0] === top; })[0][1];
+      }
+    });
+    factionEffects(Q);
+  }
+  // Monthly effects of each party's dominant faction.
+  function factionEffects(Q) {
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (c) { o[c] = x; }); return o; };
+    var rf = Q.rf, top = function (p) { return Q['rf_' + p + '_top']; };
+    if (!Q.vm || !rf) { return; }
+    // the PP leader contest weighs its factions in both modes
+    Q.pp_faction_w = { moderate: rf.pp.centrists / 33, establishment: rf.pp.pragmatists / 33, hard: rf.pp.right / 33 };
+    // historical runs are calibrated on what happened: the vote effects
+    // of the factions apply only in ahistorical runs
+    if (!Q.ahistorical) { return; }
+    // PP
+    if (top('pp') === 'centrists') {
+      partyRel(Q, 'pp', 'vox', -1); partyRel(Q, 'pp', 'cs', 1);
+      transfer(Q, 'cs', 'pp', { professionals: 0.05, self_employed: 0.04 }); transfer(Q, 'psoe', 'pp', { pensioners: 0.02 });
+    } else if (top('pp') === 'right') {
+      partyRel(Q, 'pp', 'vox', 1);
+      transfer(Q, 'vox', 'pp', { self_employed: 0.05, pensioners: 0.04 }); transfer(Q, 'pp', 'cs', { professionals: 0.03 });
+    }
+    // Cs
+    if (top('cs') === 'progressives') { Q.rel_cs = Math.min(100, (Q.rel_cs || 40) + 0.3); }
+    if (top('cs') === 'national') { partyRel(Q, 'pp', 'cs', 1); Q.rel_cs = Math.max(0, (Q.rel_cs || 40) - 0.3); }
+    // Podemos
+    if (top('up') === 'errejonistas') { Q.rel_up = Math.min(100, (Q.rel_up || 40) + 0.3); }
+    if (top('up') === 'anticapitalistas') { Q.rel_up = Math.max(0, (Q.rel_up || 40) - 0.4); transfer(Q, 'up', 'iu', { students: 0.03, workers: 0.03 }); }
+    // Vox
+    if (top('vox') === 'liberals') { partyRel(Q, 'pp', 'vox', 0.5); transfer(Q, 'cs', 'vox', { self_employed: 0.03, professionals: 0.02 }); }
+    if (top('vox') === 'catholic') { partyRel(Q, 'pp', 'vox', -0.5); campaign(Q, 'vox', { homemakers: 0.02, pensioners: 0.02, professionals: -0.03 }); }
+  }
+  function renderRivalFactions(Q, id) {
+    var out = el(id);
+    if (!out) { return; }
+    factionsInit(Q);
+    out.innerHTML = Object.keys(RIVAL_FACTIONS).map(function (p) {
+      var F = RIVAL_FACTIONS[p], cur = Q.rf[p];
+      return '<p class="sp-fac-party"><b>' + UI.partyName(p) + '</b></p><table class="sp-results sp-compact"><tbody>' + F.map(function (f) {
+        var v = cur[f[0]] || 0, lead = Q['rf_' + p + '_top'] === f[0];
+        return '<tr title="' + f[2].replace(/"/g, '&quot;') + '"><td>' + (lead ? '<b>' + f[1] + '</b>' : f[1]) + '</td><td class="sp-num">' + Math.round(v) +
+          '%</td><td style="width:40%"><div class="sp-rep-bar"><span style="width:' + v.toFixed(0) + '%;background:' + UI.partyColor(p) + '"></span></div></td></tr>';
+      }).join('') + '</tbody></table>';
+    }).join('') + '<p class="sp-map-legend">Hover a faction for what it stands for. ' + (Q.ahistorical ? 'In this ahistorical run the balance can shift with events.' : 'In this historical run the balance follows what happened.') + '</p>';
+  }
+
   // The government's health: its seats, partners, strain and record.
   function renderCoalition(Q, id) {
     var out = el(id);
@@ -5256,7 +5376,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

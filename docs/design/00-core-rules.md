@@ -857,3 +857,38 @@ These changes came from 20 bad (random), 40 OK (`--smart`) and 40 good (`--good`
 Historical replay: November 2019 PSOE 118 (real 120), Vox 47 (52); July 2023 PSOE 125 (121), PP 134 (137), Vox 26 (33).
 
 Still open: the automated "good" player is crude. It plays cards at random and keeps choosing to confront the barons, so it loses more often than a human would. No run reached the 102-month goal.
+
+### 7.47 Factions inside the other parties
+
+`RIVAL_FACTIONS` defines three currents for each rival party. The Politics tab shows them under "Inside the other parties" as bars; hover a faction for its description.
+
+| Party | Factions | Basis |
+|---|---|---|
+| PP | Centrists (sorayistas, Feijóo's line) · Pragmatists (apparatus, barons; govern with Vox for power) · National-populist right (Aznar's heirs, ayusistas) | Press coverage of the PP's "almas": sorayistas against the hard wing; Ayuso, Aznar and Aguirre against Feijóo's moderates |
+| Cs | Social liberals (the founding Catalan current) · Liberals (Garicano, Roldán) · National liberals (Girauta, Villegas, Rivera's 2018–19 turn) | The 2017 IV Assembly dropped social democracy for "liberal progresista"; the critics' amendment was defeated; the clash over ambiguity towards the separatists |
+| Podemos | Transversal populists (errejonistas) · Left populists (pablistas) · Anticapitalists (Urbán, Teresa Rodríguez) | The three lists at Vistalegre II (2017); the Citizens' Council ended 37 pablistas, 23 errejonistas, 2 anticapitalistas |
+| Vox | National conservatives (Abascal) · Ultra-Catholic nationalists (Buxadé; "neo-falangist" according to critics) · Liberal conservatives (Espinosa de los Monteros, Monasterio) | The August 2023 crisis: the liberals purged by Buxadé's wing |
+
+Two of your suggested labels were changed:
+- Vox's "Falangists" became "Ultra-Catholic nationalists". The actual Falangist parties (FE de las JONS) are separate and tiny, and the press disputes the label even for Buxadé's wing.
+- Podemos's "pragmatic left" became the two populisms. Errejonistas were the pragmatic, transversal current; pablistas were the harder left-populist line that later chose government.
+
+**How the balance moves:**
+- **Historical mode:** it follows the real balance by year (the PP to its right under Casado in 2018 and back under Feijóo in 2022; Cs national-liberal in 2018–19; Podemos pablista; Vox's liberals losing in 2023).
+- **Ahistorical mode:** it drifts with pressures plus noise:
+  - Vox's growth strengthens the PP's right, and Cs's strength its centrists;
+  - the Catalan crisis feeds Cs's national liberals;
+  - being in government feeds the pablistas, and a centrist PSOE the anticapitalists;
+  - a progressive social course feeds Vox's ultra-Catholics.
+
+  When the leading faction changes, an event fires.
+
+**Effects (ahistorical only; historical runs stay calibrated):**
+- PP centrists cool on Vox and take centrist votes from Cs and the PSOE. The PP's right warms to Vox and wins back its hard-right voters.
+- Cs's social liberals warm to the PSOE; its national liberals turn to the PP.
+- Errejonistas warm to the PSOE; anticapitalists cool and lose voters to IU.
+- Vox's liberals court Cs voters and the PP; its ultra-Catholics shift its electorate.
+
+In both modes the PP's leadership contest is weighted by the strength of its factions.
+
+**Cards:** every minister and regional president the game can appoint now has a hover card, including 35 new ones. Rival-party figures show their faction (e.g. "Faction: Ultra-Catholic nationalists" for Buxadé); PSOE figures already showed theirs.

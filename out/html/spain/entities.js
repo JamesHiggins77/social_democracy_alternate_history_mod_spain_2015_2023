@@ -34,6 +34,43 @@
 
   // name variants (longest first matters), party id, role, wing/ideology
   var PEOPLE = [
+
+    // ministers and regional presidents the game can appoint
+    [['Pablo Bustinduy', 'Bustinduy'], 'up', 'Podemos international secretary; Minister of Social Rights (2023–)', ''],
+    [['Toni Roldán', 'Roldán'], 'cs', 'Ciudadanos economic spokesperson', ''],
+    [['Marta Rivera de la Cruz'], 'cs', 'Ciudadanos; Madrid regional minister of culture', ''],
+    [['Edmundo Bal'], 'cs', 'Ciudadanos deputy, former state attorney', ''],
+    [['Francisco Igea', 'Igea'], 'cs', 'Ciudadanos; Vice-President of Castilla y León', ''],
+    [['Agustín Rosety'], 'vox', 'Vox deputy, retired general', ''],
+    [['Iván Espinosa de los Monteros', 'Espinosa de los Monteros'], 'vox', 'Vox spokesperson in Congress (to 2023)', ''],
+    [['Trinidad Jiménez'], 'psoe', 'Former Minister of Foreign Affairs (2010–11)', 'Institutionalists'],
+    [['Luz Rodríguez'], 'psoe', 'PSOE Secretary for Employment', 'Trade unionists'],
+    [['Carmen Montón', 'Montón'], 'psoe', 'Valencian health minister; Minister of Health (2018)', 'Sanchismo'],
+    [['Ángel Gabilondo', 'Gabilondo'], 'psoe', 'Former Minister of Education; Madrid candidate', 'Institutionalists'],
+    [['Hugo Morán'], 'psoe', 'PSOE environment spokesperson', 'Regional Barons (Asturias)'],
+    [['Xavier Domènech', 'Domènech'], 'up', 'Leader of En Comú Podem', ''],
+    [['Carolina Bescansa', 'Bescansa'], 'up', 'Podemos co-founder', ''],
+    [['Carlos Sánchez Mato'], 'iu', 'Madrid city finance councillor (IU)', 'Communist (PCE)'],
+    [['Julio Rodríguez'], 'up', 'Former Chief of the Defence Staff; Podemos candidate', ''],
+    [['Juantxo López de Uralde', 'López de Uralde'], 'up', 'Leader of Equo, allied to Podemos', ''],
+    [['Dolors Montserrat', 'Montserrat'], 'pp', 'Minister of Health and Social Services (2016–18)', ''],
+    [['Íñigo Méndez de Vigo', 'Méndez de Vigo'], 'pp', 'Minister of Education (2015–18)', ''],
+    [['Ana Pastor'], 'pp', 'Minister of Public Works; President of Congress (2016–19)', ''],
+    [['Juan Ignacio Zoido', 'Zoido'], 'pp', 'Minister of the Interior (2016–18)', ''],
+    [['Álvaro Nadal'], 'pp', 'Minister of Energy (2016–18)', ''],
+    [['Reyes Maroto'], 'psoe', 'Minister of Industry (2018–23)', 'Independent technocrat'],
+    [['Luis Planas'], 'psoe', 'Minister of Agriculture (2018–)', 'Regional Barons (Andalusia)'],
+    [['Pedro Duque'], 'psoe', 'Astronaut; Minister of Science (2018–21)', 'Independent'],
+    [['Isabel Rodríguez'], 'psoe', 'Government spokesperson; Minister of Housing (2023–)', 'Sanchismo'],
+    [['Ernest Urtasun', 'Urtasun'], 'up', 'Comuns MEP; Minister of Culture (2023–)', ''],
+    [['Sira Rego'], 'iu', 'IU; Minister of Youth and Children (2023–)', 'Communist (PCE)'],
+    [['Juan Carlos Girauta', 'Girauta'], 'cs', 'Ciudadanos spokesperson in Congress', ''],
+    [['José Manuel Villegas', 'Villegas'], 'cs', 'Secretary-General of Ciudadanos', ''],
+    [['Jorge Buxadé', 'Buxadé'], 'vox', 'Vox vice-president; MEP', ''],
+    [['Macarena Olona', 'Olona'], 'vox', 'Vox spokesperson; Andalusian candidate (2022)', ''],
+    [['Artur Mas', 'Mas'], 'junts', 'President of Catalonia (2010–16)', 'Convergència'],
+    [['Juan Marín'], 'cs', 'Vice-President of Andalusia (2019–22)', ''],
+    [['Francisco Serrano'], 'vox', 'Vox leader in Andalusia (2018–19)', ''],
     // PSOE
     [['Pedro Sánchez', 'Sánchez'], 'psoe', 'Secretary-General of the PSOE', 'Sanchismo: the members against the apparatus'],
     [['Susana Díaz'], 'psoe', 'President of Andalusia', 'Regional Barons (susanismo), the party\'s centrist establishment'],
@@ -577,6 +614,38 @@
     return { name: UI ? UI.partyName(id) : id, color: UI ? UI.partyColor(id) : '#888', short: UI ? UI.shortName(id) : id };
   }
 
+
+  // The factions of the other parties (see SpainGame.RIVAL_FACTIONS).
+  var FACTION_LABEL = {
+    pp: { centrists: 'Centrists', pragmatists: 'Pragmatists', right: 'National-populist right' },
+    cs: { progressives: 'Social liberals', liberals: 'Liberals', national: 'National liberals' },
+    up: { errejonistas: 'Transversal populists (errejonistas)', pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
+    vox: { national: 'National conservatives', catholic: 'Ultra-Catholic nationalists', liberals: 'Liberal conservatives' }
+  };
+  var FACTION_OF = {
+    'Mariano Rajoy': 'pragmatists', 'Soraya Sáenz de Santamaría': 'centrists', 'Pablo Casado': 'right', 'María Dolores de Cospedal': 'pragmatists',
+    'Alberto Núñez Feijóo': 'centrists', 'Isabel Díaz Ayuso': 'right', 'Cristina Cifuentes': 'centrists', 'Alberto Ruiz-Gallardón': 'centrists',
+    'Esperanza Aguirre': 'right', 'Juanma Moreno': 'centrists', 'José María Aznar': 'right', 'Cristóbal Montoro': 'pragmatists',
+    'Luis de Guindos': 'centrists', 'Fátima Báñez': 'pragmatists', 'José Manuel García-Margallo': 'centrists', 'Jorge Fernández Díaz': 'right',
+    'Pedro Morenés': 'pragmatists', 'Rafael Catalá': 'pragmatists', 'Alfonso Alonso': 'centrists', 'José Ignacio Wert': 'right',
+    'Isabel García Tejerina': 'pragmatists', 'Ignacio González': 'right', 'José Ramón Bauzá': 'right', 'Alberto Fabra': 'pragmatists',
+    'Luisa Fernanda Rudi': 'pragmatists', 'Ignacio Diego': 'pragmatists', 'Juan Vicente Herrera': 'centrists', 'José Antonio Monago': 'centrists',
+    'Alberto Garre': 'pragmatists', 'Pedro Antonio Sánchez': 'pragmatists', 'José Ignacio Ceniceros': 'pragmatists', 'Pedro Sanz': 'pragmatists',
+    'Luis Bárcenas': 'pragmatists', 'Dolors Montserrat': 'pragmatists', 'Íñigo Méndez de Vigo': 'centrists', 'Ana Pastor': 'centrists',
+    'Juan Ignacio Zoido': 'pragmatists', 'Álvaro Nadal': 'pragmatists',
+    'Albert Rivera': 'national', 'Inés Arrimadas': 'national', 'Begoña Villacís': 'liberals', 'Luis Garicano': 'liberals', 'Toni Roldán': 'liberals',
+    'Marta Rivera de la Cruz': 'liberals', 'Edmundo Bal': 'liberals', 'Francisco Igea': 'progressives', 'Juan Marín': 'liberals',
+    'Juan Carlos Girauta': 'national', 'José Manuel Villegas': 'national',
+    'Pablo Iglesias': 'pablistas', 'Íñigo Errejón': 'errejonistas', 'Irene Montero': 'pablistas', 'Ione Belarra': 'pablistas',
+    'Pablo Echenique': 'pablistas', 'Teresa Rodríguez': 'anticapitalistas', 'Nacho Álvarez': 'pablistas', 'Pablo Bustinduy': 'errejonistas',
+    'Carolina Bescansa': 'errejonistas', 'Julio Rodríguez': 'pablistas',
+    'Santiago Abascal': 'national', 'Rocío Monasterio': 'liberals', 'Javier Ortega Smith': 'national', 'Iván Espinosa de los Monteros': 'liberals',
+    'Jorge Buxadé': 'catholic', 'Macarena Olona': 'national', 'Agustín Rosety': 'national', 'Francisco Serrano': 'national'
+  };
+  // independents and allies inside the Podemos space have no current
+  var FACTION_NOTE = { 'Yolanda Díaz': 'Sumar: outside Podemos\'s currents', 'Manuel Castells': 'Independent', 'Xavier Domènech': 'En Comú Podem (ally)',
+    'Juantxo López de Uralde': 'Equo (ally)', 'Ernest Urtasun': 'Comuns / Sumar (ally)' };
+
   // Build one regex over every name, longest first, with letter boundaries.
   var INDEX = {};
   var names = [];
@@ -609,7 +678,9 @@
     if (hit.kind === 'person') {
       var p = PEOPLE[hit.i];
       var title = PERSON_WIKI[p[0][0]] === undefined ? p[0][0] : PERSON_WIKI[p[0][0]];
-      return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: p[3], wiki: title, img: imgUrl(PERSON_IMG[p[0][0]]) };
+      var fk = FACTION_OF[p[0][0]], fl = fk && FACTION_LABEL[p[1]] ? FACTION_LABEL[p[1]][fk] : (FACTION_NOTE[p[0][0]] || '');
+      var wing = fl ? 'Faction: ' + fl + (p[3] ? ' — ' + p[3] : '') : p[3];
+      return { kind: 'person', name: p[0][0], party: p[1], role: p[2], wing: wing, wiki: title, img: imgUrl(PERSON_IMG[p[0][0]]) };
     }
     if (hit.kind === 'affiliate') {
       var af = AFFILIATES[hit.i];

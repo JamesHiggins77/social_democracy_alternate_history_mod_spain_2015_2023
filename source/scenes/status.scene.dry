@@ -68,6 +68,7 @@ on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
     window.SpainGame.renderFactions(Q, 'sp-side-factions');
     window.SpainGame.renderRelations(Q, 'sp-side-relations');
+    window.SpainGame.renderRivalFactions(Q, 'sp-side-rivals');
     window.SpainGame.renderCabinet(Q, 'sp-side-cabinet');
     window.SpainGame.renderCoalition(Q, 'sp-side-coalition');
 }
@@ -108,6 +109,10 @@ Fed. Committee: **[+ committee_word +]**
 = Relations
 
 {!<div id="sp-side-relations"></div>!}
+
+= Inside the other parties
+
+{!<div id="sp-side-rivals"></div>!}
 
 = Between parties
 
