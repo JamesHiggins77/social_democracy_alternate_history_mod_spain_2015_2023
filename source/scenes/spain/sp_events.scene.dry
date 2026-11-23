@@ -2194,3 +2194,63 @@ title: Abstention
 on-arrival: {! if (window.SpainGame) { window.SpainGame.settleCity(Q, 'Madrid', 'abstain'); window.SpainGame.settleCity(Q, 'Barcelona', 'abstain'); } !}
 
 The socialists abstain. Under municipal law the largest lists take the mayoralties. The members are furious.
+
+@vox_abascal_elected
+title: Vox elects Santiago Abascal
+new-page: true
+tags: sp_event
+view-if: vox_abascal_seen = 0 and ((year = 2014 and month >= 9) or year >= 2015)
+max-visits: 1
+on-arrival: vox_abascal_seen = 1
+
+= Vox elects Santiago Abascal
+
+20 September 2014. Vox, a small party founded last December by former PP members, elects Santiago Abascal as its president by 1,010 votes to 99 for Ludovico López Cadé, and ratifies new statutes. Abascal, a former Basque PP politician who lived for years under ETA's threat, left the PP accusing Rajoy of betraying its voters. Few in Madrid notice.
+
+@vox_navarra_merger
+title: A merger in Navarre
+new-page: true
+tags: sp_event
+view-if: vox_navarra_seen = 0 and vox_abascal_seen = 1 and ((year = 2015 and month >= 2) or year >= 2016)
+max-visits: 1
+on-arrival: vox_navarra_seen = 1
+
+= A merger in Navarre
+
+24 February 2015. The tiny Derecha Navarra y Española merges into Vox, which becomes Vox Navarra under Nieves Ciprés. It is the kind of story that makes a paragraph in the regional press.
+
+@vox_andalusia_2015
+title: Vox in Andalusia
+new-page: true
+tags: sp_event
+view-if: vox_andalusia_seen = 0 and vox_abascal_seen = 1 and ((year = 2015 and month >= 4) or year >= 2016) and vox_breakthrough = 0
+max-visits: 1
+on-arrival: vox_andalusia_seen = 1
+
+= Vox in Andalusia
+
+In the March 2015 Andalusian election, Vox wins 18,017 votes, 0.45%, ninth place and no seats. The headlines belong to Podemos and Ciudadanos.
+
+@vox_may_2015
+title: Vox in May 2015
+new-page: true
+tags: sp_event
+view-if: vox_may15_seen = 0 and vox_abascal_seen = 1 and ((year = 2015 and month >= 6) or year >= 2016) and vox_breakthrough = 0
+max-visits: 1
+on-arrival: vox_may15_seen = 1
+
+= Vox in May 2015
+
+Vox stood in 9 of the 13 regions that voted on 24 May and won nothing anywhere: its best results were 1.27% in Ceuta and 1.17% (37,043 votes) in the Community of Madrid. In the municipal elections it ran in more than 120 towns and won 22 councillors and two mayoralties. On the right, the new party everyone talks about is Ciudadanos.
+
+@vox_primary_2015
+title: Abascal, Vox's candidate
+new-page: true
+tags: sp_event
+view-if: vox_primary_seen = 0 and vox_abascal_seen = 1 and ((year = 2015 and month >= 7) or year >= 2016) and vox_breakthrough = 0
+max-visits: 1
+on-arrival: vox_primary_seen = 1
+
+= Abascal, Vox's candidate
+
+27 June 2015. Vox's members choose Santiago Abascal as their candidate for the general election, with 83.84% against 15.56% for Carmelo González. He promises to recover the "real" PP voter. The polls give Vox well under 1%.

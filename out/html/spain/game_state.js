@@ -2500,7 +2500,7 @@
 
   // Saves from older versions: give every field added since a default, so
   // conditions in the scenes never compare against undefined.
-  var DEFAULTS = { city_pacts_due: 0, pod_split: 0, pod_split_due: 0, rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
+  var DEFAULTS = { vox_breakthrough: 0, vox_abascal_seen: 0, vox_navarra_seen: 0, vox_andalusia_seen: 0, vox_may15_seen: 0, vox_primary_seen: 0, city_pacts_due: 0, pod_split: 0, pod_split_due: 0, rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
     offer_pending: 0, psc_split: 0, psc_due: 0, left_split: 0, left_split_due: 0, senate_lifted_due: 0, realign_due: 0,
     bicephaly: 0, cat_repeat_due: 0, pending_budget: 0, budget_senate_delay: 0, law_senate_delay: 0, ahistorical: 0,
     alt_due: 0, rivera_open: 0, pm_months: 0, const_line: 0.6, eu_line: 1.2, laws_failed: 0, coalition_strain: 0 };

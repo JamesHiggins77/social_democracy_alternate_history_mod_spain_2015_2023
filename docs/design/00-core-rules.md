@@ -982,3 +982,16 @@ Yolanda Díaz, for example, shows no ministry or leadership until the game gives
 
   If Sánchez is not leader, or the event is not taken within two months, the game settles them: the historical choice (back the left), with a 30% chance of abstention in ahistorical runs.
 - **Regions tab:** the ten councils, with their arrangements, also appear there once municipal elections have been held.
+
+### 7.54 Vox before the breakthrough
+
+Five short news events show Vox while it is still tiny. Each fires once, at its date, and the last three only fire while Vox has not yet broken through:
+- **September 2014:** Abascal is elected president of Vox, 1,010 votes to 99 for Ludovico López Cadé.
+- **February 2015:** Derecha Navarra y Española merges into Vox as Vox Navarra (Nieves Ciprés).
+- **March 2015, Andalusia:** 18,017 votes (0.45%), ninth, no seats.
+- **May 2015:**
+  - **Regional elections:** Vox stood in 9 of the 13 regions voting and won nothing; its best results were Ceuta 1.27% and Madrid 1.17% (37,043 votes).
+  - **Municipal elections:** 22 councillors and two mayoralties.
+- **June 2015:** Abascal wins Vox's primary with 83.84% against 15.56% for Carmelo González.
+
+Figures come from the text the user supplied, taken from Spanish Wikipedia.
