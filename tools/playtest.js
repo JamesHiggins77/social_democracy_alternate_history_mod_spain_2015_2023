@@ -135,7 +135,8 @@ async function playOne(game) {
   }
   console.log = log;
   const q = Q();
-  return { elections, grand, end: q.year + '-' + q.month, pm: q.pm, government: q.government_type,
+  if (global.SpainGame.finalGrade) { global.SpainGame.finalGrade(q); }
+  return { grade: q.grade, score: q.grade_score, gparts: [q.grade_power, q.grade_laws, q.grade_budgets, q.grade_elections], elections, grand, end: q.year + '-' + q.month, pm: q.pm, government: q.government_type,
            flags: { coalrows: q.coal_rows || 0, coalbreak: q.ex_partner ? 1 : 0, npcbudget: q.npc_budget_lost || 0, cdate: q.congress_date_seen || 0, seat: q.seat_seen || 0, iceta: q.iceta_seen || 0, recupera: q.recupera_seen || 0, crowd: q.crowdfund_seen || 0, heredia: q.heredia_seen || 0, chacon: q.chacon_seen || 0, demand: q.demand_seen || 0, cat_crisis: q.cat_crisis_seen || 0, vistalegre: q.vox_rise_seen || 0, breakthrough: q.vox_breakthrough || 0 },
            pm_months: q.pm_months || 0, psc: q.psc_split || 0, left: q.left_split || 0, coup: q.rebellion_used || 0,
            right: (q.realign && q.realign.right && q.realign.right.leader) || 'pp', leftLead: (q.realign && q.realign.left && q.realign.left.leader) || 'psoe',
@@ -156,7 +157,7 @@ async function playOne(game) {
   }
   const mean = a => a.length ? Math.round(10 * a.reduce((x, y) => x + y, 0) / a.length) / 10 : NaN;
   runs.forEach((r, i) => {
-    console.log(`#${i + 1} ends ${r.end} ${r.government || ''}${r.lost ? ' [LOST]' : ''}${r.grand ? ' grand coalition from ' + r.grand : ''}` +
+    console.log(`#${i + 1} grade ${r.grade} (${r.score}: ${r.gparts.join('/')}) ends ${r.end} ${r.government || ''}${r.lost ? ' [LOST]' : ''}${r.grand ? ' grand coalition from ' + r.grand : ''}` +
       `  {rows ${r.flags.coalrows} break ${r.flags.coalbreak} npcBudgetLost ${r.flags.npcbudget} cdate ${r.flags.cdate} seat ${r.flags.seat} iceta ${r.flags.iceta} rec ${r.flags.recupera} crowd ${r.flags.crowd} her ${r.flags.heredia} chacon ${r.flags.chacon} demand ${r.flags.demand} crisis ${r.flags.cat_crisis} vistalegre ${r.flags.vistalegre} breakthrough ${r.flags.breakthrough}}`);
     r.elections.forEach(el => console.log(`    ${el.date}  PP ${el.seats.pp || 0}  PSOE ${el.seats.psoe || 0}  UP ${el.seats.up || 0}  Cs ${el.seats.cs || 0}  Vox ${el.seats.vox || 0} (${el.vox_share}%)${el.grand ? '  [after grand coalition]' : ''}`));
   });
@@ -173,6 +174,8 @@ async function playOne(game) {
   const noRise = runs.filter(r => !r.flags.vistalegre);
   console.log('Games without the Vistalegre surge:', noRise.length, '/', runs.length,
     noRise.length ? ' mean Vox seats at their elections from 2019: ' + mean(noRise.flatMap(r => r.elections.filter(el => el.date >= '2019-01')).map(el => el.seats.vox || 0)) : '');
+  const gc = {}; runs.forEach(r => { gc[r.grade] = (gc[r.grade] || 0) + 1; });
+  console.log('Grades:', ['A+', 'A', 'B', 'C', 'D', 'E', 'F'].map(g => g + ' ' + (gc[g] || 0)).join(', '), ' mean score', mean(runs.map(r => r.score)));
   console.log('Games lost:', runs.filter(r => r.lost).length, '/', runs.length);
   console.log('Months as PM: mean', mean(runs.map(r => r.pm_months)), ' max', Math.max(...runs.map(r => r.pm_months)), ' reached 102:', runs.filter(r => r.pm_months >= 102).length);
   console.log('Final polls: PSOE', mean(runs.map(r => r.psoe_final)), ' PP', mean(runs.map(r => r.pp_final)), ' Vox', mean(runs.map(r => r.vox_final)));

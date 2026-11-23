@@ -1497,16 +1497,18 @@
   // ------------------------------------------------------------------
   function finalGrade(Q) {
     var pm = Q.pm_months || 0, junior = Q.junior_months || 0;
-    var power = 40 * Math.min(1, (pm + 0.5 * junior) / 102);
+    // open-ended: governing longer than the real Sánchez scores above 40
+    var power = 40 * (pm + 0.5 * junior) / 102;
     var lp = Q.laws_passed || 0, lf = Q.laws_failed || 0;
-    var laws = 15 * lp / (lp + lf + 2) + Math.min(10, lp);
-    var budgets = Math.min(15, 4 * (Q.budgets_passed || 0)) - Math.min(5, 1.5 * (Q.budgets_failed || 0));
+    var laws = 15 * lp / (lp + lf + 2) + 0.8 * lp;
+    var budgets = 4 * (Q.budgets_passed || 0) - Math.min(5, 1.5 * (Q.budgets_failed || 0));
     var me = Q.player_party || 'psoe';
     var recs = (Q.election_records || []).filter(function (r) { return r.seats; });
     var mean = recs.length ? recs.reduce(function (a, r) { return a + (r.seats[me] || r.seats.psoe || 0); }, 0) / recs.length : 0;
-    var elections = 20 * clamp((mean - 70) / 70, 0, 1);
-    var total = Math.round(clamp(power + laws + Math.max(0, budgets) + elections, 0, 100));
-    var g = total >= 90 ? 'A+' : total >= 80 ? 'A' : total >= 68 ? 'B' : total >= 55 ? 'C' : total >= 42 ? 'D' : total >= 30 ? 'E' : 'F';
+    var elections = 20 * Math.max(0, (mean - 70) / 70);
+    // the scale is open-ended: 100 or more is a historic record
+    var total = Math.round(Math.max(0, power + laws + Math.max(0, budgets) + elections));
+    var g = total >= 100 ? 'A+' : total >= 88 ? 'A' : total >= 75 ? 'B' : total >= 62 ? 'C' : total >= 48 ? 'D' : total >= 35 ? 'E' : 'F';
     Q.grade = g; Q.grade_score = total;
     Q.grade_power = Math.round(power); Q.grade_laws = Math.round(laws); Q.grade_budgets = Math.round(Math.max(0, budgets)); Q.grade_elections = Math.round(elections);
     Q.grade_mean_seats = Math.round(mean);
