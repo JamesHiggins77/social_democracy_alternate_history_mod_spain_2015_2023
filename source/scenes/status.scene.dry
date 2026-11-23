@@ -66,7 +66,6 @@ Stability: **[+ chaos_word +]**
 title: Politics
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
-    window.SpainGame.renderFactions(Q, 'sp-side-factions');
     window.SpainGame.renderRelations(Q, 'sp-side-relations');
     window.SpainGame.renderRivalFactions(Q, 'sp-side-rivals');
     window.SpainGame.renderCabinet(Q, 'sp-side-cabinet');
@@ -74,9 +73,7 @@ if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
 }
 !}
 
-= PSOE
-
-{!<div id="sp-side-factions"></div>!}
+= Lines
 
 Economic line: **[+ econ_word +]**
 
@@ -88,13 +85,7 @@ European line: **[+ eu_word +]**
 
 Attack lines against the PSOE: PP [+ pp_attack +]; Vox [+ vox_attack +]; Podemos [+ up_attack +]
 
-Sanchismo: **[+ sanchismo_word +]**
-
-[? if sanchez_leader = 1 : Barons' plotting: **[+ plot_word +]**; loyalists in key posts: **[+ loyalist_posts_text +]** ?]
-
 Style: **[+ style_word +]**
-
-Fed. Committee: **[+ committee_word +]**
 
 = The government
 
@@ -141,6 +132,29 @@ United States: **[+ intl_us_word +]**
 NATO: **[+ intl_nato_word +]**
 
 United Nations: **[+ intl_un_word +]**[? if unsc_won = 1 : (Security Council seat) ?]
+
+@party
+title: Party
+on-display: {!
+if (typeof window !== 'undefined' && window.SpainGame && Q.congress) {
+    window.SpainGame.renderParty(Q, 'sp-side-party');
+    window.SpainGame.renderFactions(Q, 'sp-side-factions');
+}
+!}
+
+= The PSOE
+
+Sanchismo: **[+ sanchismo_word +]**
+
+[? if sanchez_leader = 1 : Barons' plotting: **[+ plot_word +]**; loyalists in key posts: **[+ loyalist_posts_text +]** ?]
+
+Fed. Committee: **[+ committee_word +]**
+
+{!<div id="sp-side-party"></div>!}
+
+= Factions
+
+{!<div id="sp-side-factions"></div>!}
 
 @paramilitaries
 title: Regions

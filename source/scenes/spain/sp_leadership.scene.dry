@@ -396,7 +396,7 @@ Emiliano García-Page, President of Castilla-La Mancha, accuses you of treating 
 - @page_ignore: Ignore him
 
 @page_primaries
-on-arrival: {! Q.primaries_called = 1; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; Q.plot += 12; Q.sanchismo += 4; Q.populism += 1; !}
+on-arrival: {! Q.primaries_called = 1; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; Q.coup_spark_until = Q.time + 2; Q.plot += 12; Q.sanchismo += 4; Q.populism += 1; !}
 
 You announce primaries within a month, followed by a Federal Congress. It is a direct appeal to the members before the deadlock can be resolved without you, and the barons see it as a declaration of war. They start discussing mass resignations from the Executive to stop it.
 
@@ -544,7 +544,7 @@ Two general elections, no government, and a third one at Christmas if nothing ch
 
 @roads_congress
 subtitle: The members decide, not the barons; it forces the barons to move now
-on-arrival: {! Q.plot = Math.max(Q.plot || 0, 80); Q.fc_bonus = (Q.fc_bonus || 0) + 2; Q.sanchismo += 4; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; !}
+on-arrival: {! Q.plot = Math.max(Q.plot || 0, 80); Q.fc_bonus = (Q.fc_bonus || 0) + 2; Q.sanchismo += 4; Q.congress_called = 1; Q.snap_called = 1; Q.snap_called_time = Q.time; Q.coup_spark_until = Q.time + 2; !}
 
 You announce primaries for the leadership on 23 October and an extraordinary congress in December. The members will decide. Within forty-eight hours, the barons answer.
 
@@ -637,3 +637,36 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 {!<div id="sp-snap-result"></div>!}
 
 [? if primary_won = 1 : The members back you against the apparatus. The plot collapses, and the barons will have to wait for another chance. ?][? if primary_won = 0 : The members choose [+ pv_winner_name +]. You are no longer Secretary-General. ?]
+
+
+@barons_demand
+title: The barons demand your resignation
+new-page: true
+tags: sp_event
+view-if: coup_spark_live = 1 and sanchez_leader = 1 and rebellion_used = 0 and coup_due = 0 and plot >= 40 and demand_seen < coup_sparks
+on-arrival: {! Q.demand_seen = Q.coup_sparks || 1; !}
+
+= The barons demand your resignation
+
+The results in [+ spark_region +] are terrible, and your critics have been waiting for them. They had turned the vote into a test of your leadership; now Susana Díaz's people call for your immediate resignation, and the regional presidents say the party cannot go on losing everywhere. A majority of the parliamentary group is muttering against you. Felipe González lets it be known that he feels "cheated".
+
+How you answer may decide whether this stays a war of words.
+
+- @demand_dare: Dare them: an express primary and congress, back me or sack me
+- @demand_hit: Hit back in public: ask which side Felipe and Susana are on
+- @demand_calm: Promise a Federal Committee debate on the strategy and lower the temperature
+
+@demand_dare
+on-arrival: {! Q.snap_called = 1; Q.snap_called_time = Q.time; Q.congress_called = 1; Q.primaries_called = 1; Q.coup_spark_until = Q.time + 2; Q.plot += 14; Q.sanchismo += 4; Q.member_morale += 2; !}
+
+You announce a primary within a month and a congress soon after. Your supporters call for all-out war against the critics. The critics start counting the members of the Federal Executive: if half resign, the Executive falls, and you with it.
+
+@demand_hit
+on-arrival: {! Q.coup_spark_until = Q.time + 2; Q.plot += 18; Q.sanchismo += 3; Q.institutionalists_dissent += 6; Q.regional_leaders_dissent += 6; !}
+
+In an interview you say that González is on the side of abstaining for Rajoy, and ask on which side Susana Díaz is. In the federations it is read as a declaration of war; it may be the straw that breaks the camel's back.
+
+@demand_calm
+on-arrival: {! Q.plot -= 8; Q.coup_spark_until = Q.time; Q.sanchez_authority -= 4; Q.federal_committee_balance += 2; !}
+
+You call for calm and a debate in the Federal Committee. The pressure eases for now, but the barons have smelled weakness and will wait for the next bad night.

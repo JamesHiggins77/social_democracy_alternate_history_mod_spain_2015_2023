@@ -3321,6 +3321,17 @@
         ds[districtToProvince(d)] = sharesByDistrict[d];
         dm[districtToProvince(d)] = mags[d];
       });
+      // a bad night for the PSOE gives the barons their pretext (Galicia
+      // and the Basque Country, September 2016): overtaken by Podemos, or
+      // a heavy fall in a federation loyal to the leader
+      var psNow = (shares.psoe || 0), psPrev = ((reg.prevShares || {}).psoe || psNow);
+      var overtaken = (shares.up || 0) > psNow && ((reg.prevShares || {}).up || 0) <= psPrev;
+      if (Q.sanchez_leader && !Q.sanchez_pm && (overtaken || psPrev - psNow >= 3)) {
+        Q.coup_sparks = (Q.coup_sparks || 0) + 1;
+        Q.coup_spark_until = (Q.time || 0) + 2;
+        Q.plot = clamp((Q.plot || 0) + 6, 0, 100);
+        Q.spark_region = region;
+      }
       results.push({ region: region, districtWinners: dw, districtShares: ds, districtSeats: dm, seats: r.totals, shares: shares, prevSeats: reg.prevSeats,
                      prevShares: reg.prevShares, government: gov, psoeLost: psoeLost, psoeWon: psoeWon });
     });
@@ -3397,7 +3408,14 @@
     }
     Q.loyalist_posts_text = (Q.loyalist_posts || 0) < 2 ? 'Few' : ((Q.loyalist_posts || 0) < 5 ? 'Some' : ((Q.loyalist_posts || 0) < 8 ? 'Many' : 'Most posts'));
     Q.plot_word = Q.plot < 20 ? 'Quiet' : (Q.plot < 40 ? 'Murmurs' : (Q.plot < 60 ? 'Organising' : 'Imminent'));
-    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.plot >= (Q.sanchez_pm ? (Q.depends_on_catalans ? 66 : 75) : 60) && Q.time >= (Q.coup_cooldown || 0)) ? 1 : 0;
+    // A coup needs a pretext as well as a plot: a bad regional night, or the
+    // leader daring the barons. Defeat alone (even a second one) feeds the
+    // plot but rarely moves the barons; an overwhelming plot needs no spark.
+    var sparked = (Q.coup_spark_until || -1) >= (Q.time || 0);
+    var thr = Q.sanchez_pm ? (Q.depends_on_catalans ? 66 : 75) : 60;
+    Q.coup_due = (Q.sanchez_leader && !Q.rebellion_used && Q.time >= (Q.coup_cooldown || 0) &&
+      ((sparked && Q.plot >= thr && (Q.demand_seen || 0) >= (Q.coup_sparks || 0)) || Q.plot >= 92)) ? 1 : 0;
+    Q.coup_spark_live = sparked ? 1 : 0;
     Q.coup_vs_pm = Q.coup_due && Q.sanchez_pm ? 1 : (Q.coup_vs_pm && Q.rebellion_used ? Q.coup_vs_pm : 0);
     // a caretaker committee hands over to an elected leader after eight months
     if (!Q.sanchez_leader && Q.psoe_interim && Q.time - (Q.interim_since || Q.time) >= 8) {
@@ -5749,6 +5767,112 @@
     return '';
   }
 
+  // ------------------------------------------------------------------
+  // The Party tab: the PSOE's organs and officers.
+  // ------------------------------------------------------------------
+  function ymNow(Q) { return Q.year + '-' + (Q.month < 10 ? '0' : '') + Q.month; }
+  function pick(list, ym) {
+    var hit = null;
+    list.forEach(function (x) { if (ym >= x[0]) { hit = x; } });
+    return hit;
+  }
+  // [from, secretary-general, current] by federation (historical holders;
+  // the camp is their stance in the 2016-17 fight, then under Sánchez)
+  var FEDERATIONS = {
+    'Andalucía': [['2013-08', 'Susana Díaz', 'Regional Barons (Susanismo)'], ['2021-06', 'Juan Espadas', 'Sanchismo'], ['2024-03', 'María Jesús Montero', 'Sanchismo']],
+    'Aragón': [['2012-03', 'Javier Lambán', 'Regional Barons'], ['2025-01', 'Pilar Alegría', 'Sanchismo']],
+    'Asturias': [['2000-01', 'Javier Fernández', 'Institutionalists'], ['2017-09', 'Adrián Barbón', 'Sanchismo']],
+    'Baleares': [['2012-04', 'Francina Armengol', 'Sanchismo']],
+    'Canarias': [['2012-03', 'José Miguel Pérez', 'Regional Barons (Susanismo)'], ['2017-09', 'Ángel Víctor Torres', 'Sanchismo']],
+    'Cantabria': [['2012-04', 'Eva Díaz Tezanos', 'Sanchismo'], ['2017-09', 'Pablo Zuloaga', 'Sanchismo']],
+    'Castilla y León': [['2014-09', 'Luis Tudanca', 'Sanchismo']],
+    'Castilla-La Mancha': [['2012-03', 'Emiliano García-Page', 'Regional Barons']],
+    'Cataluña': [['2014-07', 'Miquel Iceta', 'Sanchismo (PSC)'], ['2021-12', 'Salvador Illa', 'Sanchismo (PSC)']],
+    'Comunidad Valenciana': [['2012-03', 'Ximo Puig', 'Regional Barons'], ['2024-03', 'Diana Morant', 'Sanchismo']],
+    'Extremadura': [['2008-03', 'Guillermo Fernández Vara', 'Regional Barons'], ['2024-05', 'Miguel Ángel Gallardo', 'Sanchismo']],
+    'Galicia': [['2013-09', 'José Ramón Gómez Besteiro', 'Sanchismo'], ['2016-10', 'Caretaker committee', '—'], ['2017-10', 'Gonzalo Caballero', 'Sanchismo'], ['2021-12', 'Valentín González Formoso', 'Sanchismo'], ['2024-06', 'José Ramón Gómez Besteiro', 'Sanchismo']],
+    'Madrid': [['2015-03', 'Sara Hernández', 'Modernisers'], ['2017-09', 'José Manuel Franco', 'Sanchismo'], ['2021-10', 'Juan Lobato', 'Modernisers'], ['2025-02', 'Óscar López', 'Sanchismo']],
+    'Región de Murcia': [['2015-01', 'Rafael González Tovar', 'Regional Barons (Susanismo)'], ['2017-09', 'Diego Conesa', 'Sanchismo'], ['2021-10', 'José Vélez', 'Sanchismo'], ['2024-11', 'Francisco Lucas', 'Sanchismo']],
+    'Navarra': [['2014-03', 'María Chivite', 'Sanchismo']],
+    'País Vasco': [['2014-09', 'Idoia Mendia', 'Modernisers'], ['2021-12', 'Eneko Andueza', 'Sanchismo']],
+    'La Rioja': [['2015-01', 'Francisco Ocón', 'Regional Barons (Susanismo)'], ['2021-10', 'Concha Andreu', 'Sanchismo']]
+  };
+  function partyOfficers(Q) {
+    var ym = ymNow(Q), rows = [];
+    var leader = Q.psoe_leader || 'Pedro Sánchez';
+    var sanchez = leader === 'Pedro Sánchez' && !Q.psoe_interim;
+    var renewed = sanchez && ym >= '2017-06' && (Q.mandate_renewed || Q.rebellion_used || ym >= '2017-06');
+    if (Q.psoe_interim) {
+      rows.push(['Caretaker committee', 'Javier Fernández (chair)']);
+    } else {
+      rows.push(['Secretary-General', leader]);
+    }
+    if (renewed) {
+      rows.push(['Deputy Secretary-General', ym >= '2021-10' ? 'María Jesús Montero' : 'Adriana Lastra']);
+      rows.push(['Secretary of Organisation', ym >= '2025-07' ? 'Rebeca Torró' : (ym >= '2021-07' ? 'Santos Cerdán' : 'José Luis Ábalos')]);
+      rows.push(['President of the party', 'Cristina Narbona']);
+      rows.push(['Spokesperson in Congress', ym >= '2022-01' ? 'Patxi López' : (ym >= '2021-07' ? 'Héctor Gómez' : (ym >= '2018-06' ? 'Adriana Lastra' : 'Margarita Robles'))]);
+    } else if (sanchez) {
+      rows.push(['Deputy Secretary-General', 'None (post vacant since 2014)']);
+      rows.push(['Secretary of Organisation', 'César Luena']);
+      rows.push(['President of the party', Q.rebellion_used ? 'Vacant (resigned)' : 'Micaela Navarro']);
+      rows.push(['Spokesperson in Congress', 'Antonio Hernando']);
+    } else {
+      rows.push(['Deputy Secretary-General', 'Appointed by ' + leader]);
+      rows.push(['Secretary of Organisation', Q.psoe_interim ? 'Mario Jiménez (caretaker spokesman)' : 'A ' + leader.split(' ').slice(-1)[0] + ' loyalist']);
+      rows.push(['President of the party', Q.psoe_interim ? 'Vacant' : 'Micaela Navarro']);
+      rows.push(['Spokesperson in Congress', 'Antonio Hernando']);
+    }
+    rows.push(['President of the Federal Committee', ym >= '2017-06' && renewed ? 'Cristina Narbona' : 'Verónica Pérez']);
+    return rows;
+  }
+  // The Federal Executive by camp. 35 sitting members until the 2017
+  // congress (17 resigned on 28 September 2016); 49 after it.
+  function executiveSplit(Q) {
+    var ym = ymNow(Q);
+    var big = ym >= '2017-06' && Q.psoe_leader === 'Pedro Sánchez' && !Q.psoe_interim;
+    var base = big ? { Sanchismo: 38, 'Socialist Left': 5, Modernisers: 3, 'Regional Barons': 2, Institutionalists: 1 }
+      : { Sanchismo: 17, 'Regional Barons': 10, Institutionalists: 5, Modernisers: 2, 'Socialist Left': 1 };
+    if (Q.psoe_leader !== 'Pedro Sánchez' || Q.psoe_interim) {
+      base = Q.psoe_interim ? { 'Caretaker committee': 10 } : { 'Regional Barons': 20, Institutionalists: 9, Modernisers: 4, Sanchismo: 2, 'Socialist Left': 0 };
+    } else {
+      // loyalists placed in key posts are taken from the barons' share
+      var shift = Math.min(base['Regional Barons'] - 1, Math.round((Q.loyalist_posts || 0) / 2));
+      base.Sanchismo += shift; base['Regional Barons'] -= shift;
+    }
+    return base;
+  }
+  function renderParty(Q, id) {
+    var out = el(id);
+    if (!out) { return; }
+    var E = root.SpainEntities;
+    var ent = function (n) { return E && E.lookup && E.lookup(n) ? '<span class="sp-ent" tabindex="0" data-ent="' + n + '">' + n + '</span>' : n; };
+    var html = '<table class="sp-results sp-compact"><tbody>' + partyOfficers(Q).map(function (r) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1].replace(/^([A-ZÁÉÍÓÚ][^(]*?)( \(|$)/, function (m, a, b) { return ent(a) + b; }) + '</td></tr>';
+    }).join('') + '</tbody></table>';
+    var ex = executiveSplit(Q), total = 0;
+    Object.keys(ex).forEach(function (k) { total += ex[k]; });
+    var col = { Sanchismo: '#E30613', 'Regional Barons': '#F28C00', Institutionalists: '#8B5A2B', Modernisers: '#6A5ACD', 'Socialist Left': '#B0004A', 'Caretaker committee': '#999' };
+    html += '<h4>Federal Executive (' + total + ')</h4><div class="sp-rep-bar" style="display:flex;height:14px">' + Object.keys(ex).filter(function (k) { return ex[k] > 0; }).map(function (k) {
+      return '<div title="' + k + ': ' + ex[k] + '" style="width:' + (100 * ex[k] / total) + '%;background:' + col[k] + '"></div>';
+    }).join('') + '</div><table class="sp-results sp-compact"><tbody>' + Object.keys(ex).filter(function (k) { return ex[k] > 0; }).map(function (k) {
+      return '<tr><td><span class="sp-swatch" style="background:' + col[k] + '"></span>' + k + '</td><td class="sp-num">' + ex[k] + '</td></tr>';
+    }).join('') + '</tbody></table>';
+    if (Q.sanchez_leader && !Q.psoe_interim) {
+      var need = Math.floor(total / 2) + 1, against = total - ex.Sanchismo;
+      html += '<p class="sp-map-legend">If half the Executive resigns, it is dissolved and the Secretary-General falls with it: ' + need + ' resignations needed; ' + against + ' members are outside your camp.</p>';
+    }
+    var fcTotal = Q.year >= 2017 && Q.year * 100 + Q.month >= 201706 ? 290 : 295;
+    var fcFor = Math.round(fcTotal * (Q.federal_committee_balance || 50) / 100);
+    html += '<h4>Federal Committee</h4><p class="sp-map-legend">' + fcTotal + ' members: the barons\' delegations, the Executive and the parliamentary leaders. Roughly <b>' + fcFor + '</b> would back the leadership, <b>' + (fcTotal - fcFor) + '</b> would not' + (Q.year === 2016 ? ' (on 1 October 2016 Sánchez lost 107–132)' : '') + '.</p>';
+    var ym = ymNow(Q);
+    html += '<h4>Regional federations</h4><table class="sp-results sp-compact"><thead><tr><th>Federation</th><th>Secretary-General</th><th>Camp</th></tr></thead><tbody>' +
+      Object.keys(FEDERATIONS).map(function (r) {
+        var f = pick(FEDERATIONS[r], ym) || FEDERATIONS[r][0];
+        return '<tr><td>' + (REGION_SHORT[r] || r) + '</td><td>' + ent(f[1]) + '</td><td>' + f[2] + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    out.innerHTML = html;
+  }
   function renderFactions(Q, id) {
     var out = el(id);
     if (!out) {
@@ -5846,7 +5970,7 @@
     renderPolls: renderPolls,
     renderRegions: renderRegions,
     renderRegionalResults: renderRegionalResults,
-    renderFactions: renderFactions,
+    renderFactions: renderFactions, renderParty: renderParty,
     campaign: function (Q, party, changes) { return campaign(Q, me(Q, party), changes); },
     transfer: function (Q, from, to, changes) { return transfer(Q, me(Q, from), meTo(Q, to), changes); },
     partyRel: partyRel,
