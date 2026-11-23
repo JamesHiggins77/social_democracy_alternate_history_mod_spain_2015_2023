@@ -624,7 +624,7 @@
   };
   var FACTION_OF = {
     'Mariano Rajoy': 'pragmatists', 'Soraya Sáenz de Santamaría': 'centrists', 'Pablo Casado': 'right', 'María Dolores de Cospedal': 'pragmatists',
-    'Alberto Núñez Feijóo': 'centrists', 'Isabel Díaz Ayuso': 'right', 'Cristina Cifuentes': 'centrists', 'Alberto Ruiz-Gallardón': 'centrists',
+    'Alberto Núñez Feijóo': 'pragmatists', 'Isabel Díaz Ayuso': 'right', 'Cristina Cifuentes': 'centrists', 'Alberto Ruiz-Gallardón': 'centrists',
     'Esperanza Aguirre': 'right', 'Juanma Moreno': 'centrists', 'José María Aznar': 'right', 'Cristóbal Montoro': 'pragmatists',
     'Luis de Guindos': 'centrists', 'Fátima Báñez': 'pragmatists', 'José Manuel García-Margallo': 'centrists', 'Jorge Fernández Díaz': 'right',
     'Pedro Morenés': 'pragmatists', 'Rafael Catalá': 'pragmatists', 'Alfonso Alonso': 'centrists', 'José Ignacio Wert': 'right',

@@ -4241,7 +4241,7 @@
     santamaria: { name: 'Soraya Sáenz de Santamaría', style: 'moderate', from: 2015, to: 2019 },
     casado: { name: 'Pablo Casado', style: 'hard', from: 2015, to: 2023 },
     cospedal: { name: 'María Dolores de Cospedal', style: 'establishment', from: 2015, to: 2018 },
-    feijoo: { name: 'Alberto Núñez Feijóo', style: 'moderate', from: 2018, to: 2023 },
+    feijoo: { name: 'Alberto Núñez Feijóo', style: 'establishment', from: 2018, to: 2023 },
     ayuso: { name: 'Isabel Díaz Ayuso', style: 'hard', from: 2021, to: 2023 }
   };
 
@@ -4785,8 +4785,8 @@
   // ------------------------------------------------------------------
   var RIVAL_FACTIONS = {
     pp: [
-      ['centrists', 'Centrists', 'Christian democrats and liberal conservatives (the sorayistas, later Feijóo\'s line): no deals with Vox, open to Cs and a moderate PSOE; fish for centrist voters.'],
-      ['pragmatists', 'Pragmatists', 'The party apparatus and the regional barons: conservative, no friends of Vox, but they will govern with it to win power.'],
+      ['centrists', 'Centrists', 'Christian democrats and liberal conservatives (the sorayistas, Moreno in Andalusia): no deals with Vox, open to Cs and a moderate PSOE; fish for centrist voters.'],
+      ['pragmatists', 'Pragmatists', 'The party apparatus and most regional barons, and Feijóo as national leader: moderate in tone, no friends of Vox, but they govern with it to win power (the 2023 regional pacts).'],
       ['right', 'National-populist right', 'Aznar\'s heirs and the ayusistas: confrontational, nationalist, comfortable with Vox; win back hard-right voters from it.']
     ],
     cs: [
@@ -4807,7 +4807,7 @@
   };
   // the historical balance, by year (strengths of the three factions)
   var FACTION_HISTORY = {
-    pp: { 2014: [45, 40, 15], 2018: [25, 35, 40], 2022: [45, 35, 20], 2024: [40, 35, 25] },
+    pp: { 2014: [45, 40, 15], 2018: [25, 35, 40], 2022: [30, 45, 25], 2024: [25, 45, 30] },
     cs: { 2014: [40, 35, 25], 2017: [20, 45, 35], 2018: [15, 35, 50], 2020: [30, 45, 25] },
     up: { 2014: [40, 50, 10], 2017: [35, 55, 10], 2019: [20, 70, 10], 2021: [15, 80, 5] },
     vox: { 2014: [60, 15, 25], 2019: [55, 15, 30], 2023: [55, 35, 10], 2024: [55, 40, 5] }

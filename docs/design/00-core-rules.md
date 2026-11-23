@@ -864,7 +864,7 @@ Still open: the automated "good" player is crude. It plays cards at random and k
 
 | Party | Factions | Basis |
 |---|---|---|
-| PP | Centrists (sorayistas, Feijóo's line) · Pragmatists (apparatus, barons; govern with Vox for power) · National-populist right (Aznar's heirs, ayusistas) | Press coverage of the PP's "almas": sorayistas against the hard wing; Ayuso, Aznar and Aguirre against Feijóo's moderates |
+| PP | Centrists (sorayistas, Moreno) · Pragmatists (apparatus, barons, Feijóo as national leader; govern with Vox for power) · National-populist right (Aznar's heirs, ayusistas) | Press coverage of the PP's "almas": sorayistas against the hard wing; Ayuso, Aznar and Aguirre against Feijóo's moderates |
 | Cs | Social liberals (the founding Catalan current) · Liberals (Garicano, Roldán) · National liberals (Girauta, Villegas, Rivera's 2018–19 turn) | The 2017 IV Assembly dropped social democracy for "liberal progresista"; the critics' amendment was defeated; the clash over ambiguity towards the separatists |
 | Podemos | Transversal populists (errejonistas) · Left populists (pablistas) · Anticapitalists (Urbán, Teresa Rodríguez) | The three lists at Vistalegre II (2017); the Citizens' Council ended 37 pablistas, 23 errejonistas, 2 anticapitalistas |
 | Vox | National conservatives (Abascal) · Ultra-Catholic nationalists (Buxadé; "neo-falangist" according to critics) · Liberal conservatives (Espinosa de los Monteros, Monasterio) | The August 2023 crisis: the liberals purged by Buxadé's wing |
