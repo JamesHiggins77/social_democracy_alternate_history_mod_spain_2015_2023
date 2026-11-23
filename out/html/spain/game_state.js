@@ -2266,6 +2266,12 @@
     podemosSplit(Q);
     rightRealignment(Q);
     senateQueue(Q);
+    // without Sánchez to decide (or if he lets it drift), Madrid and Barcelona
+    // are settled as history did: the socialists back the left's candidates
+    if (Q.city_pacts_due && (!Q.sanchez_leader || (Q.time || 0) - (Q.city_pacts_time || 0) >= 2)) {
+      var ch = Q.ahistorical && Math.random() < 0.3 ? 'abstain' : 'left';
+      settleCity(Q, 'Madrid', ch); settleCity(Q, 'Barcelona', ch); Q.city_pacts_due = 0;
+    }
     splitChecks(Q);
     if (Q.pm === 'Pedro Sánchez') { Q.pm_months = (Q.pm_months || 0) + 1; }
     incumbencyWear(Q);
@@ -2494,7 +2500,7 @@
 
   // Saves from older versions: give every field added since a default, so
   // conditions in the scenes never compare against undefined.
-  var DEFAULTS = { pod_split: 0, pod_split_due: 0, rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
+  var DEFAULTS = { city_pacts_due: 0, pod_split: 0, pod_split_due: 0, rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
     offer_pending: 0, psc_split: 0, psc_due: 0, left_split: 0, left_split_due: 0, senate_lifted_due: 0, realign_due: 0,
     bicephaly: 0, cat_repeat_due: 0, pending_budget: 0, budget_senate_delay: 0, law_senate_delay: 0, ahistorical: 0,
     alt_due: 0, rivera_open: 0, pm_months: 0, const_line: 0.6, eu_line: 1.2, laws_failed: 0, coalition_strain: 0 };
@@ -3742,13 +3748,17 @@
                  prev: prev ? prev.lists.map(function (x) { return [x.label, x.seats]; }) : null, approx: C.a, year: Q.year });
     });
     Q.cities = {};
+    Q.city_settled = {};
+    Q.city_pacts_due = 1; Q.city_pacts_time = Q.time || 0;
     Q.city_mayor = Q.city_mayor || JSON.parse(JSON.stringify(CITY_MAYORS_2015));
     out.forEach(function (c) {
       Q.cities[c.name] = c;
+      if (CITY_OPEN.indexOf(c.name) !== -1) { c.mayor = null; }
       // the largest list takes the mayoralty (2015 keeps the real mayors)
       if (c.year !== 2015) { Q.city_mayor[c.name] = cityMayor(c); }
       c.mayor = Q.city_mayor[c.name];
     });
+    cityPactFlags(Q);
     return out;
   }
   // Who becomes mayor: the largest list of a bloc with a majority (the PP,
@@ -3764,6 +3774,65 @@
     if (sum(left) >= maj) { return left[0].label; }
     return c.lists[0].label;
   }
+
+  // Governing arrangements. 2015 uses what was agreed (historical mode);
+  // otherwise the mayor's bloc partners needed for a majority. Madrid and
+  // Barcelona are left open after the vote and settled by an event, where
+  // the PSOE's (or PSC's) votes can decide.
+  var CITY_GOV_2015 = {
+    'Madrid': 'Manuela Carmena (Ahora Madrid), invested with the PSOE\'s votes',
+    'Barcelona': 'Ada Colau (Barcelona en Comú), minority government; invested with ERC, PSC and CUP votes',
+    'Valencia': 'Joan Ribó (Compromís), with PSPV and València en Comú',
+    'Seville': 'Juan Espadas (PSOE), invested with Participa Sevilla and IU',
+    'Zaragoza': 'Pedro Santisteve (Zaragoza en Común), with PSOE and CHA votes',
+    'Málaga': 'Francisco de la Torre (PP), with Ciudadanos\' support',
+    'Murcia': 'José Ballesta (PP), with Ciudadanos\' support',
+    'Palma': 'José Hila (PSIB), with MÉS and Som Palma; MÉS takes the mayoralty in 2017',
+    'Las Palmas': 'Augusto Hidalgo (PSOE), with LPGC Puede and Nueva Canarias',
+    'Alicante': 'Gabriel Echávarri (PSPV), with Guanyar Alacant and Compromís'
+  };
+  var CITY_OPEN = ['Madrid', 'Barcelona'];
+  function cityArrangement(Q, c) {
+    if (CITY_OPEN.indexOf(c.name) !== -1 && !(Q.city_settled || {})[c.name]) { return 'Being negotiated'; }
+    if (c.year === 2015 && !Q.ahistorical) { return CITY_GOV_2015[c.name]; }
+    var maj = Math.floor(c.seats / 2) + 1;
+    var mayorList = c.lists.filter(function (x) { return x.label === c.mayor; })[0] || c.lists[0];
+    if (mayorList.seats >= maj) { return mayorList.label + ', absolute majority'; }
+    var right = CITY_RIGHT.indexOf(mayorList.party) !== -1;
+    var partners = c.lists.filter(function (x) { return x !== mayorList && x.seats > 0 && (CITY_RIGHT.indexOf(x.party) !== -1) === right && ['junts', 'cc'].indexOf(x.party) === -1; });
+    var got = mayorList.seats, used = [];
+    partners.forEach(function (x) { if (got < maj) { used.push(x.label); got += x.seats; } });
+    if (got >= maj) { return mayorList.label + ', with ' + used.join(' and ') + (right && used.indexOf('Vox') !== -1 ? ' (Vox votes from outside)' : ''); }
+    return mayorList.label + ', minority government (largest list)';
+  }
+  function cityPactFlags(Q) {
+    ['Madrid', 'Barcelona'].forEach(function (n) {
+      var c = Q.cities && Q.cities[n], k = n === 'Madrid' ? 'mad' : 'bcn';
+      if (!c) { Q['cp_' + k] = 0; return; }
+      var ps = c.lists.filter(function (x) { return x.party === 'psoe' || x.party === 'psc'; })[0];
+      var left = c.lists.filter(function (x) { return CITY_RIGHT.indexOf(x.party) === -1 && x !== ps && ['junts', 'cc'].indexOf(x.party) === -1; })[0];
+      var other = c.lists.filter(function (x) { return x !== left && x !== ps; })[0];
+      Q['cp_' + k + '_left'] = left ? left.label : 'the left';
+      Q['cp_' + k + '_other'] = other ? other.label : 'the largest list';
+      Q['cp_' + k + '_ps'] = ps ? ps.label : 'PSOE';
+      Q['cp_' + k + '_psseats'] = ps ? ps.seats : 0;
+      Q['cp_' + k] = 1;
+    });
+  }
+  // The open cities: who the PSOE backs decides the mayor when its seats are pivotal.
+  function settleCity(Q, name, choice) {
+    var c = Q.cities && Q.cities[name];
+    if (!c) { return; }
+    Q.city_settled = Q.city_settled || {};
+    var ps = c.lists.filter(function (x) { return x.party === 'psoe' || x.party === 'psc'; })[0];
+    var left = c.lists.filter(function (x) { return CITY_RIGHT.indexOf(x.party) === -1 && x.party !== 'psoe' && x.party !== 'psc' && ['junts', 'cc'].indexOf(x.party) === -1; })[0];
+    var other = c.lists.filter(function (x) { return x !== left && x !== ps; })[0];
+    if (choice === 'left' && left) { Q.city_mayor[name] = left.label; Q.rel_up = (Q.rel_up || 40) + 4; Q.progressives_dissent -= 2; Q.city_settled[name] = left.label + ', invested with the ' + (ps ? ps.label : 'PSOE') + '\'s votes'; }
+    else if (choice === 'own' && ps) { Q.city_mayor[name] = ps.label; Q.city_settled[name] = ps.label + ' mayor in a deal with ' + (left ? left.label : 'the left'); Q.rel_up = (Q.rel_up || 40) - 6; }
+    else { Q.city_mayor[name] = other ? other.label : c.lists[0].label; Q.city_settled[name] = (other ? other.label : c.lists[0].label) + ', the largest list, governs after the PSOE abstains'; Q.progressives_dissent += 4; Q.member_morale -= 3; Q.rel_up = (Q.rel_up || 40) - 8; }
+    c.mayor = Q.city_mayor[name];
+  }
+
   function renderCities(Q, id) {
     var out = el(id);
     if (!out || !Q.cities) { return; }
@@ -3773,14 +3842,15 @@
       var won = c.lists.filter(function (x) { return x.seats > 0; });
       var pm = {}; (c.prev || []).forEach(function (p) { pm[p[0]] = p[1]; });
       var summary = won.slice(0, 4).map(function (x) { return '<span class="sp-vote-chip"><span class="sp-swatch" style="background:' + UI.partyColor(x.party) + '"></span>' + x.label + ' ' + x.seats + '</span>'; }).join(' ');
-      html += '<details class="sp-city"><summary class="sp-no-ent"><b>' + name + '</b> ' + summary + '</summary>' +
+      var gov = Q.city_settled && Q.city_settled[name] ? Q.city_settled[name] : cityArrangement(Q, c);
+      html += '<details class="sp-city"><summary class="sp-no-ent"><b>' + name + '</b> ' + summary + '<br><span class="sp-map-legend">' + gov + '</span></summary>' +
         '<div class="sp-city-chart"><svg id="' + id + '-c' + i + '" class="sp-hemicycle"></svg></div>' +
         '<table class="sp-results sp-compact"><thead><tr><th>List</th><th class="sp-num">Votes</th><th class="sp-num">%</th><th class="sp-num">Seats</th>' + (c.prev ? '<th class="sp-num">±</th>' : '') + '</tr></thead><tbody>' +
         c.lists.map(function (x) {
           var d = c.prev ? (x.seats - (pm[x.label] || 0)) : null;
           return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(x.party) + '"></span>' + x.label + '</td><td class="sp-num">' + x.votes.toLocaleString('en-GB') +
             '</td><td class="sp-num">' + x.pct.toFixed(1) + '</td><td class="sp-num"><b>' + x.seats + '</b></td>' + (c.prev ? '<td class="sp-num" style="color:' + (d > 0 ? '#1a7f37' : (d < 0 ? '#b42318' : '#777')) + '">' + (d > 0 ? '▲' + d : (d < 0 ? '▼' + (-d) : '–')) + '</td>' : '') + '</tr>';
-        }).join('') + '</tbody></table><p class="sp-map-legend">Mayor: ' + (c.mayor || '?') + ' list. Turnout ' + c.turnout.toFixed(1) + '%. ' + c.seats + ' councillors; majority ' + (Math.floor(c.seats / 2) + 1) +
+        }).join('') + '</tbody></table><p class="sp-map-legend"><b>Government:</b> ' + (Q.city_settled && Q.city_settled[name] ? Q.city_settled[name] : cityArrangement(Q, c)) + '. Turnout ' + c.turnout.toFixed(1) + '%. ' + c.seats + ' councillors; majority ' + (Math.floor(c.seats / 2) + 1) +
         '. Other lists ' + c.others + '%.' + (c.year === 2015 && c.approx.length ? ' Estimated (not found in the sources): ' + c.approx.join(', ') + '.' : '') + (c.year === 2015 ? ' 2015 is the real result.' : ' Projected from regional polling since 2015.') + '</p></details>';
     });
     out.innerHTML = html;
@@ -5619,7 +5689,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, settleCity: settleCity, cityArrangement: cityArrangement, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

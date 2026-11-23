@@ -969,3 +969,16 @@ Every person's card now shows only what is true at the game's current date (`BIO
 - **Base description:** each card ends with a date-neutral description ("Labour lawyer from Galicia; PCE"). Foreign figures with no current post show their party.
 
 Yolanda Díaz, for example, shows no ministry or leadership until the game gives her one.
+
+### 7.53 City governing arrangements
+
+- **What each city shows:** the governing arrangement under its seats, both in the summary and in the expanded view.
+- **2015 (historical runs) uses the real deals:** Ribó with the PSPV and València en Comú, Espadas with Participa and IU, Santisteve with the PSOE and CHA, De la Torre and Ballesta with Cs, Hila with MÉS and Som Palma, Hidalgo with LPGC Puede and NC, Echávarri with Guanyar and Compromís.
+- **Later elections (and ahistorical runs):** the mayor's list plus the same-bloc partners it needs for a majority. Vox votes from outside right-wing majorities; failing a majority, the largest list governs in minority.
+- **Madrid and Barcelona** show "Being negotiated" after the vote. An event, "Who governs Madrid and Barcelona?", lets the PSOE/PSC:
+  - back the left's candidates (Carmena, Colau);
+  - demand the mayoralty for itself;
+  - abstain, so the largest lists govern.
+
+  If Sánchez is not leader, or the event is not taken within two months, the game settles them: the historical choice (back the left), with a 30% chance of abstention in ahistorical runs.
+- **Regions tab:** the ten councils, with their arrangements, also appear there once municipal elections have been held.

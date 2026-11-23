@@ -2161,3 +2161,36 @@ on-arrival: pod_split_due = 0
 The coalition Yolanda Díaz built to unite the left breaks apart. Podemos, led by Ione Belarra and Irene Montero, takes its [+ pod_moved_congress +] deputies out of Sumar's group in Congress and into the Mixed Group. The pablistas and what remains of the anticapitalists go with Podemos; the pragmatic left and the errejonistas stay with Díaz in Sumar.
 
 From now on there are two parties to the PSOE's left, and every vote in Congress needs both.
+
+@city_pacts
+title: Madrid and Barcelona
+new-page: true
+tags: sp_event
+view-if: city_pacts_due = 1 and cp_mad = 1 and sanchez_leader = 1
+on-arrival: city_pacts_due = 0
+
+= Who governs Madrid and Barcelona?
+
+The councils of the two largest cities are hung, and the socialists hold the key. In Madrid, [+ cp_mad_ps +] has [+ cp_mad_psseats +] councillors: enough to make [+ cp_mad_left +]'s candidate mayor, or to let [+ cp_mad_other +] govern by abstaining. In Barcelona, the [+ cp_bcn_ps +]'s [+ cp_bcn_psseats +] councillors face the same choice between [+ cp_bcn_left +] and [+ cp_bcn_other +].
+
+- @cp_left: Back the left's candidates in both cities
+- @cp_own: Demand the mayoralty for the socialists as the price
+- @cp_abstain: Abstain: let the largest lists govern
+
+@cp_left
+title: Mayors of change
+on-arrival: {! if (window.SpainGame) { window.SpainGame.settleCity(Q, 'Madrid', 'left'); window.SpainGame.settleCity(Q, 'Barcelona', 'left'); } !}
+
+The socialists vote for the left's candidates. Podemos's world calls them "the mayors of change"; the barons grumble that the PSOE has handed the two great cities to its rivals.
+
+@cp_own
+title: The socialists' price
+on-arrival: {! if (window.SpainGame) { window.SpainGame.settleCity(Q, 'Madrid', 'own'); window.SpainGame.settleCity(Q, 'Barcelona', 'own'); } !}
+
+You demand the mayoralties for your own candidates. The talks are bitter; where the arithmetic works, a socialist takes the staff of office, and the left calls it blackmail.
+
+@cp_abstain
+title: Abstention
+on-arrival: {! if (window.SpainGame) { window.SpainGame.settleCity(Q, 'Madrid', 'abstain'); window.SpainGame.settleCity(Q, 'Barcelona', 'abstain'); } !}
+
+The socialists abstain. Under municipal law the largest lists take the mayoralties. The members are furious.
