@@ -414,6 +414,7 @@
     Q.local_prev_year = Q.local_year || 2011;
     Q.local_final_poll = JSON.parse(JSON.stringify(Q.poll || poll));
     Q.local_shares = JSON.parse(JSON.stringify(poll));
+    if (Q.vm) { cityElections(Q); }
     if (Q.local_shares.vox) { Q.local_shares.vox *= (Q.year >= 2023 ? 0.15 : 0.05) / 0.55; }
     var prev = Q.local_seats || (Q.year === 2015 ? LOCAL_2011 : null);
     Q.local_prev = prev;
@@ -3640,6 +3641,144 @@
       ((Q.local_prev_year || 2011) === 2011 && Q.local_prev ? ' 2011 figures: Ministry of the Interior (PP 26,507, PSOE 21,766, CiU 3,896, IU 2,650, ERC 1,422, Bildu 1,138, PNV 882, BNG 590, UPyD 152); parties without a 2011 figure are not compared.' : '') + '</p>' +
       localSwing(Q);
   }
+
+  // ------------------------------------------------------------------
+  // The ten largest city councils. 2015 is the real result (sources in the
+  // design doc; 'a' marks a figure not found in the sources, estimated);
+  // later elections move each list with its parent party's share in the
+  // region since May 2015, and seats are shared by D'Hondt with the 5%
+  // municipal threshold.
+  // lists: [label, parent party, % 2015, seats 2015]
+  // ------------------------------------------------------------------
+  var CITIES = [
+    { name: 'Madrid', region: 'Madrid', seats: 57, electorate: 2372000, turnout: 68.9, a: ['turnout', 'electorate'],
+      lists: [['PP', 'pp', 34.55, 21], ['Ahora Madrid', 'up', 31.85, 20], ['PSOE', 'psoe', 15.28, 9], ['Ciudadanos', 'cs', 11.40, 7]] },
+    { name: 'Barcelona', region: 'Cataluña', seats: 41, electorate: 1161140, turnout: 60.6, a: [],
+      lists: [['Barcelona en Comú', 'up', 25.21, 11], ['CiU', 'junts', 22.75, 10], ['Ciutadans', 'cs', 11.03, 5], ['ERC', 'erc', 11.01, 5], ['PSC', 'psoe', 9.63, 4], ['PP', 'pp', 8.71, 3], ['CUP', 'cup', 7.42, 3]] },
+    { name: 'Valencia', region: 'Comunidad Valenciana', seats: 33, electorate: 582804, turnout: 72.1, a: ['PSPV %', 'València en Comú %'],
+      lists: [['PP', 'pp', 25.8, 10], ['Compromís', 'compromis', 23.3, 9], ['Ciudadanos', 'cs', 15.4, 6], ['PSPV', 'psoe', 14.0, 5], ['València en Comú', 'up', 9.8, 3]] },
+    { name: 'Seville', region: 'Andalucía', seats: 31, electorate: 544000, turnout: 59.5, a: ['Ciudadanos %', 'electorate'],
+      lists: [['PP', 'pp', 33.08, 12], ['PSOE', 'psoe', 32.14, 11], ['Participa Sevilla', 'up', 9.01, 3], ['Ciudadanos', 'cs', 9.3, 3], ['IU', 'iu', 5.97, 2]] },
+    { name: 'Zaragoza', region: 'Aragón', seats: 31, electorate: 517000, turnout: 64.0, a: ['turnout', 'electorate'],
+      lists: [['PP', 'pp', 26.88, 10], ['Zaragoza en Común', 'up', 24.57, 9], ['PSOE', 'psoe', 18.65, 6], ['Ciudadanos', 'cs', 12.29, 4], ['CHA', 'cha', 6.78, 2]] },
+    { name: 'Málaga', region: 'Andalucía', seats: 31, electorate: 432000, turnout: 53.0, a: ['all % (from votes)', 'turnout', 'electorate'],
+      lists: [['PP', 'pp', 36.6, 13], ['PSOE', 'psoe', 26.2, 9], ['Málaga Ahora', 'up', 13.3, 4], ['Ciudadanos', 'cs', 10.4, 3], ['Málaga para la Gente (IU)', 'iu', 7.5, 2]] },
+    { name: 'Murcia', region: 'Región de Murcia', seats: 29, electorate: 314000, turnout: 64.0, a: ['turnout', 'electorate'],
+      lists: [['PP', 'pp', 37.56, 12], ['PSOE', 'psoe', 19.59, 6], ['Ciudadanos', 'cs', 15.44, 5], ['Ahora Murcia', 'up', 9.19, 3], ['Cambiemos Murcia', 'iu', 9.06, 3]] },
+    { name: 'Palma', region: 'Baleares', seats: 29, electorate: 297000, turnout: 56.0, a: ['seats of MÉS, Som Palma, Cs', 'turnout', 'electorate'],
+      lists: [['PP', 'pp', 26.55, 9], ['PSIB', 'psoe', 18.95, 6], ['MÉS per Palma', 'mes', 15.74, 5], ['Som Palma', 'up', 14.76, 5], ['Ciudadanos', 'cs', 11.7, 4]] },
+    { name: 'Las Palmas', region: 'Canarias', seats: 29, electorate: 285000, turnout: 56.0, a: ['Unidos por Gran Canaria', 'turnout', 'electorate'],
+      lists: [['PP', 'pp', 28.76, 10], ['PSOE', 'psoe', 19.74, 7], ['Las Palmas de Gran Canaria Puede', 'up', 16.14, 6], ['Unidos por Gran Canaria', 'cc', 8.0, 2], ['Ciudadanos', 'cs', 7.71, 2], ['Nueva Canarias', 'nc', 7.49, 2]] },
+    { name: 'Alicante', region: 'Comunidad Valenciana', seats: 29, electorate: 240000, turnout: 60.0, a: ['Ciudadanos %', 'Compromís %', 'turnout', 'electorate'],
+      lists: [['PP', 'pp', 25.60, 8], ['PSPV', 'psoe', 20.30, 6], ['Guanyar Alacant', 'up', 18.72, 6], ['Ciudadanos', 'cs', 18.0, 6], ['Compromís', 'compromis', 9.0, 3]] }
+  ];
+  // the mayors chosen after 2015 (real): their lists get an incumbency bonus next time
+  var CITY_MAYORS_2015 = { 'Madrid': 'Ahora Madrid', 'Barcelona': 'Barcelona en Comú', 'Valencia': 'Compromís', 'Seville': 'PSOE', 'Zaragoza': 'Zaragoza en Común',
+    'Málaga': 'PP', 'Murcia': 'PP', 'Palma': 'PSIB', 'Las Palmas': 'PSOE', 'Alicante': 'PSPV' };
+  // big-city factors: Vox and new statewide brands did worse in the large
+  // cities than in their regions (Vox 7.7% in Madrid city in 2019)
+  var CITY_FACTOR = { vox: 0.55, pod: 0.8, mp: 0.9 };
+  // national parties that may stand later in a city where they had no list in 2015
+  var CITY_NEWCOMERS = { vox: 'Vox', mp: 'Más País', pod: 'Podemos', psc: 'PSC' };
+  function regionShareNow(Q, region) {
+    var r = VoteModel.regionalShares(Q.vm, base())[region] || {};
+    var tot = Object.keys(r).reduce(function (a, k) { return a + r[k]; }, 0) || 1;
+    var o = {}; Object.keys(r).forEach(function (k) { o[k] = 100 * r[k] / tot; });
+    return o;
+  }
+  function cityElections(Q) {
+    Q.city_base = Q.city_base || {};
+    var out = [];
+    CITIES.forEach(function (C) {
+      var now = regionShareNow(Q, C.region);
+      if (!Q.city_base[C.region]) { Q.city_base[C.region] = now; }
+      var then = Q.city_base[C.region];
+      var first = Q.year === 2015;
+      var lists = C.lists.map(function (l) {
+        var parent = l[1] === 'psoe' && Q.psc_split && C.region === 'Cataluña' ? 'psc' : l[1];
+        var ratio = first ? 1 : Math.max(0.15, Math.min(4, ((now[parent] || 0) + 0.5) / ((then[l[1]] || 0) + 0.5)));
+        // a sitting mayor's list holds its vote better: half the regional swing, plus a bonus
+        var mayor = (Q.city_mayor || CITY_MAYORS_2015)[C.name] === l[0];
+        if (mayor && !first) { ratio = 1.06 * (0.6 + 0.4 * ratio); }
+        return { label: l[0], party: parent, pct: l[2] * ratio };
+      });
+      if (!first) {
+        // newcomers: a national party with no 2015 list stands at its regional share
+        Object.keys(CITY_NEWCOMERS).forEach(function (p) {
+          if ((now[p] || 0) >= 2 && !lists.some(function (x) { return x.party === p; })) {
+            lists.push({ label: CITY_NEWCOMERS[p], party: p, pct: (now[p] || 0) * (CITY_FACTOR[p] || 0.9) });
+          }
+        });
+      }
+      var known = lists.reduce(function (a, x) { return a + x.pct; }, 0);
+      var others = Math.max(4, 100 - C.lists.reduce(function (a, l) { return a + l[2]; }, 0));
+      var scale = (100 - others) / known;
+      lists.forEach(function (x) { x.pct = Math.round(x.pct * scale * 100) / 100; });
+      var turnout = C.turnout + (first ? 0 : 2 * gaussian());
+      var valid = Math.round(C.electorate * turnout / 100 * 0.985);
+      var votes = {}; lists.forEach(function (x) { if (x.pct >= 5) { votes[x.label] = x.pct; } });
+      var got = first ? null : dhondtSeats(votes, C.seats);
+      lists.forEach(function (x, i) {
+        x.votes = Math.round(valid * x.pct / 100);
+        x.seats = first ? (C.lists[i] ? C.lists[i][3] : 0) : (got[x.label] || 0);
+      });
+      lists.sort(function (a, b) { return b.seats - a.seats || b.pct - a.pct; });
+      var prev = (Q.cities || {})[C.name];
+      out.push({ name: C.name, seats: C.seats, turnout: Math.round(turnout * 10) / 10, valid: valid, lists: lists, others: Math.round(others * 10) / 10,
+                 prev: prev ? prev.lists.map(function (x) { return [x.label, x.seats]; }) : null, approx: C.a, year: Q.year });
+    });
+    Q.cities = {};
+    Q.city_mayor = Q.city_mayor || JSON.parse(JSON.stringify(CITY_MAYORS_2015));
+    out.forEach(function (c) {
+      Q.cities[c.name] = c;
+      // the largest list takes the mayoralty (2015 keeps the real mayors)
+      if (c.year !== 2015) { Q.city_mayor[c.name] = cityMayor(c); }
+      c.mayor = Q.city_mayor[c.name];
+    });
+    return out;
+  }
+  // Who becomes mayor: the largest list of a bloc with a majority (the PP,
+  // Cs and Vox together on the right); otherwise the largest list, which
+  // is elected by default under Spanish municipal law.
+  var CITY_RIGHT = ['pp', 'cs', 'vox', 'upn'];
+  function cityMayor(c) {
+    var maj = Math.floor(c.seats / 2) + 1;
+    var right = c.lists.filter(function (x) { return CITY_RIGHT.indexOf(x.party) !== -1; });
+    var left = c.lists.filter(function (x) { return CITY_RIGHT.indexOf(x.party) === -1 && ['junts', 'cc'].indexOf(x.party) === -1; });
+    var sum = function (l) { return l.reduce(function (a, x) { return a + x.seats; }, 0); };
+    if (sum(right) >= maj) { return right[0].label; }
+    if (sum(left) >= maj) { return left[0].label; }
+    return c.lists[0].label;
+  }
+  function renderCities(Q, id) {
+    var out = el(id);
+    if (!out || !Q.cities) { return; }
+    var html = '<p><strong>The big city councils</strong> (' + Object.keys(Q.cities).length + ' largest cities; click a city to expand)</p>';
+    Object.keys(Q.cities).forEach(function (name, i) {
+      var c = Q.cities[name];
+      var won = c.lists.filter(function (x) { return x.seats > 0; });
+      var pm = {}; (c.prev || []).forEach(function (p) { pm[p[0]] = p[1]; });
+      var summary = won.slice(0, 4).map(function (x) { return '<span class="sp-vote-chip"><span class="sp-swatch" style="background:' + UI.partyColor(x.party) + '"></span>' + x.label + ' ' + x.seats + '</span>'; }).join(' ');
+      html += '<details class="sp-city"><summary><b>' + name + '</b> ' + summary + '</summary>' +
+        '<svg id="' + id + '-c' + i + '" class="sp-hemicycle"></svg>' +
+        '<table class="sp-results sp-compact"><thead><tr><th>List</th><th class="sp-num">Votes</th><th class="sp-num">%</th><th class="sp-num">Seats</th>' + (c.prev ? '<th class="sp-num">±</th>' : '') + '</tr></thead><tbody>' +
+        c.lists.map(function (x) {
+          var d = c.prev ? (x.seats - (pm[x.label] || 0)) : null;
+          return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(x.party) + '"></span>' + x.label + '</td><td class="sp-num">' + x.votes.toLocaleString('en-GB') +
+            '</td><td class="sp-num">' + x.pct.toFixed(1) + '</td><td class="sp-num"><b>' + x.seats + '</b></td>' + (c.prev ? '<td class="sp-num" style="color:' + (d > 0 ? '#1a7f37' : (d < 0 ? '#b42318' : '#777')) + '">' + (d > 0 ? '▲' + d : (d < 0 ? '▼' + (-d) : '–')) + '</td>' : '') + '</tr>';
+        }).join('') + '</tbody></table><p class="sp-map-legend">Mayor: ' + (c.mayor || '?') + ' list. Turnout ' + c.turnout.toFixed(1) + '%. ' + c.seats + ' councillors; majority ' + (Math.floor(c.seats / 2) + 1) +
+        '. Other lists ' + c.others + '%.' + (c.year === 2015 && c.approx.length ? ' Estimated (not found in the sources): ' + c.approx.join(', ') + '.' : '') + (c.year === 2015 ? ' 2015 is the real result.' : ' Projected from regional polling since 2015.') + '</p></details>';
+    });
+    out.innerHTML = html;
+    Object.keys(Q.cities).forEach(function (name, i) {
+      var c = Q.cities[name], t = {};
+      c.lists.forEach(function (x) { if (x.seats) { t[x.party] = (t[x.party] || 0) + x.seats; } });
+      var box = out.querySelectorAll('details.sp-city')[i];
+      var draw = function () { UI.drawHemicycle('#' + id + '-c' + i, t); };
+      if (box) { box.addEventListener('toggle', function () { if (box.open) { draw(); } }); }
+    });
+  }
+
   // Gains and losses since the last municipal elections, largest first.
   function localSwing(Q) {
     var now = Q.local_seats, prev = Q.local_prev;
@@ -5466,7 +5605,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

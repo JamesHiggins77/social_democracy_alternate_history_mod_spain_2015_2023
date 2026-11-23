@@ -922,3 +922,28 @@ In ahistorical runs, being in government or polling low strengthens the Pragmati
   - a headline naming the biggest gain and the biggest loss;
   - a "Gains and losses since <year>" chart, sorted, with green and red bars;
   - for 2015, a paragraph on the citizen platforms winning Madrid and Barcelona and Cs entering councils.
+
+### 7.50 The ten largest city councils
+
+Municipal results, and the Regions tab, now list Madrid, Barcelona, Valencia, Seville, Zaragoza, Málaga, Murcia, Palma, Las Palmas and Alicante. Each city is a collapsible entry. The heading shows the largest lists and their seats; expanding it shows the seat diagram, a table of votes, percentage, seats and change, the turnout, the majority figure and the mayor.
+
+- **2015 is the real result.** Seats are sourced for every city. Vote shares are sourced for most lists:
+  - Madrid, Barcelona, Seville, Zaragoza, Murcia, Palma and Las Palmas from press and Wikipedia tables;
+  - Málaga derived from sourced vote counts;
+  - Valencia's PSPV and València en Comú, Seville's Cs, Alicante's Cs and Compromís, Las Palmas's Unidos por Gran Canaria, and most turnouts and electorates are estimated. They are labelled as estimated in the game.
+- **Local lists are kept:** Ahora Madrid, Barcelona en Comú, Compromís, València en Comú, Participa Sevilla, Zaragoza en Común, CHA, Málaga Ahora, Málaga para la Gente, Ahora Murcia, Cambiemos Murcia, MÉS per Palma, Som Palma, LPGC Puede, Unidos por Gran Canaria, Nueva Canarias and Guanyar Alacant. Each has a parent party for polling.
+- **Later elections:**
+  - each list moves with its parent party's share in its region since May 2015;
+  - a sitting mayor's list takes only 40% of the regional swing, with a 6% bonus;
+  - new statewide parties enter at their regional share times a big-city factor (Vox 0.55, Podemos 0.8, Más País 0.9);
+  - seats go by D'Hondt with a 5% threshold;
+  - the mayor is the largest list of a bloc with a majority (PP, Cs and Vox together on the right), otherwise the largest list.
+- **Sanity check against reality (historical replay; real figures from memory, approximate):**
+  - 2019 Madrid: sim Ahora/Más Madrid 19, PP 16, PSOE 10, Cs 7, Vox 5; real 19 / 15 / 8 / 11 / 4.
+  - 2019 Valencia, Seville, Palma, Murcia and Alicante are within a seat or two per party.
+  - 2023: PP-led wins in Valencia, Zaragoza, Málaga, Murcia, Palma and Alicante, as in reality.
+  - **Known gaps:**
+    - Barcelona underrates the PSC and overrates Junts. The PSC's 2015 base was its historic low and the regional swing does not recover it.
+    - Más Madrid stays too strong in 2023 (17 against 12). In the simulation it keeps the mayoralty in 2019 because the right falls one seat short.
+    - Zaragoza en Común holds up better than it really did.
+    - Las Palmas goes to the PP in 2023, where the PSOE really won.

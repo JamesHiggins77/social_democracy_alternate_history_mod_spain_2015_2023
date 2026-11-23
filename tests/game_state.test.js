@@ -1182,3 +1182,15 @@ test('the Podemos-Sumar split: the populist left leaves with Podemos, the pragma
   assert.ok(Q.rf.up.pragmatic > Q.rf.up.populist);
   assert.strictEqual(require('../out/html/spain/entities.js').lookup('Yolanda Díaz').wing.indexOf('Pragmatic left') !== -1, true);
 });
+
+test('big city councils: 2015 is the real result; later elections are projected', () => {
+  const Q = newQ();
+  while (!(Q.year === 2015 && Q.month === 6)) { G.endOfMonth(Q); }
+  const m = Q.cities['Madrid'];
+  assert.strictEqual(m.lists.find(x => x.label === 'PP').seats, 21);
+  assert.strictEqual(m.lists.find(x => x.label === 'Ahora Madrid').seats, 20);
+  assert.strictEqual(Q.cities['Barcelona'].lists.find(x => x.label === 'Barcelona en Comú').seats, 11);
+  Object.values(Q.cities).forEach(c => assert.strictEqual(c.lists.reduce((a, x) => a + x.seats, 0), c.seats, c.name));
+  while (!(Q.year === 2019 && Q.month === 6)) { G.endOfMonth(Q); }
+  Object.values(Q.cities).forEach(c => assert.strictEqual(c.lists.reduce((a, x) => a + x.seats, 0), c.seats, c.name + ' 2019'));
+});

@@ -621,3 +621,6 @@ a.sp-ent { text-decoration: none; }
 .sp-swing-bar { height: 10px; border-radius: 2px; }
 .sp-swing-bar.up { background: #1a7f37; }
 .sp-swing-bar.down { background: #b42318; }
+details.sp-city { border-bottom: 1px solid #ddd; padding: 4px 0; }
+details.sp-city summary { cursor: pointer; }
+details.sp-city .sp-hemicycle { max-width: 360px; display: block; margin: 6px auto; }

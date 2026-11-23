@@ -147,12 +147,15 @@ title: Regions
 on-display: {!
 if (typeof window !== 'undefined' && window.SpainGame && Q.regions) {
     window.SpainGame.renderRegions(Q, 'sp-side-regions');
+    window.SpainGame.renderCities(Q, 'sp-side-cities');
 }
 !}
 
 = Regions
 
 {!<div id="sp-side-regions"></div>!}
+
+{!<div id="sp-side-cities"></div>!}
 
 @polls
 title: Polls
