@@ -1818,15 +1818,60 @@
     'Castilla y León': 3, 'Castilla-La Mancha': 3, 'Cataluña': 8, 'Comunidad Valenciana': 6, 'Extremadura': 2,
     'Galicia': 3, 'Madrid': 7, 'Región de Murcia': 2, 'Navarra': 1, 'País Vasco': 3, 'La Rioja': 1 };
 
+  // Limited vote: each voter has one vote fewer than the seats. A party's
+  // candidates poll slightly less down its ticket (split tickets, name
+  // recognition), so a close second can take two seats. Islands vote apart:
+  // Mallorca, Gran Canaria and Tenerife elect 3 (2+1); the small islands 1
+  // each, which local machines often win (ASG in La Gomera, AHI-CC in El
+  // Hierro, CC in Lanzarote/Fuerteventura) when their vote is strong enough.
+  var SENATE_DECAY = 0.015;
+  // Senate ballots list candidates by name; new parties with unknown names
+  // poll below their Congress vote (Podemos and Cs both did in 2015-16).
+  var SENATE_NEWCOMER = { up: 0.88, cs: 0.9, vox: 0.92, mp: 0.9, pod: 0.9,
+    // pro-independence voters concentrate on ERC's Senate slate (ERC took
+    // 6 senators in 2015 and 10 in 2016 while third or fourth in Congress)
+    erc: 1.06 };
+  var SENATE_SMALL_ISLANDS = {
+    'Baleares': [['Menorca', null], ['Ibiza-Formentera', null]],
+    'Las Palmas': [['Lanzarote', 'cc'], ['Fuerteventura', 'cc']],
+    'SC de Tenerife': [['La Palma', 'cc'], ['La Gomera', 'x:ASG'], ['El Hierro', 'cc']]
+  };
+  function limitedVote(lists, seats, votes) {
+    var cands = [];
+    lists.forEach(function (l) {
+      if (l.votes <= 0) { return; }
+      for (var i = 0; i < votes; i++) { cands.push({ id: l.id, v: l.votes * (1 - SENATE_DECAY * i) }); }
+    });
+    cands.sort(function (a, b) { return b.v - a.v; });
+    var out = {};
+    cands.slice(0, seats).forEach(function (c) { out[c.id] = (out[c.id] || 0) + 1; });
+    return out;
+  }
   function senateElected(ballots) {
     var out = {};
+    var add = function (o) { Object.keys(o).forEach(function (k) { out[k] = (out[k] || 0) + o[k]; }); };
     Object.keys(ballots).forEach(function (prov) {
       var lists = ballots[prov].lists.map(function (l) {
         return Array.isArray(l) ? { id: l[0], votes: l[2] } : l;
+      }).filter(function (l) { return !/^x:/.test(l.id); }).map(function (l) {
+        return { id: l.id, votes: l.votes * (SENATE_NEWCOMER[l.id] || 1) };
       }).sort(function (a, b) { return b.votes - a.votes; });
-      var split = SENATE_ISLANDS[prov] || [3, 1];
-      if (lists[0]) { out[lists[0].id] = (out[lists[0].id] || 0) + split[0]; }
-      if (lists[1] && split[1]) { out[lists[1].id] = (out[lists[1].id] || 0) + split[1]; }
+      if (!lists.length) { return; }
+      if (prov === 'Ceuta' || prov === 'Melilla') { add(limitedVote(lists, 2, 2)); return; }
+      var small = SENATE_SMALL_ISLANDS[prov];
+      if (!small) { add(limitedVote(lists, 4, 3)); return; }
+      add(limitedVote(lists, 3, 2));
+      var total = lists.reduce(function (a, l) { return a + l.votes; }, 0);
+      var share = function (id) { var l = lists.filter(function (x) { return x.id === id; })[0]; return l ? l.votes / total : 0; };
+      small.forEach(function (isl) {
+        var local = isl[1], o = {};
+        // ASG's hold on La Gomera is personal (Casimiro Curbelo) and survives
+        // any national swing; CC's island seats need a solid provincial vote.
+        if (local === 'x:ASG') { o[local] = 1; }
+        else if (local === 'cc' && share('cc') >= (isl[0] === 'El Hierro' ? 0.05 : 0.2)) { o.cc = 1; }
+        else { o[lists[0].id] = 1; }
+        add(o);
+      });
     });
     return out;
   }
