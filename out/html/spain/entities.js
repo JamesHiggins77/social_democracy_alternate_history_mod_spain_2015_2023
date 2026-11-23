@@ -619,7 +619,8 @@
   var FACTION_LABEL = {
     pp: { centrists: 'Centrists', pragmatists: 'Pragmatists', right: 'National-populist right' },
     cs: { progressives: 'Social liberals', liberals: 'Liberals', national: 'National liberals' },
-    up: { errejonistas: 'Transversal populists (errejonistas)', pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
+    up: { errejonistas: 'Transversal populists (errejonistas)', pragmatic: 'Pragmatic left (Sumar)', pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
+    pod: { pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
     vox: { national: 'National conservatives', catholic: 'Ultra-Catholic nationalists', liberals: 'Liberal conservatives' }
   };
   var FACTION_OF = {
@@ -638,12 +639,12 @@
     'Juan Carlos Girauta': 'national', 'José Manuel Villegas': 'national',
     'Pablo Iglesias': 'pablistas', 'Íñigo Errejón': 'errejonistas', 'Irene Montero': 'pablistas', 'Ione Belarra': 'pablistas',
     'Pablo Echenique': 'pablistas', 'Teresa Rodríguez': 'anticapitalistas', 'Nacho Álvarez': 'pablistas', 'Pablo Bustinduy': 'errejonistas',
-    'Carolina Bescansa': 'errejonistas', 'Julio Rodríguez': 'pablistas',
+    'Carolina Bescansa': 'errejonistas', 'Julio Rodríguez': 'pablistas', 'Yolanda Díaz': 'pragmatic', 'Ernest Urtasun': 'pragmatic',
     'Santiago Abascal': 'national', 'Rocío Monasterio': 'liberals', 'Javier Ortega Smith': 'national', 'Iván Espinosa de los Monteros': 'liberals',
     'Jorge Buxadé': 'catholic', 'Macarena Olona': 'national', 'Agustín Rosety': 'national', 'Francisco Serrano': 'national'
   };
   // independents and allies inside the Podemos space have no current
-  var FACTION_NOTE = { 'Yolanda Díaz': 'Sumar: outside Podemos\'s currents', 'Manuel Castells': 'Independent', 'Xavier Domènech': 'En Comú Podem (ally)',
+  var FACTION_NOTE = { 'Manuel Castells': 'Independent', 'Xavier Domènech': 'En Comú Podem (ally)',
     'Juantxo López de Uralde': 'Equo (ally)', 'Ernest Urtasun': 'Comuns / Sumar (ally)' };
 
   // Build one regex over every name, longest first, with letter boundaries.

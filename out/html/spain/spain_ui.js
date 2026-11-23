@@ -12,7 +12,7 @@
   // Left-to-right order for the hemicycle: [id, full name, colour, short name].
   var PARTIES = [
     ['cup', 'CUP', '#FFED00', 'CUP'], ['bildu', 'EH Bildu', '#B3A400', 'Bildu'],
-    ['erc', 'ERC', '#FFB232', 'ERC'], ['up', 'Podemos / UP / Sumar', '#6B2E68', 'Podemos'],
+    ['erc', 'ERC', '#FFB232', 'ERC'], ['up', 'Podemos / UP / Sumar', '#6B2E68', 'Podemos'], ['pod', 'Podemos', '#7C2D8C', 'Podemos'],
     ['iu', 'IU', '#A50021', 'IU'], ['mp', 'Más País / Compromís', '#0FDEC4', 'Más País'],
     ['compromis', 'Compromís', '#F39200', 'Compromís'], ['mes', 'Més per Mallorca', '#C4D600', 'Més'],
     ['mxme', 'Més per Menorca', '#9FBF1F', 'MxMe'], ['cha', 'Chunta Aragonesista', '#3A8A3A', 'CHA'],

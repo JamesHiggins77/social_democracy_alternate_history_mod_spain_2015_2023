@@ -2246,6 +2246,7 @@
     lineDrift(Q);
     ahistoricalTick(Q);
     rivalFactions(Q);
+    podemosSplit(Q);
     rightRealignment(Q);
     senateQueue(Q);
     splitChecks(Q);
@@ -2431,6 +2432,9 @@
     if (p === 'vox') {
       return 'Santiago Abascal';
     }
+    if (p === 'pod') {
+      return 'Ione Belarra';
+    }
     if (p === 'cs') {
       return Q.cs_collapsed || Q.rivera_resigns_seen ? 'Inés Arrimadas' : LEADERS.cs;
     }
@@ -2460,7 +2464,7 @@
 
   // Saves from older versions: give every field added since a default, so
   // conditions in the scenes never compare against undefined.
-  var DEFAULTS = { rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
+  var DEFAULTS = { pod_split: 0, pod_split_due: 0, rf_change_due: 0, cab_share_set: 0, cab_share: '', law_timer: 0, message_timer: 0, terr_timer: 0, eurol_timer: 0, offer_timer: 0,
     offer_pending: 0, psc_split: 0, psc_due: 0, left_split: 0, left_split_due: 0, senate_lifted_due: 0, realign_due: 0,
     bicephaly: 0, cat_repeat_due: 0, pending_budget: 0, budget_senate_delay: 0, law_senate_delay: 0, ahistorical: 0,
     alt_due: 0, rivera_open: 0, pm_months: 0, const_line: 0.6, eu_line: 1.2, laws_failed: 0, coalition_strain: 0 };
@@ -3798,6 +3802,12 @@
   // Stances for parties the stance tables do not know: the PSC after it
   // leaves the PSOE votes with it when allied, otherwise against the PP.
   function fillStances(Q, st, seats) {
+    if (seats && seats.pod && !st.pod) {
+      st = Object.assign({}, st);
+      var rp = Q.rel_pod === undefined ? 30 : Q.rel_pod;
+      // Podemos follows Sumar against the right, but makes the PSOE earn its vote
+      st.pod = st.up === 'yes' && st.pp !== 'yes' ? (rp >= 45 ? 'yes' : (rp >= 25 ? 'abstain' : 'no')) : (st.up || 'no');
+    }
     if (Q.vote_kind === 'censure' && Q.fork_pnv_rajoy === 1 && (Q.rel_pnv || 40) < 75 && st.pnv === 'yes') {
       st = Object.assign({}, st); st.pnv = 'no';
     }
@@ -3986,6 +3996,31 @@
     Q.left_split_due = 1;
     recalculate(Q);
   }
+
+  // The Podemos–Sumar split (historically December 2023, when Podemos's five
+  // deputies left Sumar's group). The pragmatic left and the errejonistas
+  // stay in Sumar; the pablistas and the anticapitalists take Podemos out.
+  // Ahistorical: it happens if the pablistas are strong enough when Sumar
+  // forms, or not at all.
+  function podemosSplit(Q) {
+    if (Q.pod_split || !Q.sumar_merged || !Q.rf || !Q.rf.up) { return; }
+    var f = Q.rf.up, hard = (f.pablistas || 0) + (f.anticapitalistas || 0);
+    var due = Q.ahistorical ? (ym2(Q) >= 202312 && fork(Q, 'pod_split', Math.min(0.9, hard / 60))) : ym2(Q) >= 202312;
+    if (!due) { return; }
+    Q.pod_split = 1; Q.pod_split_due = 1;
+    var frac = Math.max(0.1, Math.min(0.5, hard / 100 * 0.45));
+    // deputies, senators, MEPs, regional deputies, councillors
+    Q.pod_moved = moveSeats(Q, 'up', frac, { pod: 1 }, null);
+    Q.pod_moved_congress = Q.pod_moved.congress || 0;
+    // voters: Podemos keeps the more radical, younger part of the vote
+    if (Q.vm) { transfer(Q, 'up', 'pod', share(Q, 'up', Math.min(0.4, hard / 100 * 0.6))); }
+    Q.rf.pod = { pablistas: 100 * (f.pablistas || 0) / Math.max(1, hard), anticapitalistas: 100 * (f.anticapitalistas || 0) / Math.max(1, hard) };
+    Q.rel_pod = Math.max(10, (Q.rel_up || 40) - 20);
+    // Sumar is now led by Díaz with the pragmatic left
+    Q.up_successor = 'Yolanda Díaz';
+    recalculate(Q);
+  }
+
   // Monthly checks for the splits.
   function splitChecks(Q) {
     // only while that PP government stands: the 2016 abstention does not count for ever
@@ -4796,8 +4831,13 @@
     ],
     up: [
       ['errejonistas', 'Transversal populists', 'Íñigo Errejón\'s current: national-popular, aimed at the centre of the electorate, pragmatic with the PSOE.'],
+      ['pragmatic', 'Pragmatic left', 'Yolanda Díaz\'s current, the core of Sumar: labour-left, negotiated reforms (the 2021 labour reform), a junior partner to the PSOE.'],
       ['pablistas', 'Left populists', 'Pablo Iglesias\'s current: an alliance with IU, a harder line on the PSOE, and from 2019 a coalition inside government.'],
       ['anticapitalistas', 'Anticapitalists', 'Miguel Urbán and Teresa Rodríguez: the radical left, against governing with the PSOE; they left Podemos in 2020.']
+    ],
+    pod: [
+      ['pablistas', 'Left populists', 'Ione Belarra and Irene Montero: Podemos after the break with Sumar; a harder line on the PSOE.'],
+      ['anticapitalistas', 'Anticapitalists', 'What remains of the radical current inside Podemos.']
     ],
     vox: [
       ['national', 'National conservatives', 'Santiago Abascal\'s core: Spanish unity, immigration and order; the party line.'],
@@ -4809,15 +4849,18 @@
   var FACTION_HISTORY = {
     pp: { 2014: [45, 40, 15], 2018: [25, 35, 40], 2022: [30, 45, 25], 2024: [25, 45, 30] },
     cs: { 2014: [40, 35, 25], 2017: [20, 45, 35], 2018: [15, 35, 50], 2020: [30, 45, 25] },
-    up: { 2014: [40, 50, 10], 2017: [35, 55, 10], 2019: [20, 70, 10], 2021: [15, 80, 5] },
+    up: { 2014: [40, 3, 47, 10], 2017: [35, 3, 52, 10], 2019: [20, 5, 65, 10], 2021: [12, 35, 48, 5], 2023: [10, 55, 30, 5] },
+    pod: { 2014: [85, 15], 2023: [90, 10] },
     vox: { 2014: [60, 15, 25], 2019: [55, 15, 30], 2023: [55, 35, 10], 2024: [55, 40, 5] }
   };
   function factionsInit(Q) {
+    if (Q.rf && Q.rf.up && Q.rf.up.pragmatic === undefined) { Q.rf.up.pragmatic = 5; }
+    if (Q.rf && !Q.rf.pod) { Q.rf.pod = { pablistas: 85, anticapitalistas: 15 }; }
     if (Q.rf) { return; }
     Q.rf = {};
     Object.keys(RIVAL_FACTIONS).forEach(function (p) {
       var h = FACTION_HISTORY[p][2014];
-      Q.rf[p] = {}; RIVAL_FACTIONS[p].forEach(function (f, i) { Q.rf[p][f[0]] = h[i]; });
+      Q.rf[p] = {}; RIVAL_FACTIONS[p].forEach(function (f, i) { Q.rf[p][f[0]] = h[i] === undefined ? 10 : h[i]; });
     });
   }
   function rivalFactions(Q) {
@@ -4825,6 +4868,11 @@
     var t = Q.true_poll || {};
     Object.keys(RIVAL_FACTIONS).forEach(function (p) {
       var F = RIVAL_FACTIONS[p], cur = Q.rf[p];
+      if (p === 'pod' && !Q.pod_split) { return; }
+      if (p === 'up' && Q.pod_split) {
+        // after the split, Sumar keeps only the pragmatic left and the errejonistas
+        cur.pablistas = 3; cur.anticapitalistas = 2;
+      }
       if (!Q.ahistorical) {
         // follow the real balance
         var yrs = Object.keys(FACTION_HISTORY[p]).map(Number).filter(function (y) { return y <= Q.year; });
@@ -4837,7 +4885,7 @@
         var push = {};
         if (p === 'pp') { push.right = (t.vox || 0) / 10; push.centrists = (t.cs || 0) / 12; }
         if (p === 'cs') { push.national = Q.catalan_crisis ? 1 : 0; push.progressives = (Q.rel_cs || 40) > 55 ? 0.6 : 0; }
-        if (p === 'up') { push.pablistas = (Q.govt_parties || []).indexOf('up') !== -1 ? 0.8 : 0; push.anticapitalistas = (Q.econ_left || 0) < 0 ? 0.6 : 0; push.errejonistas = (t.up || 0) < 12 ? 0.5 : 0; }
+        if (p === 'up') { push.pragmatic = Q.year >= 2020 && (Q.govt_parties || []).indexOf('up') !== -1 ? 0.8 : 0; push.pablistas = (Q.govt_parties || []).indexOf('up') !== -1 && Q.year < 2020 ? 0.8 : 0; push.anticapitalistas = (Q.econ_left || 0) < 0 ? 0.6 : 0; push.errejonistas = (t.up || 0) < 12 ? 0.5 : 0; }
         if (p === 'vox') { push.catholic = (Q.social_prog || 0) > 3 ? 0.8 : 0; push.liberals = (t.cs || 0) > 12 ? 0.5 : 0; }
         F.forEach(function (f) { cur[f[0]] = Math.max(3, cur[f[0]] + (push[f[0]] || 0) + 1.2 * gaussian()); });
       }
@@ -4884,9 +4932,9 @@
     var out = el(id);
     if (!out) { return; }
     factionsInit(Q);
-    out.innerHTML = Object.keys(RIVAL_FACTIONS).map(function (p) {
+    out.innerHTML = Object.keys(RIVAL_FACTIONS).filter(function (p) { return p !== 'pod' || Q.pod_split; }).map(function (p) {
       var F = RIVAL_FACTIONS[p], cur = Q.rf[p];
-      return '<p class="sp-fac-party"><b>' + UI.partyName(p) + '</b></p><table class="sp-results sp-compact"><tbody>' + F.map(function (f) {
+      return '<p class="sp-fac-party"><b>' + (p === 'up' && Q.pod_split ? 'Sumar' : UI.partyName(p)) + '</b></p><table class="sp-results sp-compact"><tbody>' + F.map(function (f) {
         var v = cur[f[0]] || 0, lead = Q['rf_' + p + '_top'] === f[0];
         return '<tr title="' + f[2].replace(/"/g, '&quot;') + '"><td>' + (lead ? '<b>' + f[1] + '</b>' : f[1]) + '</td><td class="sp-num">' + Math.round(v) +
           '%</td><td style="width:40%"><div class="sp-rep-bar"><span style="width:' + v.toFixed(0) + '%;background:' + UI.partyColor(p) + '"></span></div></td></tr>';
@@ -5376,7 +5424,7 @@
     iglesiasSuccessor: iglesiasSuccessor, podemosBrand: podemosBrand,
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
-    voteLaw: voteLaw, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
+    voteLaw: voteLaw, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,
     grandCoalitionWear: grandCoalitionWear,

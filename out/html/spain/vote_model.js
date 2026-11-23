@@ -19,7 +19,7 @@
     ? require('./electoral_engine.js') : root.SpainElectoral;
 
   // Statewide parties driven by the class layer.
-  var STATEWIDE = ['psoe', 'pp', 'cs', 'up', 'iu', 'vox', 'mp', 'pacma', 'upyd', 'ps'];
+  var STATEWIDE = ['psoe', 'pp', 'cs', 'up', 'iu', 'vox', 'mp', 'pacma', 'upyd', 'ps', 'pod'];
   // Statewide parties large enough in 2015 for their regional pattern to be
   // meaningful. Smaller and new parties grow by class mix x regional affinity
   // instead of amplifying their 2015 micro-vote.

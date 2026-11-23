@@ -2146,3 +2146,16 @@ on-arrival: rf_change_due = 0
 = [+ rf_change_party +]: the [+ rf_change_faction +] take over
 
 Inside [+ rf_change_party +], the balance has tipped: the [+ rf_change_faction +] now set the party's line. Its relations with its neighbours, and the voters it chases, will change with them.
+
+@podemos_sumar_split
+title: Podemos leaves Sumar
+new-page: true
+tags: sp_event
+view-if: pod_split_due = 1
+on-arrival: pod_split_due = 0
+
+= Podemos leaves Sumar
+
+The coalition Yolanda Díaz built to unite the left breaks apart. Podemos, led by Ione Belarra and Irene Montero, takes its [+ pod_moved_congress +] deputies out of Sumar's group in Congress and into the Mixed Group. The pablistas and what remains of the anticapitalists go with Podemos; the pragmatic left and the errejonistas stay with Díaz in Sumar.
+
+From now on there are two parties to the PSOE's left, and every vote in Congress needs both.
