@@ -2514,3 +2514,74 @@ Your campaign team starts talking about the voto útil. Sumar's spokespeople com
 on-arrival: {! Q.rel_up = (Q.rel_up || 40) + 2; !}
 
 You let the left sort itself out.
+
+
+@coalition_row
+title: Row in the coalition
+new-page: true
+tags: sp_event
+view-if: coal_row_due = 1 and coal_row_player = 1
+on-arrival: coal_row_due = 0
+
+= Row in the coalition
+
+The partners in the [+ coal_row_govt +] government fall out in public over [+ coal_row_topic +]. Ministers contradict each other on the radio; the opposition reads their quotes back to them in Congress. Infighting costs both parties, and the smaller partner more.
+
+- @row_give: Give ground: let the partner have this one
+- @row_firm: Hold firm
+- @row_summit: Call a leaders' summit and agree a joint line
+
+@row_give
+subtitle: Lowers the strain; your own side sees weakness
+on-arrival: {! Q.coalition_strain = Math.max(0, (Q.coalition_strain || 0) - 3); Q.sanchez_authority -= 2; !}
+
+You concede quietly. The row ends; your ministers grumble.
+
+@row_firm
+subtitle: Your side is pleased; the coalition takes the strain
+on-arrival: {! Q.coalition_strain = (Q.coalition_strain || 0) + 2; Q.sanchez_authority += 2; !}
+
+You hold the line. Your partner's spokespeople say the coalition agreement is being torn up.
+
+@row_summit
+subtitle: Costs an action; lowers the strain a little and limits the damage
+on-arrival: {! Q.month_actions += 1; Q.coalition_strain = Math.max(0, (Q.coalition_strain || 0) - 1.5); !}
+
+Six hours in Moncloa and a joint statement. Nobody believes it settles anything, but the headlines move on.
+
+@coalition_row_news
+title: Row in the government
+new-page: true
+tags: sp_event
+view-if: coal_row_due = 1 and coal_row_player = 0
+on-arrival: coal_row_due = 0
+
+= Row in the government
+
+The [+ coal_row_govt +] coalition is fighting in public over [+ coal_row_topic +]. Both parties are slipping in the polls; the junior partner most of all.
+
+@coalition_breaks
+title: The coalition breaks
+new-page: true
+tags: sp_event
+view-if: coal_break_due = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.coalitionBreak(Q); } else { Q.coal_break_due = 0; } !}
+
+= The coalition breaks
+
+[+ coal_break_partner_name +] walks out of the government. Its ministers resign, and [+ coal_break_senior_name +] carries on alone, in minority. There is no election yet. But a government without its partner has to find votes for every law, and the next budget will be the test.
+
+[? if coal_break_player_senior = 1 : Your former partner will vote against your next budget unless you buy its support back. ?][? if coal_break_player_junior = 1 : You are out of the government, and free to oppose it. ?]
+
+@npc_budget_vote
+title: The government's budget
+new-page: true
+tags: sp_event
+view-if: npc_budget_ready = 1
+on-arrival: {! if (window.SpainGame) { window.SpainGame.npcBudget(Q); } else { Q.npc_budget_due = 0; } !}
+
+= The government's budget
+
+Without its former partner, [+ npc_budget_pm +]'s government brings its budget to Congress.
+
+[? if npc_budget_lost = 0 : It scrapes through. The government survives, for now. ?][? if npc_budget_lost = 1 : Congress throws it out. [? if npc_budget_election = 1 : [+ npc_budget_pm +] dissolves the Cortes: there will be a general election in two months. ?][? if npc_budget_election = 0 : [+ npc_budget_pm +] decides to govern on the rolled-over budget rather than go to the country. ?] ?]

@@ -471,6 +471,9 @@
     lawFlags(Q);
     roleFlags(Q);
     catalanCrisisState(Q, false);
+    Q.up_short = UI.shortName('up');
+    triCheck(Q);
+    Q.npc_budget_ready = Q.npc_budget_due && (Q.time || 0) >= (Q.npc_budget_time || 0) ? 1 : 0;
     var brand = podemosBrand(Q);
     if (Q.up_brand !== brand[0]) {
       Q.up_brand = brand[0];
@@ -1327,10 +1330,168 @@
     return Q.coup_survived;
   }
 
+  // ------------------------------------------------------------------
+  // The three-way government: PSOE, Podemos/Sumar and Ciudadanos. Possible
+  // but very hard (Ciudadanos and Podemos refused to sit together in 2016).
+  // Needs: talks with both; very good relations with both; a PSOE line that
+  // is neither too far left nor too moderate; Cs led by its liberals;
+  // Podemos led by its pragmatic left (a populist-led Podemos can be bought
+  // at a price; an anticapitalist-led one cannot); and a majority that does
+  // not need the Catalan independence parties, which Cs will never accept.
+  // ------------------------------------------------------------------
+  var TRI_FRIENDS = ['psoe', 'up', 'cs', 'iu', 'mp', 'compromis', 'pnv', 'cc', 'prc', 'te', 'nc', 'bng', 'geroa'];
+  function triCheck(Q) {
+    var c = Q.congress || {}, yes = 0, rest = 0;
+    Object.keys(c).forEach(function (p) { if (TRI_FRIENDS.indexOf(p) !== -1) { yes += c[p]; } else { rest += c[p]; } });
+    var e = Q.econ_left || 0;
+    var csTop = Q.rf_cs_top || 'liberals', upTop = Q.rf_up_top || 'pragmatic';
+    var csGap = Q.rf && Q.rf.cs ? (Q.rf.cs.national || 0) - Math.max(Q.rf.cs.liberals || 0, Q.rf.cs.progressives || 0) : 0;
+    var reasons = [];
+    if ((Q.up_talks || 0) < 2 || (Q.cs_talks || 0) < 2) { reasons.push('the talks with both parties must be well advanced'); }
+    if ((Q.rel_up || 0) < 80 || (Q.rel_cs || 0) < 80) { reasons.push('relations with both must be very good'); }
+    if (e > 2.5) { reasons.push('Ciudadanos finds your line too far left'); }
+    if (e < -1) { reasons.push('Podemos finds your line too moderate'); }
+    Q.tri_cs_ok = csTop !== 'national' || (Q.cs_courted && csGap < 10) ? 1 : 0;
+    if (!Q.tri_cs_ok) { reasons.push('Ciudadanos is led by its national liberals'); }
+    Q.tri_up_ok = upTop === 'anticapitalistas' ? 0 : 1;
+    Q.tri_up_cost = upTop === 'populist' && !Q.up_courted ? 3 : 0;
+    if (!Q.tri_up_ok) { reasons.push('Podemos is led by its anticapitalists'); }
+    if (Q.tri_up_cost && (Q.funds || 0) < Q.tri_up_cost) { reasons.push('winning over a populist-led Podemos needs party funds you do not have'); }
+    Q.tri_no_catalans = yes > rest ? 1 : 0;
+    if (!Q.tri_no_catalans) { reasons.push('it would need the Catalan independence parties, which Ciudadanos will never accept'); }
+    Q.tri_possible = reasons.length ? 0 : 1;
+    Q.tri_reason = reasons.length ? 'Not possible: ' + reasons.join('; ') + '.' : '';
+    Q.tri_seats = yes;
+  }
+  // Spend party resources on the other parties' internal balance.
+  function courtFaction(Q, party) {
+    Q.funds = (Q.funds || 0) - 1.5;
+    factionsInit(Q);
+    if (party === 'cs') {
+      Q.cs_courted = 1;
+      Q.rf.cs.liberals += 6; Q.rf.cs.progressives += 4; Q.rf.cs.national = Math.max(3, Q.rf.cs.national - 8);
+      Q.rel_cs = (Q.rel_cs || 40) + 4;
+    } else {
+      Q.up_courted = 1;
+      Q.rf.up.pragmatic += 8; Q.rf.up.populist = Math.max(3, Q.rf.up.populist - 5);
+      Q.rel_up = (Q.rel_up || 40) + 4;
+    }
+    recalculate(Q);
+  }
+
+  // ------------------------------------------------------------------
+  // Coalition strain, rows and breakdowns, for any coalition government
+  // (the PSOE's or the others'). Strain builds each month from the pair's
+  // distance and from flashpoints (budgets, the pandemic, corruption, Vox),
+  // and fades slowly. Rows cost both partners votes, the smaller one more;
+  // a coalition under enough strain can break. A broken coalition does not
+  // mean an election at once, but the next budget is likely lost.
+  // ------------------------------------------------------------------
+  function coalitionMonthly(Q) {
+    var g = Q.govt_parties || [];
+    if (g.length < 2 || Q.acting) { Q.coalition_strain = Math.max(0, (Q.coalition_strain || 0) * 0.9); return; }
+    var has = function (p) { return g.indexOf(p) !== -1; };
+    var base = 0.15;
+    if (has('psoe') && has('up') && has('cs')) { base = 0.45; }
+    else if (has('psoe') && has('up')) { base = 0.22 * (Q.rf_up_top === 'pragmatic' ? 0.7 : (Q.rf_up_top === 'populist' ? 1.3 : 1.6)); }
+    else if (has('pp') && has('cs')) { base = 0.15 + (Q.pp_vox_regions ? 0.25 : 0) + 0.08 * Math.min(4, Q.pp_scandal || 0); }
+    else if (has('pp') && has('vox')) { base = 0.3; }
+    else if (has('pp') && has('psoe')) { base = 0.3; }
+    // flashpoints: budget season, the first months of the pandemic, corruption
+    if (Q.month >= 9 && Q.month <= 11) { base += 0.15; }
+    if (Q.year === 2020 && Q.month >= 3 && Q.month <= 6) { base += 0.4; }
+    if (Q.koldo_seen && has('psoe')) { base += 0.1; }
+    Q.coalition_strain = clamp((Q.coalition_strain || 0) * 0.97 + base + 0.15 * gaussian(), 0, 20);
+    var since = (Q.time || 0) - (Q.coal_row_time || -99);
+    if (since >= 4 && Math.random() < Q.coalition_strain / 45) {
+      coalitionRow(Q);
+    }
+    if (Q.coalition_strain >= 11 && !Q.coal_break_due && Math.random() < 0.08 + (Q.coalition_strain - 11) * 0.03) {
+      Q.coal_break_due = 1;
+      Q.coal_break_partner = g[g.length - 1];
+      Q.coal_break_senior = g[0];
+      Q.coal_break_partner_name = UI.partyName(Q.coal_break_partner);
+      Q.coal_break_senior_name = UI.partyName(Q.coal_break_senior);
+      Q.coal_break_player_senior = g[0] === (Q.player_party || 'psoe') ? 1 : 0;
+      Q.coal_break_player_junior = Q.coal_break_partner === (Q.player_party || 'psoe') ? 1 : 0;
+      Q.coal_break_player_in = Q.coal_break_player_senior || Q.coal_break_player_junior || has(Q.player_party || 'psoe') ? 1 : 0;
+    }
+  }
+  var ROW_TOPICS = [['the budget', 'budget'], ['the response to the pandemic', 'covid'], ['a corruption case', 'corruption'],
+    ['relations with Vox', 'vox'], ['housing and rents', 'housing'], ['Catalonia', 'catalonia'], ['the monarchy', 'monarchy'], ['taxes', 'taxes']];
+  function coalitionRow(Q) {
+    var g = Q.govt_parties || [];
+    var has = function (p) { return g.indexOf(p) !== -1; };
+    var pool = ROW_TOPICS.filter(function (t) {
+      if (t[1] === 'covid') { return Q.year === 2020 || (Q.year === 2021 && Q.month <= 6); }
+      if (t[1] === 'vox') { return has('cs') || has('vox'); }
+      if (t[1] === 'corruption') { return has('pp') || Q.koldo_seen; }
+      if (t[1] === 'monarchy') { return has('up'); }
+      if (t[1] === 'housing') { return has('up'); }
+      if (t[1] === 'catalonia') { return has('cs') || has('up'); }
+      return true;
+    });
+    var t = pool[Math.floor(Math.random() * pool.length)];
+    Q.coal_row_time = Q.time || 0;
+    Q.coal_row_topic = t[0];
+    Q.coal_rows = (Q.coal_rows || 0) + 1;
+    Q.coalition_strain = (Q.coalition_strain || 0) + 1;
+    // infighting costs both partners votes, the smaller one more
+    var c = Q.congress || {};
+    var big = g.slice().sort(function (a, b) { return (c[b] || 0) - (c[a] || 0); })[0];
+    var opp = Object.keys(c).filter(function (p) { return g.indexOf(p) === -1 && ['pp', 'psoe', 'vox', 'up', 'cs'].indexOf(p) !== -1; });
+    var to = {}; opp.forEach(function (p) { to[p] = 1 / opp.length; });
+    var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
+    if (opp.length) {
+      g.forEach(function (p) { transfer(Q, p, to, all(p === big ? 0.25 : 0.45)); });
+    }
+    Q.coal_row_govt = g.map(function (p) { return UI.shortName(p); }).join('–');
+    Q.coal_row_player = has(Q.player_party || 'psoe') ? 1 : 0;
+    Q.coal_row_due = 1;
+  }
+  // The junior partner walks out: the senior governs alone, in minority.
+  function coalitionBreak(Q) {
+    var p = Q.coal_break_partner, g = (Q.govt_parties || []).slice();
+    Q.coal_break_due = 0;
+    if (g.indexOf(p) === -1) { return; }
+    Q.govt_parties = g.filter(function (x) { return x !== p; });
+    Q.coalition_strain = 2;
+    Q['rel_' + p] = Math.max(0, (Q['rel_' + p] || 40) - 25);
+    Q.ex_partner = p;
+    Q.government_type = UI.partyName(Q.govt_parties[0]) + ' minority government (after ' + UI.shortName(p) + ' left the coalition)';
+    if (p === 'cs') { Q.pact_cs = 0; } if (p === 'up') { Q.pact_up = 0; }
+    Q.pact_tri = 0;
+    if (p === (Q.player_party || 'psoe')) { Q.psoe_in_government = 0; Q.player_in_government = 0; }
+    allocateCabinet(Q, 'standard');
+    // a minority government's next budget is in danger
+    var playerLeads = Q.govt_parties[0] === (Q.player_party || 'psoe');
+    if (!playerLeads) {
+      Q.npc_budget_due = 1;
+      Q.npc_budget_time = (Q.time || 0) + 2 + Math.floor(Math.random() * 4);
+    }
+    recalculate(Q);
+  }
+  // A government without its partner loses its budget, and its leader
+  // decides whether to go to the country.
+  function npcBudget(Q) {
+    Q.npc_budget_due = 0;
+    var g = Q.govt_parties || [], c = Q.congress || {};
+    var seats = g.reduce(function (a, p) { return a + (c[p] || 0); }, 0);
+    Q.npc_budget_lost = seats >= 176 ? 0 : (Math.random() < 0.8 ? 1 : 0);
+    Q.npc_budget_election = Q.npc_budget_lost && Math.random() < 0.6 && !Q.election_year ? 1 : 0;
+    Q.npc_budget_pm = Q.pm;
+    if (Q.npc_budget_lost) {
+      var all = function (x) { var o = {}; VoteModel.CLASSES.forEach(function (k) { o[k] = x; }); return o; };
+      campaign(Q, Q.pm_party, all(-0.8));
+    }
+    if (Q.npc_budget_election) { callElection(Q); }
+    recalculate(Q);
+  }
   function monthlyWorld(Q) {
     var t = Q.year * 12 + Q.month;
     plotDrift(Q);
     grandCoalitionWear(Q);
+    coalitionMonthly(Q);
     if (Q.month === 5 && (Q.year === 2015 || Q.year === 2019 || Q.year === 2023) && Q.local_done !== Q.year) {
       Q.local_done = Q.year;
       localElections(Q);
@@ -2751,11 +2912,11 @@
       Q.pm = leaderOf(Q, 'psoe');
       Q.pm_party = 'psoe';
       Q.psoe_in_government = 1;
-      Q.govt_parties = Q.pact_up ? ['psoe', 'up'] : ['psoe'];
+      Q.govt_parties = Q.pact_tri ? ['psoe', 'up', 'cs'] : (Q.pact_up ? ['psoe', 'up'] : ['psoe']);
       if (Q.exiled && Q.player_line_left === 'coalition' && Q.player_party !== 'psoe') {
         Q.govt_parties = ['psoe', Q.player_party];
       }
-      Q.government_type = Q.govt_parties.length > 1 ? 'PSOE–' + UI.shortName(Q.govt_parties[1]) + ' coalition government'
+      Q.government_type = Q.govt_parties.length > 2 ? 'PSOE–' + UI.shortName('up') + '–Cs coalition government' : Q.govt_parties.length > 1 ? 'PSOE–' + UI.shortName(Q.govt_parties[1]) + ' coalition government'
         : (Q.pact_cs ? 'PSOE minority government with a Ciudadanos agreement' : 'PSOE minority government');
       if (Parliament.dependsOnIndependentists(Q.congress, Parliament.stancesForSanchez(Q))) {
         Q.depends_on_catalans = 1;
@@ -3057,6 +3218,7 @@
     Q.rajoy_declined = 0;
     Q.pact_cs = 0;
     Q.pact_up = 0;
+    Q.pact_tri = 0; Q.ex_partner = '';
     Q.up_talks = 0;
     Q.cs_talks = 0;
     var statusBefore = Q.government_status;
@@ -4893,6 +5055,23 @@
       cabinetFlags(Q);
       return cab;
     }
+    if (parties.length >= 3) {
+      // a three-way government: each partner gets a generous share (one
+      // ministry above its seats) and the second partner a Deputy premiership
+      var tot = parties.reduce(function (a, p) { return a + (Q.congress[p] || 1); }, 0);
+      var taken = {};
+      parties.slice(1).forEach(function (p, i) {
+        var n = Math.max(2, Math.round(keys.length * (Q.congress[p] || 1) / tot) + (i === 0 ? 0 : 1));
+        var list = (PARTNER_PREFS[p] || []).concat(keys).filter(function (k) { return k !== 'deputy' && !taken[k]; });
+        if (i === 0) { taken.deputy = p; n -= 1; }
+        list.slice(0, n).forEach(function (k) { taken[k] = p; });
+      });
+      keys.forEach(function (k) { var party = taken[k] || senior; cab[k] = { party: party, name: ministerName(party, k, Q) }; });
+      Q.cabinet = dedupeCabinet(Q, cab);
+      Q.cabinet_plan = 'tri';
+      cabinetFlags(Q);
+      return cab;
+    }
     var partner = parties[1];
     var sSeats = Q.congress[senior] || 1, pSeats = Q.congress[partner] || 1;
     var share = Math.max(2, Math.round(keys.length * pSeats / (sSeats + pSeats)));
@@ -6211,6 +6390,7 @@
     primaryEndorsements: primaryEndorsements, primaryVote: primaryVote, raceByProvince: raceByProvince,
     renderEndorsements: renderEndorsements, renderRepresentation: renderRepresentation,
     voteLaw: voteLaw,
+    courtFaction: courtFaction, coalitionBreak: coalitionBreak, npcBudget: npcBudget, triCheck: triCheck,
     startSnapPrimary: startSnapPrimary, snapEndorsements: snapEndorsements, snapPrimaryVote: snapPrimaryVote, settleCity: settleCity, cityArrangement: cityArrangement, leaderOf: leaderOf, trackHeld: trackHeld, renderCities: renderCities, cityElections: cityElections, CITIES: CITIES, base: base, podemosSplit: podemosSplit, renderRivalFactions: renderRivalFactions, rivalFactions: rivalFactions, RIVAL_FACTIONS: RIVAL_FACTIONS, renderCoalition: renderCoalition, ahistoricalTick: ahistoricalTick, fork: fork, renderSenateSide: renderSenateSide, pscSplit: pscSplit, pscChoice: pscChoice, leftSplit: leftSplit, splitChecks: splitChecks, rebelsFor: rebelsFor, renderLastVote: renderLastVote, govSenateMajority: govSenateMajority, lawEffects: lawEffects, roleFlags: roleFlags, plotDrift: plotDrift, baronsCoup: baronsCoup, renderPollChange: renderPollChange, ideologyLines: ideologyLines, lineDrift: lineDrift, rightRealignment: rightRealignment, voxCeiling: voxCeiling, catalanCrisisState: catalanCrisisState, catalanRepeat: catalanRepeat, voxFlow: voxFlow, factionMoods: factionMoods, renderSenate: renderSenate, renderEuroMap: renderEuroMap, renderLocalMap: renderLocalMap, regionVoteMap: regionVoteMap, primaryPoll: primaryPoll, budgetDeal: budgetDeal, dareBill: dareBill, LAWS: LAWS, lawStances: lawStances, renderPrimary: renderPrimary, render2014: render2014, race2014: race2014,
     isModerniser: isModerniser,
     formationClock: formationClock,

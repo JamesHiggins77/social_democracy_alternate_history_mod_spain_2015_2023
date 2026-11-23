@@ -16,6 +16,8 @@ You need 176 yes votes in the first ballot, or more yes than no votes in the sec
 
 - @sign_cs: Sign a government agreement with Ciudadanos
 - @sign_up: Sign a government agreement with Podemos
+- @sign_tri: Sign a three-way government agreement with Podemos and Ciudadanos
+- @court: Work on the other parties' internal balance
 - @referendum: Offer the Catalan parties talks on their demands
 - @debate: Go to the debate
 - @root: Not yet: keep negotiating
@@ -35,6 +37,44 @@ choose-if: up_talks >= 2 and pact_up = 0 and pact_cs = 0
 unavailable-subtitle: [? if pact_cs = 1 : Podemos will not support a government built on a deal with Ciudadanos. ?][? if pact_cs = 0 and up_talks < 2 : The talks with Podemos are not far enough advanced. ?]
 on-arrival: {! Q.pact_up = 1; Q.rel_up += 10; Q.rel_cs -= 15; Q.progressives_dissent -= 10; Q.regional_leaders_dissent += 12 + 8 * (Q.barons_veto || 0); Q.institutionalists_dissent += 6; if (window.SpainGame) { window.SpainGame.transfer(Q, 'psoe', {cs: 0.6, pp: 0.4}, {pensioners: 1.5, self_employed: 1.5, homemakers: 1}); window.SpainGame.transfer(Q, 'up', 'psoe', {workers: 1.5, unemployed: 1}); } !}
 go-to: share_posts
+
+@sign_tri
+title: A three-way government: PSOE, [+ up_short +] and Ciudadanos
+subtitle: Both vote yes and both get a generous share of the cabinet; the barons and the Socialist Left both grumble. [? if tri_up_cost > 0 : Winning over a populist-led Podemos costs [+ tri_up_cost +] in party funds. ?]
+choose-if: tri_possible = 1 and pact_cs = 0 and pact_up = 0
+unavailable-subtitle: [+ tri_reason +]
+on-arrival: {! Q.funds -= (Q.tri_up_cost || 0); Q.pact_tri = 1; Q.pact_up = 1; Q.pact_cs = 1; Q.cab_share = 'tri'; Q.cab_share_set = 1; Q.rel_up += 5; Q.rel_cs += 5; Q.regional_leaders_dissent += 6; Q.progressives_dissent += 6; Q.modernisers_dissent -= 6; Q.coalition_strain = 3; if (window.SpainGame) { window.SpainGame.campaign(Q, 'psoe', { professionals: 0.8, workers: 0.4, pensioners: 0.4 }); } !}
+go-to: sp_investiture
+
+What nobody thought possible in 2016 is signed in the Congress's Sala Constitucional: a programme for four years, a Deputy premiership for [+ up_short +], the economic portfolios for Ciudadanos, and a promise that nothing will depend on the independence parties. Everyone in the room knows how fragile it is.
+
+@court
+title: The other parties' internal balance
+subtitle: Costs party funds and an action each
+
+= The other parties' internal balance
+
+A three-way government needs a Ciudadanos run by its liberals and a Podemos run by its pragmatists. With money, favours and patience, you can help the right people inside each.
+
+- @court_cs: Help Ciudadanos's liberal wing (1.5 funds)
+- @court_up: Help Podemos's pragmatic left (1.5 funds)
+- @sp_investiture: Back
+
+@court_cs
+choose-if: funds >= 1.5
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.courtFaction(Q, 'cs'); } !}
+go-to: sp_investiture
+
+Discreet dinners with Ciudadanos's economists and its Catalan founders. The national liberals notice.
+
+@court_up
+choose-if: funds >= 1.5
+unavailable-subtitle: Not enough party funds.
+on-arrival: {! Q.month_actions += 1; if (window.SpainGame) { window.SpainGame.courtFaction(Q, 'up'); } !}
+go-to: sp_investiture
+
+Your people make sure the pragmatists get the credit for every deal. The pablistas call it buying them.
 
 @share_posts
 title: The share of the government

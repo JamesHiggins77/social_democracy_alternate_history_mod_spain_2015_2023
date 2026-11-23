@@ -192,6 +192,10 @@
     var dialogue = Q.cat_dialogue || 0;
     var st = budgetBase(Q, dialogue);
     // parties that signed a budget deal vote for it
+    // coalition partners vote for their own budget; a partner that has just
+    // walked out votes against it
+    (Q.govt_parties || []).forEach(function (p) { st[p] = 'yes'; });
+    if (Q.ex_partner && (Q.govt_parties || []).indexOf(Q.ex_partner) === -1 && !(Q.budget_deals || {})[Q.ex_partner]) { st[Q.ex_partner] = 'no'; }
     Object.keys(Q.budget_deals || {}).forEach(function (p) { if (Q.budget_deals[p]) { st[p] = 'yes'; } });
     return st;
   }
