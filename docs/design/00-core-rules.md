@@ -893,16 +893,23 @@ In both modes the PP's leadership contest is weighted by the strength of its fac
 
 **Cards:** every minister and regional president the game can appoint now has a hover card, including 35 new ones. Rival-party figures show their faction (e.g. "Faction: Ultra-Catholic nationalists" for Buxadé); PSOE figures already showed theirs.
 
-### 7.48 The Pragmatic Left and the Podemos–Sumar split
+### 7.48 Podemos's three broad factions and the Podemos–Sumar split
 
-- **New faction:** Podemos now has four currents. The new one is the **Pragmatic left**: Yolanda Díaz and the core of Sumar. It is labour-left, wins reforms by negotiation, and acts as a junior partner to the PSOE. Díaz (and Urtasun) now show "Faction: Pragmatic left (Sumar)".
-- **Historical balance:** the Pragmatic left grows from 2020 to lead the space by 2023: errejonistas 10, pragmatic left 55, pablistas 30, anticapitalists 5. In ahistorical runs, being in government from 2020 feeds the Pragmatic left.
-- **The split:**
-  - **When:** in historical runs, December 2023 once Sumar exists. In ahistorical runs, a fork with probability (pablistas + anticapitalists) / 60, capped at 90%.
-  - **Who goes where:** the pablistas and anticapitalists leave as a separate party, Podemos (`pod`, led by Ione Belarra). The Pragmatic left and the errejonistas stay in Sumar (`up`, led by Díaz).
-  - **What moves:** 10–50% of seats in every body, scaled by the hard factions' strength, plus up to 40% of Sumar's support.
-  - **Tested:** 8 of 46 deputies (real: 5 of 31), and Podemos at about 3.3% in the polls.
-- **Podemos afterwards:**
-  - It is a statewide party in the vote model.
-  - It follows Sumar against the right, but makes the PSOE earn its vote: it votes yes only when relations are 45 or more, otherwise abstains or votes no.
-  - Its two remaining factions appear in the Politics tab.
+Podemos's space has three broad factions:
+- **Pragmatic left:** Errejón's current and later Yolanda Díaz and the core of Sumar. Transversal, reforms by negotiation, a junior partner to the PSOE.
+- **Populist left:** the pablistas (Iglesias), later Belarra and Montero. Left populism, an alliance with IU, a harder line on the PSOE.
+- **Anticapitalist left:** Urbán and Teresa Rodríguez. The radical left, against governing with the PSOE.
+
+**Historical balance (pragmatic / populist / anticapitalist):**
+- 2014: 40 / 50 / 10
+- 2017: 37 / 53 / 10 (Vistalegre II)
+- 2021: 47 / 48 / 5
+- 2023: 65 / 30 / 5 (Sumar)
+
+In ahistorical runs, being in government or polling low strengthens the Pragmatic left; polling high strengthens the Populist left. Older saves merge the old currents into the three new ones.
+
+**The split** (`podemosSplit`):
+- **When:** December 2023 once Sumar exists (historical). In ahistorical runs, a fork with probability (populist + anticapitalist) / 60, capped at 90%.
+- **Who goes where:** the Populist and Anticapitalist left leave as Podemos (`pod`, led by Belarra). The Pragmatic left stays in Sumar (`up`, led by Díaz).
+- **What moves:** 10–50% of seats in every body and up to 40% of Sumar's support, scaled by the Populist and Anticapitalist left's strength. Tested: 8 of 46 deputies (real: 5 of 31); Podemos polls about 3.3%.
+- **Podemos in votes:** it follows Sumar against the right, but votes yes for the PSOE only with relations of 45 or more.

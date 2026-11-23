@@ -4004,7 +4004,7 @@
   // forms, or not at all.
   function podemosSplit(Q) {
     if (Q.pod_split || !Q.sumar_merged || !Q.rf || !Q.rf.up) { return; }
-    var f = Q.rf.up, hard = (f.pablistas || 0) + (f.anticapitalistas || 0);
+    var f = Q.rf.up, hard = (f.populist || 0) + (f.anticapitalistas || 0);
     var due = Q.ahistorical ? (ym2(Q) >= 202312 && fork(Q, 'pod_split', Math.min(0.9, hard / 60))) : ym2(Q) >= 202312;
     if (!due) { return; }
     Q.pod_split = 1; Q.pod_split_due = 1;
@@ -4014,7 +4014,7 @@
     Q.pod_moved_congress = Q.pod_moved.congress || 0;
     // voters: Podemos keeps the more radical, younger part of the vote
     if (Q.vm) { transfer(Q, 'up', 'pod', share(Q, 'up', Math.min(0.4, hard / 100 * 0.6))); }
-    Q.rf.pod = { pablistas: 100 * (f.pablistas || 0) / Math.max(1, hard), anticapitalistas: 100 * (f.anticapitalistas || 0) / Math.max(1, hard) };
+    Q.rf.pod = { populist: 100 * (f.populist || 0) / Math.max(1, hard), anticapitalistas: 100 * (f.anticapitalistas || 0) / Math.max(1, hard) };
     Q.rel_pod = Math.max(10, (Q.rel_up || 40) - 20);
     // Sumar is now led by Díaz with the pragmatic left
     Q.up_successor = 'Yolanda Díaz';
@@ -4830,14 +4830,13 @@
       ['national', 'National liberals', 'Rivera\'s 2018-19 turn (Girauta, Villegas): Spanish unity first, a veto on Sánchez, close to the PP.']
     ],
     up: [
-      ['errejonistas', 'Transversal populists', 'Íñigo Errejón\'s current: national-popular, aimed at the centre of the electorate, pragmatic with the PSOE.'],
-      ['pragmatic', 'Pragmatic left', 'Yolanda Díaz\'s current, the core of Sumar: labour-left, negotiated reforms (the 2021 labour reform), a junior partner to the PSOE.'],
-      ['pablistas', 'Left populists', 'Pablo Iglesias\'s current: an alliance with IU, a harder line on the PSOE, and from 2019 a coalition inside government.'],
-      ['anticapitalistas', 'Anticapitalists', 'Miguel Urbán and Teresa Rodríguez: the radical left, against governing with the PSOE; they left Podemos in 2020.']
+      ['pragmatic', 'Pragmatic left', 'The pragmatic, transversal left: Íñigo Errejón\'s current, and later Yolanda Díaz and the core of Sumar. Aimed at the centre of the electorate, reforms by negotiation, a junior partner to the PSOE.'],
+      ['populist', 'Populist left', 'Pablo Iglesias\'s current (the pablistas), later Ione Belarra and Irene Montero: left populism, an alliance with IU, a harder line on the PSOE.'],
+      ['anticapitalistas', 'Anticapitalist left', 'Miguel Urbán and Teresa Rodríguez: the radical left, against governing with the PSOE; they left Podemos in 2020.']
     ],
     pod: [
-      ['pablistas', 'Left populists', 'Ione Belarra and Irene Montero: Podemos after the break with Sumar; a harder line on the PSOE.'],
-      ['anticapitalistas', 'Anticapitalists', 'What remains of the radical current inside Podemos.']
+      ['populist', 'Populist left', 'Ione Belarra and Irene Montero: Podemos after the break with Sumar; a harder line on the PSOE.'],
+      ['anticapitalistas', 'Anticapitalist left', 'What remains of the radical current inside Podemos.']
     ],
     vox: [
       ['national', 'National conservatives', 'Santiago Abascal\'s core: Spanish unity, immigration and order; the party line.'],
@@ -4849,13 +4848,17 @@
   var FACTION_HISTORY = {
     pp: { 2014: [45, 40, 15], 2018: [25, 35, 40], 2022: [30, 45, 25], 2024: [25, 45, 30] },
     cs: { 2014: [40, 35, 25], 2017: [20, 45, 35], 2018: [15, 35, 50], 2020: [30, 45, 25] },
-    up: { 2014: [40, 3, 47, 10], 2017: [35, 3, 52, 10], 2019: [20, 5, 65, 10], 2021: [12, 35, 48, 5], 2023: [10, 55, 30, 5] },
+    up: { 2014: [40, 50, 10], 2017: [37, 53, 10], 2019: [25, 65, 10], 2021: [47, 48, 5], 2023: [65, 30, 5] },
     pod: { 2014: [85, 15], 2023: [90, 10] },
     vox: { 2014: [60, 15, 25], 2019: [55, 15, 30], 2023: [55, 35, 10], 2024: [55, 40, 5] }
   };
   function factionsInit(Q) {
-    if (Q.rf && Q.rf.up && Q.rf.up.pragmatic === undefined) { Q.rf.up.pragmatic = 5; }
-    if (Q.rf && !Q.rf.pod) { Q.rf.pod = { pablistas: 85, anticapitalistas: 15 }; }
+    // older saves: merge the old currents into the three broad ones
+    if (Q.rf && Q.rf.up && Q.rf.up.populist === undefined) {
+      var o = Q.rf.up;
+      Q.rf.up = { pragmatic: (o.errejonistas || 0) + (o.pragmatic || 0), populist: o.pablistas || 0, anticapitalistas: o.anticapitalistas || 0 };
+    }
+    if (Q.rf && (!Q.rf.pod || Q.rf.pod.populist === undefined)) { Q.rf.pod = { populist: 85, anticapitalistas: 15 }; }
     if (Q.rf) { return; }
     Q.rf = {};
     Object.keys(RIVAL_FACTIONS).forEach(function (p) {
@@ -4871,7 +4874,7 @@
       if (p === 'pod' && !Q.pod_split) { return; }
       if (p === 'up' && Q.pod_split) {
         // after the split, Sumar keeps only the pragmatic left and the errejonistas
-        cur.pablistas = 3; cur.anticapitalistas = 2;
+        cur.populist = 3; cur.anticapitalistas = 2;
       }
       if (!Q.ahistorical) {
         // follow the real balance
@@ -4885,7 +4888,7 @@
         var push = {};
         if (p === 'pp') { push.right = (t.vox || 0) / 10; push.centrists = (t.cs || 0) / 12; }
         if (p === 'cs') { push.national = Q.catalan_crisis ? 1 : 0; push.progressives = (Q.rel_cs || 40) > 55 ? 0.6 : 0; }
-        if (p === 'up') { push.pragmatic = Q.year >= 2020 && (Q.govt_parties || []).indexOf('up') !== -1 ? 0.8 : 0; push.pablistas = (Q.govt_parties || []).indexOf('up') !== -1 && Q.year < 2020 ? 0.8 : 0; push.anticapitalistas = (Q.econ_left || 0) < 0 ? 0.6 : 0; push.errejonistas = (t.up || 0) < 12 ? 0.5 : 0; }
+        if (p === 'up') { push.pragmatic = ((Q.govt_parties || []).indexOf('up') !== -1 ? 0.8 : 0) + ((t.up || 0) < 12 ? 0.5 : 0); push.populist = (t.up || 0) >= 15 ? 0.4 : 0; push.anticapitalistas = (Q.econ_left || 0) < 0 ? 0.6 : 0; }
         if (p === 'vox') { push.catholic = (Q.social_prog || 0) > 3 ? 0.8 : 0; push.liberals = (t.cs || 0) > 12 ? 0.5 : 0; }
         F.forEach(function (f) { cur[f[0]] = Math.max(3, cur[f[0]] + (push[f[0]] || 0) + 1.2 * gaussian()); });
       }
@@ -4922,7 +4925,7 @@
     if (top('cs') === 'progressives') { Q.rel_cs = Math.min(100, (Q.rel_cs || 40) + 0.3); }
     if (top('cs') === 'national') { partyRel(Q, 'pp', 'cs', 1); Q.rel_cs = Math.max(0, (Q.rel_cs || 40) - 0.3); }
     // Podemos
-    if (top('up') === 'errejonistas') { Q.rel_up = Math.min(100, (Q.rel_up || 40) + 0.3); }
+    if (top('up') === 'pragmatic') { Q.rel_up = Math.min(100, (Q.rel_up || 40) + 0.3); }
     if (top('up') === 'anticapitalistas') { Q.rel_up = Math.max(0, (Q.rel_up || 40) - 0.4); transfer(Q, 'up', 'iu', { students: 0.03, workers: 0.03 }); }
     // Vox
     if (top('vox') === 'liberals') { partyRel(Q, 'pp', 'vox', 0.5); transfer(Q, 'cs', 'vox', { self_employed: 0.03, professionals: 0.02 }); }

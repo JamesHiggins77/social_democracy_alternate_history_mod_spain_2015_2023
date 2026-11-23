@@ -1172,11 +1172,13 @@ test('a larger Vox or Podemos may back a moderate head of government and take ke
   assert.strictEqual(Q.cabinet.deputy.party, 'vox');
 });
 
-test('the Podemos-Sumar split: pablistas leave with Podemos, the pragmatic left stays in Sumar', () => {
+test('the Podemos-Sumar split: the populist left leaves with Podemos, the pragmatic left stays in Sumar', () => {
   const Q = newQ();
+  while (!(Q.year === 2023 && Q.month === 8)) { G.endOfMonth(Q); }
+  G.runGeneralElection(Q);
   while (!(Q.year === 2024 && Q.month === 2)) { G.endOfMonth(Q); }
   assert.strictEqual(Q.pod_split, 1);
   assert.ok(Q.congress.pod > 0);
-  assert.ok(Q.rf.up.pragmatic > Q.rf.up.pablistas);
+  assert.ok(Q.rf.up.pragmatic > Q.rf.up.populist);
   assert.strictEqual(require('../out/html/spain/entities.js').lookup('Yolanda Díaz').wing.indexOf('Pragmatic left') !== -1, true);
 });

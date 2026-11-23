@@ -619,8 +619,8 @@
   var FACTION_LABEL = {
     pp: { centrists: 'Centrists', pragmatists: 'Pragmatists', right: 'National-populist right' },
     cs: { progressives: 'Social liberals', liberals: 'Liberals', national: 'National liberals' },
-    up: { errejonistas: 'Transversal populists (errejonistas)', pragmatic: 'Pragmatic left (Sumar)', pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
-    pod: { pablistas: 'Left populists (pablistas)', anticapitalistas: 'Anticapitalists' },
+    up: { pragmatic: 'Pragmatic left', populist: 'Populist left', anticapitalistas: 'Anticapitalist left' },
+    pod: { populist: 'Populist left', anticapitalistas: 'Anticapitalist left' },
     vox: { national: 'National conservatives', catholic: 'Ultra-Catholic nationalists', liberals: 'Liberal conservatives' }
   };
   var FACTION_OF = {
@@ -637,9 +637,9 @@
     'Albert Rivera': 'national', 'Inés Arrimadas': 'liberals', 'Begoña Villacís': 'liberals', 'Luis Garicano': 'liberals', 'Toni Roldán': 'progressives',
     'Marta Rivera de la Cruz': 'liberals', 'Edmundo Bal': 'liberals', 'Francisco Igea': 'progressives', 'Juan Marín': 'liberals',
     'Juan Carlos Girauta': 'national', 'José Manuel Villegas': 'national',
-    'Pablo Iglesias': 'pablistas', 'Íñigo Errejón': 'errejonistas', 'Irene Montero': 'pablistas', 'Ione Belarra': 'pablistas',
-    'Pablo Echenique': 'pablistas', 'Teresa Rodríguez': 'anticapitalistas', 'Nacho Álvarez': 'pablistas', 'Pablo Bustinduy': 'errejonistas',
-    'Carolina Bescansa': 'errejonistas', 'Julio Rodríguez': 'pablistas', 'Yolanda Díaz': 'pragmatic', 'Ernest Urtasun': 'pragmatic',
+    'Pablo Iglesias': 'populist', 'Íñigo Errejón': 'pragmatic', 'Irene Montero': 'populist', 'Ione Belarra': 'populist',
+    'Pablo Echenique': 'populist', 'Teresa Rodríguez': 'anticapitalistas', 'Nacho Álvarez': 'populist', 'Pablo Bustinduy': 'pragmatic',
+    'Carolina Bescansa': 'pragmatic', 'Julio Rodríguez': 'populist', 'Yolanda Díaz': 'pragmatic', 'Ernest Urtasun': 'pragmatic',
     'Santiago Abascal': 'national', 'Rocío Monasterio': 'liberals', 'Javier Ortega Smith': 'national', 'Iván Espinosa de los Monteros': 'liberals',
     'Jorge Buxadé': 'catholic', 'Macarena Olona': 'national', 'Agustín Rosety': 'national', 'Francisco Serrano': 'national'
   };
