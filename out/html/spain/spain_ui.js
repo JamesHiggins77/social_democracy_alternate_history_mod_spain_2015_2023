@@ -122,11 +122,18 @@
     return out.length > 40 ? out.slice(0, 38).replace(/\s+\S*$/, '') + '…' : out;
   }
 
+  // Más País exists only from Sept 2019; before that the 'mp' slot holds
+  // Compromís (and Más Madrid's forerunners), so name it by game date.
+  function mpEarly() {
+    try { var Q = globalThis.dendryUI.dendryEngine.state.qualities; return Q.year * 12 + Q.month < 2019 * 12 + 9; } catch (e) { return false; }
+  }
   function partyName(id) {
+    if (id === 'mp' && mpEarly()) { return 'Compromís'; }
     return META[id] ? META[id].name : prettyMinor(id.replace(/^x:/, ''));
   }
 
   function shortName(id) {
+    if (id === 'mp' && mpEarly()) { return 'Compromís'; }
     return META[id] ? META[id].short : prettyMinor(id.replace(/^x:/, ''));
   }
 
