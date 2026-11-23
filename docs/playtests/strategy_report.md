@@ -64,3 +64,12 @@ The best runs reached 114–123 seats in 2019 and governed for 67–71 months. N
 4. **One game ended after only the 2015 election** (91 seats). This also needs investigating.
 
 Outcomes are noisy and most samples are small (often under 15 games per choice), so treat single-choice lifts as hints rather than rules.
+
+## Follow-up fixes (36 verification games: 24 historical, 12 ahistorical)
+
+- **Stuck caretaker committee:** this wasn't a bug. In those games the search chose to retire Sánchez, which ends the game, so the last leader shown was the caretaker. The caretaker committee already hands over to an elected leader after eight months.
+- **Coup protection:** when the critics cannot dissolve the Executive, the barons' attack is weaker (−18, was −12). Each loyal top post is worth 2.5 (was 1.5).
+- **Beating the establishment:** winning a primary after a coup, a challenge or from the backbench brings voters home. The PSOE gains about 4 points, mostly from Podemos and some from Cs, plus morale and Sanchismo. The bonus is full after an ouster and 70% after a coup survived in office.
+- **Government wear:** it now falls on the soft vote only. It shrinks as the PSOE nears about 19%. The 2023 result in historical runs went from a mean of about 80 seats to 101.
+- **Catalan crisis:** it now always ends. A hard line's effect fades, the movement tires after 30 months, and after four years a Junts-led Generalitat counts as governing pragmatically. In the verification runs the crisis lasted 40–49 months on average, with a longest of 55, and none was still running at the end.
+- **Snap election against Vox:** if the PSOE calls an early general election while Vox polls 10% or more, the polls understate the PSOE by 4–7% of its vote and overstate Vox, as in July 2023.
