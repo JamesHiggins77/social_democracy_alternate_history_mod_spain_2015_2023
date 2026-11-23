@@ -5286,6 +5286,16 @@
     'Comunidad Valenciana': 'Valencia', 'Región de Murcia': 'Murcia', 'País Vasco': 'Basque C.'
   };
 
+  // A president's surname, with the hover card of the full name when the
+  // game knows the person.
+  function presidentHtml(g) {
+    var full = String(g.president || '').replace(/ \(acting\)/, ''), E = root.SpainEntities;
+    var short = surname(g.president);
+    if (E && E.lookup && E.lookup(full)) {
+      return '<span class="sp-ent" tabindex="0" data-ent="' + full.replace(/"/g, '&quot;') + '" style="color:' + UI.partyColor(g.party) + '">' + short + '</span>';
+    }
+    return short;
+  }
   function renderRegions(Q, id) {
     var out = el(id);
     if (!out) {
@@ -5304,7 +5314,7 @@
       var g = reg.government;
       return '<tr class="sp-reg-row' + (r === selected ? ' sp-reg-selected' : '') + '" data-reg="' + r +
         '" tabindex="0"><td>' + (REGION_SHORT[r] || r) + '</td><td><span class="sp-swatch" style="background:' +
-        UI.partyColor(g.party) + '"></span>' + surname(g.president) + '</td><td class="sp-num">' +
+        UI.partyColor(g.party) + '"></span>' + presidentHtml(g) + '</td><td class="sp-num">' +
         reg.nextElection.slice(0, 4) + '</td></tr>';
     });
     var options = '<option value="">Choose a community…</option>' + regions.map(function (r) {

@@ -995,3 +995,18 @@ Five short news events show Vox while it is still tiny. Each fires once, at its 
 - **June 2015:** Abascal wins Vox's primary with 83.84% against 15.56% for Carmelo González.
 
 Figures come from the text the user supplied, taken from Spanish Wikipedia.
+
+### 7.55 No spoilers on cards; president links
+
+- **Regional presidents:** in the Regions tab table they now open their hover cards (surname shown, full name looked up).
+- **Party descriptions:** these are date-aware (`PARTY_DESC_T`): the latest segment the game has reached is used. Examples:
+  - the PP's Gürtel conviction appears from May 2018;
+  - Cs "went national" from 2015;
+  - Convergència's names change from CiU to DL, PDeCAT and then Junts;
+  - Compromís, Geroa, the PRC, UPyD, the BNG, Teruel Existe and foreign parties change at their dates.
+- **Notes on other cards (`NOTE_T`) are date-aware too:**
+  - the PSOE federations;
+  - alliances and small parties (Unidas Podemos, Sumar, En Comú Podem, En Marea, Ahora Madrid, Barcelona en Comú, Más Madrid, Más País, Junts pel Sí);
+  - the ministries (no names of future ministers);
+  - the Senate (Article 155 "never yet used" until October 2017) and the European Parliament (59 seats only after Brexit).
+- **Faction lines:** those that hinted at the future ("later turned right", "backed Susana Díaz in 2017") are now neutral.

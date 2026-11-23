@@ -115,7 +115,7 @@
     [['Francina Armengol', 'Armengol'], 'psoe', 'President of the Balearic Islands', 'Socialist Left, federalist'],
     [['Felipe González'], 'psoe', 'Prime Minister 1982–96', 'The old guard'],
     [['Alfredo Pérez Rubalcaba', 'Rubalcaba'], 'psoe', 'Secretary-General 2012–14', 'Institutionalists'],
-    [['José Luis Rodríguez Zapatero', 'Zapatero'], 'psoe', 'Prime Minister 2004–11', 'Former leader; backed Susana Díaz in 2017'],
+    [['José Luis Rodríguez Zapatero', 'Zapatero'], 'psoe', 'Prime Minister 2004–11', 'Former leader; close to the party\'s establishment'],
     [['Miquel Iceta', 'Iceta'], 'psoe', 'Leader of the PSC', 'Catalan socialists, federalist'],
     [['Salvador Illa', 'Illa'], 'psoe', 'PSC; Minister of Health', 'Catalan socialists'],
     [['Nadia Calviño', 'Calviño'], 'nonpartisan', 'Minister of Economic Affairs (independent, in the PSOE\'s share of the cabinet)', 'Modernisers: the government\'s technocratic wing'],
@@ -171,13 +171,13 @@
     [['Íñigo Errejón', 'Errejón'], 'up', 'Podemos co-founder; later Más País', 'Transversal populism (errejonismo)'],
     [['Irene Montero'], 'up', 'Podemos spokesperson; Minister of Equality', 'Pablismo, feminist left'],
     [['Ione Belarra', 'Belarra'], 'up', 'Secretary-General of Podemos (from 2021); Minister of Social Rights', 'Pablismo, Podemos loyalist'],
-    [['Yolanda Díaz'], 'up', 'Minister of Labour; leader of Sumar', 'Communist-turned-pragmatic left'],
+    [['Yolanda Díaz'], 'up', 'Minister of Labour; leader of Sumar', 'Labour-left, from the Communist Party'],
     [['Pablo Echenique', 'Echenique'], 'up', 'Secretary of Organisation of Podemos', 'Pablismo'],
     [['Teresa Rodríguez'], 'up', 'Podemos Andalusia', 'Anticapitalistas'],
     [['Ada Colau', 'Colau'], 'bcomu', 'Mayor of Barcelona', 'Municipalist left'],
     [['Manuela Carmena', 'Carmena'], 'ahoramadrid', 'Mayor of Madrid', 'Municipalist left'],
     // Ciudadanos
-    [['Albert Rivera', 'Rivera'], 'cs', 'Leader of Ciudadanos', 'Liberal, later turned right'],
+    [['Albert Rivera', 'Rivera'], 'cs', 'Leader of Ciudadanos', 'Liberal'],
     [['Inés Arrimadas', 'Arrimadas'], 'cs', 'Ciudadanos leader in Catalonia, later national leader', 'Anti-independence liberal'],
     [['Begoña Villacís', 'Villacís'], 'cs', 'Ciudadanos, Madrid', 'Liberal'],
     // Vox
@@ -215,7 +215,7 @@
     [['Ed Miliband', 'Miliband'], 'labour', 'Leader of the Labour Party (2010–15)', 'Soft left'],
     [['Harriet Harman'], 'labour', 'Acting leader of Labour (2015)', 'Labour right'],
     [['Jeremy Corbyn', 'Corbyn'], 'labour', 'Leader of the Labour Party (2015–20)', 'Socialist left'],
-    [['Keir Starmer', 'Starmer'], 'labour', 'Leader of the Labour Party (from 2020)', 'Soft left turned centrist'],
+    [['Keir Starmer', 'Starmer'], 'labour', 'Leader of the Labour Party (from 2020)', 'Soft left'],
     [['David Cameron', 'Cameron'], 'ukcon', 'Prime Minister of the UK (2010–16)', 'Liberal conservative'],
     [['Theresa May'], 'ukcon', 'Prime Minister of the UK (2016–19)', 'Conservative'],
     [['Boris Johnson'], 'ukcon', 'Prime Minister of the UK (2019–22)', 'Brexiteer conservative'],
@@ -578,16 +578,79 @@
   var NO_ARTICLE = { up: 1, vox: 1, cs: 1, mp: 1, te: 1, geroa: 1, bildu: 1, junts: 1, syriza: 1, lega: 1,
                      ahoramadrid: 1, bcomu: 1, servant: 1, ps: 1 };
 
+
+  // Date-aware descriptions: [from 'YYYY-MM', name (or null to keep), text].
+  // The latest segment whose date has been reached is used, so a card never
+  // describes what has not yet happened in the game.
+  var PARTY_DESC_T = {
+    pp: [['', null, 'the main party of the Spanish centre-right since 1989, which governed under Aznar (1996–2004) and is mired in the Gürtel and Bárcenas corruption cases'],
+         ['2018-05', null, 'the main party of the Spanish centre-right since 1989, which governed under Aznar and Rajoy and was convicted as a beneficiary of the Gürtel corruption network']],
+    cs: [['', null, 'founded in Catalonia in 2006 against Catalan nationalism'],
+         ['2015-01', null, 'founded in Catalonia in 2006 against Catalan nationalism, which went national in 2015 promising to regenerate Spanish politics']],
+    junts: [['', ['Convergència i Unió', 'Convergence and Union'], 'Jordi Pujol\'s federation of Convergència and Unió, which governed Catalonia for most of the democratic period and has turned to independence under Artur Mas'],
+            ['2015-06', ['Convergència / Democràcia i Llibertat', 'Democracy and Freedom'], 'Artur Mas\'s Convergència, which broke with Unió in 2015 and leads the independence push'],
+            ['2016-07', ['Partit Demòcrata Europeu Català (PDeCAT)', 'Catalan European Democratic Party'], 'the refounded Convergència, which leads the Catalan government under Carles Puigdemont'],
+            ['2017-10', ['Junts per Catalunya', 'Together for Catalonia'], 'heir to Jordi Pujol\'s Convergència, which led the 2017 independence push under Carles Puigdemont']],
+    cup: [['', null, 'an assembly-based party of the radical pro-independence left'],
+          ['2016-01', null, 'an assembly-based party, which forced Artur Mas out of the presidency in 2016']],
+    mp: [['', null, 'a green-left party'],
+         ['2019-09', null, 'founded in 2019 by Íñigo Errejón after his break with Podemos, which allied with Compromís in Valencia']],
+    compromis: [['', null, 'a coalition of Valencian nationalists and greens'],
+                ['2015-06', null, 'a coalition of Valencian nationalists and greens, which governs Valencia with the PSOE from 2015']],
+    prc: [['', null, 'led by Miguel Ángel Revilla, which governed Cantabria from 2003 to 2011 and lends its votes to whoever offers Cantabria the most'],
+          ['2015-07', null, 'led by Miguel Ángel Revilla, which governs Cantabria and lends its votes to whoever offers Cantabria the most']],
+    bng: [['', null, 'founded in 1982, the main Galician nationalist force'],
+          ['2020-07', null, 'founded in 1982, which became the main opposition in Galicia in 2020']],
+    te: [['', null, 'a citizens\' platform for depopulated rural Spain, founded in 1999'],
+         ['2019-04', null, 'a citizens\' platform for depopulated rural Spain, which entered Congress in 2019']],
+    geroa: [['', null, 'the Basque nationalist coalition of Navarre'],
+            ['2015-07', null, 'the Basque nationalist coalition of Navarre, which leads its government under Uxue Barkos from 2015']],
+    upyd: [['', null, 'founded in 2007 by Rosa Díez, which is being overtaken by Ciudadanos'],
+           ['2015-12', null, 'founded in 2007 by Rosa Díez, which was overtaken by Ciudadanos and lost all its seats in 2015']],
+    syriza: [['', null, 'which leads the Greek polls against austerity'],
+             ['2015-01', null, 'which won the Greek election of January 2015 against austerity'],
+             ['2015-08', null, 'which won the Greek election of 2015 against austerity and then accepted a third bailout']],
+    usdem: [['', null, 'one of the two major parties of the United States, which holds the presidency under Barack Obama'],
+            ['2017-01', null, 'one of the two major parties of the United States, which held the presidency under Barack Obama'],
+            ['2021-01', null, 'one of the two major parties of the United States, which held the presidency under Obama and now Biden']],
+    pditaly: [['', null, 'founded in 2007 by merging the post-communist and Christian-left traditions, which leads Italy under Matteo Renzi'],
+              ['2016-12', null, 'founded in 2007 by merging the post-communist and Christian-left traditions, which led Italy under Renzi'],
+              ['2019-09', null, 'founded in 2007 by merging the post-communist and Christian-left traditions, which led Italy under Renzi and now governs with the Five Star Movement']],
+    psportugal: [['', null, 'Portugal\'s main centre-left party'],
+                 ['2015-11', null, 'Portugal\'s main centre-left party, which governs with the support of the radical left from 2015']],
+    dksd: [['', null, 'Denmark\'s largest party, the party of the Danish welfare state'],
+           ['2019-06', null, 'Denmark\'s largest party, which combines a strict line on migration with the welfare state under Mette Frederiksen']],
+    ukcon: [['', null, 'the governing party of the United Kingdom from 2010'],
+            ['2016-06', null, 'the governing party of the United Kingdom from 2010, which held the Brexit referendum']],
+    cdu: [['', null, 'Germany\'s main centre-right party, which governs under Angela Merkel since 2005'],
+          ['2021-12', null, 'Germany\'s main centre-right party, which governed under Angela Merkel from 2005 to 2021']],
+    usrep: [['', null, 'one of the two major parties of the United States'],
+            ['2016-11', null, 'one of the two major parties of the United States, which won the presidency with Donald Trump in 2016']],
+    lrem: [['', ['En Marche', 'On the Move'], 'Emmanuel Macron\'s new movement'],
+           ['2017-05', null, 'founded in 2016 by Emmanuel Macron, which won the French presidency and parliament in 2017']],
+    psfrance: [['', null, 'which holds the French presidency under François Hollande'],
+               ['2017-05', null, 'which held the French presidency under Hollande and fell to 6% in the 2017 election']],
+    servant: [['', null, 'Ukraine\'s governing party'], ['2018-03', null, 'founded in 2018 and named after the TV series that made Volodymyr Zelensky famous']],
+    bcomu: [['', null, 'Ada Colau\'s municipalist platform'], ['2015-05', null, 'which won Barcelona city hall in 2015 with Ada Colau as mayor']],
+    ahoramadrid: [['', null, 'Manuela Carmena\'s municipalist platform'], ['2015-05', null, 'which won Madrid city hall in 2015 with Manuela Carmena as mayor']]
+  };
   function partySentence(id) {
     var d = PARTY_DESC[id];
     if (!d) {
       return '';
     }
-    var name = (NO_ARTICLE[id] ? '' : 'The ') + d[0] + (d[0] === d[1] ? '' : ' (en: ' + d[1] + ')');
+    var name0 = d[0], name1 = d[1], fact0 = d[3];
+    var seg = PARTY_DESC_T[id];
+    if (seg) {
+      var now = ymOf(gameQ());
+      seg.forEach(function (x) { if (!x[0] || now >= x[0]) { if (x[1]) { name0 = x[1][0]; name1 = x[1][1]; } fact0 = x[2]; } });
+    }
+    var name = (NO_ARTICLE[id] ? '' : 'The ') + name0 + (name0 === name1 ? '' : ' (en: ' + name1 + ')');
     var art = /^[aeiou]/i.test(d[2]) ? 'an ' : 'a ';
-    var fact = /^which/.test(d[3]) ? ' ' + d[3] : ', ' + d[3];
+    var fact = /^which/.test(fact0) ? ' ' + fact0 : ', ' + fact0;
     return name + ' is ' + art + d[2] + ' party in ' + (PLACE[id] || 'Spain') + fact + '.';
   }
+
 
   // Current leaders. PSOE, PP, Podemos, Cs and the sister parties follow
   // the game (window.SpainGame); the rest change on their real dates.
@@ -761,6 +824,63 @@
     return { role: parts.join('; '), current: cur };
   }
 
+
+  // Notes that would reveal the future are swapped for the version true at
+  // the game's date: {card name: [[from 'YYYY-MM', text], ...]}.
+  var NOTE_T = {
+    // federations
+    'Partido Socialista Obrero Español de Andalucía': [['', 'The largest federation of the PSOE, with about a quarter of its members. It has governed Andalusia without a break since 1982, under Rodríguez de la Borbolla, Chaves, Griñán and Susana Díaz, and is the stronghold of susanismo.'], ['2019-01', 'The largest federation of the PSOE, with about a quarter of its members. It governed Andalusia without a break from 1982 to 2019, under Rodríguez de la Borbolla, Chaves, Griñán and Susana Díaz, and is the stronghold of susanismo.']],
+    'Partit dels Socialistes de Catalunya': [['', 'A separate party federated with the PSOE since 1978, with its own group in the Catalan Parliament, led by Miquel Iceta since 2014.'], ['2021-09', 'A separate party federated with the PSOE since 1978. Led by Miquel Iceta and then Salvador Illa, who won the 2021 Catalan election.']],
+    'Partit Socialista del País Valencià': [['', 'The PSOE in the Valencian Community, led by Ximo Puig and in opposition to the PP since 1995.'], ['2015-06', 'The PSOE in the Valencian Community. Under Ximo Puig it governs with Compromís and Podemos (the Botànic pact).']],
+    'Partido dos Socialistas de Galicia': [['', 'The PSOE in Galicia, out of the Xunta since 2009.'], ['2020-07', 'The PSOE in Galicia, out of the Xunta since 2009 and overtaken by the BNG in 2020.']],
+    'Partido Socialista de Euskadi–Euskadiko Ezkerra': [['', 'The PSOE in the Basque Country, led by Idoia Mendia, an ally of Sánchez.'], ['2016-11', 'The PSOE in the Basque Country, junior partner of the PNV in the Basque government from 2016. Led by Idoia Mendia, an ally of Sánchez.']],
+    'Partido Socialista de Castilla-La Mancha': [['', 'The PSOE in Castilla-La Mancha, the federation of Emiliano García-Page.']],
+    'Partit Socialista de les Illes Balears': [['', 'The PSOE in the Balearics, led by Francina Armengol.'], ['2015-07', 'The PSOE in the Balearics, which governs under Francina Armengol from 2015.']],
+    'Partido Socialista de Navarra': [['', 'The PSOE in Navarre.'], ['2019-08', 'The PSOE in Navarre. María Chivite governs with Geroa Bai from 2019, with Bildu abstaining.']],
+    // alliances and parties
+    'Unidas Podemos': [['', 'The alliance of Podemos, IU and Equo under a new name for 2019.'], ['2020-01', 'The same alliance of Podemos, IU and Equo renamed for 2019. It entered the coalition government with the PSOE in January 2020.']],
+    'Sumar': [['', 'Yolanda Díaz\'s platform, joined by Podemos, IU, Más País, Compromís, the Comuns and others for the July 2023 election.'], ['2023-12', 'Yolanda Díaz\'s platform, joined by Podemos, IU, Más País, Compromís, the Comuns and others for the July 2023 election. Podemos left it in December 2023.']],
+    'En Comú Podem': [['', 'The Catalan alliance of Podemos with ICV, EUiA and Barcelona en Comú, led by Xavier Domènech.'], ['2016-06', 'The Catalan alliance of Podemos with ICV, EUiA and Barcelona en Comú, led by Xavier Domènech: first in Catalonia in the 2015 and 2016 general elections.']],
+    'En Marea': [['', 'The Galician alliance of Podemos, Anova, Esquerda Unida and the city "mareas".'], ['2016-06', 'The Galician alliance of Podemos, Anova, Esquerda Unida and the city "mareas": second in Galicia in the 2015 and 2016 general elections.']],
+    'Adelante Andalucía': [['', 'Podemos Andalucía (Teresa Rodríguez) and IU (Antonio Maíllo) together for the December 2018 Andalusian election.'], ['2018-12', 'Podemos Andalucía (Teresa Rodríguez) and IU (Antonio Maíllo) together for the December 2018 Andalusian election: 17 seats.']],
+    'Ahora Madrid': [['', 'Manuela Carmena\'s platform for the 2015 Madrid city election, built by Podemos with Ganemos Madrid and parts of IU and Equo.'], ['2015-06', 'Manuela Carmena\'s platform, built by Podemos with Ganemos Madrid and parts of IU and Equo; Carmena is mayor of Madrid.'], ['2019-03', 'Manuela Carmena\'s platform, built by Podemos with Ganemos Madrid and parts of IU and Equo; it has become Más Madrid.']],
+    'Barcelona en Comú': [['', 'Ada Colau\'s platform (2015), with ICV-EUiA, Podemos, Equo and Procés Constituent.'], ['2015-06', 'Ada Colau\'s platform (2015), with ICV-EUiA, Podemos, Equo and Procés Constituent; Colau is mayor of Barcelona.']],
+    'Zaragoza en Común': [['', 'Pedro Santisteve\'s platform (2015), with Podemos, IU, Equo and others.'], ['2015-06', 'Pedro Santisteve\'s platform (2015), with Podemos, IU, Equo and others; Santisteve is mayor of Zaragoza.']],
+    'Más Madrid': [['', 'Íñigo Errejón and Manuela Carmena\'s platform (2019), born from Ahora Madrid without Podemos.'], ['2019-05', 'Íñigo Errejón and Manuela Carmena\'s platform (2019), born from Ahora Madrid without Podemos. First in Madrid city in 2019.']],
+    'Más País': [['', 'Errejón\'s national party for the November 2019 election, a split from Podemos.'], ['2023-06', 'Errejón\'s national party for the November 2019 election, a split from Podemos; part of Sumar from 2023.']],
+    'Junts pel Sí': [['', 'A joint list for the plebiscitary Catalan election of 27 September 2015: Artur Mas\'s Convergència and Oriol Junqueras\'s ERC run together, with Demòcrates and MES, behind the independent Raül Romeva.'], ['2015-10', 'A temporary merger for the plebiscitary Catalan election of 27 September 2015: Convergència and ERC ran together, with Demòcrates and MES, behind Raül Romeva. It won 62 seats and governs with the CUP\'s support.'], ['2017-12', 'A temporary merger for the plebiscitary Catalan election of 27 September 2015: Artur Mas\'s Convergència and Oriol Junqueras\'s ERC ran together, with Demòcrates and MES, behind the independent Raül Romeva. It won 62 seats and governed with the CUP\'s support. The two parties ran separately again in December 2017 (Junts per Catalunya and ERC).']],
+    'Nueva Canarias': [['', 'A centre-left Canarian nationalist split from CC (2005), strong in Gran Canaria.']],
+    'Foro Asturias': [['', 'Francisco Álvarez-Cascos\'s 2011 split from the PP in Asturias.']],
+    'Geroa Bai': [['', 'Uxue Barkos\'s Basque nationalist coalition in Navarre, around the PNV.'], ['2015-07', 'Uxue Barkos\'s Basque nationalist coalition in Navarre, around the PNV; Barkos is President of Navarre.']],
+    'Unión del Pueblo Navarro / Navarra Suma': [['', 'The Navarrese centre-right regionalist party, the PP\'s ally in Navarre.'], ['2019-04', 'The Navarrese centre-right regionalist party, the PP\'s ally in Navarre; ran with the PP and Cs as Navarra Suma (NA+) in 2019.']],
+    'Chunta Aragonesista': [['', 'The left-wing Aragonese nationalist party.'], ['2019-08', 'The left-wing Aragonese nationalist party; in the Aragonese government with the PSOE from 2019.']],
+    'Teruel Existe': [['', 'The citizens\' platform of "empty Spain" in Teruel, founded in 1999.'], ['2019-04', 'The citizens\' platform of "empty Spain" in Teruel, with one deputy in Congress from 2019.']],
+    'Soria ¡Ya!': [['', 'A Soria citizens\' platform for depopulated rural Spain.'], ['2022-02', 'The Soria platform modelled on Teruel Existe: three seats in the Cortes of Castilla y León in 2022.']],
+    'Més per Mallorca': [['', 'The left-wing Majorcan nationalist party.'], ['2015-07', 'The left-wing Majorcan nationalist party; partner of the PSIB in the Balearic government from 2015.']],
+    'Convergència i Unió / Democràcia i Llibertat': [['', 'Artur Mas\'s centre-right Catalan nationalist federation of Convergència and Unió.'], ['2015-06', 'Artur Mas\'s Convergència, after the break with Unió in 2015; it runs as Democràcia i Llibertat in December 2015.']],
+    // ministries and chambers
+    'Deputy Prime Minister of Spain': [['', 'Coordinates the government and chairs the weekly meeting that prepares the Council of Ministers; stands in for the Prime Minister.']],
+    'Ministry of Finance (Spain)': [['', 'Ministry of Finance (Hacienda): taxes, the Tax Agency, the state budget and the financing of the regions. It writes the budget and negotiates it in Congress.']],
+    'Ministry of Economic Affairs (Spain)': [['', 'Ministry of Economic Affairs: macroeconomic policy, Spain\'s voice in the Eurogroup and with Brussels, banking and EU funds.']],
+    'Ministry of Defence (Spain)': [['', 'Ministry of Defence: the armed forces, missions abroad, NATO commitments and the intelligence service (CNI).']],
+    'Ministry of Justice (Spain)': [['', 'Ministry of Justice: the courts\' resources, the prosecution service\'s relations with the government, pardons and the reform of criminal law.']],
+    'Ministry of Labour and Social Economy': [['', 'Ministry of Labour: employment law, the minimum wage, collective bargaining and social dialogue with unions and employers.']],
+    'Ministry of Inclusion, Social Security and Migration': [['', 'Social Security, pensions and minimum income schemes; under coalition governments also dependency care and social rights.']],
+    'Ministry of Health (Spain)': [['', 'Ministry of Health: national health policy and coordination of the regions, which run the hospitals.'], ['2020-04', 'Ministry of Health: national health policy and coordination of the regions, which run the hospitals. It leads the response to COVID-19.']],
+    'Ministry of Education (Spain)': [['', 'Ministry of Education: the national curriculum, teacher training rules and grants; the regions run the schools. Every government passes its own education law.']],
+    'Ministry for the Ecological Transition': [['', 'The ministry for energy, climate, water and the coast.']],
+    'Ministry of Equality (Spain)': [['', 'Ministry of Equality: gender equality, violence against women, LGBTI rights.']],
+    'European Parliament': [['', '<b>Spain\'s 54 seats in the European Parliament</b>, out of 751. Spain votes as a single national constituency with no threshold. The Parliament co-legislates with the Council of the EU, approves the EU budget and the Commission. Spanish MEPs sit in European groups: the PSOE in the Socialists and Democrats (S&D), the PP in the European People\'s Party.'], ['2020-02', '<b>Spain\'s seats in the European Parliament: 54 from 2014, 59 after Brexit (2020)</b>, out of 705. Spain votes as a single national constituency with no threshold. The Parliament co-legislates with the Council of the EU, approves the EU budget and the Commission. Spanish MEPs sit in European groups: the PSOE in the Socialists and Democrats (S&D), the PP in the European People\'s Party.']],
+    'Senate of Spain': [['', '<b>The upper house: 208 elected senators plus about 58 appointed by the regional parliaments.</b> Each mainland province elects four by limited vote (the first party usually takes three). It can veto or amend bills, but Congress overrides it by absolute majority, or by simple majority after two months. Its one decisive power: authorising direct rule over a region under Article 155, never yet used.'], ['2017-10', '<b>The upper house: 208 elected senators plus about 58 appointed by the regional parliaments.</b> Each mainland province elects four by limited vote (the first party usually takes three). It can veto or amend bills, but Congress overrides it by absolute majority, or by simple majority after two months. Its one decisive power: authorising direct rule over a region under Article 155, used for the first time in October 2017.']]
+  };
+  function datedNote(key, note) {
+    var seg = NOTE_T[key];
+    if (!seg) { return note; }
+    var now = ymOf(gameQ()), out = note;
+    seg.forEach(function (x) { if (!x[0] || now >= x[0]) { out = x[1]; } });
+    return out;
+  }
+
   // Build one regex over every name, longest first, with letter boundaries.
   var INDEX = {};
   var names = [];
@@ -832,15 +952,15 @@
     }
     if (hit.kind === 'org') {
       var og = ORGS[hit.i];
-      return { kind: 'org', party: og[1], name: og[2], sub: og[3], note: og[4], wiki: og[5] };
+      return { kind: 'org', party: og[1], name: og[2], sub: og[3], note: datedNote(og[2], og[4]), wiki: og[5] };
     }
     if (hit.kind === 'affiliate') {
       var af = AFFILIATES[hit.i];
-      return { kind: 'affiliate', party: 'psoe', name: af[1], region: af[2], note: af[3], wiki: af[4] };
+      return { kind: 'affiliate', party: 'psoe', name: af[1], region: af[2], note: datedNote(af[1], af[3]), wiki: af[4] };
     }
     if (hit.kind === 'topic') {
       var t = TOPICS[hit.i];
-      return { kind: 'topic', name: text, wiki: t[1], note: t[2], img: imgUrl(TOPIC_IMG[t[0][0]]) };
+      return { kind: 'topic', name: text, wiki: t[1], note: datedNote(t[1], t[2]), img: imgUrl(TOPIC_IMG[t[0][0]]) };
     }
     return { kind: 'party', party: hit.id, wiki: NAME_WIKI[text] || PARTY_WIKI[hit.id] || null };
   }
