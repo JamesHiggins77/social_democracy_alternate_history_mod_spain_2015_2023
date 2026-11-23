@@ -388,6 +388,12 @@
   var LOCAL_FACTOR = { pp: 1.45, psoe: 1.3, up: 0.45, cs: 0.55, vox: 0.55, iu: 0.9, pnv: 1.6, erc: 1.6, junts: 1.7,
                        bildu: 1.8, cc: 1.6, bng: 1.6, prc: 1.6, compromis: 1.3, mp: 0.5, upn: 1.5, pacma: 0, upyd: 0.4 };
   var LOCAL_INDEPENDENTS = 0.11;
+  // 2011 municipal councillors (Ministry of the Interior via Wikipedia):
+  // the baseline for the 2015 comparison. IU counts IU-ICV-EUiA; Junts
+  // counts CiU. Parties without a sourced 2011 figure show as new.
+  var LOCAL_2011 = { pp: 26507, psoe: 21766, junts: 3896, iu: 2650, erc: 1422, bildu: 1138, pnv: 882, bng: 590, upyd: 152 };
+  // parties that did not exist (or barely stood) in 2011
+  var LOCAL_NEW_2015 = ['up', 'cs', 'vox', 'mp', 'pod', 'pacma'];
   function localElections(Q) {
     var poll = Q.true_poll || {};
     var raw = {}, sum = 0;
@@ -409,7 +415,7 @@
     Q.local_final_poll = JSON.parse(JSON.stringify(Q.poll || poll));
     Q.local_shares = JSON.parse(JSON.stringify(poll));
     if (Q.local_shares.vox) { Q.local_shares.vox *= (Q.year >= 2023 ? 0.15 : 0.05) / 0.55; }
-    var prev = Q.local_seats || null;
+    var prev = Q.local_seats || (Q.year === 2015 ? LOCAL_2011 : null);
     Q.local_prev = prev;
     Q.local_seats = seats;
     Q.local_year = Q.year;
@@ -423,6 +429,15 @@
     if (Q.local_poor && !Q.bluff_seen && Q.sanchez_leader && Q.psoe_in_government && !Q.acting && !Q.election_year) {
       Q.bluff_due = 1;
     }
+    // the headline: who gained and who lost most
+    if (prev) {
+      var ch = Object.keys(seats).filter(function (p) { return p !== 'ind'; }).map(function (p) { return [p, (seats[p] || 0) - (prev[p] || 0)]; })
+        .sort(function (a, b) { return b[1] - a[1]; });
+      var nm = function (p) { return UI.shortName(p); };
+      var fmt = function (n) { return (n > 0 ? '+' : '') + n.toLocaleString('en-GB'); };
+      Q.local_headline = 'Biggest gain: ' + nm(ch[0][0]) + ' (' + fmt(ch[0][1]) + ' councillors). Biggest loss: ' + nm(ch[ch.length - 1][0]) + ' (' + fmt(ch[ch.length - 1][1]) + '). ';
+      Q.local_psoe_change_text = fmt(Q.local_psoe_change);
+    } else { Q.local_headline = ''; }
     Q.rep_local = seats[Q.player_party || 'psoe'] || 0;
     Q.rep_local_total = LOCAL_COUNCILLORS;
     return seats;
@@ -3616,8 +3631,32 @@
     var out = el(id);
     if (!out || !Q.local_seats) { return; }
     var t = {}; Object.keys(Q.local_seats).forEach(function (p) { if (p !== 'ind') { t[p] = Q.local_seats[p]; } });
-    out.innerHTML = UI.resultsTable(t, null, { prevSeats: Q.local_prev ? (function () { var o = {}; Object.keys(Q.local_prev).forEach(function (p) { if (p !== 'ind') { o[p] = Q.local_prev[p]; } }); return o; })() : null, compact: true }) +
-      '<p class="sp-map-legend">Independents and local lists: ' + Q.local_seats.ind.toLocaleString('en-GB') + ' councillors. About ' + LOCAL_COUNCILLORS.toLocaleString('en-GB') + ' in all.</p>';
+    var first = (Q.local_prev_year || 2011) === 2011;
+    out.innerHTML = UI.resultsTable(t, null, { prevSeats: Q.local_prev ? (function () {
+      var o = {}; Object.keys(Q.local_prev).forEach(function (p) { if (p !== 'ind') { o[p] = Q.local_prev[p]; } });
+      if (first) { Object.keys(t).forEach(function (p) { if (o[p] === undefined && LOCAL_NEW_2015.indexOf(p) === -1) { o[p] = null; } }); }
+      return o; })() : null, compact: true }) +
+      '<p class="sp-map-legend">Independents and local lists: ' + Q.local_seats.ind.toLocaleString('en-GB') + ' councillors. About ' + LOCAL_COUNCILLORS.toLocaleString('en-GB') + ' in all.' +
+      ((Q.local_prev_year || 2011) === 2011 && Q.local_prev ? ' 2011 figures: Ministry of the Interior (PP 26,507, PSOE 21,766, CiU 3,896, IU 2,650, ERC 1,422, Bildu 1,138, PNV 882, BNG 590, UPyD 152); parties without a 2011 figure are not compared.' : '') + '</p>' +
+      localSwing(Q);
+  }
+  // Gains and losses since the last municipal elections, largest first.
+  function localSwing(Q) {
+    var now = Q.local_seats, prev = Q.local_prev;
+    if (!now || !prev) { return ''; }
+    var first = prev === LOCAL_2011 || (Q.local_prev_year || 2011) === 2011;
+    // parties with no sourced 2011 figure that did exist (e.g. CC) are left out of the comparison
+    var ids = Object.keys(now).filter(function (p) { return p !== 'ind' && (now[p] || 0) + (prev[p] || 0) >= 100 &&
+      !(first && prev[p] === undefined && LOCAL_NEW_2015.indexOf(p) === -1); });
+    var rows = ids.map(function (p) { return { id: p, d: (now[p] || 0) - (prev[p] || 0), isNew: prev[p] === undefined }; })
+      .sort(function (a, b) { return b.d - a.d; });
+    var max = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.d); }).concat([1]));
+    return '<p><strong>Gains and losses since ' + (Q.local_prev_year || 2011) + '</strong></p><table class="sp-results sp-compact sp-swing"><tbody>' + rows.map(function (r) {
+      var w = Math.round(48 * Math.abs(r.d) / max), up = r.d >= 0;
+      return '<tr><td><span class="sp-swatch" style="background:' + UI.partyColor(r.id) + '"></span>' + UI.shortName(r.id) + (r.isNew ? ' <em>(new)</em>' : '') +
+        '</td><td class="sp-num" style="color:' + (up ? '#1a7f37' : '#b42318') + ';font-weight:bold">' + (up ? '▲ +' : '▼ ') + r.d.toLocaleString('en-GB') +
+        '</td><td style="width:50%"><div class="sp-swing-bar ' + (up ? 'up' : 'down') + '" style="width:' + w + '%"></div></td></tr>';
+    }).join('') + '</tbody></table>';
   }
 
   // Wikipedia-style representation bars, in the party's colour.

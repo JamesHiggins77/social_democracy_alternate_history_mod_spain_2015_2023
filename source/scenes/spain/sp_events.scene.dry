@@ -1862,7 +1862,7 @@ if (typeof window !== 'undefined' && window.SpainGame) { window.SpainGame.render
 
 = May [+ local_year +]: municipal elections
 
-Spain elects its town and city councils. [+ local_winner +] wins the most councillors.
+Spain elects its town and city councils. [+ local_winner +] wins the most councillors. [+ local_headline +][? if year = 2015 : Across the country the two-party system cracks: the citizen platforms backed by Podemos win Madrid and Barcelona with Manuela Carmena and Ada Colau, and Ciudadanos enters hundreds of councils for the first time. ?]
 
 {!<div id="sp-local-result"></div>!}
 
@@ -1870,7 +1870,7 @@ Spain elects its town and city councils. [+ local_winner +] wins the most counci
 
 {!<div id="sp-local-pollchange"></div>!}
 
-[? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it loses [+ local_psoe_change +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]
+[? if local_poor = 1 : It is a bad night for the PSOE[? if local_psoe_change < 0 : : it changes by [+ local_psoe_change_text +] councillors ?], and the town halls it loses are the ones that organise its campaigns. ?][? if local_poor = 0 : The PSOE holds its ground in the town halls. ?]
 
 @realignment
 title: A realignment

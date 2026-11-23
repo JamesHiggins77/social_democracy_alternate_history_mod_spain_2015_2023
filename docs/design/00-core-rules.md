@@ -913,3 +913,12 @@ In ahistorical runs, being in government or polling low strengthens the Pragmati
 - **Who goes where:** the Populist and Anticapitalist left leave as Podemos (`pod`, led by Belarra). The Pragmatic left stays in Sumar (`up`, led by Díaz).
 - **What moves:** 10–50% of seats in every body and up to 40% of Sumar's support, scaled by the Populist and Anticapitalist left's strength. Tested: 8 of 46 deputies (real: 5 of 31); Podemos polls about 3.3%.
 - **Podemos in votes:** it follows Sumar against the right, but votes yes for the PSOE only with relations of 45 or more.
+
+### 7.49 Municipal gains and losses
+
+- **2015 baseline:** the 2015 municipal results now compare against the real 2011 councillor counts (Ministry of the Interior, via Wikipedia): PP 26,507, PSOE 21,766, CiU 3,896, IU-ICV-EUiA 2,650, ERC 1,422, Bildu 1,138, PNV 882, BNG 590, UPyD 152.
+- **Unsourced parties:** those without a sourced 2011 figure that did exist then (such as CC) show "n/a". Genuinely new parties (Podemos, Cs, Vox, Más País, PACMA) are marked "(new)".
+- **What the result shows:**
+  - a headline naming the biggest gain and the biggest loss;
+  - a "Gains and losses since <year>" chart, sorted, with green and red bars;
+  - for 2015, a paragraph on the citizen platforms winning Madrid and Barcelona and Cs entering councils.

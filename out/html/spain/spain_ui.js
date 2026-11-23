@@ -304,6 +304,8 @@
     });
     var seatChange = function (id) {
       if (!prevSeats) { return ''; }
+      // null marks a party with no comparable earlier figure
+      if (prevSeats[id] === null) { return '<span class="sp-map-legend">n/a</span>'; }
       return signed((totals[id] || 0) - (prevSeats[id] || 0), 0);
     };
     var head;

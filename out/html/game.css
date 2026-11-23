@@ -618,3 +618,6 @@ a.sp-ent { text-decoration: none; }
 .sp-vote-table td { vertical-align: top; }
 .sp-vote-chip { display: inline-block; white-space: nowrap; margin: 1px 6px 1px 0; }
 .sp-vote-chip em { color: #8a2a2a; font-size: 0.9em; }
+.sp-swing-bar { height: 10px; border-radius: 2px; }
+.sp-swing-bar.up { background: #1a7f37; }
+.sp-swing-bar.down { background: #b42318; }
