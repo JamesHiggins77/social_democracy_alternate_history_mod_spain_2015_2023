@@ -1194,7 +1194,7 @@
   function coupAttack(Q) {
     // without a majority in the Executive the critics cannot dissolve it by
     // resigning; a hostile chair of the Federal Committee helps them
-    return (Q.exec_can_fall === 0 ? -12 : 0) + (Q.fcpres_hostile ? 5 : 0) - 1.5 * (Q.posts_loyal || 0) +
+    return (Q.exec_can_fall === 0 ? -12 : 0) + (Q.fcpres_hostile ? 5 : 0) + (Q.congress_renewed ? 0 : 2) - 1.5 * (Q.posts_loyal || 0) +
       0.6 * (Q.plot || 0) + 0.5 * (Q.regional_leaders_strength || 30) +
       (Q.year <= 2018 && (Q.diaz_relation || 50) < 50 ? 8 : 0) + 2 * leftDrift(Q) +
       (Q.acting && (Q.congress.psoe || 0) < 100 ? 10 : 0);
@@ -5797,10 +5797,10 @@
     'Comunidad Valenciana': [['2012-03', 'Ximo Puig', 'Regional Barons'], ['2024-03', 'Diana Morant', 'Sanchismo']],
     'Extremadura': [['2008-03', 'Guillermo Fernández Vara', 'Regional Barons'], ['2024-05', 'Miguel Ángel Gallardo', 'Sanchismo']],
     'Galicia': [['2013-09', 'José Ramón Gómez Besteiro', 'Sanchismo'], ['2016-10', 'Caretaker committee', '—'], ['2017-10', 'Gonzalo Caballero', 'Sanchismo'], ['2021-12', 'Valentín González Formoso', 'Sanchismo'], ['2024-06', 'José Ramón Gómez Besteiro', 'Sanchismo']],
-    'Madrid': [['2015-03', 'Sara Hernández', 'Modernisers'], ['2017-09', 'José Manuel Franco', 'Sanchismo'], ['2021-10', 'Juan Lobato', 'Modernisers'], ['2025-02', 'Óscar López', 'Sanchismo']],
+    'Madrid': [['2015-03', 'Sara Hernández', 'Sanchismo'], ['2017-09', 'José Manuel Franco', 'Sanchismo'], ['2021-10', 'Juan Lobato', 'Modernisers'], ['2025-02', 'Óscar López', 'Sanchismo']],
     'Región de Murcia': [['2015-01', 'Rafael González Tovar', 'Regional Barons (Susanismo)'], ['2017-09', 'Diego Conesa', 'Sanchismo'], ['2021-10', 'José Vélez', 'Sanchismo'], ['2024-11', 'Francisco Lucas', 'Sanchismo']],
     'Navarra': [['2014-03', 'María Chivite', 'Sanchismo']],
-    'País Vasco': [['2014-09', 'Idoia Mendia', 'Modernisers'], ['2021-12', 'Eneko Andueza', 'Sanchismo']],
+    'País Vasco': [['2014-09', 'Idoia Mendia', 'Sanchismo'], ['2021-12', 'Eneko Andueza', 'Sanchismo']],
     'La Rioja': [['2015-01', 'Francisco Ocón', 'Regional Barons (Susanismo)'], ['2021-10', 'Concha Andreu', 'Sanchismo']]
   };
   // ---- Party posts and the Federal Executive are game state ----------
@@ -5819,19 +5819,22 @@
   // by faction at the start of the game. Sánchez was then Díaz's protégé:
   // "sanchismo" as a camp barely existed. The 17 who resigned on 28
   // September 2016 are the Andalusians, the barons' people and the old guard.
+  // [name, faction, side in Sept 2016: 'D' resigned (es.wikipedia, "Crisis
+  // del PSOE de 2016", after El Mundo 28/9/2016), 'S' named among the
+  // loyalists, '' not documented]. Factions are our reading.
   var EXEC_2014 = [
-    ['Micaela Navarro', 'Institutionalists'], ['Antonio Pradas', 'Regional Barons'], ['María José Sánchez Rubio', 'Regional Barons'],
-    ['Estefanía Martín Palop', 'Regional Barons'], ['Noemí Cruz', 'Regional Barons'], ['Javier Pizarro', 'Regional Barons'],
-    ['Juan Pablo Durán', 'Regional Barons'], ['Manuela Galiano', 'Regional Barons'], ['María Luz Rodríguez', 'Unionists'],
-    ['Emiliano García-Page', 'Regional Barons'], ['Ximo Puig', 'Regional Barons'], ['Tomás Gómez', 'Institutionalists'],
-    ['Eva Matarín', 'Institutionalists'], ['Carme Chacón', 'Institutionalists'], ['José Miguel Pérez', 'Regional Barons'],
-    ['Carlos Pérez Anadón', 'Regional Barons'], ['María Ascensión Murillo', 'Regional Barons'],
-    ['César Luena', 'Sanchismo'], ['Susana Sumelzo', 'Sanchismo'], ['María González Veracruz', 'Sanchismo'],
-    ['Hugo Morán', 'Modernisers'], ['Patxi López', 'Modernisers'], ['Meritxell Batet', 'Modernisers'],
-    ['Carmen Montón', 'Socialist Left'], ['Adriana Lastra', 'Socialist Left'], ['Manuel de la Rocha', 'Socialist Left'],
-    ['Eva Díaz Tezanos', 'Sanchismo'], ['José Ramón Gómez Besteiro', 'Modernisers'], ['Javier Abreu', 'Institutionalists'],
-    ['Sergio Gutiérrez', 'Socialist Left'], ['Iratxe García', 'Modernisers'], ['Luisa Carcedo', 'Institutionalists'],
-    ['Toni Ferrer', 'Unionists'], ['Rafael Simancas', 'Institutionalists'], ['Ignacio Sánchez Amor', 'Modernisers']
+    ['Micaela Navarro', 'Institutionalists', 'D'], ['Antonio Pradas', 'Regional Barons', 'D'], ['María José Sánchez Rubio', 'Regional Barons', 'D'],
+    ['Estefanía Martín Palop', 'Regional Barons', 'D'], ['Noemí Cruz', 'Regional Barons', 'D'], ['Francisco Pizarro', 'Regional Barons', 'D'],
+    ['Juan Pablo Durán', 'Regional Barons', 'D'], ['Manuela Galiano', 'Regional Barons', 'D'], ['María Luz Rodríguez', 'Unionists', 'D'],
+    ['Emiliano García-Page', 'Regional Barons', 'D'], ['Ximo Puig', 'Regional Barons', 'D'], ['Tomás Gómez', 'Institutionalists', 'D'],
+    ['Eva Matarín', 'Institutionalists', 'D'], ['Carme Chacón', 'Institutionalists', 'D'], ['José Miguel Pérez', 'Regional Barons', 'D'],
+    ['Carlos Pérez Anadón', 'Regional Barons', 'D'], ['María Ascensión Murillo', 'Regional Barons', 'D'],
+    ['César Luena', 'Sanchismo', 'S'], ['Meritxell Batet', 'Modernisers', 'S'], ['Patxi López', 'Modernisers', 'S'],
+    ['Carmen Montón', 'Socialist Left', 'S'], ['Adriana Lastra', 'Socialist Left', 'S'], ['Manuel de la Rocha', 'Socialist Left', 'S'],
+    ['Susana Sumelzo', 'Sanchismo', ''], ['María González Veracruz', 'Sanchismo', ''], ['Hugo Morán', 'Modernisers', ''],
+    ['Eva Díaz Tezanos', 'Sanchismo', ''], ['José Ramón Gómez Besteiro', 'Modernisers', ''], ['Javier Abreu', 'Institutionalists', ''],
+    ['Sergio Gutiérrez', 'Socialist Left', ''], ['Iratxe García', 'Modernisers', ''], ['Luisa Carcedo', 'Institutionalists', ''],
+    ['Toni Ferrer', 'Unionists', ''], ['Rafael Simancas', 'Institutionalists', ''], ['Ignacio Sánchez Amor', 'Modernisers', '']
   ];
   function rosterSeats(roster) {
     var o = {};
@@ -5876,7 +5879,7 @@
     // critics: the Susanismo camp plus half the waverers; with the
     // Executive's usual vacancies, half its seats is enough (17 of 35 in 2016)
     var crit = 0;
-    EXEC_FACTIONS.forEach(function (f) { var c = campShares(Q, f); crit += (ex[f] || 0) * ((c.Susanismo || 0) + 0.5 * (c['Neutral / others'] || 0)); });
+    Q.exec_roster.forEach(function (m) { var c = memberShares(Q, m); crit += (c.Susanismo || 0) + 0.5 * (c['Neutral / others'] || 0); });
     Q.exec_critics = Math.round(crit);
     Q.exec_can_fall = Q.sanchez_leader && Q.exec_critics >= Math.floor(tot / 2) ? 1 : 0;
     Q.posts_loyal = ['deputy', 'org', 'president', 'spokes', 'fcpres'].filter(function (k) {
@@ -5964,6 +5967,16 @@
     san = clamp(san * 0.6 + g, 0, 1); sus = clamp(sus * (1 - Math.max(0, g)), 0, 1 - san);
     return { Sanchismo: san, Susanismo: sus, 'Neutral / others': Math.max(0, 1 - san - sus) };
   }
+  // a member's own record pulls them beyond their faction's average
+  function memberShares(Q, m) {
+    var c = campShares(Q, m[1]);
+    if (!m[2] || m[1] === 'Sanchismo' || m[1] === 'Regional Barons') { return c; }
+    var k = m[2] === 'D' ? 'Susanismo' : 'Sanchismo', pull = 0.4, out = {};
+    Object.keys(c).forEach(function (x) { out[x] = c[x] * (1 - pull); });
+    out[k] = (out[k] || 0) + pull;
+    return out;
+  }
+  function argmax(c) { var b = null; Object.keys(c).forEach(function (k) { if (b === null || c[k] > c[b]) { b = k; } }); return b; }
   function mainCamp(Q, f) {
     var c = campShares(Q, f), best = null;
     Object.keys(c).forEach(function (k) { if (best === null || c[k] > c[best]) { best = k; } });
@@ -5983,7 +5996,11 @@
   // The Committee's camps: its structure, pulled halfway towards the
   // balance the leader actually commands there (federal_committee_balance)
   function committeeCamps(Q, fc) {
-    var c = toCamps(Q, fc), two = c.Sanchismo + c.Susanismo;
+    var c = toCamps(Q, fc);
+    // in a showdown most waverers must pick a side (14 of 253 did not, 2016)
+    var mv = Math.round(c['Neutral / others'] * 0.7), sh = c.Susanismo / Math.max(1, c.Sanchismo + c.Susanismo);
+    c.Susanismo += Math.round(mv * sh); c.Sanchismo += mv - Math.round(mv * sh); c['Neutral / others'] -= mv;
+    var two = c.Sanchismo + c.Susanismo;
     var bal = clamp((Q.federal_committee_balance || 50) / 100, 0.05, 0.95);
     var san = Math.round(two * (0.5 * c.Sanchismo / two + 0.5 * bal));
     c.Susanismo = two - san; c.Sanchismo = san;
@@ -5995,7 +6012,8 @@
   // its secretary-general's faction.
   function committeeSplit(Q) {
     syncParty(Q);
-    var ym = ymNow(Q), del = Q.congress_renewed ? 241 : 260, totM = 0, out = {};
+    // 253 members voted on 1 October 2016: 132 critics, 107 loyal, 14 undeclared
+    var ym = ymNow(Q), del = Q.congress_renewed ? 241 : 218, totM = 0, out = {};
     Object.keys(FEDERATIONS).forEach(function (r) { totM += MEMBERS[r] || 0; });
     Object.keys(FEDERATIONS).forEach(function (r) {
       var f = pick(FEDERATIONS[r], ym) || FEDERATIONS[r][0];
@@ -6041,7 +6059,9 @@
     }
     var ex = executiveSplit(Q), fc = committeeSplit(Q);
     var need = Math.floor(Q.exec_total / 2);
-    html += blocBlock('Federal Executive', camps ? toCamps(Q, ex) : ex,
+    var exCamps = { Sanchismo: 0, Susanismo: 0, 'Neutral / others': 0 };
+    Q.exec_roster.forEach(function (m) { exCamps[argmax(memberShares(Q, m))]++; });
+    html += blocBlock('Federal Executive', camps ? exCamps : ex,
       Q.sanchez_leader && !Q.psoe_interim ? 'If ' + need + ' members resign, the Executive is dissolved and the Secretary-General falls with it. About ' + Q.exec_critics + ' would. ' +
         (Q.exec_can_fall ? 'Your critics have the numbers to do it.' : 'Your critics no longer have the numbers: they would have to go through the Federal Committee.') : '');
     if (camps) {
@@ -6053,8 +6073,11 @@
         }).join('') + '</tbody></table><p class="sp-map-legend">Shifts with your course (moderate or progressive) and with how far sanchismo has grown.</p>';
     }
     html += '<details><summary class="sp-no-ent">Members of the Federal Executive</summary><table class="sp-results sp-compact"><tbody>' + Q.exec_roster.map(function (m) {
-      return '<tr><td>' + ent(m[0]) + '</td><td><span class="sp-swatch" style="background:' + (BLOC_COL[m[1]] || '#999') + '"></span>' + (camps ? mainCamp(Q, m[1]) : m[1]) + '</td></tr>';
+      return '<tr><td>' + ent(m[0]) + '</td><td><span class="sp-swatch" style="background:' + (BLOC_COL[m[1]] || '#999') + '"></span>' + (camps ? argmax(memberShares(Q, m)) : m[1]) + (m[2] === 'D' && Q.rebellion_used ? ' (resigned)' : '') + '</td></tr>';
     }).join('') + '</tbody></table></details>';
+    if (!Q.congress_renewed && Q.sanchez_leader !== undefined) {
+      html += '<h4>Ethics and Guarantees Commission</h4><p class="sp-map-legend">Isabel Celaá (chair) and Félix Bolaños lean to the leadership; María Jesús Montero, Inés Ayala and Wilfredo Jurado to Díaz. In a dispute over the statutes, this 3–2 majority can rule against the Secretary-General.</p>';
+    }
     html += blocBlock('Federal Committee', camps ? committeeCamps(Q, fc) : fc, 'The party\'s parliament between congresses: the federations\' delegations, the Executive and the parliamentary leaders.' + (Q.year === 2016 ? ' On 1 October 2016 Sánchez lost it 107–132.' : ''));
     var ym = ymNow(Q);
     html += '<h4>Regional federations</h4><table class="sp-results sp-compact"><thead><tr><th>Federation</th><th>Secretary-General</th><th>' + (camps ? 'Camp' : 'Faction') + '</th></tr></thead><tbody>' +
