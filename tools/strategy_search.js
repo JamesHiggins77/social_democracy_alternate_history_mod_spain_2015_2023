@@ -58,6 +58,12 @@ const pick = a => a[Math.floor(Math.random() * a.length)];
 const OUT = (() => { const i = args.indexOf('--out'); return i >= 0 ? args[i + 1] : null; })();
 const STATS = (() => { const i = args.indexOf('--stats'); return i >= 0 ? JSON.parse(fs.readFileSync(args[i + 1], 'utf8')) : null; })();
 const EPS = (() => { const i = args.indexOf('--eps'); return i >= 0 ? Number(args[i + 1]) : 0.15; })();
+// --boost: always use an adviser's action when one is ready, put laws and
+// budgets first, and rally and campaign whenever there is nothing to pass
+const BOOST = args.includes('--boost');
+const LAW_CARD = /legislation|budget|minimum_wage|pensions|labour|tax_reform|memory/;
+const CAMPAIGN_CARD = /rally|campaign|media_appearance|pensions_campaign|feminism|debate/;
+const PREF_OPT = /^Present |Present the budget|Pass |Go to the debate|Seek investiture/;
 const BAD = /nation of nations|federal Europe|Recentralise|Leave politics|Resign rather|dark arts|Rig|sabotage/i;
 function value(key) {
   const s = STATS && STATS[key];
@@ -85,7 +91,7 @@ async function playOne(game) {
   const Q = () => e.state.qualities;
   const taken = {};
   const seats = [], polls = [];
-  let lastE = 0, lastM = -1, steps = 0, stuck = 0;
+  let lastE = 0, lastM = -1, steps = 0, stuck = 0, usedAdv = 0, rallies = 0;
   while (!e.isGameOver() && steps < 6000) {
     steps += 1;
     const q = Q();
@@ -95,14 +101,28 @@ async function playOne(game) {
     if (q.year > 2026) { break; }
     const scene = e.getCurrentScene();
     if (scene.isHand) {
+      if (BOOST && (q.advisor_action_timer || 0) <= 0 && ui.pinned.length) {
+        const c = choose(ui.pinned.slice(), x => 'card:' + x.id);
+        taken['card:' + c.id] = 1; usedAdv += 1;
+        e.playPinnedCard(c.id);
+        continue;
+      }
       const hand = e.state.currentHands[e.state.sceneId] || [];
       if (hand.length < (scene.maxCards || 3) && ui.decks.length) {
-        const d = choose(ui.decks.slice(), x => 'deck:' + x.id) || ui.decks[0];
+        let d = null;
+        if (BOOST) {
+          const order = ['deck_budget', 'deck_government', 'deck_national'];
+          for (const id of order) { const x = ui.decks.find(k => k.id === id || (k.id || '').endsWith(id)); if (x && Math.random() < 0.85) { d = x; break; } }
+        }
+        d = d || choose(ui.decks.slice(), x => 'deck:' + x.id) || ui.decks[0];
         e.drawCard(d.id);
       }
       const now = e.state.currentHands[e.state.sceneId] || [];
       if (now.length) {
-        const c = choose(now.slice(), x => 'card:' + x.id);
+        let c = null;
+        if (BOOST) { c = now.find(x => LAW_CARD.test(x.id || '')) || now.find(x => CAMPAIGN_CARD.test(x.id || '')) || null; }
+        c = c || choose(now.slice(), x => 'card:' + x.id);
+        if (BOOST && CAMPAIGN_CARD.test(c.id || '')) { rallies += 1; }
         taken['card:' + c.id] = 1;
         e.playCard(c.id); stuck = 0;
       } else if (ui.pinned.length) {
@@ -124,7 +144,14 @@ async function playOne(game) {
     if (ok.length > 1) { const g = ok.filter(([c]) => !BAD.test(c.title || '')); if (g.length) { ok = g; } }
     if (!ok.length) { break; }
     const sid = e.state.sceneId;
-    const c = start.length ? ok[0] : choose(ok, ([o]) => 'opt:' + sid + ':' + (o.title || ''));
+    let c = null;
+    if (BOOST && !start.length) {
+      const pref = ok.filter(([o]) => PREF_OPT.test(o.title || '') && !/Repeal/.test(o.title || ''));
+      if (pref.length) { c = pref[Math.floor(Math.random() * pref.length)]; }
+      // in an adviser's card, take an action rather than going back
+      if (!c && /^sp_advisers/.test(sid)) { const acts = ok.filter(([o]) => !/^Back$|Not now/.test(o.title || '')); if (acts.length) { c = choose(acts, ([o]) => 'opt:' + sid + ':' + (o.title || '')); } }
+    }
+    c = c || (start.length ? ok[0] : choose(ok, ([o]) => 'opt:' + sid + ':' + (o.title || '')));
     if (!start.length) { taken['opt:' + sid + ':' + (c[0].title || '')] = 1; }
     e.choose(c[1]);
   }
@@ -133,7 +160,8 @@ async function playOne(game) {
   const advisers = Object.keys(q).filter(k => /^adv_[a-z]+$/.test(k) && q[k] === 1 && !/^adv_(count|pm|deputy|econ|loyalist|home)/.test(k)).map(k => k.slice(4));
   const meanPoll = polls.length ? polls.reduce((a, b) => a + b, 0) / polls.length : 0;
   const meanSeats = seats.length ? seats.reduce((a, b) => a + b.psoe, 0) / seats.length : 0;
-  return { score: meanSeats + 3 * meanPoll, meanSeats, meanPoll, maxPoll: Math.max(...polls), finalPoll: q.true_poll ? q.true_poll.psoe : 0, seats,
+  if (global.SpainGame.finalGrade) { global.SpainGame.finalGrade(q); }
+  return { grade: q.grade, gscore: q.grade_score, gparts: [q.grade_power, q.grade_laws, q.grade_budgets, q.grade_elections], laws: q.laws_passed || 0, lawsFailed: q.laws_failed || 0, budgets: q.budgets_passed || 0, usedAdv, rallies, score: meanSeats + 3 * meanPoll, meanSeats, meanPoll, maxPoll: Math.max(...polls), finalPoll: q.true_poll ? q.true_poll.psoe : 0, seats,
            pm_months: q.pm_months || 0, advisers, econ: q.econ_word, social: q.social_word, constit: q.const_word, eu: q.eu_word, style: q.style_word,
            cat_on: q.catalan_crisis || 0, cat_months: q.cat_crisis_months || 0, cat_ended: q.cat_crisis_ended || 0, est_bounce: q.est_defeated_bounce || 0, sanchismo: q.sanchismo, coup: q.rebellion_used || 0, leader: q.psoe_leader, taken: Object.keys(taken) };
 }
@@ -143,5 +171,5 @@ async function playOne(game) {
   const runs = [];
   for (let i = 0; i < GAMES; i++) { runs.push(await playOne(game)); }
   if (OUT) { fs.writeFileSync(OUT, JSON.stringify(runs)); }
-  runs.forEach((r, i) => console.log('#' + (i + 1), 'score', r.score.toFixed(1), 'seats', r.seats.map(s => s.psoe).join('/'), 'poll', r.meanPoll.toFixed(1), 'PM months', r.pm_months));
+  runs.forEach((r, i) => console.log('#' + (i + 1), 'grade', r.grade, r.gscore, '(' + r.gparts.join('/') + ')', 'laws', r.laws + '/' + (r.laws + r.lawsFailed), 'budgets', r.budgets, 'adviser uses', r.usedAdv, 'rallies', r.rallies, 'score', r.score.toFixed(1), 'seats', r.seats.map(s => s.psoe).join('/'), 'poll', r.meanPoll.toFixed(1), 'PM months', r.pm_months));
 })();
