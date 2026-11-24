@@ -73,3 +73,25 @@ Outcomes are noisy and most samples are small (often under 15 games per choice),
 - **Government wear:** it now falls on the soft vote only. It shrinks as the PSOE nears about 19%. The 2023 result in historical runs went from a mean of about 80 seats to 101.
 - **Catalan crisis:** it now always ends. A hard line's effect fades, the movement tires after 30 months, and after four years a Junts-led Generalitat counts as governing pragmatically. In the verification runs the crisis lasted 40–49 months on average, with a longest of 55, and none was still running at the end.
 - **Snap election against Vox:** if the PSOE calls an early general election while Vox polls 10% or more, the polls understate the PSOE by 4–7% of its vote and overstate Vox, as in July 2023.
+
+## Boosted strategy and the final grade (25 games)
+
+These games used the learned best choices plus three habits:
+- use an adviser's action whenever one is ready;
+- draw from the budget and government decks first, and present laws and budgets;
+- otherwise play rally and campaign cards.
+
+| | Boosted (25) | Strong bot, no boost (9) |
+|---|---|---|
+| Grades | A 1, B 4, C 10, D 5, E 1, F 4 | C 1, D 2, E 1, F 5 |
+| Mean grade score | 58 | 35 |
+| Months as PM | 73 | 37 |
+| Laws passed | 4.6 | — |
+| Budgets passed | 1.7 | — |
+| Mean PSOE seats per election | 117 | — |
+| Mean poll | 26.1% | — |
+
+- The A was a full term (104 months as PM), 8 laws and 5 budgets.
+- All 4 F games ended with Sánchez ousted in a coup and Susana Díaz leading the party. The PSOE still won 115–135 seats in those games, but under her, so they don't count for him.
+- Budgets are the weak point: about half the games passed one or none. Even long-serving governments often score 0 on budgets.
+- Laws mostly pass when presented (4.6 per game). The bot runs out of new bills: there are only ten in the agenda.
